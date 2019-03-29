@@ -2,28 +2,34 @@
 
 > JavaScript SDK for Cozify REST API
 
-[![NPM](https://img.shields.io/npm/v/cozify-sdk.svg)](https://www.npmjs.com/package/cozify-sdk) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
-## Install
 
-```bash
-npm install --save cozify-sdk
-```
 
 ## Usage
 
-```jsx
-import React, { Component } from 'react'
+```browsers (should use iife-version)
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script type="text/javascript" src="../dist/sdk-browser.js"></script>
+<script type="text/javascript">
+      let state = CozifySDK.state;
+      console.log(`Initial connection state now ${state.connectionState}`);
+      ...
+</script>
+ (more in /browser-example)
+```
 
-import MyComponent from 'cozify-sdk'
+```react-projects (should use es-version)
+import { state } from 'cozify-sdk'
+console.log(`Initial connection state now ${state.connectionState}`);
+...
+(...more in /example)
+```
 
-class Example extends Component {
-  render () {
-    return (
-      <MyComponent />
-    )
-  }
-}
+```node-projects (should use cjs-version)
+import { state } from 'cozify-sdk'
+console.log(`Initial connection state now ${state.connectionState}`);
+...
+(... more in /node-example)
 ```
 
 ## License
