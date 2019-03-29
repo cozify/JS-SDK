@@ -24,7 +24,7 @@ class User extends Person {
   role: ROLES_TYPE
   password: string
   eulaAcceted: boolean
-  /**
+  /*
    * Create User
    *
    * @param  {String} options.firstName
@@ -46,11 +46,17 @@ class User extends Person {
 
   }
 
+  /**
+   * Get USer state
+   */
   getState(): USER_STATE_TYPE {
     return _state;
   }
 
-
+  /**
+   * User action to change current language
+   * @type {LANGUAGES_TYPE}
+   */
   changeLanguage(newLanguage: LANGUAGES_TYPE): boolean {
     let retVel = false
     if (Object.values(LANGUAGES).indexOf(newLanguage) > -1) {
@@ -63,6 +69,9 @@ class User extends Person {
     return retVel;
   }
 
+  /**
+   * User action to accept EULA
+   */
   acceptEula(): boolean {
     let retVel = false
       this.eulaAcceted = true;
@@ -74,6 +83,11 @@ class User extends Person {
     return retVel;
   }
 
+  /**
+   * User action to log in
+   * @param {string} email
+   * @param {password} email  - fixed password
+   */
   doPwLogin(email: string, password: string): Promise<Object> {
     return new Promise( (resolve, reject) => {
       send( {command: COMMANDS.USER_LOGIN,  data:{email:email, password:password} })
@@ -94,6 +108,9 @@ class User extends Person {
     });
   }
 
+  /**
+   * User action to logout
+   */
   doLogout(): boolean {
     let retVel = false
       if (_state === USER_STATES.AUTHENTICATED) {
@@ -105,6 +122,10 @@ class User extends Person {
     return retVel;
   }
 
+  /**
+   * Change state of user state-machine
+   * @param {USER_STATE_TYPE} newState
+   */
   setState(newState: USER_STATE_TYPE): USER_STATE_TYPE {
     const oldState = _state
     switch (_state) {

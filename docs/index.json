@@ -1,0 +1,1830 @@
+[
+  {
+    "__docId__": 1,
+    "kind": "external",
+    "name": "Infinity",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Infinity",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Infinity",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 2,
+    "kind": "external",
+    "name": "NaN",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~NaN",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 3,
+    "kind": "external",
+    "name": "undefined",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~undefined",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 4,
+    "kind": "external",
+    "name": "null",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~null",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 5,
+    "kind": "external",
+    "name": "Object",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Object",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 6,
+    "kind": "external",
+    "name": "object",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~object",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 7,
+    "kind": "external",
+    "name": "Function",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Function",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 8,
+    "kind": "external",
+    "name": "function",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~function",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 9,
+    "kind": "external",
+    "name": "Boolean",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Boolean",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 10,
+    "kind": "external",
+    "name": "boolean",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~boolean",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 11,
+    "kind": "external",
+    "name": "Symbol",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Symbol",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 12,
+    "kind": "external",
+    "name": "Error",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Error",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 13,
+    "kind": "external",
+    "name": "EvalError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/EvalError",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~EvalError",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 14,
+    "kind": "external",
+    "name": "InternalError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/InternalError",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~InternalError",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 15,
+    "kind": "external",
+    "name": "RangeError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RangeError",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~RangeError",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 16,
+    "kind": "external",
+    "name": "ReferenceError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ReferenceError",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~ReferenceError",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 17,
+    "kind": "external",
+    "name": "SyntaxError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SyntaxError",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~SyntaxError",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 18,
+    "kind": "external",
+    "name": "TypeError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypeError",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~TypeError",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 19,
+    "kind": "external",
+    "name": "URIError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/URIError",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~URIError",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 20,
+    "kind": "external",
+    "name": "Number",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Number",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 21,
+    "kind": "external",
+    "name": "number",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~number",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 22,
+    "kind": "external",
+    "name": "Date",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Date",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 23,
+    "kind": "external",
+    "name": "String",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~String",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 24,
+    "kind": "external",
+    "name": "string",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~string",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 25,
+    "kind": "external",
+    "name": "RegExp",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~RegExp",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 26,
+    "kind": "external",
+    "name": "Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Array",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 27,
+    "kind": "external",
+    "name": "Int8Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int8Array",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Int8Array",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 28,
+    "kind": "external",
+    "name": "Uint8Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Uint8Array",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 29,
+    "kind": "external",
+    "name": "Uint8ClampedArray",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8ClampedArray",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Uint8ClampedArray",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 30,
+    "kind": "external",
+    "name": "Int16Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int16Array",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Int16Array",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 31,
+    "kind": "external",
+    "name": "Uint16Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint16Array",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Uint16Array",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 32,
+    "kind": "external",
+    "name": "Int32Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int32Array",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Int32Array",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 33,
+    "kind": "external",
+    "name": "Uint32Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint32Array",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Uint32Array",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 34,
+    "kind": "external",
+    "name": "Float32Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Float32Array",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 35,
+    "kind": "external",
+    "name": "Float64Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float64Array",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Float64Array",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 36,
+    "kind": "external",
+    "name": "Map",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Map",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 37,
+    "kind": "external",
+    "name": "Set",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Set",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 38,
+    "kind": "external",
+    "name": "WeakMap",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~WeakMap",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 39,
+    "kind": "external",
+    "name": "WeakSet",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~WeakSet",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 40,
+    "kind": "external",
+    "name": "ArrayBuffer",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~ArrayBuffer",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 41,
+    "kind": "external",
+    "name": "DataView",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~DataView",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 42,
+    "kind": "external",
+    "name": "JSON",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~JSON",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 43,
+    "kind": "external",
+    "name": "Promise",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Promise",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 44,
+    "kind": "external",
+    "name": "Generator",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Generator",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 45,
+    "kind": "external",
+    "name": "GeneratorFunction",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/GeneratorFunction",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~GeneratorFunction",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 46,
+    "kind": "external",
+    "name": "Reflect",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Reflect",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Reflect",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 47,
+    "kind": "external",
+    "name": "Proxy",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Proxy",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 48,
+    "kind": "file",
+    "name": "src/connection/send.js",
+    "content": "// @flow\nimport isEmpty from 'lodash/isEmpty';\nimport axios from 'axios';\nimport axiosRetry from 'axios-retry';\nimport {isNode} from '../utils.js'\nconst CLOUD_URL: string = \"https://cloud.cozify.fi/ui/0.2/\";\n\nexport const COMMANDS = Object.freeze({\n  USER_LOGIN: { method: 'POST', url: CLOUD_URL + \"user/login\", params: ['password', 'email'], config:{responseType: isNode ? 'blob' : 'stream', timeout: 5000} },\n  HUB_KEYS: { method: 'GET', url: CLOUD_URL + \"user/hubkeys\"}\n});\n\n\n\ntype ST = {\n  command?: Object,\n  url?: string,\n  method?: string,\n  authKey?: string,\n  hubKey?: string,\n  config?: Object,\n  data?: Object\n}\n\n/**\n * Send method for REST API\n * @param  {Object} command         Optional command like USER_LOGIN\n * @param  {String} url             Optional url\n * @param  {String} method          Optional method\n * @param  {String} authKey         Optional authKey\n * @param  {String} hubKey          Optional hubKey\n * @param  {Object} config          Optional config that might have timeout or responseType configs to be used over defaults\n * @param  {Object} data            Optional data to be sent\n * @return {Promise}                Promise of results or error\n */\nexport function send({command = {}, url = '', method = 'GET', authKey = '' , hubKey = '', config ={}, data = {}}: ST): Promise<Object> {\n  let body = {}\n\n  //console.log(\"send: command \", command);\n\n  if (typeof command != \"undefined\" && command){\n    if (command.method) {\n      method = command.method;\n    }\n    if (command.url) {\n      url = command.url;\n    }\n    if (command.params) {\n      command.params.forEach(param => {\n          body[param] = data[param];\n      });\n    }\n    if (command.config) {\n      config = command.config;\n    }\n  }\n\n  const bodyString = JSON.stringify(body);\n\n  const reqConf ={\n    timeout: 1000,\n    method: method,\n    //withCredentials: false,\n    headers: {\n      'Accept': 'application/json, application/binary, text/plain, */*',\n      'Content-Type': 'application/json;charset=UTF-8',\n      'Authorization': authKey\n    },\n    crossDomain: true,\n    responseType: 'application/json',\n    url: url,\n    data: isEmpty(bodyString)? null : bodyString\n  }\n\n  Object.assign(reqConf, config);\n\n  return new Promise( (resolve, reject) => {\n    if (command) {\n\n      axios.interceptors.response.use(response => {\n        if(response.headers['content-type'] === 'application/json' || response.headers['content-type'] === 'application/binary') {\n          return response\n        }\n        else {\n         console.error(\"send: unknown response type\");\n         debugger;\n         return Promise.reject(response);\n        }\n      }, error => Promise.reject(error));\n\n\n      axiosRetry(axios, { retries: 3, shouldResetTimeout: true });\n\n      // See options: https://github.com/axios/axios#request-config\n      axios(reqConf)\n        .then(function (response) {\n          // console.error(\"send: response \", response);\n          resolve(response.data);\n\n        })\n        .catch(function (error) {\n          console.log(error);\n          reject(error);\n        });\n\n    } else {\n      reject(new Error('Command not found.'));\n    }\n  });\n\n  //headers: {\"Authorization\" : userToken},\n  //contentType: \"application/json;charset=utf-8\",\n\n\n}\n",
+    "static": true,
+    "longname": "/Users/vesalindfors/Code/JS-SDK/src/connection/send.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 49,
+    "kind": "variable",
+    "name": "CLOUD_URL",
+    "memberof": "src/connection/send.js",
+    "static": true,
+    "longname": "src/connection/send.js~CLOUD_URL",
+    "access": "public",
+    "export": false,
+    "importPath": "cozify-sdk/src/connection/send.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 6,
+    "undocument": true,
+    "type": {
+      "types": [
+        "string"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 50,
+    "kind": "variable",
+    "name": "COMMANDS",
+    "memberof": "src/connection/send.js",
+    "static": true,
+    "longname": "src/connection/send.js~COMMANDS",
+    "access": "public",
+    "export": true,
+    "importPath": "cozify-sdk/src/connection/send.js",
+    "importStyle": "{COMMANDS}",
+    "description": null,
+    "lineNumber": 8,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 51,
+    "kind": "function",
+    "name": "send",
+    "memberof": "src/connection/send.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/connection/send.js~send",
+    "access": "public",
+    "export": true,
+    "importPath": "cozify-sdk/src/connection/send.js",
+    "importStyle": "{send}",
+    "description": "Send method for REST API",
+    "lineNumber": 36,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "command",
+        "description": "Optional command like USER_LOGIN"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "String"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "url",
+        "description": "Optional url"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "String"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "method",
+        "description": "Optional method"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "String"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "authKey",
+        "description": "Optional authKey"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "String"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "hubKey",
+        "description": "Optional hubKey"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "config",
+        "description": "Optional config that might have timeout or responseType configs to be used over defaults"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "data",
+        "description": "Optional data to be sent"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Promise"
+      ],
+      "spread": false,
+      "description": "Promise of results or error"
+    }
+  },
+  {
+    "__docId__": 52,
+    "kind": "file",
+    "name": "src/events/constants.js",
+    "content": "// @flow\n\n/**\n  * Enumeration of events, that could be\n  * USER_STATE_CHANGE, HUBS_STATE_CHANGE...\n  * @readonly\n  * @enum {string}\n  */\nexport const EVENTS = Object.freeze({\n  USER_STATE_CHANGED: 'USER STATE CHANGED',\n  HUBS_LIST_CHANGED: 'HUBS LIST CHANGED',\n});\nexport type EVENTSS_TYPE = $Values<typeof EVENTS>;\n",
+    "static": true,
+    "longname": "/Users/vesalindfors/Code/JS-SDK/src/events/constants.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 53,
+    "kind": "variable",
+    "name": "EVENTS",
+    "memberof": "src/events/constants.js",
+    "static": true,
+    "longname": "src/events/constants.js~EVENTS",
+    "access": "public",
+    "export": true,
+    "importPath": "cozify-sdk/src/events/constants.js",
+    "importStyle": "{EVENTS}",
+    "description": "Enumeration of events, that could be\nUSER_STATE_CHANGE, HUBS_STATE_CHANGE...",
+    "lineNumber": 9,
+    "unknown": [
+      {
+        "tagName": "@readonly",
+        "tagValue": ""
+      },
+      {
+        "tagName": "@enum",
+        "tagValue": "{string}"
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 54,
+    "kind": "file",
+    "name": "src/events/events.js",
+    "content": "// @flow\n\n/**\n * Really simply proxy to expose an emitter instance to be used across modules\n */\nimport mitt from 'mitt'\n\nexport const events: mitt.Emitter = mitt()\n\n\n",
+    "static": true,
+    "longname": "/Users/vesalindfors/Code/JS-SDK/src/events/events.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 55,
+    "kind": "variable",
+    "name": "events",
+    "memberof": "src/events/events.js",
+    "static": true,
+    "longname": "src/events/events.js~events",
+    "access": "public",
+    "export": true,
+    "importPath": "cozify-sdk/src/events/events.js",
+    "importStyle": "{events}",
+    "description": null,
+    "lineNumber": 8,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 56,
+    "kind": "file",
+    "name": "src/hub/constants.js",
+    "content": "/**\n  * Enumeration of hub state, that could be\n  * UNCLAIMED, CLAIMED, TOO_NEW_VERSION, NO_ACCESS or CONNECTED\n  * @readonly\n  * @enum {string}\n  */\nexport const HUB_STATES = Object.freeze({\n  LOST: 'lost',\n  UNCLAIMED: 'unclaimed',\n  CLAIMED: 'claimed',\n  TOO_NEW_VERSION: 'new version',\n  NO_ACCESS: 'no access',\n  CONNECTED: 'connected',\n});\n\nexport type HUB_STATE_TYPE = $Values<typeof HUB_STATES>;\n",
+    "static": true,
+    "longname": "/Users/vesalindfors/Code/JS-SDK/src/hub/constants.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 57,
+    "kind": "variable",
+    "name": "HUB_STATES",
+    "memberof": "src/hub/constants.js",
+    "static": true,
+    "longname": "src/hub/constants.js~HUB_STATES",
+    "access": "public",
+    "export": true,
+    "importPath": "cozify-sdk/src/hub/constants.js",
+    "importStyle": "{HUB_STATES}",
+    "description": "Enumeration of hub state, that could be\nUNCLAIMED, CLAIMED, TOO_NEW_VERSION, NO_ACCESS or CONNECTED",
+    "lineNumber": 7,
+    "unknown": [
+      {
+        "tagName": "@readonly",
+        "tagValue": ""
+      },
+      {
+        "tagName": "@enum",
+        "tagValue": "{string}"
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 58,
+    "kind": "file",
+    "name": "src/hub/hubs.js",
+    "content": "// @flow\nimport isEmpty from 'lodash/isEmpty';\nimport { HUB_STATES } from './constants.js';\nimport type { HUB_STATES_TYPE } from './constants.js';\nimport { events } from '../events/events.js'\nimport { EVENTS } from '../events/constants.js'\nimport {send, COMMANDS} from '../connection/send.js'\nimport { ROLES } from '../user/constants.js';\nimport {isNode} from '../utils.js'\n\n\n\nlet _hubState: HUB_STATES_TYPE = HUB_STATES.LOST;\n\nlet _hubs: Object = {}\n\n\n/**\n * Helper method to Base64 decode\n * @param  {string} str - string to be decoded\n * @return {<string>}  - decoded string\n */\nfunction urlBase64Decode(encoded): string {\n  let str = encoded.replace(/-/g, \"+\").replace(/_/g, \"/\");\n  let output = str;\n  switch (output.length % 4) {\n      case 0:\n      case 2:\n          output += \"==\";\n          break;\n      case 3:\n          output += \"=\";\n          break;\n      default:\n          throw \"Illegal base64url string!\"\n  }\n  var retVal = \"\";\n\n  let atob = function(a:string) {};\n  if(!isNode){\n    atob  = window.atob;\n  } else {\n    atob = function(a) {\n      return new Buffer(a, 'base64').toString('binary');\n    };\n  }\n\n  try {\n        retVal = atob(str);\n  } catch(error){\n      try {\n        retVal = atob(output);\n      } catch(error){\n        console.error( \"urlBase64Decode: trying atob failed\");\n      }\n  }\n  return retVal\n}\n\n/**\n * Helper method to extract hub info from JWT based hub keys\n * @param  {{Object<HubKeys>}} HubKeys - map of hub keys\n * @return {Object<HubInfo>}  - map of hub information\n */\nfunction setHubInfo(HUBKeys: Object): {} {\n  let hubs = {};\n  for (let key in HUBKeys) {\n      let coded = HUBKeys[key].split('.')[1];\n      let decoded = urlBase64Decode(coded);\n      let payload = JSON.parse(decoded);\n      let info = {};\n      info.id = payload.hubId || payload.hub_id;\n      info.name = payload.hubName || payload.hub_name;\n      info.hubKey = HUBKeys[key];\n      info.connState = undefined;\n      if (payload.role){\n          info.role = payload.role;\n          info.roleString = ''\n          Object.keys(ROLES).forEach( (key)=> {\n            if (ROLES[key] === info.role)\n              info.roleString = key\n          });\n      }\n      hubs[ info.name ] = info;\n  }\n  return hubs;\n}\n\n/**\n * fetch Hub Tokens by given authKey\n * @param  {string} authKey   - user authKey got from login\n * @return {Promise<Object>}\n */\nexport function fetchHubTokens( authKey: string ): Promise<Object> {\n  return new Promise( (resolve, reject) => {\n    let retVel = false;\n    send( {command: COMMANDS.HUB_KEYS,  authKey: authKey })\n      .then((tokens) => {\n        if (tokens) {\n          _hubs = setHubInfo(tokens);\n          //console.log(JSON.stringify(_hubs));\n          events.emit(EVENTS.HUBS_LIST_CHANGED, _hubs);\n        }\n        resolve(_hubs);\n      })\n      .catch((error) => {\n        console.error(\"fetchHubTokens error: \", error.data);\n        reject(error)\n      });\n  });\n\n}\n\nexport function getHubs () {\n  return _hubs;\n}\n\n",
+    "static": true,
+    "longname": "/Users/vesalindfors/Code/JS-SDK/src/hub/hubs.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 59,
+    "kind": "variable",
+    "name": "_hubState",
+    "memberof": "src/hub/hubs.js",
+    "static": true,
+    "longname": "src/hub/hubs.js~_hubState",
+    "access": "private",
+    "export": false,
+    "importPath": "cozify-sdk/src/hub/hubs.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 13,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 60,
+    "kind": "variable",
+    "name": "_hubs",
+    "memberof": "src/hub/hubs.js",
+    "static": true,
+    "longname": "src/hub/hubs.js~_hubs",
+    "access": "private",
+    "export": false,
+    "importPath": "cozify-sdk/src/hub/hubs.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 15,
+    "undocument": true,
+    "type": {
+      "types": [
+        "{}"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 61,
+    "kind": "function",
+    "name": "urlBase64Decode",
+    "memberof": "src/hub/hubs.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/hub/hubs.js~urlBase64Decode",
+    "access": "public",
+    "export": false,
+    "importPath": "cozify-sdk/src/hub/hubs.js",
+    "importStyle": null,
+    "description": "Helper method to Base64 decode  ",
+    "lineNumber": 23,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "encoded",
+        "description": "{string} str - string to be decoded"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "<string>"
+      ],
+      "spread": false,
+      "description": "decoded string"
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 62,
+    "kind": "function",
+    "name": "setHubInfo",
+    "memberof": "src/hub/hubs.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/hub/hubs.js~setHubInfo",
+    "access": "public",
+    "export": false,
+    "importPath": "cozify-sdk/src/hub/hubs.js",
+    "importStyle": null,
+    "description": "Helper method to extract hub info from JWT based hub keys  ",
+    "lineNumber": 65,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "HUBKeys",
+        "description": "{{Object<HubKeys>}} HubKeys - map of hub keys"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Object<HubInfo>"
+      ],
+      "spread": false,
+      "description": "map of hub information"
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 63,
+    "kind": "function",
+    "name": "fetchHubTokens",
+    "memberof": "src/hub/hubs.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/hub/hubs.js~fetchHubTokens",
+    "access": "public",
+    "export": true,
+    "importPath": "cozify-sdk/src/hub/hubs.js",
+    "importStyle": "{fetchHubTokens}",
+    "description": "fetch Hub Tokens by given authKey",
+    "lineNumber": 94,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "authKey",
+        "description": "user authKey got from login"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Promise<Object>"
+      ],
+      "spread": false,
+      "description": ""
+    }
+  },
+  {
+    "__docId__": 64,
+    "kind": "function",
+    "name": "getHubs",
+    "memberof": "src/hub/hubs.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/hub/hubs.js~getHubs",
+    "access": "public",
+    "export": true,
+    "importPath": "cozify-sdk/src/hub/hubs.js",
+    "importStyle": "{getHubs}",
+    "description": "",
+    "lineNumber": 114,
+    "params": [],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 65,
+    "kind": "file",
+    "name": "src/index.js",
+    "content": "// @flow\nexport {LANGUAGES} from './person/constants.js';\nexport { USER_STATES, ROLES } from './user/constants.js';\nexport { HUB_STATES } from './hub/constants.js';\nexport {events} from './events/events.js'\nexport { EVENTS } from './events/constants.js'\nexport { user } from './user/user.js';\nexport { fetchHubTokens, getHubs } from './hub/hubs.js';\nexport { CONNECTION_STATES, state } from './state/state.js';\n",
+    "static": true,
+    "longname": "/Users/vesalindfors/Code/JS-SDK/src/index.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 66,
+    "kind": "file",
+    "name": "src/person/constants.js",
+    "content": "// @flow\n\n/**\n  * Enumeration of language, that could be\n  * NONE, EN_UK or FI_FI\n  * @readonly\n  * @enum {string}\n  */\nexport const LANGUAGES = Object.freeze({\n  NONE: 'none',\n  EN_UK: 'en-uk',\n  FI_FI: 'fi-fi',\n});\nexport type LANGUAGES_TYPE = $Values<typeof LANGUAGES>;\n",
+    "static": true,
+    "longname": "/Users/vesalindfors/Code/JS-SDK/src/person/constants.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 67,
+    "kind": "variable",
+    "name": "LANGUAGES",
+    "memberof": "src/person/constants.js",
+    "static": true,
+    "longname": "src/person/constants.js~LANGUAGES",
+    "access": "public",
+    "export": true,
+    "importPath": "cozify-sdk/src/person/constants.js",
+    "importStyle": "{LANGUAGES}",
+    "description": "Enumeration of language, that could be\nNONE, EN_UK or FI_FI",
+    "lineNumber": 9,
+    "unknown": [
+      {
+        "tagName": "@readonly",
+        "tagValue": ""
+      },
+      {
+        "tagName": "@enum",
+        "tagValue": "{string}"
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 68,
+    "kind": "file",
+    "name": "src/person/person.js",
+    "content": "// @flow\nimport { LANGUAGES } from './constants.js';\nimport type { LANGUAGES_TYPE } from './constants.js';\n\n/*\n *  General person class to be used for current user and all other users\n */\nexport class Person {\n  firstName: string\n  lastName: string\n  email: string\n  language: LANGUAGES_TYPE\n\n\n  /*\n   * Create Person\n   * @param  {String} options.firstName - first name\n   * @param  {String} options.lastName  - last name\n   * @param  {String} options.email     - email address\n   * @param  {LANGUAGES_TYPE} options.language  - language\n   */\n  constructor({ firstName = '', lastName = '', email = '', language = LANGUAGES.NONE }: {firstName?: string, lastName?: string, email?: string, language?: LANGUAGES_TYPE} = {}) {\n    this.firstName = firstName;\n    this.lastName = lastName;\n    this.email = email;\n    this.language = language;\n  }\n\n  toString(): string {\n    return `Person ${this.firstName}  ${this.lastName}. Language: ${this.language}. Email: ${this.language}`;\n  }\n\n  print() {\n    console.log(this.toString());\n  }\n}\n",
+    "static": true,
+    "longname": "/Users/vesalindfors/Code/JS-SDK/src/person/person.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 69,
+    "kind": "class",
+    "name": "Person",
+    "memberof": "src/person/person.js",
+    "static": true,
+    "longname": "src/person/person.js~Person",
+    "access": "public",
+    "export": true,
+    "importPath": "cozify-sdk/src/person/person.js",
+    "importStyle": "{Person}",
+    "description": null,
+    "lineNumber": 8,
+    "undocument": true,
+    "interface": false
+  },
+  {
+    "__docId__": 70,
+    "kind": "member",
+    "name": "firstName",
+    "memberof": "src/person/person.js~Person",
+    "static": false,
+    "longname": "src/person/person.js~Person#firstName",
+    "access": "public",
+    "description": "",
+    "lineNumber": 9,
+    "type": {
+      "nullable": null,
+      "types": [
+        "string"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 71,
+    "kind": "member",
+    "name": "lastName",
+    "memberof": "src/person/person.js~Person",
+    "static": false,
+    "longname": "src/person/person.js~Person#lastName",
+    "access": "public",
+    "description": "",
+    "lineNumber": 10,
+    "type": {
+      "nullable": null,
+      "types": [
+        "string"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 72,
+    "kind": "member",
+    "name": "email",
+    "memberof": "src/person/person.js~Person",
+    "static": false,
+    "longname": "src/person/person.js~Person#email",
+    "access": "public",
+    "description": "",
+    "lineNumber": 11,
+    "type": {
+      "nullable": null,
+      "types": [
+        "string"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 73,
+    "kind": "member",
+    "name": "language",
+    "memberof": "src/person/person.js~Person",
+    "static": false,
+    "longname": "src/person/person.js~Person#language",
+    "access": "public",
+    "description": "",
+    "lineNumber": 12,
+    "type": {
+      "nullable": null,
+      "types": [
+        "LANGUAGES_TYPE"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 74,
+    "kind": "constructor",
+    "name": "constructor",
+    "memberof": "src/person/person.js~Person",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/person/person.js~Person#constructor",
+    "access": "public",
+    "description": "",
+    "lineNumber": 22,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": true,
+        "defaultValue": "{}",
+        "defaultRaw": {},
+        "name": "undefined",
+        "description": ""
+      }
+    ]
+  },
+  {
+    "__docId__": 79,
+    "kind": "method",
+    "name": "toString",
+    "memberof": "src/person/person.js~Person",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/person/person.js~Person#toString",
+    "access": "public",
+    "description": " ",
+    "lineNumber": 29,
+    "return": {
+      "nullable": null,
+      "types": [
+        "string"
+      ],
+      "spread": false,
+      "description": ""
+    },
+    "params": []
+  },
+  {
+    "__docId__": 80,
+    "kind": "method",
+    "name": "print",
+    "memberof": "src/person/person.js~Person",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/person/person.js~Person#print",
+    "access": "public",
+    "description": "",
+    "lineNumber": 33,
+    "params": [],
+    "return": null
+  },
+  {
+    "__docId__": 81,
+    "kind": "file",
+    "name": "src/state/state.js",
+    "content": "// @flow\n\n\n/**\n  * Enumeration of connection state, that could be\n  * UNCONNECTED, REMOTE, LOCAL or LOST\n  * @readonly\n  * @enum {string}\n  */\nexport const CONNECTION_STATES = Object.freeze({\n  UNCONNECTED: 'no connection',\n  REMOTE: 'remote',\n  LOCAL: 'local',\n  LOST: 'lost',\n});\ntype CONNECTION_STATE_TYPE = $Values<typeof CONNECTION_STATES>;\n\nlet _connectionState: CONNECTION_STATE_TYPE = CONNECTION_STATES.UNCONNECTED;\n/*\n * state\n * @type {Object}\n */\nexport const state = {\n  get connectionState(): CONNECTION_STATE_TYPE { return _connectionState; },\n  set connectionState(value: CONNECTION_STATE_TYPE) { _connectionState = value; },\n};\n",
+    "static": true,
+    "longname": "/Users/vesalindfors/Code/JS-SDK/src/state/state.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 82,
+    "kind": "variable",
+    "name": "CONNECTION_STATES",
+    "memberof": "src/state/state.js",
+    "static": true,
+    "longname": "src/state/state.js~CONNECTION_STATES",
+    "access": "public",
+    "export": true,
+    "importPath": "cozify-sdk/src/state/state.js",
+    "importStyle": "{CONNECTION_STATES}",
+    "description": "Enumeration of connection state, that could be\nUNCONNECTED, REMOTE, LOCAL or LOST",
+    "lineNumber": 10,
+    "unknown": [
+      {
+        "tagName": "@readonly",
+        "tagValue": ""
+      },
+      {
+        "tagName": "@enum",
+        "tagValue": "{string}"
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 83,
+    "kind": "variable",
+    "name": "_connectionState",
+    "memberof": "src/state/state.js",
+    "static": true,
+    "longname": "src/state/state.js~_connectionState",
+    "access": "private",
+    "export": false,
+    "importPath": "cozify-sdk/src/state/state.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 18,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 84,
+    "kind": "variable",
+    "name": "state",
+    "memberof": "src/state/state.js",
+    "static": true,
+    "longname": "src/state/state.js~state",
+    "access": "public",
+    "export": true,
+    "importPath": "cozify-sdk/src/state/state.js",
+    "importStyle": "{state}",
+    "description": null,
+    "lineNumber": 23,
+    "undocument": true,
+    "type": {
+      "types": [
+        "{\"connectionState\": function}"
+      ]
+    }
+  },
+  {
+    "__docId__": 85,
+    "kind": "file",
+    "name": "src/user/constants.js",
+    "content": "// @flow\n\n\n/**\n  * Enumeration of language, that could be\n  * NONE, EN_UK or FI_FI\n  * @readonly\n  * @enum {string}\n  */\nexport const LANGUAGES = Object.freeze({\n  NONE: 'none',\n  EN_UK: 'en-uk',\n  FI_FI: 'fi-fi',\n});\nexport type LANGUAGES_TYPE = $Values<typeof LANGUAGES>;\n\n\n/**\n  * Enumeration of user state, that could be\n  * WAITING_LANGUAGE, LANGUAGE_SET, WAITING_LOGIN, LOGIN_DONE, WAITING_EULA, EULA_ACCEPTED, AUTHENTICATED or LOGGED_OUT\n  * @readonly\n  * @enum {string}\n  */\nexport const USER_STATES = Object.freeze({\n  WAITING_LANGUAGE: 'wait language',\n  LANGUAGE_SET: 'language set',\n  WAITING_LOGIN: 'wait login',\n  LOGIN_DONE: 'login done',\n  WAITING_EULA: 'wait eula',\n  EULA_ACCEPTED: 'eula accepted',\n  AUTHENTICATED: 'logged in',\n  LOGGED_OUT: 'loged out',\n});\nexport type USER_STATE_TYPE = $Values<typeof USER_STATES>;\n\n\n/**\n  * Enumeration of ROLES, that could be\n  * ADMIN, USER, GUEST or ANONYMOUS\n  * @readonly\n  * @enum {string}\n  */\nexport const ROLES = Object.freeze({\n  ADMIN: 32,\n  USER: 8,\n  GUEST: 2,\n  ANONYMOUS: 1,\n});\nexport type ROLES_TYPE = $Values<typeof ROLES>;\n\n",
+    "static": true,
+    "longname": "/Users/vesalindfors/Code/JS-SDK/src/user/constants.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 86,
+    "kind": "variable",
+    "name": "LANGUAGES",
+    "memberof": "src/user/constants.js",
+    "static": true,
+    "longname": "src/user/constants.js~LANGUAGES",
+    "access": "public",
+    "export": true,
+    "importPath": "cozify-sdk/src/user/constants.js",
+    "importStyle": "{LANGUAGES}",
+    "description": "Enumeration of language, that could be\nNONE, EN_UK or FI_FI",
+    "lineNumber": 10,
+    "unknown": [
+      {
+        "tagName": "@readonly",
+        "tagValue": ""
+      },
+      {
+        "tagName": "@enum",
+        "tagValue": "{string}"
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 87,
+    "kind": "variable",
+    "name": "USER_STATES",
+    "memberof": "src/user/constants.js",
+    "static": true,
+    "longname": "src/user/constants.js~USER_STATES",
+    "access": "public",
+    "export": true,
+    "importPath": "cozify-sdk/src/user/constants.js",
+    "importStyle": "{USER_STATES}",
+    "description": "Enumeration of user state, that could be\nWAITING_LANGUAGE, LANGUAGE_SET, WAITING_LOGIN, LOGIN_DONE, WAITING_EULA, EULA_ACCEPTED, AUTHENTICATED or LOGGED_OUT",
+    "lineNumber": 24,
+    "unknown": [
+      {
+        "tagName": "@readonly",
+        "tagValue": ""
+      },
+      {
+        "tagName": "@enum",
+        "tagValue": "{string}"
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 88,
+    "kind": "variable",
+    "name": "ROLES",
+    "memberof": "src/user/constants.js",
+    "static": true,
+    "longname": "src/user/constants.js~ROLES",
+    "access": "public",
+    "export": true,
+    "importPath": "cozify-sdk/src/user/constants.js",
+    "importStyle": "{ROLES}",
+    "description": "Enumeration of ROLES, that could be\nADMIN, USER, GUEST or ANONYMOUS",
+    "lineNumber": 43,
+    "unknown": [
+      {
+        "tagName": "@readonly",
+        "tagValue": ""
+      },
+      {
+        "tagName": "@enum",
+        "tagValue": "{string}"
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 89,
+    "kind": "file",
+    "name": "src/user/user.js",
+    "content": "// @flow\nimport isEmpty  from 'lodash/isEmpty';\nimport isString from 'lodash/isString';\nimport { events } from '../events/events.js'\nimport { EVENTS } from '../events/constants.js'\n\nimport { Person } from '../person/person.js';\nimport {send, COMMANDS} from '../connection/send.js'\n\nimport { LANGUAGES } from '../person/constants.js';\nimport type { LANGUAGES_TYPE } from '../person/constants.js';\n\nimport { USER_STATES, ROLES } from './constants.js';\nimport type { USER_STATE_TYPE, ROLES_TYPE } from './constants.js';\n\n\nlet _state: USER_STATE_TYPE = USER_STATES.WAITING_LANGUAGE\n\n/**\n * User Class\n */\nclass User extends Person {\n  authKey: string\n  role: ROLES_TYPE\n  password: string\n  eulaAcceted: boolean\n  /*\n   * Create User\n   *\n   * @param  {String} options.firstName\n   * @param  {String} options.lastName\n   * @param  {String} options.email\n   * @param  {LANGUAGES_TYPE} options.language\n   * @param  {String} options.authKey     Atuhentication key for cloud access\n   * @param  {[ROLES_TYPE} options.role   Role\n   * @param  {boolen} options.eulaAcceted True when EULA is accepted\n   */\n  constructor({\n    firstName = '', lastName = '', email = '', language = LANGUAGES.NONE, authKey = '', role = ROLES.ANONYMOUS, eulaAcceted =false\n  }: {firstName: string, lastName: string, email: string, language: LANGUAGES_TYPE, authKey: string, role: ROLES_TYPE, password:string, eulaAcceted:boolean} = {}) {\n    super({\n      firstName, lastName, email, language,\n    });\n    this.authKey = authKey;\n    this.role = role;\n\n  }\n\n  /**\n   * Get USer state\n   */\n  getState(): USER_STATE_TYPE {\n    return _state;\n  }\n\n  /**\n   * User action to change current language\n   * @type {LANGUAGES_TYPE}\n   */\n  changeLanguage(newLanguage: LANGUAGES_TYPE): boolean {\n    let retVel = false\n    if (Object.values(LANGUAGES).indexOf(newLanguage) > -1) {\n      this.language = newLanguage;\n      if (_state === USER_STATES.WAITING_LANGUAGE) {\n        this.setState(USER_STATES.LANGUAGE_SET);\n      }\n      retVel = true;\n    }\n    return retVel;\n  }\n\n  /**\n   * User action to accept EULA\n   */\n  acceptEula(): boolean {\n    let retVel = false\n      this.eulaAcceted = true;\n      if (_state === USER_STATES.WAITING_EULA) {\n        this.setState(USER_STATES.EULA_ACCEPTED);\n      }\n      retVel = true;\n\n    return retVel;\n  }\n\n  /**\n   * User action to log in\n   * @param {string} email\n   * @param {password} email  - fixed password\n   */\n  doPwLogin(email: string, password: string): Promise<Object> {\n    return new Promise( (resolve, reject) => {\n      send( {command: COMMANDS.USER_LOGIN,  data:{email:email, password:password} })\n        .then((response) => {\n          if (response && isString(response)) {\n            this.authKey = response;\n            if (_state === USER_STATES.WAITING_LOGIN) {\n              this.setState(USER_STATES.LOGIN_DONE);\n            }\n          }\n          resolve(response);\n        })\n        .catch((error) => {\n          //console.error(error);\n          reject(false)\n        });\n\n    });\n  }\n\n  /**\n   * User action to logout\n   */\n  doLogout(): boolean {\n    let retVel = false\n      if (_state === USER_STATES.AUTHENTICATED) {\n        this.authKey = '';\n        this.setState(USER_STATES.LOGGED_OUT);\n      }\n      retVel = true;\n\n    return retVel;\n  }\n\n  /**\n   * Change state of user state-machine\n   * @param {USER_STATE_TYPE} newState\n   */\n  setState(newState: USER_STATE_TYPE): USER_STATE_TYPE {\n    const oldState = _state\n    switch (_state) {\n      case USER_STATES.WAITING_LANGUAGE: {\n        if (newState === USER_STATES.LANGUAGE_SET) {\n          if (!isEmpty(this.language)) {\n            _state = USER_STATES.WAITING_LOGIN;\n          }\n        }\n        break;\n      }\n      case USER_STATES.WAITING_LOGIN: {\n        if (newState === USER_STATES.LOGIN_DONE) {\n          if (!isEmpty(this.authKey)) {\n            if (isEmpty(this.eulaAcceted)) {\n              _state = USER_STATES.WAITING_EULA;\n\n            } else {\n              _state = USER_STATES.AUTHENTICATED;\n            }\n          }\n        }\n        break;\n      }\n      case USER_STATES.WAITING_EULA: {\n        if (newState === USER_STATES.EULA_ACCEPTED) {\n          _state = USER_STATES.AUTHENTICATED;\n        }\n        break;\n      }\n      case USER_STATES.AUTHENTICATED: {\n        if (newState === USER_STATES.LOGGED_OUT) {\n          _state = USER_STATES.WAITING_LOGIN;\n        }\n        break;\n      }\n      default: {\n        // statements;\n        break;\n      }\n    }\n    if (oldState !== _state) {\n      events.emit(EVENTS.USER_STATE_CHANGED, _state);\n    }\n    return _state;\n  }\n}\n\n\n/**\n * Singleton current user of the application\n * @type {User}\n */\nexport const user = new User();\n",
+    "static": true,
+    "longname": "/Users/vesalindfors/Code/JS-SDK/src/user/user.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 90,
+    "kind": "variable",
+    "name": "_state",
+    "memberof": "src/user/user.js",
+    "static": true,
+    "longname": "src/user/user.js~_state",
+    "access": "private",
+    "export": false,
+    "importPath": "cozify-sdk/src/user/user.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 17,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 91,
+    "kind": "variable",
+    "name": "user",
+    "memberof": "src/user/user.js",
+    "static": true,
+    "longname": "src/user/user.js~user",
+    "access": "public",
+    "export": true,
+    "importPath": "cozify-sdk/src/user/user.js",
+    "importStyle": "{user}",
+    "description": "Singleton current user of the application",
+    "lineNumber": 182,
+    "type": {
+      "nullable": null,
+      "types": [
+        "User"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 92,
+    "kind": "class",
+    "name": "User",
+    "memberof": "src/user/user.js",
+    "static": true,
+    "longname": "src/user/user.js~User",
+    "access": "public",
+    "export": true,
+    "importPath": "cozify-sdk/src/user/user.js",
+    "importStyle": null,
+    "description": "User Class",
+    "lineNumber": 22,
+    "pseudoExport": true,
+    "interface": false,
+    "extends": [
+      "src/person/person.js~Person"
+    ]
+  },
+  {
+    "__docId__": 93,
+    "kind": "member",
+    "name": "authKey",
+    "memberof": "src/user/user.js~User",
+    "static": false,
+    "longname": "src/user/user.js~User#authKey",
+    "access": "public",
+    "description": "",
+    "lineNumber": 23,
+    "type": {
+      "nullable": null,
+      "types": [
+        "string"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 94,
+    "kind": "member",
+    "name": "role",
+    "memberof": "src/user/user.js~User",
+    "static": false,
+    "longname": "src/user/user.js~User#role",
+    "access": "public",
+    "description": "",
+    "lineNumber": 24,
+    "type": {
+      "nullable": null,
+      "types": [
+        "ROLES_TYPE"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 95,
+    "kind": "member",
+    "name": "password",
+    "memberof": "src/user/user.js~User",
+    "static": false,
+    "longname": "src/user/user.js~User#password",
+    "access": "public",
+    "description": "",
+    "lineNumber": 25,
+    "type": {
+      "nullable": null,
+      "types": [
+        "string"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 96,
+    "kind": "member",
+    "name": "eulaAcceted",
+    "memberof": "src/user/user.js~User",
+    "static": false,
+    "longname": "src/user/user.js~User#eulaAcceted",
+    "access": "public",
+    "description": "",
+    "lineNumber": 26,
+    "type": {
+      "nullable": null,
+      "types": [
+        "boolean"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 97,
+    "kind": "constructor",
+    "name": "constructor",
+    "memberof": "src/user/user.js~User",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/user/user.js~User#constructor",
+    "access": "public",
+    "description": "",
+    "lineNumber": 38,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": true,
+        "defaultValue": "{}",
+        "defaultRaw": {},
+        "name": "undefined",
+        "description": ""
+      }
+    ]
+  },
+  {
+    "__docId__": 100,
+    "kind": "method",
+    "name": "getState",
+    "memberof": "src/user/user.js~User",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/user/user.js~User#getState",
+    "access": "public",
+    "description": "Get USer state  ",
+    "lineNumber": 52,
+    "return": {
+      "nullable": null,
+      "types": [
+        "USER_STATE_TYPE"
+      ],
+      "spread": false,
+      "description": ""
+    },
+    "params": []
+  },
+  {
+    "__docId__": 101,
+    "kind": "method",
+    "name": "changeLanguage",
+    "memberof": "src/user/user.js~User",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/user/user.js~User#changeLanguage",
+    "access": "public",
+    "description": "User action to change current language  ",
+    "lineNumber": 60,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "LANGUAGES_TYPE"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "newLanguage",
+        "description": ""
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "boolean"
+      ],
+      "spread": false,
+      "description": ""
+    },
+    "type": {
+      "nullable": null,
+      "types": [
+        "LANGUAGES_TYPE"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 102,
+    "kind": "member",
+    "name": "language",
+    "memberof": "src/user/user.js~User",
+    "static": false,
+    "longname": "src/user/user.js~User#language",
+    "access": "public",
+    "description": null,
+    "lineNumber": 63,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 103,
+    "kind": "method",
+    "name": "acceptEula",
+    "memberof": "src/user/user.js~User",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/user/user.js~User#acceptEula",
+    "access": "public",
+    "description": "User action to accept EULA  ",
+    "lineNumber": 75,
+    "return": {
+      "nullable": null,
+      "types": [
+        "boolean"
+      ],
+      "spread": false,
+      "description": ""
+    },
+    "params": []
+  },
+  {
+    "__docId__": 105,
+    "kind": "method",
+    "name": "doPwLogin",
+    "memberof": "src/user/user.js~User",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/user/user.js~User#doPwLogin",
+    "access": "public",
+    "description": "User action to log in  ",
+    "lineNumber": 91,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "email",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "password"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "email",
+        "description": "fixed password"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Promise<Object>"
+      ],
+      "spread": false,
+      "description": ""
+    }
+  },
+  {
+    "__docId__": 107,
+    "kind": "method",
+    "name": "doLogout",
+    "memberof": "src/user/user.js~User",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/user/user.js~User#doLogout",
+    "access": "public",
+    "description": "User action to logout  ",
+    "lineNumber": 114,
+    "return": {
+      "nullable": null,
+      "types": [
+        "boolean"
+      ],
+      "spread": false,
+      "description": ""
+    },
+    "params": []
+  },
+  {
+    "__docId__": 109,
+    "kind": "method",
+    "name": "setState",
+    "memberof": "src/user/user.js~User",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/user/user.js~User#setState",
+    "access": "public",
+    "description": "Change state of user state-machine  ",
+    "lineNumber": 129,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "USER_STATE_TYPE"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "newState",
+        "description": ""
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "USER_STATE_TYPE"
+      ],
+      "spread": false,
+      "description": ""
+    }
+  },
+  {
+    "__docId__": 110,
+    "kind": "file",
+    "name": "src/utils.js",
+    "content": "// @flow\n\n/* Helper to check run environment */\nexport let isNode: boolean = false;\nif (typeof process === 'object') {\n  if (typeof process.versions === 'object') {\n    if (typeof process.versions.node !== 'undefined') {\n      isNode = true;\n      console.log(\"Running in node.js\");\n    } else {\n      console.log(\"Running in browser\");\n    }\n  }\n}\n",
+    "static": true,
+    "longname": "/Users/vesalindfors/Code/JS-SDK/src/utils.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 111,
+    "kind": "variable",
+    "name": "isNode",
+    "memberof": "src/utils.js",
+    "static": true,
+    "longname": "src/utils.js~isNode",
+    "access": "public",
+    "export": true,
+    "importPath": "cozify-sdk/src/utils.js",
+    "importStyle": "{isNode}",
+    "description": null,
+    "lineNumber": 4,
+    "undocument": true,
+    "type": {
+      "types": [
+        "boolean"
+      ]
+    }
+  },
+  {
+    "kind": "index",
+    "content": "# cozify-sdk\n\n> JavaScript SDK for Cozify REST API\n\n\n### Usage\n\n#### Browsers (should use iife-version)\n```\n<script src=\"https://unpkg.com/axios/dist/axios.min.js\"></script>\n<script type=\"text/javascript\" src=\"../dist/sdk-browser.js\"></script>\n<script type=\"text/javascript\">\n      let state = CozifySDK.state;\n      console.log(`Initial connection state now ${state.connectionState}`);\n\n      ... more in /browser-example\n\n```\n\n#### React-projects (should use es-version)\n```\nimport { state } from 'cozify-sdk'\nconsole.log(`Initial connection state now ${state.connectionState}`);\n\n... more in /example\n\n```\n\n#### Node-projects (should use cjs-version)\n```\nimport { state } from 'cozify-sdk'\nconsole.log(`Initial connection state now ${state.connectionState}`);\n\n... more in /node-example\n\n```\n\n## License\n\nMIT © [cozify/JS-SDK]\n",
+    "longname": "/Users/vesalindfors/Code/JS-SDK/README.md",
+    "name": "./README.md",
+    "static": true,
+    "access": "public"
+  },
+  {
+    "kind": "packageJSON",
+    "content": "{\n  \"name\": \"cozify-sdk\",\n  \"version\": \"1.0.0\",\n  \"description\": \"JavaScript SDK for Cozify REST API\",\n  \"author\": \"tech-admin\",\n  \"license\": \"MIT\",\n  \"repository\": \"tech-admin/cozify-sdk\",\n  \"module\": \"dist/index.es.js\",\n  \"node\": \"dist/sdk-node.js\",\n  \"browser\": \"dist/sdk-browser.js\",\n  \"jsnext:main\": \"dist/index.es.js\",\n  \"engines\": {\n    \"node\": \">=8\",\n    \"npm\": \">=5\"\n  },\n  \"scripts\": {\n    \"build\": \"rollup -c\",\n    \"start\": \"rollup -c -w\",\n    \"buildall\": \"rollup -c rollup-all.config.js\",\n    \"startall\": \"rollup -c rollup-all.config.js -w\",\n    \"test\": \"jest src\",\n    \"test:watch\": \"jest src --watch --notify\",\n    \"cover\": \"jest src --coverage\",\n    \"flow\": \"flow\",\n    \"flow:check\": \"flow check ./src/\",\n    \"flow:status\": \"flow status\",\n    \"flow:coverage\": \"flow-coverage-report --config .flowcoverage.json\",\n    \"flow:deps\": \"flow-typed install\",\n    \"docs\": \" ./node_modules/.bin/esdoc\",\n    \"deploy\": \"gh-pages -d example/build\",\n    \"lint\": \"eslint src\",\n    \"lint:fix\": \"eslint src --fix\",\n    \"prepare\": \"npm run build\",\n    \"predeploy\": \"cd example && npm install && npm run build\",\n    \"precommit\": \"flow src && npm lint && npm test\",\n    \"prepublishOnly\": \"npm clean && npm lint && npm test && npm build\"\n  },\n  \"peerDependencies\": {},\n  \"devDependencies\": {\n    \"@babel/cli\": \"^7.2.3\",\n    \"@babel/core\": \"^7.4.0\",\n    \"@babel/node\": \"^7.2.2\",\n    \"@babel/plugin-external-helpers\": \"^7.2.0\",\n    \"@babel/plugin-proposal-object-rest-spread\": \"^7.4.0\",\n    \"@babel/plugin-transform-flow-strip-types\": \"^7.4.0\",\n    \"@babel/plugin-transform-runtime\": \"^7.4.0\",\n    \"@babel/preset-env\": \"^7.4.2\",\n    \"@babel/preset-flow\": \"^7.0.0\",\n    \"@babel/runtime\": \"^7.4.2\",\n    \"acorn\": \"^6.1.1\",\n    \"babel-eslint\": \"^10.0.1\",\n    \"babel-plugin-lodash\": \"^3.3.4\",\n    \"esdoc\": \"^1.1.0\",\n    \"esdoc-flow-type-plugin\": \"^1.1.0\",\n    \"esdoc-standard-plugin\": \"^1.0.0\",\n    \"eslint\": \"^5.15.3\",\n    \"eslint-config-airbnb-base\": \"^13.1.0\",\n    \"eslint-config-standard\": \"^12.0.0\",\n    \"eslint-plugin-flowtype\": \"^3.4.2\",\n    \"eslint-plugin-import\": \"^2.16.0\",\n    \"eslint-plugin-jest\": \"^22.4.1\",\n    \"eslint-plugin-node\": \"^8.0.1\",\n    \"eslint-plugin-promise\": \"^4.0.1\",\n    \"eslint-plugin-standard\": \"^4.0.0\",\n    \"flow-bin\": \"^0.95.1\",\n    \"flow-typed\": \"^2.5.1\",\n    \"jest\": \"^24.5.0\",\n    \"rollup\": \"^1.7.3\",\n    \"rollup-all\": \"^1.5.2\",\n    \"rollup-jest\": \"0.0.2\",\n    \"rollup-plugin-babel\": \"^4.3.2\",\n    \"rollup-plugin-commonjs\": \"^9.2.2\",\n    \"rollup-plugin-cpy\": \"^1.1.0\",\n    \"rollup-plugin-flow\": \"^1.1.1\",\n    \"rollup-plugin-flow-entry\": \"^0.3.1\",\n    \"rollup-plugin-json\": \"^4.0.0\",\n    \"rollup-plugin-node-resolve\": \"^4.0.1\",\n    \"rollup-plugin-npm\": \"^2.0.0\",\n    \"rollup-plugin-peer-deps-external\": \"^2.2.0\",\n    \"rollup-plugin-uglify\": \"^6.0.2\"\n  },\n  \"files\": [\n    \"dist\"\n  ],\n  \"dependencies\": {\n    \"axios\": \"^0.18.0\",\n    \"axios-retry\": \"^3.1.2\",\n    \"lodash\": \"^4.17.11\",\n    \"mitt\": \"^1.1.3\"\n  }\n}\n",
+    "longname": "/Users/vesalindfors/Code/JS-SDK/package.json",
+    "name": "package.json",
+    "static": true,
+    "access": "public"
+  }
+]

@@ -12,7 +12,7 @@ export class Person {
   language: LANGUAGES_TYPE
 
 
-  /**
+  /*
    * Create Person
    * @param  {String} options.firstName - first name
    * @param  {String} options.lastName  - last name

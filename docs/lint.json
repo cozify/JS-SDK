@@ -1,0 +1,106 @@
+[
+  {
+    "name": "send",
+    "filePath": "src/connection/send.js",
+    "lines": [
+      {
+        "lineNumber": 24,
+        "line": "/**"
+      },
+      {
+        "lineNumber": 25,
+        "line": " * Send method for REST API"
+      },
+      {
+        "lineNumber": 26,
+        "line": " * @param  {Object} command         Optional command like USER_LOGIN"
+      },
+      {
+        "lineNumber": 27,
+        "line": " * @param  {String} url             Optional url"
+      },
+      {
+        "lineNumber": 28,
+        "line": " * @param  {String} method          Optional method"
+      },
+      {
+        "lineNumber": 29,
+        "line": " * @param  {String} authKey         Optional authKey"
+      },
+      {
+        "lineNumber": 30,
+        "line": " * @param  {String} hubKey          Optional hubKey"
+      },
+      {
+        "lineNumber": 31,
+        "line": " * @param  {Object} config          Optional config that might have timeout or responseType configs to be used over defaults"
+      },
+      {
+        "lineNumber": 32,
+        "line": " * @param  {Object} data            Optional data to be sent"
+      },
+      {
+        "lineNumber": 33,
+        "line": " * @return {Promise}                Promise of results or error"
+      },
+      {
+        "lineNumber": 34,
+        "line": " */"
+      },
+      {
+        "lineNumber": 35,
+        "line": "export function send({command = {}, url = '', method = 'GET', authKey = '' , hubKey = '', config ={}, data = {}}: ST): Promise<Object> {"
+      }
+    ],
+    "codeParams": [
+      "*"
+    ],
+    "docParams": [
+      "command",
+      "url",
+      "method",
+      "authKey",
+      "hubKey",
+      "config",
+      "data"
+    ]
+  },
+  {
+    "name": "User#doPwLogin",
+    "filePath": "src/user/user.js",
+    "lines": [
+      {
+        "lineNumber": 85,
+        "line": "  /**"
+      },
+      {
+        "lineNumber": 86,
+        "line": "   * User action to log in"
+      },
+      {
+        "lineNumber": 87,
+        "line": "   * @param {string} email"
+      },
+      {
+        "lineNumber": 88,
+        "line": "   * @param {password} email  - fixed password"
+      },
+      {
+        "lineNumber": 89,
+        "line": "   */"
+      },
+      {
+        "lineNumber": 90,
+        "line": "  doPwLogin(email: string, password: string): Promise<Object> {"
+      }
+    ],
+    "codeParams": [
+      "email",
+      "password"
+    ],
+    "docParams": [
+      "email",
+      "email"
+    ]
+  }
+]
