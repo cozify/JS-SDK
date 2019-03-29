@@ -1,0 +1,33 @@
+{
+  "source": "./src",
+  "destination": "./docs",
+  "plugins": [
+      {
+        "name": "esdoc-standard-plugin",
+        "option": {
+          "lint": {"enable": true},
+          "coverage": {"enable": true},
+          "accessor": {"access": ["public", "protected", "private"], "autoPrivate": true},
+          "undocumentIdentifier": {"enable": true},
+          "unexportedIdentifier": {"enable": false},
+          "typeInference": {"enable": true},
+          "brand": {
+            "logo": "./cozify-logo.png",
+            "title": "Cozify SDK",
+            "description": "Cozify UI SDK for REST aPI",
+            "repository": "https://github.com/foo/bar",
+            "site": "http://my-library.org",
+            "author": "https://twitter.com/foo",
+            "image": "http://my-library.org/logo.png"
+          }
+        }
+
+      }
+    , {
+        "name": "esdoc-flow-type-plugin",
+        "option": {
+          "enable": true
+        }
+      }
+    ]
+}

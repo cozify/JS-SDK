@@ -1,0 +1,20 @@
+{
+  // ensures most commonly used transpilations e.g. import
+  "presets": ["@babel/preset-flow", ["@babel/preset-env", {targets: {node: "current"}}] ],
+
+  // some additional plugins: Flow and Rewire (described in the Jest section)
+  "plugins": [
+    "@babel/plugin-transform-flow-strip-types",
+    "@babel/plugin-proposal-object-rest-spread",
+    [
+      "@babel/plugin-transform-runtime",
+      {
+        "absoluteRuntime": false,
+        "corejs": false,
+        "helpers": true,
+        "regenerator": true,
+        "useESModules": false
+      }
+    ]
+  ]
+}

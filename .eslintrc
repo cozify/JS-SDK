@@ -1,0 +1,25 @@
+{
+  "parser": "babel-eslint",
+  "extends": [
+    "airbnb-base",
+    "plugin:jest/recommended",
+    "plugin:flowtype/recommended"
+  ],
+  "env": {
+    "es6": true
+  },
+  "plugins": [
+    "jest",
+    "flowtype",
+  ],
+  "parserOptions": {
+    "sourceType": "module"
+  },
+  "rules": {
+    // don't force es6 functions to include space before paren
+    "space-before-function-paren": 0,
+
+    // special case for rewire __get__
+    "no-underscore-dangle": ["error", { "allow": ["__get__"] }]
+  }
+}

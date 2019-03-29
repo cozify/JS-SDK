@@ -1,0 +1,16 @@
+[ignore]
+.*/lib/.*
+.*/flow-coverage/.*
+
+[include]
+
+[untyped]
+
+[libs]
+flow-typed
+
+[lints]
+
+[options]
+
+[strict]

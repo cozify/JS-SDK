@@ -1,0 +1,39 @@
+{
+    "srcDir": "src",
+
+    "mainModuleFileName": "index.js",
+
+    "mainModuleName": "CozifySDK",
+
+    "fileExtensions": [".js"],
+
+    "exclude": [],
+
+    "include": ["*"],
+
+    "copyAssets": false,
+
+    "uglify": false,
+
+    "interop": false,
+
+    "sourcemap": true,
+
+    "watch": {},
+
+    "globals": {},
+
+    "distConfig": {
+        "uglify": false,
+        "enabled": false,
+        "format": "iife",
+        "outDir": "dist"
+    },
+
+    "libConfig": {
+        "uglify": false,
+        "enabled": false,
+        "format": "cjs",
+        "outDir": "lib"
+    }
+}

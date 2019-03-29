@@ -1,0 +1,9 @@
+Testing Cozify SDK from node.js
+Initial connection state now no connection
+Initial user state wait language
+--1--
+--2--
+USER_STATE CHANGED:  wait eula
+Login response eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImRvbSI6InVrIn0.eyJraWQiOiIyMjQ5NjE2NS03OGU5LTRjZjktYmY4YS1mZTZkN2JiZmJmMmYiLCJpc3MiOiJDbG91ZCIsImlhdCI6MTU1MzgxNjYxOSwiZXhwIjoxNTUzODQ2MDE5LCJ1c2VyX2lkIjoiNzE2YmU5ZjQtMGY3My00MGNkLTg1OGEtMDAwZDY4M2NiYzE5Iiwicm9sZSI6MTI4fQ.spTUyeJJk2Gah6vXcKofi110AEUt-HGVPlNqZFFGKUc94NgVQvACgONgQF4ZY5TxWFBCeQw-2GqdYWQkeMPfLA
+USER_STATE CHANGED:  logged in
+--3--
