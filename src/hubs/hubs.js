@@ -1,6 +1,7 @@
 // @flow
 import isEmpty from 'lodash/isEmpty'
-import { HUB_STATES, REMOTE_POLL_INTERVAL_MS, HUB_PROTOCOL, HUB_PORT, HUB_CONNECTION_STATES } from './constants'
+import { HUB_STATES, REMOTE_POLL_INTERVAL_MS, HUB_PROTOCOL, HUB_PORT } from './constants'
+import { HUB_CONNECTION_STATES } from '../connection/constants'
 import { events } from '../events/events'
 import { EVENTS } from '../events/constants'
 import { COMMANDS, send, sendAll } from '../connection/send'

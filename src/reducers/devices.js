@@ -27,7 +27,7 @@ const devicesState = createSlice({
     deleteDevice(state, action) {
       const hubId = action.payload.hubId;
       const device = action.payload.device;
-      delete state[hubId]
+      delete state[hubId][device.id]
     }
   }
 })

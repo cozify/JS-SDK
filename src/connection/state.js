@@ -1,6 +1,6 @@
 // @flow
 
-import type { CLOUD_CONNECTION_STATE_TYPE } from './constants.js';
+import type { CLOUD_CONNECTION_STATE_TYPE, HUB_CONNECTION_STATES } from './constants.js';
 import { connectionsState, connectionsReducer } from "../reducers/connections";
 import { hubsState, hubsReducer } from "../reducers/hubs"
 import {getStore} from "../store.js"
@@ -18,5 +18,14 @@ export function setCloudConnectionState(value: CLOUD_CONNECTION_STATE_TYPE) {
  * @param {Object} hubAndSate hubId and new state
  */
 export function setHubConnectionState(hubAndSate) {
+    const stateNow = getStore().getState()
+    const storedHubs = hubsState.selectors.getHubs(stateNow)
+    /* If hub is unconnected, lets try remote */
+    if (hubAndSate.state === HUB_CONNECTION_STATES.UNCONNECTED && storedHubs[hubAndSate.hubId]){
+      if (storedHubs[hubAndSate.hubId].connectionState === HUB_CONNECTION_STATES.REMOTE){
+        hubAndSate.state = HUB_CONNECTION_STATES.LOCALE
+      }
+    }
     getStore().dispatch(hubsState.actions.setHubConnectionState(hubAndSate));
+
 }

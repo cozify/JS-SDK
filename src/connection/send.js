@@ -5,7 +5,7 @@ import axiosRetry from 'axios-retry'
 import { isNode } from '../utils.js'
 import { CLOUD_CONNECTION_STATES, CLOUD_URL, CLOUD_API_VERSION } from './constants'
 import { setCloudConnectionState, setHubConnectionState } from './state'
-import {  HUB_CONNECTION_STATES } from '../hubs/constants';
+import {  HUB_CONNECTION_STATES } from '../connection/constants';
 
 export const COMMANDS = Object.freeze({
   USER_LOGIN: { method: 'POST', url: CLOUD_URL + "user/login", params: ['password', 'email'], config:{responseType: isNode ? 'blob' : 'stream', timeout: 5000} },
@@ -173,12 +173,12 @@ export function send({command = {}, localUrl='', hubId='', url = '', method = 'G
               console.error("send: unauhorized error ", error);
             } else {
               setCloudConnectionState(CLOUD_CONNECTION_STATES.UNCONNECTED)
-              if (hubCommand){
-                setHubConnectionState({hubId: hubId, state:HUB_CONNECTION_STATES.UNCONNECTED})
+              if (hubCommand) {
+                setHubConnectionState({hubId: hubId, state: HUB_CONNECTION_STATES.UNCONNECTED})
               }
             }
           } else if (!isEmpty(hubId)) {
-            setHubConnectionState({hubId: hubId, state:HUB_CONNECTION_STATES.UNCONNECTED})
+            setHubConnectionState({hubId: hubId, state: HUB_CONNECTION_STATES.UNCONNECTED})
           }
           console.error("send: error ", error);
           reject(error);

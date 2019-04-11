@@ -9,9 +9,9 @@ import {initStore} from "./store"
 //import logger from 'redux-logger'
 //const middleware = [...getDefaultMiddleware(), logger]
 
-export { CLOUD_CONNECTION_STATES} from './connection/constants';
+export { CLOUD_CONNECTION_STATES, HUB_CONNECTION_STATES} from './connection/constants';
 export { LANGUAGES, USER_STATES, ROLES } from './user/constants';
-export { HUB_STATES, HUB_CONNECTION_STATES} from './hubs/constants';
+export { HUB_STATES } from './hubs/constants';
 
 export { events } from './events/events'
 export { EVENTS } from './events/constants'
