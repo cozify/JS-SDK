@@ -1,12 +1,14 @@
 import babel from 'rollup-plugin-babel'
 import commonjs from 'rollup-plugin-commonjs'
-import external from 'rollup-plugin-peer-deps-external'
 import resolve from 'rollup-plugin-node-resolve'
 import flow from 'rollup-plugin-flow'
 import flowEntry from 'rollup-plugin-flow-entry'
 import json from 'rollup-plugin-json'
 import copy from 'rollup-plugin-cpy'
 import pkg from './package.json'
+import replace from 'rollup-plugin-replace';
+
+const isProduction = process.env.NODE_ENV === 'production';
 
 // Some ideas from
 // https://www.grzegorowski.com/publishing-npm-package-with-rollup-babel-and/
@@ -37,10 +39,12 @@ export default {
       sourcemap: true
     }
   ],
-  external: ['axios'],
   plugins: [
-    external('axios'),
-    flow()
+    replace({
+      ENVIRONMENT: JSON.stringify(process.env.NODE_ENV || 'production'),
+      'process.env.NODE_ENV': "'production'",
+    })
+    , flow()
     , flowEntry()
     , resolve({
       jsnext: true, preferBuiltins: true, browser: true,
@@ -67,5 +71,6 @@ export default {
       dest: 'lib',
     }),
     */
-  ]
+  ],
+  external: ['axios']
 }

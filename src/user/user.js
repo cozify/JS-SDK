@@ -1,182 +1,81 @@
 // @flow
 import isEmpty  from 'lodash/isEmpty';
-import isString from 'lodash/isString';
-import { events } from '../events/events.js'
-import { EVENTS } from '../events/constants.js'
+import isString  from 'lodash/isString';
 
-import { Person } from '../person/person.js';
-import {send, COMMANDS} from '../connection/send.js'
 
-import { LANGUAGES } from '../person/constants.js';
-import type { LANGUAGES_TYPE } from '../person/constants.js';
+import { send, COMMANDS } from '../connection/send.js'
+import { getStore } from "../store.js"
+import { userState, userReducer } from "../reducers/user";
 
-import { USER_STATES, ROLES } from './constants.js';
+import { USER_STATES, ROLES, LANGUAGES } from './constants.js';
 import type { USER_STATE_TYPE, ROLES_TYPE } from './constants.js';
 
-
-let _state: USER_STATE_TYPE = USER_STATES.WAITING_LANGUAGE
-
-/**
- * User Class
- */
-class User extends Person {
-  authKey: string
-  role: ROLES_TYPE
-  password: string
-  eulaAcceted: boolean
-  /*
-   * Create User
-   *
-   * @param  {String} options.firstName
-   * @param  {String} options.lastName
-   * @param  {String} options.email
-   * @param  {LANGUAGES_TYPE} options.language
-   * @param  {String} options.authKey     Atuhentication key for cloud access
-   * @param  {[ROLES_TYPE} options.role   Role
-   * @param  {boolen} options.eulaAcceted True when EULA is accepted
-   */
-  constructor({
-    firstName = '', lastName = '', email = '', language = LANGUAGES.NONE, authKey = '', role = ROLES.ANONYMOUS, eulaAcceted =false
-  }: {firstName: string, lastName: string, email: string, language: LANGUAGES_TYPE, authKey: string, role: ROLES_TYPE, password:string, eulaAcceted:boolean} = {}) {
-    super({
-      firstName, lastName, email, language,
-    });
-    this.authKey = authKey;
-    this.role = role;
-
-  }
-
-  /**
-   * Get USer state
-   */
-  getState(): USER_STATE_TYPE {
-    return _state;
-  }
-
-  /**
-   * User action to change current language
-   * @type {LANGUAGES_TYPE}
-   */
-  changeLanguage(newLanguage: LANGUAGES_TYPE): boolean {
-    let retVel = false
-    if (Object.values(LANGUAGES).indexOf(newLanguage) > -1) {
-      this.language = newLanguage;
-      if (_state === USER_STATES.WAITING_LANGUAGE) {
-        this.setState(USER_STATES.LANGUAGE_SET);
-      }
-      retVel = true;
-    }
-    return retVel;
-  }
-
-  /**
-   * User action to accept EULA
-   */
-  acceptEula(): boolean {
-    let retVel = false
-      this.eulaAcceted = true;
-      if (_state === USER_STATES.WAITING_EULA) {
-        this.setState(USER_STATES.EULA_ACCEPTED);
-      }
-      retVel = true;
-
-    return retVel;
-  }
-
-  /**
-   * User action to log in
-   * @param {string} email
-   * @param {password} email  - fixed password
-   */
-  doPwLogin(email: string, password: string): Promise<Object> {
-    return new Promise( (resolve, reject) => {
-      send( {command: COMMANDS.USER_LOGIN,  data:{email:email, password:password} })
-        .then((response) => {
-          if (response && isString(response)) {
-            this.authKey = response;
-            if (_state === USER_STATES.WAITING_LOGIN) {
-              this.setState(USER_STATES.LOGIN_DONE);
-            }
-          }
-          resolve(response);
-        })
-        .catch((error) => {
-          //console.error(error);
-          reject(false)
-        });
-
-    });
-  }
-
-  /**
-   * User action to logout
-   */
-  doLogout(): boolean {
-    let retVel = false
-      if (_state === USER_STATES.AUTHENTICATED) {
-        this.authKey = '';
-        this.setState(USER_STATES.LOGGED_OUT);
-      }
-      retVel = true;
-
-    return retVel;
-  }
-
-  /**
-   * Change state of user state-machine
-   * @param {USER_STATE_TYPE} newState
-   */
-  setState(newState: USER_STATE_TYPE): USER_STATE_TYPE {
-    const oldState = _state
-    switch (_state) {
-      case USER_STATES.WAITING_LANGUAGE: {
-        if (newState === USER_STATES.LANGUAGE_SET) {
-          if (!isEmpty(this.language)) {
-            _state = USER_STATES.WAITING_LOGIN;
-          }
-        }
-        break;
-      }
-      case USER_STATES.WAITING_LOGIN: {
-        if (newState === USER_STATES.LOGIN_DONE) {
-          if (!isEmpty(this.authKey)) {
-            if (isEmpty(this.eulaAcceted)) {
-              _state = USER_STATES.WAITING_EULA;
-
-            } else {
-              _state = USER_STATES.AUTHENTICATED;
-            }
-          }
-        }
-        break;
-      }
-      case USER_STATES.WAITING_EULA: {
-        if (newState === USER_STATES.EULA_ACCEPTED) {
-          _state = USER_STATES.AUTHENTICATED;
-        }
-        break;
-      }
-      case USER_STATES.AUTHENTICATED: {
-        if (newState === USER_STATES.LOGGED_OUT) {
-          _state = USER_STATES.WAITING_LOGIN;
-        }
-        break;
-      }
-      default: {
-        // statements;
-        break;
-      }
-    }
-    if (oldState !== _state) {
-      events.emit(EVENTS.USER_STATE_CHANGED, _state);
-    }
-    return _state;
-  }
+function storedUser() {
+  const stateNow = getStore().getState()
+  const storedUser = userState.selectors.getUser(stateNow)
+  return storedUser;
 }
 
 
 /**
- * Singleton current user of the application
- * @type {User}
+ * User action to change current language
+ * @type {LANGUAGES_TYPE}
  */
-export const user = new User();
+export function changeLanguage(newLanguage: LANGUAGES_TYPE): boolean {
+  let retVel = false
+  if (Object.values(LANGUAGES).indexOf(newLanguage) > -1) {
+    getStore().dispatch(userState.actions.setLanguage(newLanguage));
+    if (storedUser().state === USER_STATES.WAITING_LANGUAGE) {
+      getStore().dispatch(userState.actions.changeState(USER_STATES.LANGUAGE_SET));
+    }
+    retVel = true;
+  }
+  return retVel;
+}
+
+/**
+ * User action to accept EULA
+ */
+export function acceptEula(): boolean {
+  let retVel = false
+  getStore().dispatch(userState.actions.setEula(true));
+  if (storedUser().state === USER_STATES.WAITING_EULA) {
+    getStore().dispatch(userState.actions.changeState(USER_STATES.EULA_ACCEPTED));
+  }
+  retVel = true;
+
+  return retVel;
+}
+
+/**
+ * User action to log in
+ * @param {string} email
+ * @param {password} email  - fixed password
+ */
+export function doPwLogin(email: string, password: string): Promise<Object> {
+  return new Promise( (resolve, reject) => {
+    send( {command: COMMANDS.USER_LOGIN,  data:{email:email, password:password} })
+      .then((response) => {
+        if (response && isString(response)) {
+          getStore().dispatch(userState.actions.setAuthKey(response));
+          if (storedUser().state === USER_STATES.WAITING_LOGIN) {
+            getStore().dispatch(userState.actions.changeState(USER_STATES.LOGIN_DONE));
+          }
+        }
+        resolve(response);
+      })
+      .catch((error) => {
+        //console.error(error);
+        reject(false)
+      });
+  });
+}
+
+/**
+ * Get state of user state-machine
+ */
+ export function getUserState() {
+  return storedUser().state
+ }
+
+

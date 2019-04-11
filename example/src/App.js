@@ -14,8 +14,8 @@ import { fetchHubTokens, getHubs } from 'cozify-sdk'
 import { state } from 'cozify-sdk'
 
 // Fill them as should
-let fixedUsername = ''
-let fixedPassword = ''
+let fixedUsername = 'vesa@cozify.fi'
+let fixedPassword = 'Fortum!123'
 
 console.log(events);
 console.log(`Initial connection state now ${state.connectionState}`);

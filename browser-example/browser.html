@@ -12,61 +12,91 @@
       // Fill them as should
       //let fixedUsername = ""
       //let fixedPassword = ""
-      let fixedUsername = ''
-      let fixedPassword = ''
+      let fixedUsername = 'vesa@cozify.fi'
+      let fixedPassword = 'Fortum!123'
+      let fixedHubId = 'cd3bd9e4-7943-11e5-a567-544a168673f2'
 
-      let state = CozifySDK.state;
-      let user = CozifySDK.user;
+      let store = CozifySDK.store;
+
       let LANGUAGES = CozifySDK.LANGUAGES;
       let events = CozifySDK.events;
       let EVENTS = CozifySDK.EVENTS;
       let USER_STATES = CozifySDK.USER_STATES;
 
-      console.log(`Initial connection state now ${state.connectionState}`);
-      console.log(`Initial user state ${user.getState()}`);
+
+      console.log(`Initial user state ${CozifySDK.getUserState()}`);
       console.log(`--1--`);
 
-      user.changeLanguage(LANGUAGES.FI_FI);
+      CozifySDK.changeLanguage(LANGUAGES.FI_FI);
       console.log(`--2--`);
 
 
-      user.doPwLogin( fixedUsername, fixedPassword )
+      CozifySDK.doPwLogin( fixedUsername, fixedPassword )
         .then((response) => {
-          user.acceptEula();
+          CozifySDK.acceptEula();
           console.log(`--3--`);
 
-          //user.doLogout();
+          //CozifySDK.doLogout();
           //console.log(`--4--`);
 
         })
         .catch(function (error) {
-          console.log(`User state ${user.getState()}`);
+          console.log(`Pw failure when user state ${CozifySDK.getState()}`, error);
         })
 
 
 
+
+      let hubsFetched = false
+      let hubSelected = false
+      store.subscribe(() => {
+        const storeNow = store.getState()
+        if (hubsFetched) {
+          console.log("Hubs now", storeNow.hubs) //CozifySDK.hubsState.selectors.getHubs(storeNow))
+        }
+        if (!hubsFetched && storeNow.user.authKey) {
+          hubsFetched = true;
+          CozifySDK.fetchHubTokens(storeNow.user.authKey).then(() => {
+            hubsReceived = true;
+
+            if (!hubSelected) {
+              CozifySDK.selectHubById(fixedHubId);
+              hubSelected = true;
+            }
+          });
+        }
+        console.log("Devices:", storeNow.devices)
+        console.log("Cloud connection:", storeNow.connections.cloudState)
+
+        if (storeNow.hubs[fixedHubId] && storeNow.hubs[fixedHubId].selected && storeNow.hubs[fixedHubId].connectionState === CozifySDK.HUB_CONNECTION_STATES.LOCAL) {
+          setTimeout(function() {
+            CozifySDK.unSelectHubById(fixedHubId);
+          }, 10000);
+
+        }
+
+      })
+
       /**
        * Listener of User state changes
-       */
       const unbindUserStateChangedListener = events.on(EVENTS.USER_STATE_CHANGED, newState => {
         console.log("USER_STATE CHANGED: ", newState);
         if (newState === USER_STATES.AUTHENTICATED){
-          CozifySDK.fetchHubTokens(user.authKey);
+
         }
       });
+       */
 
 
       /**
        * Listener of HUB list changes
-       */
       const unbindHubListCahngeListener = events.on(EVENTS.HUBS_LIST_CHANGED, eventHubs => {
         const hubs = CozifySDK.getHubs(); // Optional because eventHubs contains same info
         for (let key in hubs) {
           console.log(` Hub name: ${hubs[key].name} - role: ${hubs[key].roleString}`);
         }
       });
-
-
+       */
     </script>
     <title>cozify-sdk</title>
   </head>

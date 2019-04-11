@@ -2,8 +2,8 @@
 const CozifySDK = require('../dist/sdk-node.js');
 console.log('Testing Cozify SDK from node.js')
 
-let fixedUsername = ''
-let fixedPassword = ''
+let fixedUsername = 'vesa@cozify.fi'
+let fixedPassword = 'Fortum!123'
 
 let state = CozifySDK.state;
 let user = CozifySDK.user;
