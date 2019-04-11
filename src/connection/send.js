@@ -3,9 +3,8 @@ import isEmpty from 'lodash/isEmpty'
 import axios from 'axios'
 import axiosRetry from 'axios-retry'
 import { isNode } from '../utils.js'
-import { CLOUD_CONNECTION_STATES, CLOUD_URL, CLOUD_API_VERSION } from './constants'
+import { CLOUD_CONNECTION_STATES, CLOUD_URL, CLOUD_API_VERSION, HUB_CONNECTION_STATES } from './constants'
 import { setCloudConnectionState, setHubConnectionState } from './state'
-import {  HUB_CONNECTION_STATES } from '../connection/constants';
 
 export const COMMANDS = Object.freeze({
   USER_LOGIN: { method: 'POST', url: CLOUD_URL + "user/login", params: ['password', 'email'], config:{responseType: isNode ? 'blob' : 'stream', timeout: 5000} },

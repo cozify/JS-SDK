@@ -5224,7 +5224,7 @@ const CLOUD_CONNECTION_STATES = Object.freeze({
   UNCONNECTED: 'no connection',
   CONNECTED: 'connected'
 });
-const HUB_CONNECTION_STATES$1 = Object.freeze({
+const HUB_CONNECTION_STATES = Object.freeze({
   UNCONNECTED: 'no connection',
   REMOTE: 'remote',
   LOCAL: 'local'
@@ -5438,7 +5438,7 @@ const hubsState = createSlice({
       const newState = action.payload.state;
       const oldState = state[hubId].connectionState;
 
-      if (Object.values(HUB_CONNECTION_STATES$1).indexOf(newState) > -1) {
+      if (Object.values(HUB_CONNECTION_STATES).indexOf(newState) > -1) {
         if (oldState !== newState) {
           console.log(`HUB ${hubId} connection state ${oldState} -> ${newState}`);
           state[hubId].connectionState = newState;
@@ -6112,7 +6112,7 @@ function send({
         } else if (!isEmpty_1(hubId)) {
           setHubConnectionState$1({
             hubId: hubId,
-            state: HUB_CONNECTION_STATES$1.LOCAL
+            state: HUB_CONNECTION_STATES.LOCAL
           });
         }
 
@@ -6131,14 +6131,14 @@ function send({
             if (hubCommand) {
               setHubConnectionState$1({
                 hubId: hubId,
-                state: HUB_CONNECTION_STATES$1.UNCONNECTED
+                state: HUB_CONNECTION_STATES.UNCONNECTED
               });
             }
           }
         } else if (!isEmpty_1(hubId)) {
           setHubConnectionState$1({
             hubId: hubId,
-            state: HUB_CONNECTION_STATES$1.UNCONNECTED
+            state: HUB_CONNECTION_STATES.UNCONNECTED
           });
         }
 
@@ -6316,7 +6316,7 @@ function setHubInfo(HUBKeys) {
 function updateFoundHub(hubURL, foundHub) {
   const hubData = {};
   hubData[foundHub.hubId] = {
-    connectionState: HUB_CONNECTION_STATES$1.REMOTE,
+    connectionState: HUB_CONNECTION_STATES.REMOTE,
     connected: foundHub.connected,
     features: foundHub.features,
     state: foundHub.state,
@@ -6324,7 +6324,7 @@ function updateFoundHub(hubURL, foundHub) {
   };
 
   if (hubURL) {
-    hubData[foundHub.hubId].connectionState = HUB_CONNECTION_STATES$1.LOCAL;
+    hubData[foundHub.hubId].connectionState = HUB_CONNECTION_STATES.LOCAL;
     hubData[foundHub.hubId].url = hubURL;
   }
 
@@ -6534,5 +6534,5 @@ const store = configureStore({
 console.log("Initial state", store.getState());
 initStore(store);
 
-export { CLOUD_CONNECTION_STATES, EVENTS$1 as EVENTS, HUB_CONNECTION_STATES$1 as HUB_CONNECTION_STATES, HUB_STATES, LANGUAGES, ROLES, USER_STATES, acceptEula, changeLanguage, deleteDevice, devicesState, doPwLogin, events$1 as events, fetchHubTokens, getHubs, getUserState, hubsState, selectHubById, setDevices, startPolling, stopPolling, store, unSelectHubById, updateHubs };
+export { CLOUD_CONNECTION_STATES, EVENTS$1 as EVENTS, HUB_CONNECTION_STATES, HUB_STATES, LANGUAGES, ROLES, USER_STATES, acceptEula, changeLanguage, deleteDevice, devicesState, doPwLogin, events$1 as events, fetchHubTokens, getHubs, getUserState, hubsState, selectHubById, setDevices, startPolling, stopPolling, store, unSelectHubById, updateHubs };
 //# sourceMappingURL=index.es.js.map

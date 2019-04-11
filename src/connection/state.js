@@ -1,10 +1,10 @@
 // @flow
 
-import type { CLOUD_CONNECTION_STATE_TYPE, HUB_CONNECTION_STATES } from './constants.js';
 import { connectionsState, connectionsReducer } from "../reducers/connections";
 import { hubsState, hubsReducer } from "../reducers/hubs"
-import {getStore} from "../store.js"
-
+import { getStore } from "../store"
+import { HUB_CONNECTION_STATES } from './constants'
+import type { CLOUD_CONNECTION_STATE_TYPE, HUB_CONNECTION_STATE_TYPE } from './constants';
 /**
  * Change Cloud connection state
  * @param {[type]} value: CLOUD_CONNECTION_STATE_TYPE [description]

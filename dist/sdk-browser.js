@@ -5227,7 +5227,7 @@ var CozifySDK = (function (exports, axios) {
 	  UNCONNECTED: 'no connection',
 	  CONNECTED: 'connected'
 	});
-	const HUB_CONNECTION_STATES$1 = Object.freeze({
+	const HUB_CONNECTION_STATES = Object.freeze({
 	  UNCONNECTED: 'no connection',
 	  REMOTE: 'remote',
 	  LOCAL: 'local'
@@ -5441,7 +5441,7 @@ var CozifySDK = (function (exports, axios) {
 	      const newState = action.payload.state;
 	      const oldState = state[hubId].connectionState;
 
-	      if (Object.values(HUB_CONNECTION_STATES$1).indexOf(newState) > -1) {
+	      if (Object.values(HUB_CONNECTION_STATES).indexOf(newState) > -1) {
 	        if (oldState !== newState) {
 	          console.log(`HUB ${hubId} connection state ${oldState} -> ${newState}`);
 	          state[hubId].connectionState = newState;
@@ -6115,7 +6115,7 @@ var CozifySDK = (function (exports, axios) {
 	        } else if (!isEmpty_1(hubId)) {
 	          setHubConnectionState$1({
 	            hubId: hubId,
-	            state: HUB_CONNECTION_STATES$1.LOCAL
+	            state: HUB_CONNECTION_STATES.LOCAL
 	          });
 	        }
 
@@ -6134,14 +6134,14 @@ var CozifySDK = (function (exports, axios) {
 	            if (hubCommand) {
 	              setHubConnectionState$1({
 	                hubId: hubId,
-	                state: HUB_CONNECTION_STATES$1.UNCONNECTED
+	                state: HUB_CONNECTION_STATES.UNCONNECTED
 	              });
 	            }
 	          }
 	        } else if (!isEmpty_1(hubId)) {
 	          setHubConnectionState$1({
 	            hubId: hubId,
-	            state: HUB_CONNECTION_STATES$1.UNCONNECTED
+	            state: HUB_CONNECTION_STATES.UNCONNECTED
 	          });
 	        }
 
@@ -6319,7 +6319,7 @@ var CozifySDK = (function (exports, axios) {
 	function updateFoundHub(hubURL, foundHub) {
 	  const hubData = {};
 	  hubData[foundHub.hubId] = {
-	    connectionState: HUB_CONNECTION_STATES$1.REMOTE,
+	    connectionState: HUB_CONNECTION_STATES.REMOTE,
 	    connected: foundHub.connected,
 	    features: foundHub.features,
 	    state: foundHub.state,
@@ -6327,7 +6327,7 @@ var CozifySDK = (function (exports, axios) {
 	  };
 
 	  if (hubURL) {
-	    hubData[foundHub.hubId].connectionState = HUB_CONNECTION_STATES$1.LOCAL;
+	    hubData[foundHub.hubId].connectionState = HUB_CONNECTION_STATES.LOCAL;
 	    hubData[foundHub.hubId].url = hubURL;
 	  }
 
@@ -6539,7 +6539,7 @@ var CozifySDK = (function (exports, axios) {
 
 	exports.CLOUD_CONNECTION_STATES = CLOUD_CONNECTION_STATES;
 	exports.EVENTS = EVENTS$1;
-	exports.HUB_CONNECTION_STATES = HUB_CONNECTION_STATES$1;
+	exports.HUB_CONNECTION_STATES = HUB_CONNECTION_STATES;
 	exports.HUB_STATES = HUB_STATES;
 	exports.LANGUAGES = LANGUAGES;
 	exports.ROLES = ROLES;
