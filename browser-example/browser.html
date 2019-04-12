@@ -24,49 +24,49 @@
       let USER_STATES = CozifySDK.USER_STATES;
 
 
-      console.log(`Initial user state ${CozifySDK.getUserState()}`);
-      console.log(`--1--`);
+      console.info(`Initial user state ${CozifySDK.getUserState()}`);
+      console.info(`--1--`);
 
       CozifySDK.changeLanguage(LANGUAGES.FI_FI);
-      console.log(`--2--`);
+      console.info(`--2--`);
 
 
       CozifySDK.doPwLogin( fixedUsername, fixedPassword )
         .then((response) => {
           CozifySDK.acceptEula();
-          console.log(`--3--`);
+          console.info(`--3--`);
 
           //CozifySDK.doLogout();
-          //console.log(`--4--`);
+          //console.info(`--4--`);
 
         })
         .catch(function (error) {
-          console.log(`Pw failure when user state ${CozifySDK.getState()}`, error);
+          console.info(`Pw failure when user state ${CozifySDK.getCloudConnectionState()}`, error);
         })
-
-
 
 
       let hubsFetched = false
       let hubSelected = false
       store.subscribe(() => {
         const storeNow = store.getState()
-        if (hubsFetched) {
-          console.log("Hubs now", storeNow.hubs) //CozifySDK.hubsState.selectors.getHubs(storeNow))
-        }
+
+
         if (!hubsFetched && storeNow.user.authKey) {
           hubsFetched = true;
-          CozifySDK.fetchHubTokens(storeNow.user.authKey).then(() => {
+          CozifySDK.fetchHubs(storeNow.user.authKey).then(() => {
+            const storeNow = store.getState()
+            console.info("Hubs now", storeNow.hubs)
             hubsReceived = true;
-
             if (!hubSelected) {
               CozifySDK.selectHubById(fixedHubId);
               hubSelected = true;
             }
           });
         }
-        console.log("Devices:", storeNow.devices)
-        console.log("Cloud connection:", storeNow.connections.cloudState)
+
+        console.info("Devices:", CozifySDK.getDevices()[fixedHubId])
+        console.info("Cloud connection:", CozifySDK.getCloudConnectionState());
+        console.info("Hub connection:", CozifySDK.getHubConnectionState(fixedHubId));
 
         if (storeNow.hubs[fixedHubId] && storeNow.hubs[fixedHubId].selected && storeNow.hubs[fixedHubId].connectionState === CozifySDK.HUB_CONNECTION_STATES.LOCAL) {
           setTimeout(function() {

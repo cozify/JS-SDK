@@ -16,8 +16,10 @@ export { HUB_STATES } from './hubs/constants';
 export { events } from './events/events'
 export { EVENTS } from './events/constants'
 
+export { getCloudConnectionState, getHubConnectionState } from "./connection/state"
 export { changeLanguage, doPwLogin, acceptEula, getUserState } from "./user/user"
-export { fetchHubTokens, getHubs, selectHubById, unSelectHubById, startPolling, stopPolling} from './hubs/hubs';
+export { fetchHubs, getHubs, selectHubById, unSelectHubById, startPolling, stopPolling} from './hubs/hubs';
+export { getDevices} from './devices/devices';
 
 
 

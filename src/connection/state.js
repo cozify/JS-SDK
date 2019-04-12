@@ -13,6 +13,11 @@ export function setCloudConnectionState(value: CLOUD_CONNECTION_STATE_TYPE) {
     getStore().dispatch(connectionsState.actions.setCloudConnectionState(value));
 }
 
+export function getCloudConnectionState () {
+  const stateNow = getStore().getState();
+  return connectionsState.selectors.getConnections(stateNow).cloudState;
+}
+
 /**
  * Change hub connection state
  * @param {Object} hubAndSate hubId and new state
@@ -27,5 +32,12 @@ export function setHubConnectionState(hubAndSate) {
       }
     }
     getStore().dispatch(hubsState.actions.setHubConnectionState(hubAndSate));
+}
 
+export function getHubConnectionState (hubId) {
+  const stateNow = getStore().getState();
+  if (hubsState.selectors.getHubs(stateNow)[hubId]){
+    return hubsState.selectors.getHubs(stateNow)[hubId].connectionState;
+  }
+  return HUB_CONNECTION_STATES.UNCONNECTED
 }

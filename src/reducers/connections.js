@@ -12,8 +12,7 @@ import { EVENTS } from '../events/constants.js'
 const connectionsState = createSlice({
   slice: 'connections',
   initialState: {
-    cloudState: CLOUD_CONNECTION_STATES.UNCONNECTED,
-    hubState: {}
+    cloudState: CLOUD_CONNECTION_STATES.UNCONNECTED
   },
   reducers: {
     setCloudConnectionState(state, action) {

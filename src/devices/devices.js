@@ -7,8 +7,7 @@ import { devicesState, devicesReducer } from "../reducers/devices"
 
 export function deviceDeltaHandler(hubId: string, reset: boolean, devices: Object) {
   let oldHubDevices = {}
-  const stateNow = getStore().getState()
-  const storedDevices = devicesState.selectors.getDevices(stateNow)
+  const storedDevices = getDevices()
   if (storedDevices && storedDevices[hubId]) {
     oldHubDevices = storedDevices[hubId];
   }
@@ -34,6 +33,11 @@ export function deviceDeltaHandler(hubId: string, reset: boolean, devices: Objec
       }
     });
   }
-
-
 }
+
+
+export function getDevices() {
+  const stateNow = getStore().getState();
+  return devicesState.selectors.getDevices(stateNow)
+}
+

@@ -5233,7 +5233,7 @@ var CozifySDK = (function (exports, axios) {
 	  LOCAL: 'local'
 	});
 	const CLOUD_API_VERSION = "ui/0.2/";
-	const CLOUD_URL = "https://cloud.cozify.fi/" + CLOUD_API_VERSION;
+	const CLOUD_URL = "https://testapi.cozify.fi/" + CLOUD_API_VERSION;
 
 	//      
 	// An event handler can take an optional event argument
@@ -5311,8 +5311,7 @@ var CozifySDK = (function (exports, axios) {
 	const connectionsState = createSlice({
 	  slice: 'connections',
 	  initialState: {
-	    cloudState: CLOUD_CONNECTION_STATES.UNCONNECTED,
-	    hubState: {}
+	    cloudState: CLOUD_CONNECTION_STATES.UNCONNECTED
 	  },
 	  reducers: {
 	    setCloudConnectionState(state, action) {
@@ -5606,6 +5605,35 @@ var CozifySDK = (function (exports, axios) {
 	const REMOTE_POLL_INTERVAL_MS = 2000;
 	const HUB_PROTOCOL = 'http://';
 	const HUB_PORT = '8893';
+
+	function setCloudConnectionState(value) {
+	  getStore().dispatch(connectionsState.actions.setCloudConnectionState(value));
+	}
+	function getCloudConnectionState() {
+	  const stateNow = getStore().getState();
+	  return connectionsState.selectors.getConnections(stateNow).cloudState;
+	}
+	function setHubConnectionState$1(hubAndSate) {
+	  const stateNow = getStore().getState();
+	  const storedHubs = hubsState.selectors.getHubs(stateNow);
+
+	  if (hubAndSate.state === HUB_CONNECTION_STATES.UNCONNECTED && storedHubs[hubAndSate.hubId]) {
+	    if (storedHubs[hubAndSate.hubId].connectionState === HUB_CONNECTION_STATES.REMOTE) {
+	      hubAndSate.state = HUB_CONNECTION_STATES.LOCALE;
+	    }
+	  }
+
+	  getStore().dispatch(hubsState.actions.setHubConnectionState(hubAndSate));
+	}
+	function getHubConnectionState(hubId) {
+	  const stateNow = getStore().getState();
+
+	  if (hubsState.selectors.getHubs(stateNow)[hubId]) {
+	    return hubsState.selectors.getHubs(stateNow)[hubId].connectionState;
+	  }
+
+	  return HUB_CONNECTION_STATES.UNCONNECTED;
+	}
 
 	/** `Object#toString` result references. */
 	var stringTag$1 = '[object String]';
@@ -5969,22 +5997,6 @@ var CozifySDK = (function (exports, axios) {
 	  }
 	}
 
-	function setCloudConnectionState(value) {
-	  getStore().dispatch(connectionsState.actions.setCloudConnectionState(value));
-	}
-	function setHubConnectionState$1(hubAndSate) {
-	  const stateNow = getStore().getState();
-	  const storedHubs = hubsState.selectors.getHubs(stateNow);
-
-	  if (hubAndSate.state === HUB_CONNECTION_STATES.UNCONNECTED && storedHubs[hubAndSate.hubId]) {
-	    if (storedHubs[hubAndSate.hubId].connectionState === HUB_CONNECTION_STATES.REMOTE) {
-	      hubAndSate.state = HUB_CONNECTION_STATES.LOCALE;
-	    }
-	  }
-
-	  getStore().dispatch(hubsState.actions.setHubConnectionState(hubAndSate));
-	}
-
 	const COMMANDS = Object.freeze({
 	  USER_LOGIN: {
 	    method: 'POST',
@@ -6215,8 +6227,7 @@ var CozifySDK = (function (exports, axios) {
 
 	function deviceDeltaHandler(hubId, reset, devices) {
 	  let oldHubDevices = {};
-	  const stateNow = getStore().getState();
-	  const storedDevices = devicesState.selectors.getDevices(stateNow);
+	  const storedDevices = getDevices();
 
 	  if (storedDevices && storedDevices[hubId]) {
 	    oldHubDevices = storedDevices[hubId];
@@ -6243,8 +6254,13 @@ var CozifySDK = (function (exports, axios) {
 	    });
 	  }
 	}
+	function getDevices() {
+	  const stateNow = getStore().getState();
+	  return devicesState.selectors.getDevices(stateNow);
+	}
 
 	let _hubState = HUB_STATES.LOST;
+	let _hubs = {};
 
 	function urlBase64Decode(encoded) {
 	  let str = encoded.replace(/-/g, "+").replace(/_/g, "/");
@@ -6289,7 +6305,7 @@ var CozifySDK = (function (exports, axios) {
 	  return retVal;
 	}
 
-	function setHubInfo(HUBKeys) {
+	function extractHubInfo(HUBKeys) {
 	  let hubs = {};
 
 	  for (let key in HUBKeys) {
@@ -6300,7 +6316,7 @@ var CozifySDK = (function (exports, axios) {
 	    info.id = payload.hubId || payload.hub_id;
 	    info.name = payload.hubName || payload.hub_name;
 	    info.hubKey = HUBKeys[key];
-	    info.connectionState = undefined;
+	    info.connectionState = HUB_CONNECTION_STATES.UNCONNECTED;
 
 	    if (payload.role) {
 	      info.role = payload.role;
@@ -6317,22 +6333,21 @@ var CozifySDK = (function (exports, axios) {
 	}
 
 	function updateFoundHub(hubURL, foundHub) {
-	  const hubData = {};
-	  hubData[foundHub.hubId] = {
-	    connectionState: HUB_CONNECTION_STATES.REMOTE,
-	    connected: foundHub.connected,
-	    features: foundHub.features,
-	    state: foundHub.state,
-	    version: foundHub.version
-	  };
-
-	  if (hubURL) {
-	    hubData[foundHub.hubId].connectionState = HUB_CONNECTION_STATES.LOCAL;
-	    hubData[foundHub.hubId].url = hubURL;
+	  if (foundHub.hubId) {
+	    foundHub.id = foundHub.hubId;
+	    delete foundHub.hubId;
 	  }
 
-	  console.log("Hub metadata found ", JSON.stringify(hubData));
-	  getStore().dispatch(hubsState.actions.updateHubs(hubData));
+	  _hubs[foundHub.id].connected = foundHub.connected;
+	  _hubs[foundHub.id].features = foundHub.features;
+	  _hubs[foundHub.id].state = foundHub.state;
+	  _hubs[foundHub.id].version = foundHub.version;
+	  _hubs[foundHub.id].connectionState = foundHub.connected ? HUB_CONNECTION_STATES.REMOTE : HUB_CONNECTION_STATES.UNCONNECTED;
+
+	  if (hubURL) {
+	    _hubs[foundHub.id].connectionState = HUB_CONNECTION_STATES.LOCAL;
+	    _hubs[foundHub.id].url = hubURL;
+	  }
 	}
 
 	function doRemoteIdQuery(hubId, authKey, hubKey) {
@@ -6353,60 +6368,83 @@ var CozifySDK = (function (exports, axios) {
 	}
 
 	function doLocalIdQuery(ip) {
-	  if (ip) {
-	    const hubURL = HUB_PROTOCOL + ip + ":" + HUB_PORT;
-	    const url = hubURL + "/hub";
-	    send({
-	      url: url
-	    }).then(hubData => {
-	      updateFoundHub(hubURL, hubData);
-	    });
-	  }
+	  return new Promise((resolve, reject) => {
+	    if (ip) {
+	      const hubURL = HUB_PROTOCOL + ip + ":" + HUB_PORT;
+	      const url = hubURL + "/hub";
+	      send({
+	        url: url
+	      }).then(hubData => {
+	        updateFoundHub(hubURL, hubData);
+	        resolve(ip);
+	      }).catch(error => {
+	        console.log(`doLocalIdQuery ${IP} error `, error.message);
+	        reject(ip);
+	      });
+	    } else {
+	      resolve();
+	    }
+	  });
 	}
 
 	function doCloudDiscovery(authKey) {
-	  send({
-	    command: COMMANDS.CLOUD_IP
-	  }).then(ips => {
-	    if (ips && !isEmpty_1(ips)) {
-	      console.log("doCloudDiscovery ", JSON.stringify(ips));
+	  return new Promise((resolve, reject) => {
+	    send({
+	      command: COMMANDS.CLOUD_IP
+	    }).then(ips => {
+	      let queries = [];
 
-	      for (var ip of ips) {
-	        doLocalIdQuery(ip);
+	      if (ips && !isEmpty_1(ips)) {
+	        for (var ip of ips) {
+	          queries.push(doLocalIdQuery(ip));
+	        }
 	      }
+
+	      sendAll(queries).then(values => {}).catch(error => {
+	        debugger;
+	      }).finally(() => {
+	        getStore().dispatch(hubsState.actions.updateHubs(_hubs));
+	        resolve();
+	      });
+	    }).catch(error => {
+	      console.error("doCloudDiscovery error: ", error.message);
+	      getStore().dispatch(hubsState.actions.updateHubs(_hubs));
+	      resolve();
+	    });
+	  });
+	}
+
+	function fetchMetaData(hubs, authKey) {
+	  return new Promise((resolve, reject) => {
+	    let queries = [];
+
+	    for (var hub of Object.values(hubs)) {
+	      queries.push(doRemoteIdQuery(hub.id, authKey, hub.hubKey));
 	    }
-	  }).catch(error => {
-	    console.error("doCloudDiscovery error: ", error.message);
+
+	    sendAll(queries).then(values => {}).catch(error => {}).finally(() => {
+	      doCloudDiscovery().finally(() => {
+	        resolve();
+	      });
+	    });
 	  });
 	}
 
-	function fetchMetaData(authKey) {
-	  const hubs = getHubs();
-	  let queries = [];
-
-	  for (var hub of Object.values(hubs)) {
-	    queries.push(doRemoteIdQuery(hub.id, authKey, hub.hubKey));
-	  }
-
-	  sendAll(queries).then(values => {}).catch(error => {}).finally(() => {
-	    doCloudDiscovery();
-	  });
-	}
-
-	function fetchHubTokens(authKey) {
+	function fetchHubs(authKey) {
 	  return new Promise((resolve, reject) => {
 	    send({
 	      command: COMMANDS.HUB_KEYS,
 	      authKey: authKey
 	    }).then(tokens => {
 	      if (tokens) {
-	        const hubs = setHubInfo(tokens);
-	        getStore().dispatch(hubsState.actions.updateHubs(hubs));
-	        events$1.emit(EVENTS$1.HUBS_LIST_CHANGED, getHubs());
-	        fetchMetaData(authKey);
+	        _hubs = extractHubInfo(tokens);
+	        fetchMetaData(_hubs, authKey).finally(() => {
+	          doCloudDiscovery();
+	          resolve(getHubs());
+	        });
+	      } else {
+	        resolve(getHubs());
 	      }
-
-	      resolve(authKey);
 	    }).catch(error => {
 	      console.error("fetchHubTokens error: ", error.message);
 	      reject(error);
@@ -6550,7 +6588,10 @@ var CozifySDK = (function (exports, axios) {
 	exports.devicesState = devicesState;
 	exports.doPwLogin = doPwLogin;
 	exports.events = events$1;
-	exports.fetchHubTokens = fetchHubTokens;
+	exports.fetchHubs = fetchHubs;
+	exports.getCloudConnectionState = getCloudConnectionState;
+	exports.getDevices = getDevices;
+	exports.getHubConnectionState = getHubConnectionState;
 	exports.getHubs = getHubs;
 	exports.getUserState = getUserState;
 	exports.hubsState = hubsState;

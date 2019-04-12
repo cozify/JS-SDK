@@ -28,4 +28,4 @@ export type HUB_CONNECTION_STATE_TYPE = $Values<typeof HUB_CONNECTION_STATES>;
 
 
 export const CLOUD_API_VERSION: string = "ui/0.2/";
-export const CLOUD_URL: string = "https://cloud.cozify.fi/" + CLOUD_API_VERSION;
+export const CLOUD_URL: string = "https://testapi.cozify.fi/" + CLOUD_API_VERSION;
