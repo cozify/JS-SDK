@@ -93,10 +93,11 @@ export function send({command = {}, localUrl='', hubId='', url = '', method = 'G
       });
     }
     if (command.urlParams) {
-      url = url + "?";
+      let params = []
       command.urlParams.forEach(param => {
-          url = url + param + '=' + data[param] + '&'
+          params.push(encodeURIComponent(param) + '=' + encodeURIComponent(data[param]));
       });
+      url = url + "?" + params.join('&');
     }
     if (command.config) {
       config = command.config;

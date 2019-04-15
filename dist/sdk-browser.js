@@ -6079,10 +6079,11 @@ var CozifySDK = (function (exports, axios) {
 	    }
 
 	    if (command.urlParams) {
-	      url = url + "?";
+	      let params = [];
 	      command.urlParams.forEach(param => {
-	        url = url + param + '=' + data[param] + '&';
+	        params.push(encodeURIComponent(param) + '=' + encodeURIComponent(data[param]));
 	      });
+	      url = url + "?" + params.join('&');
 	    }
 
 	    if (command.config) {
@@ -6378,7 +6379,7 @@ var CozifySDK = (function (exports, axios) {
 	        updateFoundHub(hubURL, hubData);
 	        resolve(ip);
 	      }).catch(error => {
-	        console.log(`doLocalIdQuery ${IP} error `, error.message);
+	        console.log(`doLocalIdQuery ${ip} error `, error.message);
 	        reject(ip);
 	      });
 	    } else {

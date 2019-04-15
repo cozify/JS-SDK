@@ -6082,10 +6082,11 @@ function send({
     }
 
     if (command.urlParams) {
-      url = url + "?";
+      let params = [];
       command.urlParams.forEach(param => {
-        url = url + param + '=' + data[param] + '&';
+        params.push(encodeURIComponent(param) + '=' + encodeURIComponent(data[param]));
       });
+      url = url + "?" + params.join('&');
     }
 
     if (command.config) {
@@ -6381,7 +6382,7 @@ function doLocalIdQuery(ip) {
         updateFoundHub(hubURL, hubData);
         resolve(ip);
       }).catch(error => {
-        console.log(`doLocalIdQuery ${IP} error `, error.message);
+        console.log(`doLocalIdQuery ${ip} error `, error.message);
         reject(ip);
       });
     } else {

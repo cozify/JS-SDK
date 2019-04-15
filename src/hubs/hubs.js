@@ -167,7 +167,7 @@ function doLocalIdQuery(ip: string) {
         resolve(ip)
       })
       .catch((error) => {
-        console.log(`doLocalIdQuery ${IP} error `, error.message);
+        console.log(`doLocalIdQuery ${ip} error `, error.message);
         reject(ip);
       });
     } else {
