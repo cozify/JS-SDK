@@ -1,6 +1,6 @@
 // @flow
 import isEmpty from 'lodash/isEmpty'
-import { HUB_STATES, REMOTE_POLL_INTERVAL_MS, HUB_PROTOCOL, HUB_PORT } from './constants'
+import { HUB_STATES, REMOTE_POLL_INTERVAL_MS, HUB_PROTOCOL, HUB_PORT, DISCOVERY_INTERVAL_MS } from './constants'
 import { HUB_CONNECTION_STATES } from '../connection/constants'
 import { events } from '../events/events'
 import { EVENTS } from '../events/constants'
@@ -195,8 +195,7 @@ function doCloudDiscovery(authKey: string) {
         //console.log(values);
       })
       .catch(error => {
-        debugger
-        //console.log(error);
+        // console.log(error);
       })
       .finally(() => {
         //console.log("Hubs metadata found ", JSON.stringify(_hubs));
@@ -243,8 +242,14 @@ function fetchMetaData(hubs: Object, authKey: string) {
  * @param  {string} authKey   - user authKey got from login
  * @return {Promise<Object>}
  */
-export function fetchHubs( authKey: string ): Promise<Object> {
+export function fetchHubs( ): Promise<Object> {
+  const authKey = storedUser().authKey;
   return new Promise( (resolve, reject) => {
+
+    if (!authKey) {
+      reject('not userKey');
+      return;
+    }
     send( {command: COMMANDS.HUB_KEYS,  authKey: authKey })
     .then((tokens) => {
       if (tokens) {
@@ -267,6 +272,22 @@ export function fetchHubs( authKey: string ): Promise<Object> {
     });
   });
 }
+
+/**
+ * Discovery of hubs and local ones every 30s
+ * @type {Object}
+ */
+let discoveryInterval = undefined
+
+export function startDiscoveringHubs() {
+  fetchHubs(); // call immediately and then every 30s
+  discoveryInterval = setInterval(fetchHubs, DISCOVERY_INTERVAL_MS);
+}
+
+export function stopDiscoveringHubs() {
+  clearInterval(discoveryInterval);
+}
+
 
 /**
  * Un select hub by id

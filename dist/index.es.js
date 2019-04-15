@@ -5599,6 +5599,7 @@ const HUB_STATES = Object.freeze({
   NO_ACCESS: 'no access',
   CONNECTED: 'connected'
 });
+const DISCOVERY_INTERVAL_MS = 30000;
 const REMOTE_POLL_INTERVAL_MS = 2000;
 const HUB_PROTOCOL = 'http://';
 const HUB_PORT = '8893';
@@ -6398,9 +6399,7 @@ function doCloudDiscovery(authKey) {
         }
       }
 
-      sendAll(queries).then(values => {}).catch(error => {
-        debugger;
-      }).finally(() => {
+      sendAll(queries).then(values => {}).catch(error => {}).finally(() => {
         getStore().dispatch(hubsState.actions.updateHubs(_hubs));
         resolve();
       });
@@ -6428,8 +6427,14 @@ function fetchMetaData(hubs, authKey) {
   });
 }
 
-function fetchHubs(authKey) {
+function fetchHubs() {
+  const authKey = storedUser$1().authKey;
   return new Promise((resolve, reject) => {
+    if (!authKey) {
+      reject('not userKey');
+      return;
+    }
+
     send({
       command: COMMANDS.HUB_KEYS,
       authKey: authKey
@@ -6448,6 +6453,11 @@ function fetchHubs(authKey) {
       reject(error);
     });
   });
+}
+let discoveryInterval = undefined;
+function startDiscoveringHubs() {
+  fetchHubs();
+  discoveryInterval = setInterval(fetchHubs, DISCOVERY_INTERVAL_MS);
 }
 function unSelectHubById(selectedId) {
   const hubs = getHubs();
@@ -6573,5 +6583,5 @@ const store = configureStore({
 console.log("Initial state", store.getState());
 initStore(store);
 
-export { CLOUD_CONNECTION_STATES, EVENTS$1 as EVENTS, HUB_CONNECTION_STATES, HUB_STATES, LANGUAGES, ROLES, USER_STATES, acceptEula, changeLanguage, deleteDevice, devicesState, doPwLogin, events$1 as events, fetchHubs, getCloudConnectionState, getDevices, getHubConnectionState, getHubs, getUserState, hubsState, selectHubById, setDevices, startPolling, stopPolling, store, unSelectHubById, updateHubs };
+export { CLOUD_CONNECTION_STATES, EVENTS$1 as EVENTS, HUB_CONNECTION_STATES, HUB_STATES, LANGUAGES, ROLES, USER_STATES, acceptEula, changeLanguage, deleteDevice, devicesState, doPwLogin, events$1 as events, getCloudConnectionState, getDevices, getHubConnectionState, getHubs, getUserState, hubsState, selectHubById, setDevices, startDiscoveringHubs, startPolling, stopPolling, store, unSelectHubById, updateHubs };
 //# sourceMappingURL=index.es.js.map

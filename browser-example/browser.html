@@ -50,18 +50,20 @@
       store.subscribe(() => {
         const storeNow = store.getState()
 
-
         if (!hubsFetched && storeNow.user.authKey) {
           hubsFetched = true;
-          CozifySDK.fetchHubs(storeNow.user.authKey).then(() => {
-            const storeNow = store.getState()
-            console.info("Hubs now", storeNow.hubs)
+          CozifySDK.startDiscoveringHubs()
+        }
+
+        if (hubsFetched) {
+          console.info("Hubs now", storeNow.hubs)
+          if (storeNow.hubs && storeNow.hubs[fixedHubId] && !storeNow.hubs[fixedHubId].selected) {
             hubsReceived = true;
             if (!hubSelected) {
               CozifySDK.selectHubById(fixedHubId);
               hubSelected = true;
             }
-          });
+          }
         }
 
         console.info("Devices:", CozifySDK.getDevices()[fixedHubId])

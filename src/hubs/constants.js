@@ -15,6 +15,7 @@ export const HUB_STATES = Object.freeze({
 export type HUB_STATE_TYPE = $Values<typeof HUB_STATES>;
 
 
+export const DISCOVERY_INTERVAL_MS = 30000
 export const REMOTE_POLL_INTERVAL_MS = 2000
 export const HUB_PROTOCOL = 'http://'
 export const HUB_PORT = '8893'

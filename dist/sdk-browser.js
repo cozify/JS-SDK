@@ -5602,6 +5602,7 @@ var CozifySDK = (function (exports, axios) {
 	  NO_ACCESS: 'no access',
 	  CONNECTED: 'connected'
 	});
+	const DISCOVERY_INTERVAL_MS = 30000;
 	const REMOTE_POLL_INTERVAL_MS = 2000;
 	const HUB_PROTOCOL = 'http://';
 	const HUB_PORT = '8893';
@@ -6401,9 +6402,7 @@ var CozifySDK = (function (exports, axios) {
 	        }
 	      }
 
-	      sendAll(queries).then(values => {}).catch(error => {
-	        debugger;
-	      }).finally(() => {
+	      sendAll(queries).then(values => {}).catch(error => {}).finally(() => {
 	        getStore().dispatch(hubsState.actions.updateHubs(_hubs));
 	        resolve();
 	      });
@@ -6431,8 +6430,14 @@ var CozifySDK = (function (exports, axios) {
 	  });
 	}
 
-	function fetchHubs(authKey) {
+	function fetchHubs() {
+	  const authKey = storedUser$1().authKey;
 	  return new Promise((resolve, reject) => {
+	    if (!authKey) {
+	      reject('not userKey');
+	      return;
+	    }
+
 	    send({
 	      command: COMMANDS.HUB_KEYS,
 	      authKey: authKey
@@ -6451,6 +6456,11 @@ var CozifySDK = (function (exports, axios) {
 	      reject(error);
 	    });
 	  });
+	}
+	let discoveryInterval = undefined;
+	function startDiscoveringHubs() {
+	  fetchHubs();
+	  discoveryInterval = setInterval(fetchHubs, DISCOVERY_INTERVAL_MS);
 	}
 	function unSelectHubById(selectedId) {
 	  const hubs = getHubs();
@@ -6589,7 +6599,6 @@ var CozifySDK = (function (exports, axios) {
 	exports.devicesState = devicesState;
 	exports.doPwLogin = doPwLogin;
 	exports.events = events$1;
-	exports.fetchHubs = fetchHubs;
 	exports.getCloudConnectionState = getCloudConnectionState;
 	exports.getDevices = getDevices;
 	exports.getHubConnectionState = getHubConnectionState;
@@ -6598,6 +6607,7 @@ var CozifySDK = (function (exports, axios) {
 	exports.hubsState = hubsState;
 	exports.selectHubById = selectHubById;
 	exports.setDevices = setDevices;
+	exports.startDiscoveringHubs = startDiscoveringHubs;
 	exports.startPolling = startPolling;
 	exports.stopPolling = stopPolling;
 	exports.store = store;
