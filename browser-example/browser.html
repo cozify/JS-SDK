@@ -36,8 +36,15 @@
           CozifySDK.acceptEula();
           console.info(`--3--`);
 
+          const storeNow = store.getState()
+          if (storeNow.user.authKey) {
+            CozifySDK.startDiscoveringHubs()
+          }
+
+
           //CozifySDK.doLogout();
           //console.info(`--4--`);
+
 
         })
         .catch(function (error) {
@@ -45,32 +52,23 @@
         })
 
 
-      let hubsFetched = false
-      let hubSelected = false
+      let selected = false;
+
       store.subscribe(() => {
         const storeNow = store.getState()
 
-        if (!hubsFetched && storeNow.user.authKey) {
-          hubsFetched = true;
-          CozifySDK.startDiscoveringHubs()
+
+        if (!selected && storeNow.hubs && storeNow.hubs[fixedHubId] && !storeNow.hubs[fixedHubId].selected) {
+          selected = true;
+          CozifySDK.selectHubById(fixedHubId);
         }
 
-        if (hubsFetched) {
-          console.info("Hubs now", storeNow.hubs)
-          if (storeNow.hubs && storeNow.hubs[fixedHubId] && !storeNow.hubs[fixedHubId].selected) {
-            hubsReceived = true;
-            if (!hubSelected) {
-              CozifySDK.selectHubById(fixedHubId);
-              hubSelected = true;
-            }
-          }
-        }
-
-        console.info("Devices:", CozifySDK.getDevices()[fixedHubId])
         console.info("Cloud connection:", CozifySDK.getCloudConnectionState());
         console.info("Hub connection:", CozifySDK.getHubConnectionState(fixedHubId));
+        console.info("Hubs", storeNow.hubs)
+        console.info("Devices:", CozifySDK.getDevices()[fixedHubId])
 
-        if (storeNow.hubs[fixedHubId] && storeNow.hubs[fixedHubId].selected && storeNow.hubs[fixedHubId].connectionState === CozifySDK.HUB_CONNECTION_STATES.LOCAL) {
+        if (storeNow.hubs && storeNow.hubs[fixedHubId] && storeNow.hubs[fixedHubId].selected) {
           setTimeout(function() {
             CozifySDK.unSelectHubById(fixedHubId);
           }, 10000);
