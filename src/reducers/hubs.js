@@ -44,7 +44,6 @@ const hubsState = createSlice({
         if (oldState && oldState !== newState) {
           console.log (`HUB ${hubId} connection state ${oldState} -> ${newState}`);
           state[hubId].connectionState = newState;
-          events.emit(EVENTS.HUB_CONNECTION_STATE_CHANGED, newState);
         }
       }
     }

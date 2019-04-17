@@ -17,11 +17,8 @@
       let fixedHubId = 'cd3bd9e4-7943-11e5-a567-544a168673f2'
       let fixedDeviceId = '53d59fdc-bd8d-4231-a4a0-d6c6ee51d30e' // Power socet
 
-      let store = CozifySDK.store;
 
       let LANGUAGES = CozifySDK.LANGUAGES;
-      let events = CozifySDK.events;
-      let EVENTS = CozifySDK.EVENTS;
       let USER_STATES = CozifySDK.USER_STATES;
 
 
@@ -40,70 +37,51 @@
           //CozifySDK.doLogout();
           //console.info(`--4--`);
 
-
         })
         .catch(function (error) {
           console.info(`Pw failure when user state ${CozifySDK.getCloudConnectionState()}`, error);
         })
 
 
-      let selected = false;
-      let deviceStateChanged = false;
-      store.subscribe(() => {
-        const storeNow = store.getState()
+      /** Listener for specific changes */
+      CozifySDK.watchChanges('user.state', (newState, oldState) => {
+        console.log('user.state changed from %s to %s', oldState, newState);
+      });
 
-
-        if (!selected && storeNow.hubs && storeNow.hubs[fixedHubId] && !storeNow.hubs[fixedHubId].selected) {
-          selected = true;
+      CozifySDK.watchChanges('hubs', (newHubsState, oldHubsState) => {
+        if (newHubsState[fixedHubId] && !newHubsState[fixedHubId].selected) {
           CozifySDK.selectHubById(fixedHubId);
-        }
-
-        console.info("Cloud connection:", CozifySDK.getCloudConnectionState());
-        console.info("Hub connection:", CozifySDK.getHubConnectionState(fixedHubId));
-        console.info("Hubs", storeNow.hubs)
-        console.info("Devices:", CozifySDK.getDevices()[fixedHubId])
-
-        if (storeNow.hubs && storeNow.hubs[fixedHubId] && storeNow.hubs[fixedHubId].selected) {
-          const hubDevices = CozifySDK.getHubDevices(fixedHubId);
-          if (hubDevices){
-            let state = hubDevices[fixedDeviceId].state;
-            if (!deviceStateChanged) {
-              deviceStateChanged = true;
-              state.isOn = !state.isOn;
-              CozifySDK.sendDeviceCmd(fixedHubId, fixedDeviceId, state);
-            }
-          }
-
           /*
           setTimeout(function() {
             CozifySDK.unSelectHubById(fixedHubId);
           }, 10000);
           */
-
         }
 
+      });
+
+      let deviceStateChanged = false;
+      CozifySDK.watchChanges('devices', (newDevicesState, oldDevicesState) => {
+        if ( newDevicesState[fixedHubId] && newDevicesState[fixedHubId][fixedDeviceId] && newDevicesState[fixedHubId][fixedDeviceId].state ) {
+          if (!deviceStateChanged) {
+            deviceStateChanged = true;
+            let state = newDevicesState[fixedHubId][fixedDeviceId].state;
+            state.isOn = !state.isOn;
+            CozifySDK.sendDeviceCmd(fixedHubId, fixedDeviceId, state);
+          }
+        }
+      });
+
+
+      /** Listener for store changes like React will internally do */
+      CozifySDK.store.subscribe(() => {
+        const storeNow = CozifySDK.store.getState()
+        console.info("Cloud connection:", CozifySDK.getCloudConnectionState());
+        console.info("Hub connection:", CozifySDK.getHubConnectionState(fixedHubId));
+        console.info("Hubs", storeNow.hubs)
+        console.info("Devices:", CozifySDK.getDevices()[fixedHubId])
       })
 
-      /**
-       * Listener of User state changes
-      const unbindUserStateChangedListener = events.on(EVENTS.USER_STATE_CHANGED, newState => {
-        console.log("USER_STATE CHANGED: ", newState);
-        if (newState === USER_STATES.AUTHENTICATED){
-
-        }
-      });
-       */
-
-
-      /**
-       * Listener of HUB list changes
-      const unbindHubListCahngeListener = events.on(EVENTS.HUBS_LIST_CHANGED, eventHubs => {
-        const hubs = CozifySDK.getHubs(); // Optional because eventHubs contains same info
-        for (let key in hubs) {
-          console.log(` Hub name: ${hubs[key].name} - role: ${hubs[key].roleString}`);
-        }
-      });
-       */
     </script>
     <title>cozify-sdk</title>
   </head>

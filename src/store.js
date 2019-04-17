@@ -1,8 +1,18 @@
 
+import { configureStore, getDefaultMiddleware } from 'redux-starter-kit';
+import {rootReducer} from './reducers';
+
 import get from 'get-value'
 
-let _store = null;
 
+export const store = configureStore({
+  reducer: rootReducer
+  //middleware: [...getDefaultMiddleware(), logger]
+  // default true like: devTools: process.env.NODE_ENV !== 'production'
+  //preloadedState
+  //enhancers: [reduxBatch]
+});
+console.log("Initial state", store.getState())
 
 function watchState (getState, objectPath) {
   var currentValue = get(getState(), objectPath)
@@ -18,15 +28,9 @@ function watchState (getState, objectPath) {
   }
 }
 
-export function initStore(store) {
-  _store = store;
+export function watchChanges(path, changed, optionalStore) {
+    let selectedStore = optionalStore ? optionalStore : store
+    let watchFn = watchState(selectedStore.getState, path);
+    selectedStore.subscribe(watchFn(changed));
 }
 
-export function watchChanges(path, changed) {
-    let watchFn = watchState(_store.getState, path);
-    _store.subscribe(watchFn(changed));
-}
-
-export function getStore() {
-  return _store
-}

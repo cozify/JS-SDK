@@ -5,8 +5,6 @@ import { createSlice } from 'redux-starter-kit'
 import { LANGUAGES, USER_STATES, ROLES } from '../user/constants.js';
 import type { USER_STATE_TYPE, ROLES_TYPE } from '../user/constants.js';
 import type { LANGUAGES_TYPE } from '../user/constants.js';
-import { events } from '../events/events.js'
-import { EVENTS } from '../events/constants.js'
 import isEmpty  from 'lodash/isEmpty';
 
 
@@ -64,9 +62,6 @@ const userState = createSlice({
           // statements;
           break;
         }
-      }
-      if (oldState !== state.state) {
-        events.emit(EVENTS.USER_STATE_CHANGED, state.state);
       }
     },
 

@@ -2,7 +2,7 @@
 //@flow
 
 import { send, COMMANDS } from '../connection/send.js'
-import { getStore } from "../store.js"
+import { store } from "../store.js"
 import { userState } from "../reducers/user"
 import { hubsState } from "../reducers/hubs"
 
@@ -13,7 +13,7 @@ import { hubsState } from "../reducers/hubs"
  */
 export function sendDeviceCmd(hubId: string, deviceId: string, state: Object): Promise<Object> {
   return new Promise( (resolve, reject) => {
-     const stateNow = getStore().getState()
+     const stateNow = store.getState()
 
     const user = userState.selectors.getUser(stateNow);
     if (!user || !user.authKey) {

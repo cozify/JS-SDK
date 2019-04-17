@@ -2,7 +2,7 @@
 
 //import { COMMANDS, send, sendAll } from '../connection/send'
 import { ROLES } from '../user/constants'
-import { getStore } from "../store"
+import { store } from "../store"
 import { devicesState, devicesReducer } from "../reducers/devices"
 
 export function deviceDeltaHandler(hubId: string, reset: boolean, devices: Object) {
@@ -18,7 +18,7 @@ export function deviceDeltaHandler(hubId: string, reset: boolean, devices: Objec
       hubId: hubId,
       devices: devices
     };
-    getStore().dispatch(devicesState.actions.setDevices(stateDevices));
+    store.dispatch(devicesState.actions.setDevices(stateDevices));
   } else {
     // Loop devices to check could it be added or should be removed
     Object.entries(devices).forEach(([key, device]) => {
@@ -27,9 +27,9 @@ export function deviceDeltaHandler(hubId: string, reset: boolean, devices: Objec
         device: device
       };
       if (key && device) {
-        getStore().dispatch(devicesState.actions.setDevice(stateDevice));
+        store.dispatch(devicesState.actions.setDevice(stateDevice));
       } else if (key && oldHubDevices[key]) {
-        getStore().dispatch(devicesState.actions.deleteDevice(stateDevice));
+        store.dispatch(devicesState.actions.deleteDevice(stateDevice));
       }
     });
   }
@@ -46,7 +46,7 @@ export function getHubDevices(hubId) {
 }
 
 export function getDevices() {
-  const stateNow = getStore().getState();
+  const stateNow = store.getState();
   return devicesState.selectors.getDevices(stateNow)
 }
 

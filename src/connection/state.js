@@ -2,7 +2,7 @@
 
 import { connectionsState, connectionsReducer } from "../reducers/connections";
 import { hubsState, hubsReducer } from "../reducers/hubs"
-import { getStore } from "../store"
+import { store } from "../store"
 import { HUB_CONNECTION_STATES } from './constants'
 import type { CLOUD_CONNECTION_STATE_TYPE, HUB_CONNECTION_STATE_TYPE } from './constants';
 /**
@@ -10,11 +10,11 @@ import type { CLOUD_CONNECTION_STATE_TYPE, HUB_CONNECTION_STATE_TYPE } from './c
  * @param {[type]} value: CLOUD_CONNECTION_STATE_TYPE [description]
  */
 export function setCloudConnectionState(value: CLOUD_CONNECTION_STATE_TYPE) {
-    getStore().dispatch(connectionsState.actions.setCloudConnectionState(value));
+    store.dispatch(connectionsState.actions.setCloudConnectionState(value));
 }
 
 export function getCloudConnectionState () {
-  const stateNow = getStore().getState();
+  const stateNow = store.getState();
   return connectionsState.selectors.getConnections(stateNow).cloudState;
 }
 
@@ -23,7 +23,7 @@ export function getCloudConnectionState () {
  * @param {Object} hubAndState hubId and new state
  */
 export function setHubConnectionState(hubAndState) {
-    const stateNow = getStore().getState()
+    const stateNow = store.getState()
     const storedHubs = hubsState.selectors.getHubs(stateNow)
     /* If hub is unconnected, lets try remote */
     if (hubAndState.state === HUB_CONNECTION_STATES.UNCONNECTED && storedHubs[hubAndState.hubId]){
@@ -31,11 +31,11 @@ export function setHubConnectionState(hubAndState) {
         hubAndState.state = HUB_CONNECTION_STATES.LOCALE
       }
     }
-    getStore().dispatch(hubsState.actions.setHubConnectionState(hubAndState));
+    store.dispatch(hubsState.actions.setHubConnectionState(hubAndState));
 }
 
 export function getHubConnectionState (hubId) {
-  const stateNow = getStore().getState();
+  const stateNow = store.getState();
   if (hubsState.selectors.getHubs(stateNow)[hubId]){
     return hubsState.selectors.getHubs(stateNow)[hubId].connectionState;
   }

@@ -5,8 +5,6 @@ import isEmpty  from 'lodash/isEmpty';
 import { createSlice } from 'redux-starter-kit'
 import { CLOUD_CONNECTION_STATES } from '../connection/constants.js';
 import type { CLOUD_CONNECTION_STATE_TYPE } from '../connection/constants.js';
-import { events } from '../events/events.js'
-import { EVENTS } from '../events/constants.js'
 
 
 const connectionsState = createSlice({
@@ -22,7 +20,7 @@ const connectionsState = createSlice({
         if (oldState !== newState) {
           console.log ("CLOUD connection state " + oldState + " -> " + newState)
           state.cloudState = newState
-          events.emit(EVENTS.CLOUD_CONNECTION_STATE_CHANGED, state.state);
+
         }
       }
     },

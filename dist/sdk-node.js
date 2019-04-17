@@ -5244,79 +5244,6 @@ const HUB_CONNECTION_STATES = Object.freeze({
 const CLOUD_API_VERSION = "ui/0.2/";
 const CLOUD_URL = "https://testapi.cozify.fi/" + CLOUD_API_VERSION;
 
-//      
-// An event handler can take an optional event argument
-// and should not return a value
-                                          
-                                                               
-
-// An array of all currently registered event handlers for a type
-                                            
-                                                            
-// A map of event types and their corresponding event handlers.
-                        
-                                 
-                                   
-  
-
-/** Mitt: Tiny (~200b) functional event emitter / pubsub.
- *  @name mitt
- *  @returns {Mitt}
- */
-function mitt(all                 ) {
-	all = all || Object.create(null);
-
-	return {
-		/**
-		 * Register an event handler for the given type.
-		 *
-		 * @param  {String} type	Type of event to listen for, or `"*"` for all events
-		 * @param  {Function} handler Function to call in response to given event
-		 * @memberOf mitt
-		 */
-		on: function on(type        , handler              ) {
-			(all[type] || (all[type] = [])).push(handler);
-		},
-
-		/**
-		 * Remove an event handler for the given type.
-		 *
-		 * @param  {String} type	Type of event to unregister `handler` from, or `"*"`
-		 * @param  {Function} handler Handler function to remove
-		 * @memberOf mitt
-		 */
-		off: function off(type        , handler              ) {
-			if (all[type]) {
-				all[type].splice(all[type].indexOf(handler) >>> 0, 1);
-			}
-		},
-
-		/**
-		 * Invoke all handlers for the given type.
-		 * If present, `"*"` handlers are invoked after type-matched handlers.
-		 *
-		 * @param {String} type  The event type to invoke
-		 * @param {Any} [evt]  Any value (object is recommended and powerful), passed to each handler
-		 * @memberOf mitt
-		 */
-		emit: function emit(type        , evt     ) {
-			(all[type] || []).slice().map(function (handler) { handler(evt); });
-			(all['*'] || []).slice().map(function (handler) { handler(type, evt); });
-		}
-	};
-}
-//# sourceMappingURL=mitt.es.js.map
-
-const events$1 = mitt();
-
-const EVENTS$1 = Object.freeze({
-  USER_STATE_CHANGED: 'USER STATE CHANGED',
-  HUBS_LIST_CHANGED: 'HUBS LIST CHANGED',
-  HUB_SELECTED: 'HUBS LIST CHANGED',
-  CLOUD_CONNECTION_STATE_CHANGED: 'CLOUD CONNECTION STATE CHANGED',
-  HUB_CONNECTION_STATE_CHANGED: 'HUB CONNECTION STATE CHANGED'
-});
-
 const connectionsState = createSlice({
   slice: 'connections',
   initialState: {
@@ -5331,7 +5258,6 @@ const connectionsState = createSlice({
         if (oldState !== newState) {
           console.log("CLOUD connection state " + oldState + " -> " + newState);
           state.cloudState = newState;
-          events$1.emit(EVENTS$1.CLOUD_CONNECTION_STATE_CHANGED, state.state);
         }
       }
     }
@@ -5453,7 +5379,6 @@ const hubsState = createSlice({
         if (oldState && oldState !== newState) {
           console.log(`HUB ${hubId} connection state ${oldState} -> ${newState}`);
           state[hubId].connectionState = newState;
-          events.emit(EVENTS.HUB_CONNECTION_STATE_CHANGED, newState);
         }
       }
     }
@@ -5561,10 +5486,6 @@ const userState = createSlice({
           {
             break;
           }
-      }
-
-      if (oldState !== state.state) {
-        events$1.emit(EVENTS$1.USER_STATE_CHANGED, state.state);
       }
     },
 
@@ -5717,7 +5638,10 @@ function isValidObject(val) {
   return isobject(val) || Array.isArray(val) || typeof val === 'function';
 }
 
-let _store = null;
+const store = configureStore({
+  reducer: rootReducer
+});
+console.log("Initial state", store.getState());
 
 function watchState(getState, objectPath) {
   var currentValue = getValue$1(getState(), objectPath);
@@ -5734,16 +5658,10 @@ function watchState(getState, objectPath) {
   };
 }
 
-function initStore(store) {
-  _store = store;
-}
-function watchChanges(path, changed) {
-  let watchFn = watchState(_store.getState, path);
-
-  _store.subscribe(watchFn(changed));
-}
-function getStore() {
-  return _store;
+function watchChanges(path, changed, optionalStore) {
+  let selectedStore = optionalStore ? optionalStore : store;
+  let watchFn = watchState(selectedStore.getState, path);
+  selectedStore.subscribe(watchFn(changed));
 }
 
 const HUB_STATES = Object.freeze({
@@ -5760,14 +5678,14 @@ const HUB_PROTOCOL = 'http://';
 const HUB_PORT = '8893';
 
 function setCloudConnectionState(value) {
-  getStore().dispatch(connectionsState.actions.setCloudConnectionState(value));
+  store.dispatch(connectionsState.actions.setCloudConnectionState(value));
 }
 function getCloudConnectionState() {
-  const stateNow = getStore().getState();
+  const stateNow = store.getState();
   return connectionsState.selectors.getConnections(stateNow).cloudState;
 }
 function setHubConnectionState$1(hubAndState) {
-  const stateNow = getStore().getState();
+  const stateNow = store.getState();
   const storedHubs = hubsState.selectors.getHubs(stateNow);
 
   if (hubAndState.state === HUB_CONNECTION_STATES.UNCONNECTED && storedHubs[hubAndState.hubId]) {
@@ -5776,10 +5694,10 @@ function setHubConnectionState$1(hubAndState) {
     }
   }
 
-  getStore().dispatch(hubsState.actions.setHubConnectionState(hubAndState));
+  store.dispatch(hubsState.actions.setHubConnectionState(hubAndState));
 }
 function getHubConnectionState(hubId) {
-  const stateNow = getStore().getState();
+  const stateNow = store.getState();
 
   if (hubsState.selectors.getHubs(stateNow)[hubId]) {
     return hubsState.selectors.getHubs(stateNow)[hubId].connectionState;
@@ -6424,7 +6342,7 @@ function send({
 }
 
 function storedUser() {
-  const stateNow = getStore().getState();
+  const stateNow = store.getState();
   const storedUser = userState.selectors.getUser(stateNow);
   return storedUser;
 }
@@ -6433,10 +6351,10 @@ function changeLanguage(newLanguage) {
   let retVel = false;
 
   if (Object.values(LANGUAGES).indexOf(newLanguage) > -1) {
-    getStore().dispatch(userState.actions.setLanguage(newLanguage));
+    store.dispatch(userState.actions.setLanguage(newLanguage));
 
     if (storedUser().state === USER_STATES$1.WAITING_LANGUAGE) {
-      getStore().dispatch(userState.actions.changeState(USER_STATES$1.LANGUAGE_SET));
+      store.dispatch(userState.actions.changeState(USER_STATES$1.LANGUAGE_SET));
     }
 
     retVel = true;
@@ -6446,10 +6364,10 @@ function changeLanguage(newLanguage) {
 }
 function acceptEula() {
   let retVel = false;
-  getStore().dispatch(userState.actions.setEula(true));
+  store.dispatch(userState.actions.setEula(true));
 
   if (storedUser().state === USER_STATES$1.WAITING_EULA) {
-    getStore().dispatch(userState.actions.changeState(USER_STATES$1.EULA_ACCEPTED));
+    store.dispatch(userState.actions.changeState(USER_STATES$1.EULA_ACCEPTED));
   }
 
   retVel = true;
@@ -6465,10 +6383,10 @@ function doPwLogin(email, password) {
       }
     }).then(response => {
       if (response && isString_1(response)) {
-        getStore().dispatch(userState.actions.setAuthKey(response));
+        store.dispatch(userState.actions.setAuthKey(response));
 
         if (storedUser().state === USER_STATES$1.WAITING_LOGIN) {
-          getStore().dispatch(userState.actions.changeState(USER_STATES$1.LOGIN_DONE));
+          store.dispatch(userState.actions.changeState(USER_STATES$1.LOGIN_DONE));
         }
       }
 
@@ -6495,7 +6413,7 @@ function deviceDeltaHandler(hubId, reset, devices) {
       hubId: hubId,
       devices: devices
     };
-    getStore().dispatch(devicesState.actions.setDevices(stateDevices));
+    store.dispatch(devicesState.actions.setDevices(stateDevices));
   } else {
     Object.entries(devices).forEach(([key, device]) => {
       const stateDevice = {
@@ -6504,9 +6422,9 @@ function deviceDeltaHandler(hubId, reset, devices) {
       };
 
       if (key && device) {
-        getStore().dispatch(devicesState.actions.setDevice(stateDevice));
+        store.dispatch(devicesState.actions.setDevice(stateDevice));
       } else if (key && oldHubDevices[key]) {
-        getStore().dispatch(devicesState.actions.deleteDevice(stateDevice));
+        store.dispatch(devicesState.actions.deleteDevice(stateDevice));
       }
     });
   }
@@ -6522,7 +6440,7 @@ function getHubDevices(hubId) {
   return retVal;
 }
 function getDevices() {
-  const stateNow = getStore().getState();
+  const stateNow = store.getState();
   return devicesState.selectors.getDevices(stateNow);
 }
 
@@ -6668,12 +6586,12 @@ function doCloudDiscovery(authKey) {
       }
 
       sendAll(queries).then(values => {}).catch(error => {}).finally(() => {
-        getStore().dispatch(hubsState.actions.updateHubs(_hubs));
+        store.dispatch(hubsState.actions.updateHubs(_hubs));
         resolve();
       });
     }).catch(error => {
       console.error("doCloudDiscovery error: ", error.message);
-      getStore().dispatch(hubsState.actions.updateHubs(_hubs));
+      store.dispatch(hubsState.actions.updateHubs(_hubs));
       resolve();
     });
   });
@@ -6734,7 +6652,7 @@ function unSelectHubById(selectedId) {
 
   for (var hub of Object.values(hubs)) {
     if (selectedId === hub.id) {
-      getStore().dispatch(hubsState.actions.unSelectHub(hub.id));
+      store.dispatch(hubsState.actions.unSelectHub(hub.id));
       stopPolling(hub.id);
     }
   }
@@ -6744,31 +6662,39 @@ function selectHubById(selectedId) {
 
   for (var hub of Object.values(hubs)) {
     if (selectedId === hub.id) {
-      getStore().dispatch(hubsState.actions.selectHub(hub.id));
+      store.dispatch(hubsState.actions.selectHub(hub.id));
       startPolling(hub);
     }
   }
 }
-setTimeout(() => {
-  watchChanges('user.state', (newState, oldState) => {
-    if (newState === USER_STATES.AUTHENTICATED) {
-      console.log('user.state changed from %s to %s', oldState, newState);
-      startDiscoveringHubs();
-    }
-  });
-}, 100);
 let pollIntervals = {};
 let pollTimeStamp = 0;
 let pollInAction = false;
+let secondPoll = false;
 function doPoll(hubId) {
+  const hub = getHubs()[hubId];
+
+  if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
+    return;
+  }
+
+  if (hub.connectionState === HUB_CONNECTION_STATES.REMOTE) {
+    if (secondPoll) {
+      secondPoll = false;
+      return;
+    }
+
+    secondPoll = true;
+  }
+
+  const authKey = storedUser$1().authKey;
+  const hubKey = hub.hubKey;
+
   if (pollInAction) {
     return;
   }
 
   pollInAction = true;
-  const hub = getHubs()[hubId];
-  const authKey = storedUser$1().authKey;
-  const hubKey = hub.hubKey;
   let reset = pollTimeStamp === 0 ? true : false;
   send({
     command: COMMANDS.POLL,
@@ -6853,18 +6779,21 @@ function stopPolling(hubId) {
 }
 
 function storedUser$1() {
-  const stateNow = getStore().getState();
-  return userState.selectors.getUser(stateNow);
+  return userState.selectors.getUser(store.getState());
 }
 
 function getHubs() {
-  const stateNow = getStore().getState();
-  return hubsState.selectors.getHubs(stateNow);
+  return hubsState.selectors.getHubs(store.getState());
 }
+watchChanges('user.state', (newState, oldState) => {
+  if (newState === USER_STATES.AUTHENTICATED) {
+    startDiscoveringHubs();
+  }
+});
 
 function sendDeviceCmd(hubId, deviceId, state) {
   return new Promise((resolve, reject) => {
-    const stateNow = getStore().getState();
+    const stateNow = store.getState();
     const user = userState.selectors.getUser(stateNow);
 
     if (!user || !user.authKey) {
@@ -6897,14 +6826,7 @@ function sendDeviceCmd(hubId, deviceId, state) {
   });
 }
 
-const store = configureStore({
-  reducer: rootReducer
-});
-console.log("Initial state", store.getState());
-initStore(store);
-
 exports.CLOUD_CONNECTION_STATES = CLOUD_CONNECTION_STATES;
-exports.EVENTS = EVENTS$1;
 exports.HUB_CONNECTION_STATES = HUB_CONNECTION_STATES;
 exports.HUB_STATES = HUB_STATES;
 exports.LANGUAGES = LANGUAGES;
@@ -6915,7 +6837,6 @@ exports.changeLanguage = changeLanguage;
 exports.deleteDevice = deleteDevice;
 exports.devicesState = devicesState;
 exports.doPwLogin = doPwLogin;
-exports.events = events$1;
 exports.getCloudConnectionState = getCloudConnectionState;
 exports.getDevices = getDevices;
 exports.getHubConnectionState = getHubConnectionState;
@@ -6932,4 +6853,5 @@ exports.stopPolling = stopPolling;
 exports.store = store;
 exports.unSelectHubById = unSelectHubById;
 exports.updateHubs = updateHubs;
+exports.watchChanges = watchChanges;
 //# sourceMappingURL=sdk-node.js.map
