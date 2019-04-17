@@ -39,9 +39,9 @@ const hubsState = createSlice({
     setHubConnectionState(state, action) {
       const hubId = action.payload.hubId
       const newState = action.payload.state
-      const oldState = state[hubId].connectionState
+      const oldState = state[hubId] ? state[hubId].connectionState : undefined
       if (Object.values(HUB_CONNECTION_STATES).indexOf(newState) > -1) {
-        if (oldState !== newState) {
+        if (oldState && oldState !== newState) {
           console.log (`HUB ${hubId} connection state ${oldState} -> ${newState}`);
           state[hubId].connectionState = newState;
           events.emit(EVENTS.HUB_CONNECTION_STATE_CHANGED, newState);

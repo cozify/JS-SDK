@@ -20,18 +20,18 @@ export function getCloudConnectionState () {
 
 /**
  * Change hub connection state
- * @param {Object} hubAndSate hubId and new state
+ * @param {Object} hubAndState hubId and new state
  */
-export function setHubConnectionState(hubAndSate) {
+export function setHubConnectionState(hubAndState) {
     const stateNow = getStore().getState()
     const storedHubs = hubsState.selectors.getHubs(stateNow)
     /* If hub is unconnected, lets try remote */
-    if (hubAndSate.state === HUB_CONNECTION_STATES.UNCONNECTED && storedHubs[hubAndSate.hubId]){
-      if (storedHubs[hubAndSate.hubId].connectionState === HUB_CONNECTION_STATES.REMOTE){
-        hubAndSate.state = HUB_CONNECTION_STATES.LOCALE
+    if (hubAndState.state === HUB_CONNECTION_STATES.UNCONNECTED && storedHubs[hubAndState.hubId]){
+      if (storedHubs[hubAndState.hubId].connectionState === HUB_CONNECTION_STATES.REMOTE){
+        hubAndState.state = HUB_CONNECTION_STATES.LOCALE
       }
     }
-    getStore().dispatch(hubsState.actions.setHubConnectionState(hubAndSate));
+    getStore().dispatch(hubsState.actions.setHubConnectionState(hubAndState));
 }
 
 export function getHubConnectionState (hubId) {

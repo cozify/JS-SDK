@@ -36,6 +36,15 @@ export function deviceDeltaHandler(hubId: string, reset: boolean, devices: Objec
 }
 
 
+export function getHubDevices(hubId) {
+  let retVal = undefined;
+  const devices = getDevices();
+  if (devices && devices[hubId]) {
+    retVal = devices[hubId];
+  }
+  return retVal;
+}
+
 export function getDevices() {
   const stateNow = getStore().getState();
   return devicesState.selectors.getDevices(stateNow)

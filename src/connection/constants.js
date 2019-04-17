@@ -9,7 +9,10 @@
   */
 export const CLOUD_CONNECTION_STATES = Object.freeze({
   UNCONNECTED: 'no connection',
-  CONNECTED: 'connected',
+  UNAUTHENTICATED: 'unauthenticated',
+  UNAUTHORIZED: 'unauthorized',
+  OBSOLETE_API_VERSION: 'obsolete api version',
+  CONNECTED: 'connected'
 });
 export type CLOUD_CONNECTION_STATE_TYPE = $Values<typeof CLOUD_CONNECTION_STATES>;
 
@@ -21,6 +24,9 @@ export type CLOUD_CONNECTION_STATE_TYPE = $Values<typeof CLOUD_CONNECTION_STATES
   */
 export const HUB_CONNECTION_STATES = Object.freeze({
   UNCONNECTED: 'no connection',
+  UNAUTHENTICATED: 'unauthenticated',
+  UNAUTHORIZED: 'unauthorized',
+  OBSOLETE_API_VERSION: 'obsolete api version',
   REMOTE: 'remote',
   LOCAL: 'local'
 });

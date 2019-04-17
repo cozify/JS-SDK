@@ -1,6 +1,6 @@
 // @flow
 import isEmpty from 'lodash/isEmpty'
-import { HUB_STATES, REMOTE_POLL_INTERVAL_MS, HUB_PROTOCOL, HUB_PORT, DISCOVERY_INTERVAL_MS } from './constants'
+import { HUB_STATES, POLL_INTERVAL_MS, HUB_PROTOCOL, HUB_PORT, DISCOVERY_INTERVAL_MS } from './constants'
 import { HUB_CONNECTION_STATES } from '../connection/constants'
 import { events } from '../events/events'
 import { EVENTS } from '../events/constants'
@@ -8,7 +8,7 @@ import { COMMANDS, send, sendAll } from '../connection/send'
 import { ROLES } from '../user/constants'
 import { deviceDeltaHandler } from '../devices/devices'
 import { isNode } from '../utils'
-import { getStore } from "../store"
+import { getStore, watchChanges } from "../store"
 import { hubsState, hubsReducer } from "../reducers/hubs"
 import { userState, userReducer } from "../reducers/user"
 
@@ -99,7 +99,7 @@ function extractHubInfo(HUBKeys: Object): {} {
  * @param  {string} url
  * @param  {Object} foundHub
  */
-export function updateFoundHub(hubURL: string, foundHub) {
+function updateFoundHub(hubURL: string, foundHub) {
   /*
   const hubData = {}
   hubData[foundHub.hubId] = {
@@ -247,10 +247,10 @@ export function fetchHubs( ): Promise<Object> {
   return new Promise( (resolve, reject) => {
 
     if (!authKey) {
-      reject('not userKey');
+      reject('No userKey!');
       return;
     }
-    send( {command: COMMANDS.HUB_KEYS,  authKey: authKey })
+    send({ command: COMMANDS.HUB_KEYS,  authKey: authKey })
     .then((tokens) => {
       if (tokens) {
         _hubs = extractHubInfo(tokens);
@@ -280,8 +280,10 @@ export function fetchHubs( ): Promise<Object> {
 let discoveryInterval = undefined
 
 export function startDiscoveringHubs() {
-  fetchHubs(); // call immediately and then every 30s
-  discoveryInterval = setInterval(fetchHubs, DISCOVERY_INTERVAL_MS);
+  if (!discoveryInterval) {
+    fetchHubs(); // call immediately and then every 30s
+    discoveryInterval = setInterval(fetchHubs, DISCOVERY_INTERVAL_MS);
+  }
 }
 
 export function stopDiscoveringHubs() {
@@ -317,28 +319,48 @@ export function selectHubById( selectedId: string ) {
   }
 }
 
+/**
+ * Listener of User state changes
+ */
+setTimeout( ()=> {
 
+  watchChanges('user.state', (newState, oldState) => {
+    // Start discovery when user is authenticated
+    if (newState === USER_STATES.AUTHENTICATED) {
+      console.log('user.state changed from %s to %s', oldState, newState);
+      startDiscoveringHubs();
+    }
+
+  });
+
+}, 100);
 
 /*
 ** Polling
  */
 
-let pollIntervals = {}
-let pollTimeStamp = 0
-
+let pollIntervals = {};
+let pollTimeStamp = 0;
+let pollInAction = false;
 
 export function doPoll(hubId: string){
+
+  if (pollInAction) {
+    return;
+  }
+  pollInAction = true
   const hub = getHubs()[hubId];
   const authKey = storedUser().authKey;
   const hubKey = hub.hubKey;
-  const reset = pollTimeStamp === 0 ? true : false
+
+  let reset = pollTimeStamp === 0 ? true : false
   send( {command: COMMANDS.POLL, hubId:hubId, authKey: authKey, hubKey: hubKey, localUrl: hub.url, data: {ts:pollTimeStamp} })
   .then((deltas) => {
     if (deltas) {
       //console.log(JSON.stringify(deltas));
       pollTimeStamp = deltas.timestamp
       // Return can be null poll, even if not asked that
-      if (pollTimeStamp === 0) {
+      if (pollTimeStamp === 0 || deltas.full) {
         reset = true
       }
       for (let delta of deltas.polls) {
@@ -374,15 +396,17 @@ export function doPoll(hubId: string){
         }
       }
     }
+    pollInAction = false;
   })
   .catch((error) => {
     //getStore().dispatch(hubsState.actions.hubPollFailed())
     console.error("doPoll error: ", error.message);
+    pollInAction = false;
   });
 }
 
 export function startPolling(hub) {
-  const intervalTime = REMOTE_POLL_INTERVAL_MS
+  const intervalTime = POLL_INTERVAL_MS
   pollIntervals[hub.id] = setInterval(doPoll, intervalTime, hub.id);
 }
 
@@ -390,15 +414,15 @@ export function stopPolling(hubId: string) {
   clearInterval(pollIntervals[hubId]);
 }
 
+
+
 function storedUser() {
-  const stateNow = getStore().getState()
-  const storedUser = userState.selectors.getUser(stateNow)
-  return storedUser;
+  const stateNow = getStore().getState();
+  return userState.selectors.getUser(stateNow);
 }
 
 export function getHubs() {
-  const stateNow = getStore().getState()
-  const storedHubs = hubsState.selectors.getHubs(stateNow)
-  return storedHubs;
+  const stateNow = getStore().getState();
+  return hubsState.selectors.getHubs(stateNow);
 }
 

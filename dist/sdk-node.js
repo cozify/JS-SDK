@@ -5228,10 +5228,16 @@ var isEmpty_1 = isEmpty;
 
 const CLOUD_CONNECTION_STATES = Object.freeze({
   UNCONNECTED: 'no connection',
+  UNAUTHENTICATED: 'unauthenticated',
+  UNAUTHORIZED: 'unauthorized',
+  OBSOLETE_API_VERSION: 'obsolete api version',
   CONNECTED: 'connected'
 });
 const HUB_CONNECTION_STATES = Object.freeze({
   UNCONNECTED: 'no connection',
+  UNAUTHENTICATED: 'unauthenticated',
+  UNAUTHORIZED: 'unauthorized',
+  OBSOLETE_API_VERSION: 'obsolete api version',
   REMOTE: 'remote',
   LOCAL: 'local'
 });
@@ -5441,10 +5447,10 @@ const hubsState = createSlice({
     setHubConnectionState(state, action) {
       const hubId = action.payload.hubId;
       const newState = action.payload.state;
-      const oldState = state[hubId].connectionState;
+      const oldState = state[hubId] ? state[hubId].connectionState : undefined;
 
       if (Object.values(HUB_CONNECTION_STATES).indexOf(newState) > -1) {
-        if (oldState !== newState) {
+        if (oldState && oldState !== newState) {
           console.log(`HUB ${hubId} connection state ${oldState} -> ${newState}`);
           state[hubId].connectionState = newState;
           events.emit(EVENTS.HUB_CONNECTION_STATE_CHANGED, newState);
@@ -5471,7 +5477,7 @@ const LANGUAGES = Object.freeze({
   EN_UK: 'en-uk',
   FI_FI: 'fi-fi'
 });
-const USER_STATES = Object.freeze({
+const USER_STATES$1 = Object.freeze({
   WAITING_LANGUAGE: 'wait language',
   LANGUAGE_SET: 'language set',
   WAITING_LOGIN: 'wait login',
@@ -5498,7 +5504,7 @@ const userState = createSlice({
     authKey: '',
     role: ROLES.ANONYMOUS,
     eulaAccepted: false,
-    state: USER_STATES.WAITING_LANGUAGE
+    state: USER_STATES$1.WAITING_LANGUAGE
   },
   reducers: {
     changeState(state, action) {
@@ -5507,25 +5513,25 @@ const userState = createSlice({
       console.log("User state " + oldState + " -> " + newState);
 
       switch (oldState) {
-        case USER_STATES.WAITING_LANGUAGE:
+        case USER_STATES$1.WAITING_LANGUAGE:
           {
-            if (newState === USER_STATES.LANGUAGE_SET) {
+            if (newState === USER_STATES$1.LANGUAGE_SET) {
               if (!isEmpty_1(state.language)) {
-                state.state = USER_STATES.WAITING_LOGIN;
+                state.state = USER_STATES$1.WAITING_LOGIN;
               }
             }
 
             break;
           }
 
-        case USER_STATES.WAITING_LOGIN:
+        case USER_STATES$1.WAITING_LOGIN:
           {
-            if (newState === USER_STATES.LOGIN_DONE) {
+            if (newState === USER_STATES$1.LOGIN_DONE) {
               if (!isEmpty_1(state.authKey)) {
                 if (isEmpty_1(state.eulaAcceted)) {
-                  state.state = USER_STATES.WAITING_EULA;
+                  state.state = USER_STATES$1.WAITING_EULA;
                 } else {
-                  state.state = USER_STATES.AUTHENTICATED;
+                  state.state = USER_STATES$1.AUTHENTICATED;
                 }
               }
             }
@@ -5533,19 +5539,19 @@ const userState = createSlice({
             break;
           }
 
-        case USER_STATES.WAITING_EULA:
+        case USER_STATES$1.WAITING_EULA:
           {
-            if (newState === USER_STATES.EULA_ACCEPTED) {
-              state.state = USER_STATES.AUTHENTICATED;
+            if (newState === USER_STATES$1.EULA_ACCEPTED) {
+              state.state = USER_STATES$1.AUTHENTICATED;
             }
 
             break;
           }
 
-        case USER_STATES.AUTHENTICATED:
+        case USER_STATES$1.AUTHENTICATED:
           {
-            if (newState === USER_STATES.LOGGED_OUT) {
-              state.state = USER_STATES.WAITING_LOGIN;
+            if (newState === USER_STATES$1.LOGGED_OUT) {
+              state.state = USER_STATES$1.WAITING_LOGIN;
             }
 
             break;
@@ -5589,9 +5595,152 @@ const rootReducer = {
   user: userReducer
 };
 
+/*!
+ * isobject <https://github.com/jonschlinkert/isobject>
+ *
+ * Copyright (c) 2014-2017, Jon Schlinkert.
+ * Released under the MIT License.
+ */
+
+var isobject = function isObject(val) {
+  return val != null && typeof val === 'object' && Array.isArray(val) === false;
+};
+
+/*!
+ * get-value <https://github.com/jonschlinkert/get-value>
+ *
+ * Copyright (c) 2014-2018, Jon Schlinkert.
+ * Released under the MIT License.
+ */
+
+
+
+var getValue$1 = function(target, path, options) {
+  if (!isobject(options)) {
+    options = { default: options };
+  }
+
+  if (!isValidObject(target)) {
+    return typeof options.default !== 'undefined' ? options.default : target;
+  }
+
+  if (typeof path === 'number') {
+    path = String(path);
+  }
+
+  const isArray = Array.isArray(path);
+  const isString = typeof path === 'string';
+  const splitChar = options.separator || '.';
+  const joinChar = options.joinChar || (typeof splitChar === 'string' ? splitChar : '.');
+
+  if (!isString && !isArray) {
+    return target;
+  }
+
+  if (isString && path in target) {
+    return isValid(path, target, options) ? target[path] : options.default;
+  }
+
+  let segs = isArray ? path : split(path, splitChar, options);
+  let len = segs.length;
+  let idx = 0;
+
+  do {
+    let prop = segs[idx];
+    if (typeof prop === 'number') {
+      prop = String(prop);
+    }
+
+    while (prop && prop.slice(-1) === '\\') {
+      prop = join([prop.slice(0, -1), segs[++idx] || ''], joinChar, options);
+    }
+
+    if (prop in target) {
+      if (!isValid(prop, target, options)) {
+        return options.default;
+      }
+
+      target = target[prop];
+    } else {
+      let hasProp = false;
+      let n = idx + 1;
+
+      while (n < len) {
+        prop = join([prop, segs[n++]], joinChar, options);
+
+        if ((hasProp = prop in target)) {
+          if (!isValid(prop, target, options)) {
+            return options.default;
+          }
+
+          target = target[prop];
+          idx = n - 1;
+          break;
+        }
+      }
+
+      if (!hasProp) {
+        return options.default;
+      }
+    }
+  } while (++idx < len && isValidObject(target));
+
+  if (idx === len) {
+    return target;
+  }
+
+  return options.default;
+};
+
+function join(segs, joinChar, options) {
+  if (typeof options.join === 'function') {
+    return options.join(segs);
+  }
+  return segs[0] + joinChar + segs[1];
+}
+
+function split(path, splitChar, options) {
+  if (typeof options.split === 'function') {
+    return options.split(path);
+  }
+  return path.split(splitChar);
+}
+
+function isValid(key, target, options) {
+  if (typeof options.isValid === 'function') {
+    return options.isValid(key, target);
+  }
+  return true;
+}
+
+function isValidObject(val) {
+  return isobject(val) || Array.isArray(val) || typeof val === 'function';
+}
+
 let _store = null;
+
+function watchState(getState, objectPath) {
+  var currentValue = getValue$1(getState(), objectPath);
+  return function w(fn) {
+    return function () {
+      var newValue = getValue$1(getState(), objectPath);
+
+      if (currentValue !== newValue) {
+        var oldValue = currentValue;
+        currentValue = newValue;
+        fn(newValue, oldValue);
+      }
+    };
+  };
+}
+
 function initStore(store) {
   _store = store;
+}
+function watchChanges(path, changed) {
+  let watchFn = watchState(_store.getState, path);
+
+  _store.subscribe(watchFn(changed));
 }
 function getStore() {
   return _store;
@@ -5605,8 +5754,8 @@ const HUB_STATES = Object.freeze({
   NO_ACCESS: 'no access',
   CONNECTED: 'connected'
 });
-const DISCOVERY_INTERVAL_MS = 30000;
-const REMOTE_POLL_INTERVAL_MS = 2000;
+const DISCOVERY_INTERVAL_MS = 60 * 1000;
+const POLL_INTERVAL_MS = 1 * 1000;
 const HUB_PROTOCOL = 'http://';
 const HUB_PORT = '8893';
 
@@ -5617,17 +5766,17 @@ function getCloudConnectionState() {
   const stateNow = getStore().getState();
   return connectionsState.selectors.getConnections(stateNow).cloudState;
 }
-function setHubConnectionState$1(hubAndSate) {
+function setHubConnectionState$1(hubAndState) {
   const stateNow = getStore().getState();
   const storedHubs = hubsState.selectors.getHubs(stateNow);
 
-  if (hubAndSate.state === HUB_CONNECTION_STATES.UNCONNECTED && storedHubs[hubAndSate.hubId]) {
-    if (storedHubs[hubAndSate.hubId].connectionState === HUB_CONNECTION_STATES.REMOTE) {
-      hubAndSate.state = HUB_CONNECTION_STATES.LOCALE;
+  if (hubAndState.state === HUB_CONNECTION_STATES.UNCONNECTED && storedHubs[hubAndState.hubId]) {
+    if (storedHubs[hubAndState.hubId].connectionState === HUB_CONNECTION_STATES.REMOTE) {
+      hubAndState.state = HUB_CONNECTION_STATES.LOCALE;
     }
   }
 
-  getStore().dispatch(hubsState.actions.setHubConnectionState(hubAndSate));
+  getStore().dispatch(hubsState.actions.setHubConnectionState(hubAndState));
 }
 function getHubConnectionState(hubId) {
   const stateNow = getStore().getState();
@@ -6001,6 +6150,21 @@ if (typeof process === 'object') {
   }
 }
 
+const SAFE_HTTP_METHODS = ['get', 'head', 'options'];
+const IDEMPOTENT_HTTP_METHODS = SAFE_HTTP_METHODS.concat(['put', 'delete']);
+
+function isRetryableError(error) {
+  return error.code !== 'ECONNABORTED' && (!error.response || error.response.status >= 500 && error.response.status <= 599);
+}
+
+function retryCondition(error) {
+  if (!error.config) {
+    return false;
+  }
+
+  return isRetryableError(error) && IDEMPOTENT_HTTP_METHODS.indexOf(error.config.method) !== -1;
+}
+
 const COMMANDS = Object.freeze({
   USER_LOGIN: {
     method: 'POST',
@@ -6027,10 +6191,58 @@ const COMMANDS = Object.freeze({
     method: 'GET',
     url: CLOUD_URL + "hub/remote/cc/1.11" + "/hub/poll",
     urlParams: ['ts']
+  },
+  CMD_DEVICE: {
+    method: 'PUT',
+    url: CLOUD_URL + "hub/remote/cc/1.11" + "/devices/command",
+    type: 'CMD_DEVICE',
+    params: ['id', 'state']
   }
 });
+
+function cloudErrorState(error) {
+  let retVal = CLOUD_CONNECTION_STATES.UNCONNECTED;
+
+  if (error && error.response && error.response.status === 401) {
+    retVal = CLOUD_CONNECTION_STATES.UNAUTHENTICATED;
+    console.error("send: authentication error ", error);
+  } else if (error && error.response && error.response.status === 403) {
+    retVal = CLOUD_CONNECTION_STATES.UNAUTHORIZED;
+    console.error("send: unauhorized error ", error);
+  } else if (error && error.response && error.response.status === 410) {
+    retVal = CLOUD_CONNECTION_STATES.OBSOLETE_API_VERSION;
+    console.error("send: version error ", error);
+  }
+
+  return retVal;
+}
+
+function hubErrorState(error) {
+  let retVal = HUB_CONNECTION_STATES.UNCONNECTED;
+
+  if (error && error.response && error.response.status === 400) {
+    console.log("send: no-connection error ", error);
+  } else if (error && error.response && error.response.status === 401) {
+    retVal = HUB_CONNECTION_STATES.UNAUTHENTICATED;
+    console.error("send: authentication error ", error);
+  } else if (error && error.response && error.response.status === 403) {
+    retVal = HUB_CONNECTION_STATES.UNAUTHORIZED;
+    console.error("send: unauhorized error ", error);
+  } else if (error && error.response && error.response.status === 410) {
+    retVal = HUB_CONNECTION_STATES.OBSOLETE_API_VERSION;
+    console.error("send: version error ", error);
+  }
+
+  return retVal;
+}
+
 function sendAll(requests) {
   return new Promise((resolve, reject) => {
+    axiosRetry(axios, {
+      retries: 3,
+      shouldResetTimeout: true,
+      retryCondition: retryCondition
+    });
     axios.all(requests).then(axios.spread(function (succ, err) {
       resolve(succ);
     })).catch(error => {
@@ -6046,10 +6258,11 @@ function send({
   method = 'GET',
   authKey = '',
   hubKey = '',
+  type = '',
   config = {},
   data = {}
 }) {
-  let body = {};
+  let body = data;
   let remoteConnection = false;
   const hubCommand = isEmpty_1(hubId) ? false : true;
 
@@ -6076,10 +6289,12 @@ function send({
       remoteConnection = true;
     }
 
-    if (command.params) {
-      command.params.forEach(param => {
-        body[param] = data[param];
-      });
+    if (command.type) {
+      if (isArray_1(data)) {
+        body[0]['type'] = command.type;
+      } else {
+        body['type'] = command.type;
+      }
     }
 
     if (command.urlParams) {
@@ -6124,7 +6339,8 @@ function send({
       }, error => Promise.reject(error));
       axiosRetry(axios, {
         retries: 3,
-        shouldResetTimeout: true
+        shouldResetTimeout: true,
+        retryCondition: retryCondition
       });
       axios(reqConf).then(function (response) {
         if (remoteConnection) {
@@ -6138,14 +6354,30 @@ function send({
 
         resolve(response.data);
       }).catch(function (error) {
-        if (error.response) ; else if (error.request) ;
+        if (error && error.response) {
+          if (remoteConnection) {
+            setCloudConnectionState(cloudErrorState(error));
 
-        if (remoteConnection) {
-          if (error && error.response && error.response.status === 400) {
-            console.log("send: no connection error ", error);
-          } else if (error && error.response && error.response.status === 401) {
-            console.error("send: unauhorized error ", error);
+            if (hubCommand) {
+              setHubConnectionState$1({
+                hubId: hubId,
+                state: hubErrorState(error)
+              });
+            }
           } else {
+            if (error && error.response && error.response.status === 401) {
+              setCloudConnectionState(cloudErrorState(error));
+            }
+
+            if (hubCommand) {
+              setHubConnectionState$1({
+                hubId: hubId,
+                state: hubErrorState(error)
+              });
+            }
+          }
+        } else if (error.request) {
+          if (remoteConnection) {
             setCloudConnectionState(CLOUD_CONNECTION_STATES.UNCONNECTED);
 
             if (hubCommand) {
@@ -6154,19 +6386,39 @@ function send({
                 state: HUB_CONNECTION_STATES.UNCONNECTED
               });
             }
+          } else {
+            if (hubCommand) {
+              setHubConnectionState$1({
+                hubId: hubId,
+                state: HUB_CONNECTION_STATES.UNCONNECTED
+              });
+            }
           }
-        } else if (!isEmpty_1(hubId)) {
-          setHubConnectionState$1({
-            hubId: hubId,
-            state: HUB_CONNECTION_STATES.UNCONNECTED
-          });
+        } else {
+          if (remoteConnection) {
+            setCloudConnectionState(CLOUD_CONNECTION_STATES.UNCONNECTED);
+
+            if (hubCommand) {
+              setHubConnectionState$1({
+                hubId: hubId,
+                state: HUB_CONNECTION_STATES.UNCONNECTED
+              });
+            }
+          } else {
+            if (hubCommand) {
+              setHubConnectionState$1({
+                hubId: hubId,
+                state: HUB_CONNECTION_STATES.UNCONNECTED
+              });
+            }
+          }
         }
 
-        console.error("send: error ", error);
-        reject(error);
+        console.error('SDK send: error ', error);
+        reject(new Error('SDK send: error ', error));
       });
     } else {
-      reject(new Error('Command not found.'));
+      reject(new Error('SDK Error: Command or Command API URL not found.'));
     }
   });
 }
@@ -6183,8 +6435,8 @@ function changeLanguage(newLanguage) {
   if (Object.values(LANGUAGES).indexOf(newLanguage) > -1) {
     getStore().dispatch(userState.actions.setLanguage(newLanguage));
 
-    if (storedUser().state === USER_STATES.WAITING_LANGUAGE) {
-      getStore().dispatch(userState.actions.changeState(USER_STATES.LANGUAGE_SET));
+    if (storedUser().state === USER_STATES$1.WAITING_LANGUAGE) {
+      getStore().dispatch(userState.actions.changeState(USER_STATES$1.LANGUAGE_SET));
     }
 
     retVel = true;
@@ -6196,8 +6448,8 @@ function acceptEula() {
   let retVel = false;
   getStore().dispatch(userState.actions.setEula(true));
 
-  if (storedUser().state === USER_STATES.WAITING_EULA) {
-    getStore().dispatch(userState.actions.changeState(USER_STATES.EULA_ACCEPTED));
+  if (storedUser().state === USER_STATES$1.WAITING_EULA) {
+    getStore().dispatch(userState.actions.changeState(USER_STATES$1.EULA_ACCEPTED));
   }
 
   retVel = true;
@@ -6215,8 +6467,8 @@ function doPwLogin(email, password) {
       if (response && isString_1(response)) {
         getStore().dispatch(userState.actions.setAuthKey(response));
 
-        if (storedUser().state === USER_STATES.WAITING_LOGIN) {
-          getStore().dispatch(userState.actions.changeState(USER_STATES.LOGIN_DONE));
+        if (storedUser().state === USER_STATES$1.WAITING_LOGIN) {
+          getStore().dispatch(userState.actions.changeState(USER_STATES$1.LOGIN_DONE));
         }
       }
 
@@ -6258,6 +6510,16 @@ function deviceDeltaHandler(hubId, reset, devices) {
       }
     });
   }
+}
+function getHubDevices(hubId) {
+  let retVal = undefined;
+  const devices = getDevices();
+
+  if (devices && devices[hubId]) {
+    retVal = devices[hubId];
+  }
+
+  return retVal;
 }
 function getDevices() {
   const stateNow = getStore().getState();
@@ -6437,7 +6699,7 @@ function fetchHubs() {
   const authKey = storedUser$1().authKey;
   return new Promise((resolve, reject) => {
     if (!authKey) {
-      reject('not userKey');
+      reject('No userKey!');
       return;
     }
 
@@ -6462,8 +6724,10 @@ function fetchHubs() {
 }
 let discoveryInterval = undefined;
 function startDiscoveringHubs() {
-  fetchHubs();
-  discoveryInterval = setInterval(fetchHubs, DISCOVERY_INTERVAL_MS);
+  if (!discoveryInterval) {
+    fetchHubs();
+    discoveryInterval = setInterval(fetchHubs, DISCOVERY_INTERVAL_MS);
+  }
 }
 function unSelectHubById(selectedId) {
   const hubs = getHubs();
@@ -6485,13 +6749,27 @@ function selectHubById(selectedId) {
     }
   }
 }
+setTimeout(() => {
+  watchChanges('user.state', (newState, oldState) => {
+    if (newState === USER_STATES.AUTHENTICATED) {
+      console.log('user.state changed from %s to %s', oldState, newState);
+      startDiscoveringHubs();
+    }
+  });
+}, 100);
 let pollIntervals = {};
 let pollTimeStamp = 0;
+let pollInAction = false;
 function doPoll(hubId) {
+  if (pollInAction) {
+    return;
+  }
+
+  pollInAction = true;
   const hub = getHubs()[hubId];
   const authKey = storedUser$1().authKey;
   const hubKey = hub.hubKey;
-  const reset = pollTimeStamp === 0 ? true : false;
+  let reset = pollTimeStamp === 0 ? true : false;
   send({
     command: COMMANDS.POLL,
     hubId: hubId,
@@ -6505,7 +6783,7 @@ function doPoll(hubId) {
     if (deltas) {
       pollTimeStamp = deltas.timestamp;
 
-      if (pollTimeStamp === 0) {
+      if (pollTimeStamp === 0 || deltas.full) {
         reset = true;
       }
 
@@ -6559,12 +6837,15 @@ function doPoll(hubId) {
         }
       }
     }
+
+    pollInAction = false;
   }).catch(error => {
     console.error("doPoll error: ", error.message);
+    pollInAction = false;
   });
 }
 function startPolling(hub) {
-  const intervalTime = REMOTE_POLL_INTERVAL_MS;
+  const intervalTime = POLL_INTERVAL_MS;
   pollIntervals[hub.id] = setInterval(doPoll, intervalTime, hub.id);
 }
 function stopPolling(hubId) {
@@ -6573,14 +6854,47 @@ function stopPolling(hubId) {
 
 function storedUser$1() {
   const stateNow = getStore().getState();
-  const storedUser = userState.selectors.getUser(stateNow);
-  return storedUser;
+  return userState.selectors.getUser(stateNow);
 }
 
 function getHubs() {
   const stateNow = getStore().getState();
-  const storedHubs = hubsState.selectors.getHubs(stateNow);
-  return storedHubs;
+  return hubsState.selectors.getHubs(stateNow);
+}
+
+function sendDeviceCmd(hubId, deviceId, state) {
+  return new Promise((resolve, reject) => {
+    const stateNow = getStore().getState();
+    const user = userState.selectors.getUser(stateNow);
+
+    if (!user || !user.authKey) {
+      reject('No userKey!');
+      return;
+    }
+
+    const hubs = hubsState.selectors.getHubs(stateNow);
+
+    if (!hubs[hubId] || !hubs[hubId].hubKey) {
+      reject('No hubKey!');
+      return;
+    }
+
+    const authKey = user.authKey;
+    const hubKey = hubs[hubId].hubKey;
+    send({
+      command: COMMANDS.CMD_DEVICE,
+      authKey: authKey,
+      hubKey: hubKey,
+      data: [{
+        id: deviceId,
+        state: state
+      }]
+    }).then(response => {
+      resolve(response);
+    }).catch(error => {
+      reject(false);
+    });
+  });
 }
 
 const store = configureStore({
@@ -6595,7 +6909,7 @@ exports.HUB_CONNECTION_STATES = HUB_CONNECTION_STATES;
 exports.HUB_STATES = HUB_STATES;
 exports.LANGUAGES = LANGUAGES;
 exports.ROLES = ROLES;
-exports.USER_STATES = USER_STATES;
+exports.USER_STATES = USER_STATES$1;
 exports.acceptEula = acceptEula;
 exports.changeLanguage = changeLanguage;
 exports.deleteDevice = deleteDevice;
@@ -6605,10 +6919,12 @@ exports.events = events$1;
 exports.getCloudConnectionState = getCloudConnectionState;
 exports.getDevices = getDevices;
 exports.getHubConnectionState = getHubConnectionState;
+exports.getHubDevices = getHubDevices;
 exports.getHubs = getHubs;
 exports.getUserState = getUserState;
 exports.hubsState = hubsState;
 exports.selectHubById = selectHubById;
+exports.sendDeviceCmd = sendDeviceCmd;
 exports.setDevices = setDevices;
 exports.startDiscoveringHubs = startDiscoveringHubs;
 exports.startPolling = startPolling;

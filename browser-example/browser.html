@@ -15,6 +15,7 @@
       let fixedUsername = 'vesa@cozify.fi'
       let fixedPassword = 'Fortum!123'
       let fixedHubId = 'cd3bd9e4-7943-11e5-a567-544a168673f2'
+      let fixedDeviceId = '53d59fdc-bd8d-4231-a4a0-d6c6ee51d30e' // Power socet
 
       let store = CozifySDK.store;
 
@@ -36,12 +37,6 @@
           CozifySDK.acceptEula();
           console.info(`--3--`);
 
-          const storeNow = store.getState()
-          if (storeNow.user.authKey) {
-            CozifySDK.startDiscoveringHubs()
-          }
-
-
           //CozifySDK.doLogout();
           //console.info(`--4--`);
 
@@ -53,7 +48,7 @@
 
 
       let selected = false;
-
+      let deviceStateChanged = false;
       store.subscribe(() => {
         const storeNow = store.getState()
 
@@ -69,9 +64,21 @@
         console.info("Devices:", CozifySDK.getDevices()[fixedHubId])
 
         if (storeNow.hubs && storeNow.hubs[fixedHubId] && storeNow.hubs[fixedHubId].selected) {
+          const hubDevices = CozifySDK.getHubDevices(fixedHubId);
+          if (hubDevices){
+            let state = hubDevices[fixedDeviceId].state;
+            if (!deviceStateChanged) {
+              deviceStateChanged = true;
+              state.isOn = !state.isOn;
+              CozifySDK.sendDeviceCmd(fixedHubId, fixedDeviceId, state);
+            }
+          }
+
+          /*
           setTimeout(function() {
             CozifySDK.unSelectHubById(fixedHubId);
           }, 10000);
+          */
 
         }
 

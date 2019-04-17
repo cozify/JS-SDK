@@ -1,10 +1,72 @@
 // @flow
 import isEmpty from 'lodash/isEmpty'
+import isArray from 'lodash/isArray'
 import axios from 'axios'
 import axiosRetry from 'axios-retry'
 import { isNode } from '../utils.js'
 import { CLOUD_CONNECTION_STATES, CLOUD_URL, CLOUD_API_VERSION, HUB_CONNECTION_STATES } from './constants'
 import { setCloudConnectionState, setHubConnectionState } from './state'
+
+const SAFE_HTTP_METHODS = ['get', 'head', 'options'];
+const IDEMPOTENT_HTTP_METHODS = SAFE_HTTP_METHODS.concat(['put', 'delete']);
+/**
+ * @param  {Error}  error
+ * @return {boolean}
+ */
+function isNetworkError(error) {
+  return (
+    !error.response &&
+    isRetryAllowed(error) && // Prevents retrying unsafe errors
+    !(Boolean(error.code) && error.code == 'ECONNABORTED') // Prevents retrying timed out requests
+  );
+}
+
+
+/**
+ * @param  {Error}  error
+ * @return {boolean}
+ */
+function isRetryableError(error) {
+  return (
+    error.code !== 'ECONNABORTED' &&
+    (!error.response || (error.response.status >= 500 && error.response.status <= 599))
+  );
+}
+
+/**
+ * @param  {Error}  error
+ * @return {boolean}
+ */
+function isSafeRequestError(error) {
+  if (!error.config) {
+    // Cannot determine if the request can be retried
+    return false;
+  }
+
+  return isRetryableError(error) && SAFE_HTTP_METHODS.indexOf(error.config.method) !== -1;
+}
+
+/**
+ * @param  {Error}  error
+ * @return {boolean}
+ */
+function retryCondition(error) {
+  if (!error.config) {
+    // Cannot determine if the request can be retried
+    return false;
+  }
+
+  return isRetryableError(error) && IDEMPOTENT_HTTP_METHODS.indexOf(error.config.method) !== -1;
+}
+
+/**
+ * @param  {Error}  error
+ * @return {boolean}
+ */
+function isNetworkOrIdempotentRequestError(error) {
+  return isNetworkError(error) || isIdempotentRequestError(error);
+}
+
 
 export const COMMANDS = Object.freeze({
   USER_LOGIN: { method: 'POST', url: CLOUD_URL + "user/login", params: ['password', 'email'], config:{responseType: isNode ? 'blob' : 'stream', timeout: 5000} },
@@ -12,10 +74,50 @@ export const COMMANDS = Object.freeze({
   CLOUD_IP: {method: 'GET', url: CLOUD_URL + "hub/lan_ip"},
   CLOUD_META: {method: 'GET', url: CLOUD_URL + "hub/remote/hub"},
   POLL: {method: 'GET', url: CLOUD_URL + "hub/remote/cc/1.11" + "/hub/poll" , urlParams: ['ts']},
+  CMD_DEVICE: {method: 'PUT', url: CLOUD_URL + "hub/remote/cc/1.11" + "/devices/command", type: 'CMD_DEVICE', params: ['id', 'state']},
   //LOCAL_POLL: {method: 'GET', url: "cc/1.11/" + "/hub/poll?ts=0"},
 });
 
+function cloudErrorState(error) {
+  let retVal = CLOUD_CONNECTION_STATES.UNCONNECTED
+  if (error && error.response && error.response.status === 401) {
+    // 401 Authentication information missing or expired.
+    retVal = CLOUD_CONNECTION_STATES.UNAUTHENTICATED
+    console.error("send: authentication error ", error);
+  } else if (error && error.response && error.response.status === 403) {
+    // 403 Unauthorized
+    retVal = CLOUD_CONNECTION_STATES.UNAUTHORIZED
+    console.error("send: unauhorized error ", error);
+  } else if (error && error.response && error.response.status === 410) {
+    // 410 Version problem
+    retVal = CLOUD_CONNECTION_STATES.OBSOLETE_API_VERSION
+    console.error("send: version error ", error);
+  }
 
+  return retVal
+}
+
+function hubErrorState(error) {
+  let retVal = HUB_CONNECTION_STATES.UNCONNECTED
+  if (error && error.response && error.response.status === 400) {
+    // no connection to offline hub
+    console.log("send: no-connection error ", error);
+  } else if (error && error.response && error.response.status === 401) {
+    // 401 Authentication information missing or expired.
+    retVal = HUB_CONNECTION_STATES.UNAUTHENTICATED
+    console.error("send: authentication error ", error);
+  } else if (error && error.response && error.response.status === 403) {
+    // 403 Unauthorized
+    retVal = HUB_CONNECTION_STATES.UNAUTHORIZED
+    console.error("send: unauhorized error ", error);
+  } else if (error && error.response && error.response.status === 410) {
+    // 410 Version problem
+    retVal = HUB_CONNECTION_STATES.OBSOLETE_API_VERSION
+    console.error("send: version error ", error);
+  }
+
+  return retVal
+}
 
 type ST = {
   command?: Object,
@@ -25,12 +127,14 @@ type ST = {
   authKey?: string,
   hubKey?: string,
   config?: Object,
-  data?: Object
+  data?: Object,
+  type?: string
 }
 
 export function sendAll(requests) {
   return new Promise( (resolve, reject) => {
-
+    // retries if it is a network error or a 5xx error on an idempotent request (GET, HEAD, OPTIONS, PUT or DELETE).
+    axiosRetry(axios, { retries: 3, shouldResetTimeout: true, retryCondition: retryCondition });
     axios.all(requests)
     .then(axios.spread(function (succ, err) {
       // All requests are now complete
@@ -57,9 +161,14 @@ export function sendAll(requests) {
  * @param  {Object} data            Optional data to be sent
  * @return {Promise}                Promise of results or error
  */
-export function send({command = {}, localUrl='', hubId='', url = '', method = 'GET', authKey = '' , hubKey = '', config ={}, data = {}}: ST): Promise<Object> {
-  let body = {}
-
+export function send({command = {}, localUrl='', hubId='', url = '', method = 'GET', authKey = '' , hubKey = '', type = '', config ={}, data = {}}: ST): Promise<Object> {
+  let body = data;
+  /*
+  if (isArray(data)) {
+    body = [];
+    body.push({});
+  }
+  */
   //console.log("send: command ", command);
   // Flag to indicate are we using remote (vrs.local) connection
   let remoteConnection = false;
@@ -87,11 +196,25 @@ export function send({command = {}, localUrl='', hubId='', url = '', method = 'G
       remoteConnection = true;
     }
 
+    if (command.type) {
+        if (isArray(data)) {
+          body[0]['type'] = command.type;
+        } else {
+          body['type'] = command.type;
+        }
+    }
+
+    /*
     if (command.params) {
       command.params.forEach(param => {
-        body[param] = data[param];
+        if (isArray(data)){
+          body[0][param] = data[param];
+        } else {
+          body[param] = data[param];
+        }
       });
-    }
+    } */
+
     if (command.urlParams) {
       let params = []
       command.urlParams.forEach(param => {
@@ -138,8 +261,8 @@ export function send({command = {}, localUrl='', hubId='', url = '', method = 'G
         }
       }, error => Promise.reject(error));
 
-
-      axiosRetry(axios, { retries: 3, shouldResetTimeout: true });
+      //retries if it is a network error or a 5xx error on an idempotent request (GET, HEAD, OPTIONS, PUT or DELETE).
+      axiosRetry(axios, { retries: 3, shouldResetTimeout: true, retryCondition: retryCondition });
 
       // See options: https://github.com/axios/axios#request-config
       axios(reqConf)
@@ -154,38 +277,59 @@ export function send({command = {}, localUrl='', hubId='', url = '', method = 'G
 
         })
         .catch(function (error) {
-          if (error.response){
-          // The request was made and the server responded with a status code
-          // that falls out of the range of 2xx
+          if (error && error.response){
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            if (remoteConnection) {
+                setCloudConnectionState(cloudErrorState(error))
+                if (hubCommand) {
+                  setHubConnectionState({hubId: hubId, state: hubErrorState(error)})
+                }
+            } else {
+              // Local connection
+              // 401 means also cloud auth required
+              if (error && error.response && error.response.status === 401) {
+                setCloudConnectionState(cloudErrorState(error))
+              }
+              if (hubCommand) {
+                setHubConnectionState({hubId: hubId, state: hubErrorState(error)})
+              }
+            }
           } else if (error.request) {
             // The request was made but no response was received
             // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
             // http.ClientRequest in node.js
-          } else {
-            // Something happened in setting up the request that triggered an Error
-          }
-          if (remoteConnection) {
-            if (error && error.response && error.response.status === 400) {
-              // no connection to offline hub
-              console.log("send: no connection error ", error);
-            } else if (error && error.response && error.response.status === 401) {
-              // 401 Unauthorized
-              console.error("send: unauhorized error ", error);
-            } else {
+            if (remoteConnection) {
               setCloudConnectionState(CLOUD_CONNECTION_STATES.UNCONNECTED)
+              if (hubCommand) {
+                  setHubConnectionState({hubId: hubId, state: HUB_CONNECTION_STATES.UNCONNECTED})
+              }
+            } else {
+              // Local connection
               if (hubCommand) {
                 setHubConnectionState({hubId: hubId, state: HUB_CONNECTION_STATES.UNCONNECTED})
               }
             }
-          } else if (!isEmpty(hubId)) {
-            setHubConnectionState({hubId: hubId, state: HUB_CONNECTION_STATES.UNCONNECTED})
+          } else {
+            // Something happened in setting up the request that triggered an Error
+            if (remoteConnection) {
+              setCloudConnectionState(CLOUD_CONNECTION_STATES.UNCONNECTED)
+              if (hubCommand) {
+                  setHubConnectionState({hubId: hubId, state: HUB_CONNECTION_STATES.UNCONNECTED})
+              }
+            } else {
+              // Local connection
+              if (hubCommand) {
+                setHubConnectionState({hubId: hubId, state: HUB_CONNECTION_STATES.UNCONNECTED})
+              }
+            }
           }
-          console.error("send: error ", error);
-          reject(error);
+          console.error('SDK send: error ', error);
+          reject(new Error('SDK send: error ', error));
         });
 
     } else {
-      reject(new Error('Command not found.'));
+      reject(new Error('SDK Error: Command or Command API URL not found.'));
     }
   });
 
