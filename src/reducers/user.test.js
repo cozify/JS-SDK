@@ -2,13 +2,13 @@ import { configureStore } from 'redux-starter-kit';
 import { userState, userReducer } from "./user";
 import { USER_STATES, ROLES, LANGUAGES } from '../user/constants.js';
 import {changeLanguage, doPwLogin} from "../user/user"
-import {watchChanges} from "../store.js"
+import {store, watchChanges} from "../store.js"
 
 describe('hubTokensReducer', () => {
   it('user language is changed with changeLanguage', () => {
 
     // just temp store for test
-    const store = configureStore({reducer: {user: userReducer}});
+    //const store = configureStore({reducer: {user: userReducer}});
 
     changeLanguage(LANGUAGES.FI_FI)
 

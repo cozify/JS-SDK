@@ -6,7 +6,7 @@ import { COMMANDS, send, sendAll } from '../connection/send'
 import { getHubConnectionState } from '../connection/state'
 import { ROLES } from '../user/constants'
 import { deviceDeltaHandler } from '../devices/devices'
-import { isNode } from '../utils'
+import { isNode, urlBase64Decode } from '../utils'
 import { store, watchChanges } from "../store"
 import { hubsState, hubsReducer } from "../reducers/hubs"
 import { userState, userReducer } from "../reducers/user"
@@ -21,47 +21,7 @@ let _hubState: HUB_STATES_TYPE = HUB_STATES.LOST;
 let _hubs: Object = {}
 
 
-/**
- * Helper method to Base64 decode
- * @param  {string} str - string to be decoded
- * @return {<string>}  - decoded string
- */
-function urlBase64Decode(encoded): string {
-  let str = encoded.replace(/-/g, "+").replace(/_/g, "/");
-  let output = str;
-  switch (output.length % 4) {
-      case 0:
-      case 2:
-          output += "==";
-          break;
-      case 3:
-          output += "=";
-          break;
-      default:
-          throw "Illegal base64url string!"
-  }
-  var retVal = "";
 
-  let atob = function(a:string) {};
-  if(!isNode){
-    atob  = window.atob;
-  } else {
-    atob = function(a) {
-      return new Buffer(a, 'base64').toString('binary');
-    };
-  }
-
-  try {
-        retVal = atob(str);
-  } catch(error){
-      try {
-        retVal = atob(output);
-      } catch(error){
-        console.error( "urlBase64Decode: trying atob failed");
-      }
-  }
-  return retVal
-}
 
 /**
  * Helper method to extract hub info from JWT based hub keys
@@ -99,23 +59,6 @@ function extractHubInfo(HUBKeys: Object): {} {
  * @param  {Object} foundHub
  */
 function updateFoundHub(hubURL: string, foundHub) {
-  /*
-  const hubData = {}
-  hubData[foundHub.hubId] = {
-    connectionState: HUB_CONNECTION_STATES.REMOTE,
-    connected: foundHub.connected,
-    features: foundHub.features,
-    state: foundHub.state,
-    version: foundHub.version
-  }
-  if (hubURL) {
-    hubData[foundHub.hubId].connectionState = HUB_CONNECTION_STATES.LOCAL;
-    hubData[foundHub.hubId].url =  hubURL
-  }
-  console.log("Hub metadata found ", JSON.stringify(hubData));
-  store.dispatch(hubsState.actions.updateHubs(hubData));
-  */
-
   // Hub keys returns ids idQuerys hubId
   if(foundHub.hubId){
     foundHub.id = foundHub.hubId;
@@ -129,7 +72,10 @@ function updateFoundHub(hubURL: string, foundHub) {
   if (hubURL) {
     _hubs[foundHub.id].connectionState = HUB_CONNECTION_STATES.LOCAL;
     _hubs[foundHub.id].url =  hubURL
+  } else {
+    _hubs[foundHub.id].url =  undefined
   }
+
 
 }
 
@@ -198,6 +144,8 @@ function doCloudDiscovery(authKey: string) {
       })
       .finally(() => {
         //console.log("Hubs metadata found ", JSON.stringify(_hubs));
+        // mark selected hubs to selected still
+        setSelectedHubs(_hubs);
         store.dispatch(hubsState.actions.updateHubs(_hubs));
         resolve();
       });
@@ -228,13 +176,27 @@ function fetchMetaData(hubs: Object, authKey: string) {
       //console.log(error);
     })
     .finally(() => {
-      doCloudDiscovery()
-      .finally(() => {
         resolve();
-      });
     });
   });
 }
+
+/**
+ * Check hubs that are currently selected and mark them selected also in map of given hubs
+ * @param {Objct} newHubs - map of given hubs
+ */
+function setSelectedHubs(newHubs) {
+  const hubs = getHubs();
+  for (var hub of Object.values(hubs)) {
+    if (hub.selected) {
+      const selectedNewHub = newHubs[hub.id]
+      if (selectedNewHub) {
+        selectedNewHub.selected = true
+      }
+    }
+  }
+}
+
 
 /**
  * Fetch Hub keys by given authKey and start fetching hub meta datas

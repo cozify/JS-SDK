@@ -9,6 +9,7 @@ import { userState, userReducer } from "../reducers/user";
 
 import { USER_STATES, ROLES, LANGUAGES } from './constants.js';
 import type { USER_STATE_TYPE, ROLES_TYPE } from './constants.js';
+import type { LANGUAGES_TYPE } from '../user/constants.js';
 
 function storedUser() {
   const stateNow = store.getState()
@@ -70,6 +71,7 @@ export function doPwLogin(email: string, password: string): Promise<Object> {
       });
   });
 }
+
 
 /**
  * Get state of user state-machine

@@ -1,13 +1,9 @@
 import { configureStore } from 'redux-starter-kit';
 import { hubsState, hubsReducer } from "./hubs";
-import { initStore } from "../store.js"
+import {store, watchChanges} from "../store.js"
 
 describe('hubsReducer', () => {
   it('add hubs with action updateHubs', () => {
-
-    // just temp store for test
-    const store = configureStore({reducer: {hubs: hubsReducer}});
-    initStore(store);
 
     const hub1 = {'id': '111', 'name': 'testi'}
     const hub2 = {'id': '123', 'name': 'testiII'}

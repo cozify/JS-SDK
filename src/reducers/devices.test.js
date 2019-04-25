@@ -1,13 +1,13 @@
 import { configureStore } from 'redux-starter-kit';
 import { devicesState, devicesReducer, setDevices, setDevice, deleteDevice } from "./devices";
-
+import {store, watchChanges} from "../store.js"
 import deepFreeze from 'deep-freeze'
 // deepFreeze(state) to test state immutability
 
 describe('devicesReducer', () => {
   it('setDevices and setDevice will add devices', () => {
 
-    const store = configureStore({reducer: {devices: devicesReducer}});
+
     const device1 = {id: 111, name: 'testiI'}
     const devices = {hubId: '007', devices: {'111': device1}}
 

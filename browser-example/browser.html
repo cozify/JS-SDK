@@ -44,6 +44,10 @@
 
 
       /** Listener for specific changes */
+      CozifySDK.watchChanges('connections.cloudState', (newState, oldState) => {
+        console.log('connections.cloudState changed from %s to %s', oldState, newState);
+      });
+
       CozifySDK.watchChanges('user.state', (newState, oldState) => {
         console.log('user.state changed from %s to %s', oldState, newState);
       });
@@ -56,6 +60,12 @@
             CozifySDK.unSelectHubById(fixedHubId);
           }, 10000);
           */
+        };
+
+        if (newHubsState[fixedHubId] && oldHubsState[fixedHubId]){
+          if (newHubsState[fixedHubId].connectionState !== oldHubsState[fixedHubId].connectionState) {
+            console.log('Hub connectionState changed from %s to %s', oldHubsState[fixedHubId].connectionState, newHubsState[fixedHubId].connectionState);
+          }
         }
 
       });
@@ -76,8 +86,7 @@
       /** Listener for store changes like React will internally do */
       CozifySDK.store.subscribe(() => {
         const storeNow = CozifySDK.store.getState()
-        console.info("Cloud connection:", CozifySDK.getCloudConnectionState());
-        console.info("Hub connection:", CozifySDK.getHubConnectionState(fixedHubId));
+        //console.info("Hub connection:", CozifySDK.getHubConnectionState(fixedHubId));
         console.info("Hubs", storeNow.hubs)
         console.info("Devices:", CozifySDK.getDevices()[fixedHubId])
       })

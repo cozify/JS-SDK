@@ -3,6 +3,7 @@ import { CLOUD_CONNECTION_STATES } from '../connection/constants.js';
 
 import { configureStore } from 'redux-starter-kit';
 import { connectionsState, connectionsReducer, setCloudConnectionState } from "./connections";
+import {store, watchChanges} from "../store.js"
 
 import deepFreeze from 'deep-freeze'
 // deepFreeze(state) to test state immutability
@@ -10,7 +11,6 @@ import deepFreeze from 'deep-freeze'
 describe('connectionsReducer', () => {
   it('sinitial value is correct', () => {
 
-    const store = configureStore({reducer: {connections: connectionsReducer}});
     const stateNow = store.getState()
     const storedConnection = connectionsState.selectors.getConnections(stateNow)
 
