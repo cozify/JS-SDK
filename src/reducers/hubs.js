@@ -3,7 +3,6 @@
 // This actionreducer uses internally https://github.com/mweststrate/immer, so it's safe to modify given state directly
 import { createSlice } from 'redux-starter-kit'
 import { HUB_CONNECTION_STATES } from '../connection/constants';
-import type { HUB_CONNECTION_STATE_TYPES } from '../connection/constants';
 
 const hubsState = createSlice({
   slice: 'hubs',

@@ -8,22 +8,24 @@ import { hubsState } from "../reducers/hubs"
 
 /**
  * Device command
- * @param {string} id
- * @param {Object} state
+ * @param  {string} hubId
+ * @param  {string} deviceId
+ * @param  {Object} state
+ * @return {Promise}
  */
 export function sendDeviceCmd(hubId: string, deviceId: string, state: Object): Promise<Object> {
   return new Promise( (resolve, reject) => {
-     const stateNow = store.getState()
+    const stateNow = store.getState()
 
     const user = userState.selectors.getUser(stateNow);
     if (!user || !user.authKey) {
-      reject('No userKey!');
+      reject(new Error("Device command error: No userKey!"));
       return;
     }
 
     const hubs = hubsState.selectors.getHubs(stateNow)
     if (!hubs[hubId] || !hubs[hubId].hubKey) {
-      reject('No hubKey!');
+      reject(new Error("Device command error: No hubKey!"));
       return;
     }
 
@@ -36,7 +38,7 @@ export function sendDeviceCmd(hubId: string, deviceId: string, state: Object): P
       })
       .catch((error) => {
         //console.error(error);
-        reject(false)
+        reject(new Error("Device command error: send failed"));
       });
   });
 }

@@ -15,7 +15,7 @@ export { HUB_STATES } from './hubs/constants';
 
 export { getCloudConnectionState, getHubConnectionState } from "./connection/state"
 export { changeLanguage, doPwLogin, acceptEula, getUserState } from "./user/user"
-export { startDiscoveringHubs, getHubs, selectHubById, unSelectHubById, startPolling, stopPolling} from './hubs/hubs';
+export { getHubs, selectHubById, unSelectHubById } from './hubs/hubs';
 export { getDevices, getHubDevices} from './devices/devices';
 export { sendDeviceCmd} from './devices/device';
 

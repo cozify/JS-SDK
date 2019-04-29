@@ -21,13 +21,17 @@ const devicesState = createSlice({
     setDevice(state, action) {
       const hubId = action.payload.hubId;
       const device = action.payload.device;
-      state[hubId][device.id] = {...device}
+      if(state[hubId]) {
+        state[hubId][device.id] = {...device}
+      }
     },
 
     deleteDevice(state, action) {
       const hubId = action.payload.hubId;
       const device = action.payload.device;
-      delete state[hubId][device.id]
+      if(state[hubId]) {
+        delete state[hubId][device.id]
+      }
     }
   }
 })

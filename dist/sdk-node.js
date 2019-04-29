@@ -5226,6 +5226,103 @@ function isEmpty(value) {
 
 var isEmpty_1 = isEmpty;
 
+function urlBase64Decode(encoded) {
+  let str = encoded.replace(/-/g, "+").replace(/_/g, "/");
+  let output = str;
+
+  switch (output.length % 4) {
+    case 0:
+    case 2:
+      output += "==";
+      break;
+
+    case 3:
+      output += "=";
+      break;
+
+    default:
+      throw "Illegal base64url string!";
+  }
+
+  var retVal = "";
+
+  let atob = function (a) {};
+
+  if (!isNode) {
+    atob = window.atob;
+  } else {
+    atob = function (a) {
+      return new Buffer(a, 'base64').toString('binary');
+    };
+  }
+
+  try {
+    retVal = atob(str);
+  } catch (error) {
+    try {
+      retVal = atob(output);
+    } catch (error) {
+      console.error("urlBase64Decode: trying atob failed");
+    }
+  }
+
+  return retVal;
+}
+let isNode = false;
+
+if (typeof process === 'object') {
+  if (typeof process.versions === 'object') {
+    if (typeof process.versions.node !== 'undefined') {
+      isNode = true;
+      console.log("Running in node.js");
+    } else {
+      console.log("Running in browser");
+    }
+  }
+}
+
+const CLOUD_FINGERPRINTS_SHA1 = ["91 30 CF 20 17 F7 D7 EC F7 BA 43 30 8E 19 83 B4 CF DE 5A CC", "26 B0 20 FA AB E8 A3 81 63 37 C6 B7 EF 94 4D 40 3D 1B 85 10"];
+const CLOUD_HOST = 'https://testapi.cozify.fi';
+const CLOUD_API_VERSION = "ui/0.2/";
+const CLOUD_URL = CLOUD_HOST + "/" + CLOUD_API_VERSION;
+const COMMANDS = Object.freeze({
+  USER_LOGIN: {
+    method: 'POST',
+    url: CLOUD_URL + "user/login",
+    params: ['password', 'email'],
+    config: {
+      responseType: isNode ? 'blob' : 'stream',
+      timeout: 5000
+    }
+  },
+  HUB_KEYS: {
+    method: 'GET',
+    url: CLOUD_URL + "user/hubkeys"
+  },
+  REFRESH_AUTHKEY: {
+    method: 'GET',
+    url: CLOUD_URL + "user/refreshsession"
+  },
+  CLOUD_IP: {
+    method: 'GET',
+    url: CLOUD_URL + "hub/lan_ip"
+  },
+  CLOUD_META: {
+    method: 'GET',
+    url: CLOUD_URL + "hub/remote/hub"
+  },
+  POLL: {
+    method: 'GET',
+    url: CLOUD_URL + "hub/remote/cc/1.11" + "/hub/poll",
+    urlParams: ['ts']
+  },
+  CMD_DEVICE: {
+    method: 'PUT',
+    url: CLOUD_URL + "hub/remote/cc/1.11" + "/devices/command",
+    type: 'CMD_DEVICE',
+    params: ['id', 'state']
+  }
+});
 const CLOUD_CONNECTION_STATES = Object.freeze({
   UNCONNECTED: 'no connection',
   UNAUTHENTICATED: 'unauthenticated',
@@ -5242,10 +5339,6 @@ const HUB_CONNECTION_STATES = Object.freeze({
   REMOTE: 'remote',
   LOCAL: 'local'
 });
-const CLOUD_HOST = 'https://testapi.cozify.fi';
-const CLOUD_FINGERPRINTS_SHA1 = ["91 30 CF 20 17 F7 D7 EC F7 BA 43 30 8E 19 83 B4 CF DE 5A CC", "26 B0 20 FA AB E8 A3 81 63 37 C6 B7 EF 94 4D 40 3D 1B 85 10"];
-const CLOUD_API_VERSION = "ui/0.2/";
-const CLOUD_URL = CLOUD_HOST + "/" + CLOUD_API_VERSION;
 
 const connectionsState = createSlice({
   slice: 'connections',
@@ -5330,13 +5423,19 @@ const devicesState = createSlice({
     setDevice(state, action) {
       const hubId = action.payload.hubId;
       const device = action.payload.device;
-      state[hubId][device.id] = objectSpread({}, device);
+
+      if (state[hubId]) {
+        state[hubId][device.id] = objectSpread({}, device);
+      }
     },
 
     deleteDevice(state, action) {
       const hubId = action.payload.hubId;
       const device = action.payload.device;
-      delete state[hubId][device.id];
+
+      if (state[hubId]) {
+        delete state[hubId][device.id];
+      }
     }
 
   }
@@ -5405,7 +5504,7 @@ const LANGUAGES = Object.freeze({
   EN_UK: 'en-uk',
   FI_FI: 'fi-fi'
 });
-const USER_STATES$1 = Object.freeze({
+const USER_STATES = Object.freeze({
   WAITING_LANGUAGE: 'wait language',
   LANGUAGE_SET: 'language set',
   WAITING_LOGIN: 'wait login',
@@ -5432,7 +5531,7 @@ const userState = createSlice({
     authKey: '',
     role: ROLES.ANONYMOUS,
     eulaAccepted: false,
-    state: USER_STATES$1.WAITING_LANGUAGE
+    state: USER_STATES.WAITING_LANGUAGE
   },
   reducers: {
     changeState(state, action) {
@@ -5441,25 +5540,25 @@ const userState = createSlice({
       console.log("User state " + oldState + " -> " + newState);
 
       switch (oldState) {
-        case USER_STATES$1.WAITING_LANGUAGE:
+        case USER_STATES.WAITING_LANGUAGE:
           {
-            if (newState === USER_STATES$1.LANGUAGE_SET) {
+            if (newState === USER_STATES.LANGUAGE_SET) {
               if (!isEmpty_1(state.language)) {
-                state.state = USER_STATES$1.WAITING_LOGIN;
+                state.state = USER_STATES.WAITING_LOGIN;
               }
             }
 
             break;
           }
 
-        case USER_STATES$1.WAITING_LOGIN:
+        case USER_STATES.WAITING_LOGIN:
           {
-            if (newState === USER_STATES$1.LOGIN_DONE) {
+            if (newState === USER_STATES.LOGIN_DONE) {
               if (!isEmpty_1(state.authKey)) {
                 if (isEmpty_1(state.eulaAcceted)) {
-                  state.state = USER_STATES$1.WAITING_EULA;
+                  state.state = USER_STATES.WAITING_EULA;
                 } else {
-                  state.state = USER_STATES$1.AUTHENTICATED;
+                  state.state = USER_STATES.AUTHENTICATED;
                 }
               }
             }
@@ -5467,19 +5566,19 @@ const userState = createSlice({
             break;
           }
 
-        case USER_STATES$1.WAITING_EULA:
+        case USER_STATES.WAITING_EULA:
           {
-            if (newState === USER_STATES$1.EULA_ACCEPTED) {
-              state.state = USER_STATES$1.AUTHENTICATED;
+            if (newState === USER_STATES.EULA_ACCEPTED) {
+              state.state = USER_STATES.AUTHENTICATED;
             }
 
             break;
           }
 
-        case USER_STATES$1.AUTHENTICATED:
+        case USER_STATES.AUTHENTICATED:
           {
-            if (newState === USER_STATES$1.LOGGED_OUT) {
-              state.state = USER_STATES$1.WAITING_LOGIN;
+            if (newState === USER_STATES.LOGGED_OUT) {
+              state.state = USER_STATES.WAITING_LOGIN;
             }
 
             break;
@@ -5675,7 +5774,6 @@ const HUB_STATES = Object.freeze({
   NO_ACCESS: 'no access',
   CONNECTED: 'connected'
 });
-const DISCOVERY_INTERVAL_MS = 20 * 1000;
 const POLL_INTERVAL_MS = 1 * 1000;
 const HUB_PROTOCOL = 'http://';
 const HUB_PORT = '8893';
@@ -5693,7 +5791,7 @@ function setHubConnectionState$1(hubAndState) {
 
   if (hubAndState.state === HUB_CONNECTION_STATES.UNCONNECTED && storedHubs[hubAndState.hubId]) {
     if (storedHubs[hubAndState.hubId].connectionState === HUB_CONNECTION_STATES.REMOTE) {
-      hubAndState.state = HUB_CONNECTION_STATES.LOCALE;
+      hubAndState.state = HUB_CONNECTION_STATES.LOCAL;
     }
   }
 
@@ -6058,138 +6156,7 @@ var lib_6 = lib.exponentialDelay;
 
 var axiosRetry = lib.default;
 
-function urlBase64Decode(encoded) {
-  let str = encoded.replace(/-/g, "+").replace(/_/g, "/");
-  let output = str;
-
-  switch (output.length % 4) {
-    case 0:
-    case 2:
-      output += "==";
-      break;
-
-    case 3:
-      output += "=";
-      break;
-
-    default:
-      throw "Illegal base64url string!";
-  }
-
-  var retVal = "";
-
-  let atob = function (a) {};
-
-  if (!isNode) {
-    atob = window.atob;
-  } else {
-    atob = function (a) {
-      return new Buffer(a, 'base64').toString('binary');
-    };
-  }
-
-  try {
-    retVal = atob(str);
-  } catch (error) {
-    try {
-      retVal = atob(output);
-    } catch (error) {
-      console.error("urlBase64Decode: trying atob failed");
-    }
-  }
-
-  return retVal;
-}
-let isNode = false;
-
-if (typeof process === 'object') {
-  if (typeof process.versions === 'object') {
-    if (typeof process.versions.node !== 'undefined') {
-      isNode = true;
-      console.log("Running in node.js");
-    } else {
-      console.log("Running in browser");
-    }
-  }
-}
-
 const SSL_CHECK_INTERVALL = 1000 * 60 * 60;
-const SAFE_HTTP_METHODS = ['get', 'head', 'options'];
-const IDEMPOTENT_HTTP_METHODS = SAFE_HTTP_METHODS.concat(['put', 'delete']);
-
-function isRetryableError(error) {
-  return error.code !== 'ECONNABORTED' && (!error.response || error.response.status >= 500 && error.response.status <= 599);
-}
-
-function retryCondition(error) {
-  if (!error.config) {
-    return false;
-  }
-
-  return isRetryableError(error) && IDEMPOTENT_HTTP_METHODS.indexOf(error.config.method) !== -1;
-}
-
-let refreshingToken = false;
-
-function refreshAuthKey(authKey) {
-  if (!refreshingToken) {
-    refreshingToken = true;
-    send({
-      command: COMMANDS.REFRESH_AUTHKEY,
-      authKey: authKey
-    }).then(response => {
-      setTimeout(function () {
-        refreshingToken = false;
-      }, 1000 * 60 * 10);
-
-      if (response.length > 10) {
-        store.dispatch(userState.actions.setAuthKey(response));
-      }
-    }).catch(error => {
-      refreshingToken = false;
-    });
-  }
-}
-
-const COMMANDS = Object.freeze({
-  USER_LOGIN: {
-    method: 'POST',
-    url: CLOUD_URL + "user/login",
-    params: ['password', 'email'],
-    config: {
-      responseType: isNode ? 'blob' : 'stream',
-      timeout: 5000
-    }
-  },
-  HUB_KEYS: {
-    method: 'GET',
-    url: CLOUD_URL + "user/hubkeys"
-  },
-  REFRESH_AUTHKEY: {
-    method: 'GET',
-    url: CLOUD_URL + "user/refreshsession"
-  },
-  CLOUD_IP: {
-    method: 'GET',
-    url: CLOUD_URL + "hub/lan_ip"
-  },
-  CLOUD_META: {
-    method: 'GET',
-    url: CLOUD_URL + "hub/remote/hub"
-  },
-  POLL: {
-    method: 'GET',
-    url: CLOUD_URL + "hub/remote/cc/1.11" + "/hub/poll",
-    urlParams: ['ts']
-  },
-  CMD_DEVICE: {
-    method: 'PUT',
-    url: CLOUD_URL + "hub/remote/cc/1.11" + "/devices/command",
-    type: 'CMD_DEVICE',
-    params: ['id', 'state']
-  }
-});
-
 function cloudErrorState(error) {
   let retVal = CLOUD_CONNECTION_STATES.UNCONNECTED;
 
@@ -6209,7 +6176,6 @@ function cloudErrorState(error) {
 
   return retVal;
 }
-
 function hubErrorState(error) {
   let retVal = HUB_CONNECTION_STATES.UNCONNECTED;
 
@@ -6228,10 +6194,8 @@ function hubErrorState(error) {
 
   return retVal;
 }
-
-let ongoingSSLCertificateCheck = false;
-let lastSSLCertificateCheckTime = undefined;
-
+let _ongoingSSLCertificateCheck = false;
+let _lastSSLCertificateCheckTime = null;
 function testSSLCertificate(remoteConnection) {
   return new Promise((resolve, reject) => {
     if (!remoteConnection) {
@@ -6241,27 +6205,27 @@ function testSSLCertificate(remoteConnection) {
 
     let now = new Date().getTime();
 
-    if (!ongoingSSLCertificateCheck && (!lastSSLCertificateCheckTime || now - lastSSLCertificateCheckTime > SSL_CHECK_INTERVALL)) {
-      ongoingSSLCertificateCheck = true;
-      lastSSLCertificateCheckTime = now;
+    if (!_ongoingSSLCertificateCheck && (!_lastSSLCertificateCheckTime || now - _lastSSLCertificateCheckTime > SSL_CHECK_INTERVALL)) {
+      _ongoingSSLCertificateCheck = true;
+      _lastSSLCertificateCheckTime = now;
 
       if (window && window.plugins && window.plugins.sslCertificateChecker) {
         window.plugins.sslCertificateChecker.check(successMsg => {
-          ongoingSSLCertificateCheck = false;
+          _ongoingSSLCertificateCheck = false;
           resolve(true);
         }, errorMsg => {
           if (errorMsg === "CONNECTION_NOT_SECURE") {
-            ongoingSSLCertificateCheck = false;
+            _ongoingSSLCertificateCheck = false;
             resolve(false);
           } else {
-            ongoingSSLCertificateCheck = false;
-            lastSSLCertificateCheckTime = undefined;
+            _ongoingSSLCertificateCheck = false;
+            _lastSSLCertificateCheckTime = undefined;
             resolve(true);
           }
         }, CLOUD_HOST, CLOUD_FINGERPRINTS_SHA1);
       } else {
         setTimeout(function () {
-          ongoingSSLCertificateCheck = false;
+          _ongoingSSLCertificateCheck = false;
         }, SSL_CHECK_INTERVALL);
         resolve(true);
       }
@@ -6271,19 +6235,56 @@ function testSSLCertificate(remoteConnection) {
   });
 }
 
-function testAndRefreshToken(authKey) {
-  let exp = undefined;
-  let header = undefined;
-  let payload = undefined;
-  let diff = undefined;
+const SAFE_HTTP_METHODS = ['get', 'head', 'options'];
+const IDEMPOTENT_HTTP_METHODS = SAFE_HTTP_METHODS.concat(['put', 'delete']);
 
-  if (authKey) {
-    const tokenParts = authKey.split('.');
+function isRetryableError(error) {
+  return error.code !== 'ECONNABORTED' && (!error.response || error.response.status >= 500 && error.response.status <= 599);
+}
+
+function retryCondition(error) {
+  if (!error.config) {
+    return false;
+  }
+
+  return isRetryableError(error) && IDEMPOTENT_HTTP_METHODS.indexOf(error.config.method) !== -1;
+}
+
+let _refreshingToken = false;
+
+function refreshAuthKey(authKey) {
+  if (!_refreshingToken) {
+    _refreshingToken = true;
+    send({
+      command: COMMANDS.REFRESH_AUTHKEY,
+      authKey: authKey
+    }).then(response => {
+      setTimeout(function () {
+        _refreshingToken = false;
+      }, 1000 * 60 * 10);
+
+      if (response.length > 10) {
+        store.dispatch(userState.actions.setAuthKey(response));
+      }
+    }).catch(error => {
+      _refreshingToken = false;
+    });
+  }
+}
+
+function testAndRefreshToken(key) {
+  let exp = null;
+  let header = {};
+  let payload = {};
+  let diff = null;
+
+  if (key) {
+    const tokenParts = key.split('.');
     header = JSON.parse(urlBase64Decode(tokenParts[0]));
     payload = JSON.parse(urlBase64Decode(tokenParts[1]));
   }
 
-  if (header && header.exp || payload && payload.exp) {
+  if (header && header.exp || payload != null && payload.exp) {
     exp = header.exp ? header.exp : payload.exp;
   }
 
@@ -6294,37 +6295,36 @@ function testAndRefreshToken(authKey) {
   if (!diff || diff < 0) {
     setCloudConnectionState(CLOUD_CONNECTION_STATES.UNAUTHENTICATED);
   } else if (diff && diff < 5 * 24 * 60 * 60) {
-    refreshAuthKey(authKey);
+    refreshAuthKey(key);
   }
 }
 
 function sendAll(requests) {
   return new Promise((resolve, reject) => {
-    axiosRetry(axios, {
-      retries: 3,
-      shouldResetTimeout: true,
-      retryCondition: retryCondition
-    });
-    axios.all(requests).then(axios.spread(function (succ, err) {
-      resolve(succ);
-    })).catch(error => {
-      reject(error);
+    Promise.all(requests).then(results => {
+      resolve();
+    }).catch(error => {
+      resolve();
     });
   });
 }
-let permanentSSLFailure = false;
+let _permanentSSLFailure = false;
 function send({
-  command = {},
-  localUrl = '',
-  hubId = '',
-  url = '',
-  method = 'GET',
-  authKey = '',
-  hubKey = '',
-  type = '',
-  config = {},
-  data = {}
+  command,
+  localUrl,
+  hubId,
+  url,
+  method,
+  authKey,
+  hubKey,
+  type,
+  config,
+  data
 }) {
+  if (method == null) {
+    method = 'GET';
+  }
+
   let body = data;
   let remoteConnection = false;
   const hubCommand = isEmpty_1(hubId) ? false : true;
@@ -6338,22 +6338,27 @@ function send({
       url = command.url;
     }
 
-    var parts = url.split('hub/remote');
+    if (url) {
+      var parts = url.split('hub/remote');
 
-    if (parts && parts[1]) {
-      if (localUrl) {
-        url = localUrl + parts[1];
-        authKey = hubKey;
-        hubKey = undefined;
+      if (parts && parts[1]) {
+        if (localUrl) {
+          url = localUrl + parts[1];
+
+          if (hubKey) {
+            authKey = hubKey;
+            hubKey = null;
+          }
+        }
       }
     }
 
-    if (url.indexOf(CLOUD_URL) > -1) {
+    if (url && url.indexOf(CLOUD_URL) > -1) {
       remoteConnection = true;
     }
 
-    if (command.type) {
-      if (isArray_1(data)) {
+    if (command.type && body) {
+      if (isArray_1(body)) {
         body[0]['type'] = command.type;
       } else {
         body['type'] = command.type;
@@ -6363,9 +6368,14 @@ function send({
     if (command.urlParams) {
       let params = [];
       command.urlParams.forEach(param => {
-        params.push(encodeURIComponent(param) + '=' + encodeURIComponent(data[param]));
+        if (data && data[param] !== undefined) {
+          params.push(encodeURIComponent(param) + '=' + encodeURIComponent(data[param]));
+        }
       });
-      url = url + "?" + params.join('&');
+
+      if (url && params.length > 0) {
+        url = url + "?" + params.join('&');
+      }
     }
 
     if (command.config) {
@@ -6406,8 +6416,8 @@ function send({
         retryCondition: retryCondition
       });
       testSSLCertificate(remoteConnection).then(function (status) {
-        if (!status || permanentSSLFailure) {
-          permanentSSLFailure = true;
+        if (!status || _permanentSSLFailure) {
+          _permanentSSLFailure = true;
           reject(new Error('SDK Error: SSL failure.'));
         } else {
           if (authKey) {
@@ -6417,7 +6427,7 @@ function send({
           axios(reqConf).then(function (response) {
             if (remoteConnection) {
               setCloudConnectionState(CLOUD_CONNECTION_STATES.CONNECTED);
-            } else if (!isEmpty_1(hubId)) {
+            } else if (hubId) {
               setHubConnectionState$1({
                 hubId: hubId,
                 state: HUB_CONNECTION_STATES.LOCAL
@@ -6432,7 +6442,7 @@ function send({
                   setCloudConnectionState(cloudErrorState(error));
                 }
 
-                if (hubCommand) {
+                if (hubCommand && hubId) {
                   setHubConnectionState$1({
                     hubId: hubId,
                     state: hubErrorState(error)
@@ -6443,7 +6453,7 @@ function send({
                   setCloudConnectionState(cloudErrorState(error));
                 }
 
-                if (hubCommand) {
+                if (hubCommand && hubId) {
                   setHubConnectionState$1({
                     hubId: hubId,
                     state: hubErrorState(error)
@@ -6454,14 +6464,14 @@ function send({
               if (remoteConnection) {
                 setCloudConnectionState(CLOUD_CONNECTION_STATES.UNCONNECTED);
 
-                if (hubCommand) {
+                if (hubCommand && hubId) {
                   setHubConnectionState$1({
                     hubId: hubId,
                     state: HUB_CONNECTION_STATES.UNCONNECTED
                   });
                 }
               } else {
-                if (hubCommand) {
+                if (hubCommand && hubId) {
                   setHubConnectionState$1({
                     hubId: hubId,
                     state: HUB_CONNECTION_STATES.UNCONNECTED
@@ -6472,14 +6482,14 @@ function send({
               if (remoteConnection) {
                 setCloudConnectionState(CLOUD_CONNECTION_STATES.UNCONNECTED);
 
-                if (hubCommand) {
+                if (hubCommand && hubId) {
                   setHubConnectionState$1({
                     hubId: hubId,
                     state: HUB_CONNECTION_STATES.UNCONNECTED
                   });
                 }
               } else {
-                if (hubCommand) {
+                if (hubCommand && hubId) {
                   setHubConnectionState$1({
                     hubId: hubId,
                     state: HUB_CONNECTION_STATES.UNCONNECTED
@@ -6489,7 +6499,7 @@ function send({
             }
 
             console.error('SDK send: error ', error);
-            reject(new Error('SDK send: error ', error));
+            reject(new Error('SDK Error: Send error'));
           });
         }
       });
@@ -6511,8 +6521,8 @@ function changeLanguage(newLanguage) {
   if (Object.values(LANGUAGES).indexOf(newLanguage) > -1) {
     store.dispatch(userState.actions.setLanguage(newLanguage));
 
-    if (storedUser().state === USER_STATES$1.WAITING_LANGUAGE) {
-      store.dispatch(userState.actions.changeState(USER_STATES$1.LANGUAGE_SET));
+    if (storedUser().state === USER_STATES.WAITING_LANGUAGE) {
+      store.dispatch(userState.actions.changeState(USER_STATES.LANGUAGE_SET));
     }
 
     retVel = true;
@@ -6524,8 +6534,8 @@ function acceptEula() {
   let retVel = false;
   store.dispatch(userState.actions.setEula(true));
 
-  if (storedUser().state === USER_STATES$1.WAITING_EULA) {
-    store.dispatch(userState.actions.changeState(USER_STATES$1.EULA_ACCEPTED));
+  if (storedUser().state === USER_STATES.WAITING_EULA) {
+    store.dispatch(userState.actions.changeState(USER_STATES.EULA_ACCEPTED));
   }
 
   retVel = true;
@@ -6543,8 +6553,8 @@ function doPwLogin(email, password) {
       if (response && isString_1(response)) {
         store.dispatch(userState.actions.setAuthKey(response));
 
-        if (storedUser().state === USER_STATES$1.WAITING_LOGIN) {
-          store.dispatch(userState.actions.changeState(USER_STATES$1.LOGIN_DONE));
+        if (storedUser().state === USER_STATES.WAITING_LOGIN) {
+          store.dispatch(userState.actions.changeState(USER_STATES.LOGIN_DONE));
         }
       }
 
@@ -6602,7 +6612,6 @@ function getDevices() {
   return devicesState.selectors.getDevices(stateNow);
 }
 
-let _hubState = HUB_STATES.LOST;
 let _hubs = {};
 
 function extractHubInfo(HUBKeys) {
@@ -6681,7 +6690,7 @@ function doLocalIdQuery(ip) {
         resolve(ip);
       }).catch(error => {
         console.log(`doLocalIdQuery ${ip} error `, error.message);
-        reject(ip);
+        resolve(ip);
       });
     } else {
       resolve();
@@ -6689,7 +6698,7 @@ function doLocalIdQuery(ip) {
   });
 }
 
-function doCloudDiscovery(authKey) {
+function doCloudDiscovery() {
   return new Promise((resolve, reject) => {
     send({
       command: COMMANDS.CLOUD_IP
@@ -6702,15 +6711,15 @@ function doCloudDiscovery(authKey) {
         }
       }
 
-      sendAll(queries).then(values => {}).catch(error => {}).finally(() => {
+      sendAll(queries).finally(() => {
         setSelectedHubs(_hubs);
         store.dispatch(hubsState.actions.updateHubs(_hubs));
-        resolve();
+        resolve('ok');
       });
     }).catch(error => {
       console.error("doCloudDiscovery error: ", error.message);
       store.dispatch(hubsState.actions.updateHubs(_hubs));
-      resolve();
+      resolve('error');
     });
   });
 }
@@ -6720,7 +6729,9 @@ function fetchMetaData(hubs, authKey) {
     let queries = [];
 
     for (var hub of Object.values(hubs)) {
-      queries.push(doRemoteIdQuery(hub.id, authKey, hub.hubKey));
+      if (hub.hubKey) {
+        queries.push(doRemoteIdQuery(hub.id, authKey, hub.hubKey));
+      }
     }
 
     sendAll(queries).then(values => {}).catch(error => {}).finally(() => {
@@ -6770,13 +6781,13 @@ function fetchHubs() {
     });
   });
 }
-let discoveryInterval = undefined;
+
 function startDiscoveringHubs() {
-  if (!discoveryInterval) {
+  {
     fetchHubs();
-    discoveryInterval = setInterval(fetchHubs, DISCOVERY_INTERVAL_MS);
   }
 }
+
 function unSelectHubById(selectedId) {
   const hubs = getHubs();
 
@@ -6793,14 +6804,15 @@ function selectHubById(selectedId) {
   for (var hub of Object.values(hubs)) {
     if (selectedId === hub.id) {
       store.dispatch(hubsState.actions.selectHub(hub.id));
-      startPolling(hub);
+      startPolling(hub.id);
     }
   }
 }
-let pollIntervals = {};
-let pollTimeStamp = 0;
-let pollInAction = false;
-let secondPoll = false;
+let _pollIntervals = {};
+let _pollTimeStamp = 0;
+let _pollInAction = false;
+let _secondPoll = false;
+
 function doPoll(hubId) {
   const hub = getHubs()[hubId];
 
@@ -6809,23 +6821,23 @@ function doPoll(hubId) {
   }
 
   if (hub.connectionState === HUB_CONNECTION_STATES.REMOTE) {
-    if (secondPoll) {
-      secondPoll = false;
+    if (_secondPoll) {
+      _secondPoll = false;
       return;
     }
 
-    secondPoll = true;
+    _secondPoll = true;
   }
 
   const authKey = storedUser$1().authKey;
   const hubKey = hub.hubKey;
 
-  if (pollInAction) {
+  if (_pollInAction) {
     return;
   }
 
-  pollInAction = true;
-  let reset = pollTimeStamp === 0 ? true : false;
+  _pollInAction = true;
+  let reset = _pollTimeStamp === 0 ? true : false;
   send({
     command: COMMANDS.POLL,
     hubId: hubId,
@@ -6833,15 +6845,15 @@ function doPoll(hubId) {
     hubKey: hubKey,
     localUrl: hub.url,
     data: {
-      ts: pollTimeStamp
+      ts: _pollTimeStamp
     }
   }).then(deltas => {
     if (deltas) {
-      pollTimeStamp = deltas.timestamp;
-
-      if (pollTimeStamp === 0 || deltas.full) {
+      if (_pollTimeStamp === 0 || deltas.full) {
         reset = true;
       }
+
+      _pollTimeStamp = deltas.timestamp;
 
       for (let delta of deltas.polls) {
         switch (delta.type) {
@@ -6894,18 +6906,19 @@ function doPoll(hubId) {
       }
     }
 
-    pollInAction = false;
+    _pollInAction = false;
   }).catch(error => {
     console.error("doPoll error: ", error.message);
-    pollInAction = false;
+    _pollInAction = false;
   });
 }
-function startPolling(hub) {
+
+function startPolling(hubId) {
   const intervalTime = POLL_INTERVAL_MS;
-  pollIntervals[hub.id] = setInterval(doPoll, intervalTime, hub.id);
+  _pollIntervals[hubId] = setInterval(doPoll, intervalTime, hubId);
 }
 function stopPolling(hubId) {
-  clearInterval(pollIntervals[hubId]);
+  clearInterval(_pollIntervals[hubId]);
 }
 
 function storedUser$1() {
@@ -6927,14 +6940,14 @@ function sendDeviceCmd(hubId, deviceId, state) {
     const user = userState.selectors.getUser(stateNow);
 
     if (!user || !user.authKey) {
-      reject('No userKey!');
+      reject(new Error("Device command error: No userKey!"));
       return;
     }
 
     const hubs = hubsState.selectors.getHubs(stateNow);
 
     if (!hubs[hubId] || !hubs[hubId].hubKey) {
-      reject('No hubKey!');
+      reject(new Error("Device command error: No hubKey!"));
       return;
     }
 
@@ -6951,7 +6964,7 @@ function sendDeviceCmd(hubId, deviceId, state) {
     }).then(response => {
       resolve(response);
     }).catch(error => {
-      reject(false);
+      reject(new Error("Device command error: send failed"));
     });
   });
 }
@@ -6961,7 +6974,7 @@ exports.HUB_CONNECTION_STATES = HUB_CONNECTION_STATES;
 exports.HUB_STATES = HUB_STATES;
 exports.LANGUAGES = LANGUAGES;
 exports.ROLES = ROLES;
-exports.USER_STATES = USER_STATES$1;
+exports.USER_STATES = USER_STATES;
 exports.acceptEula = acceptEula;
 exports.changeLanguage = changeLanguage;
 exports.deleteDevice = deleteDevice;
@@ -6977,9 +6990,6 @@ exports.hubsState = hubsState;
 exports.selectHubById = selectHubById;
 exports.sendDeviceCmd = sendDeviceCmd;
 exports.setDevices = setDevices;
-exports.startDiscoveringHubs = startDiscoveringHubs;
-exports.startPolling = startPolling;
-exports.stopPolling = stopPolling;
 exports.store = store;
 exports.unSelectHubById = unSelectHubById;
 exports.updateHubs = updateHubs;

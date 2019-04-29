@@ -5,7 +5,7 @@
  * @param  {string} str - string to be decoded
  * @return {<string>}  - decoded string
  */
-export function urlBase64Decode(encoded): string {
+export function urlBase64Decode(encoded:string): string {
   let str = encoded.replace(/-/g, "+").replace(/_/g, "/");
   let output = str;
   switch (output.length % 4) {

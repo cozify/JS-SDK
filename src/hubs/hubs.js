@@ -1,6 +1,7 @@
 // @flow
 import isEmpty from 'lodash/isEmpty'
 import { HUB_STATES, POLL_INTERVAL_MS, HUB_PROTOCOL, HUB_PORT, DISCOVERY_INTERVAL_MS } from './constants'
+import { USER_STATES } from '../user/constants';
 import { HUB_CONNECTION_STATES } from '../connection/constants'
 import { COMMANDS, send, sendAll } from '../connection/send'
 import { getHubConnectionState } from '../connection/state'
@@ -11,25 +12,20 @@ import { store, watchChanges } from "../store"
 import { hubsState, hubsReducer } from "../reducers/hubs"
 import { userState, userReducer } from "../reducers/user"
 
-import type { HUB_STATES_TYPE } from './constants'
+import type { HUB_STATES_TYPE, HUB_TYPE, HUBS_MAP_TYPE } from './constants'
 
 
 
 
-let _hubState: HUB_STATES_TYPE = HUB_STATES.LOST;
 
-let _hubs: Object = {}
-
+let _hubs: HUBS_MAP_TYPE = {}
 
 
-
-/**
+/*
  * Helper method to extract hub info from JWT based hub keys
- * @param  {{Object<HubKeys>}} HubKeys - map of hub keys
- * @return {Object<HubInfo>}  - map of hub information
  */
-function extractHubInfo(HUBKeys: Object): {} {
-  let hubs = {};
+function extractHubInfo(HUBKeys: { [hubId: string]: string }): HUBS_MAP_TYPE {
+  let hubs: HUBS_MAP_TYPE = {};
   for (let key in HUBKeys) {
       let coded = HUBKeys[key].split('.')[1];
       let decoded = urlBase64Decode(coded);
@@ -53,13 +49,11 @@ function extractHubInfo(HUBKeys: Object): {} {
 }
 
 
-/**
+/*
  * Hub metadata is received and will be stored
- * @param  {string} url
- * @param  {Object} foundHub
  */
-function updateFoundHub(hubURL: string, foundHub) {
-  // Hub keys returns ids idQuerys hubId
+function updateFoundHub(hubURL: ?string, foundHub: HUB_TYPE) {
+  // Hub keys returns ids, idQuerys return hubId
   if(foundHub.hubId){
     foundHub.id = foundHub.hubId;
     delete foundHub.hubId;
@@ -79,11 +73,10 @@ function updateFoundHub(hubURL: string, foundHub) {
 
 }
 
-/**
+/*
  * Remote hub metamata request for version etc information
- * @param  {string} authKey - user authKey
  */
-function doRemoteIdQuery(hubId, authKey, hubKey) {
+function doRemoteIdQuery(hubId: string, authKey: string, hubKey: string): Promise<any> {
   return new Promise( (resolve, reject) => {
     send( {command: COMMANDS.CLOUD_META, authKey: authKey, hubKey: hubKey, hubId: hubId })
     .then((hubData) => {
@@ -97,23 +90,22 @@ function doRemoteIdQuery(hubId, authKey, hubKey) {
   });
 }
 
-/**
+/*
  * Local hub metadata request for version etc information
- * @param  {string} authKey - user authKey
  */
-function doLocalIdQuery(ip: string) {
+function doLocalIdQuery(ip: string): Promise<?string> {
   return new Promise( (resolve, reject) => {
     if (ip) {
       const hubURL = HUB_PROTOCOL + ip + ":" + HUB_PORT
       const url = hubURL + "/hub";
-      send( {url: url })
+      send( {url: url} )
       .then((hubData) => {
         updateFoundHub(hubURL, hubData)
         resolve(ip)
       })
       .catch((error) => {
         console.log(`doLocalIdQuery ${ip} error `, error.message);
-        reject(ip);
+        resolve(ip);
       });
     } else {
       resolve()
@@ -121,13 +113,12 @@ function doLocalIdQuery(ip: string) {
   });
 }
 
-/**
+/*
  * Fetch HUB IP addresses in the same network
- * @param  {string} authKey   - user authKey
  */
-function doCloudDiscovery(authKey: string) {
+function doCloudDiscovery(): Promise<string> {
   return new Promise( (resolve, reject) => {
-    send( {command: COMMANDS.CLOUD_IP }) //,  authKey: authKey })
+    send( {command: COMMANDS.CLOUD_IP })
     .then((ips) => {
       let queries = []
       if (ips && !isEmpty(ips)) {
@@ -136,37 +127,31 @@ function doCloudDiscovery(authKey: string) {
         }
       }
       sendAll(queries)
-      .then( values => {
-        //console.log(values);
-      })
-      .catch(error => {
-        // console.log(error);
-      })
       .finally(() => {
-        //console.log("Hubs metadata found ", JSON.stringify(_hubs));
-        // mark selected hubs to selected still
+        // mark selected hubs to be selected after
         setSelectedHubs(_hubs);
         store.dispatch(hubsState.actions.updateHubs(_hubs));
-        resolve();
+        resolve('ok');
       });
     })
     .catch((error) => {
       console.error("doCloudDiscovery error: ", error.message);
       store.dispatch(hubsState.actions.updateHubs(_hubs));
-      resolve();
+      resolve('error');
     });
   });
 }
 
-/**
+/*
  * Fetch hub metadatas
- * @param  {string} authKey   - user authKey
  */
-function fetchMetaData(hubs: Object, authKey: string) {
+function fetchMetaData(hubs: HUBS_MAP_TYPE, authKey: string): Promise<Object> {
   return new Promise( (resolve, reject) => {
     let queries = []
-    for (var hub of Object.values(hubs)) {
-      queries.push(doRemoteIdQuery(hub.id, authKey, hub.hubKey));
+    for (var hub: HUB_TYPE of (Object.values(hubs):any) ) {
+      if (hub.hubKey){
+        queries.push(doRemoteIdQuery(hub.id, authKey, hub.hubKey));
+      }
     }
     sendAll(queries)
     .then( values => {
@@ -181,13 +166,12 @@ function fetchMetaData(hubs: Object, authKey: string) {
   });
 }
 
-/**
+/*
  * Check hubs that are currently selected and mark them selected also in map of given hubs
- * @param {Objct} newHubs - map of given hubs
  */
-function setSelectedHubs(newHubs) {
+function setSelectedHubs(newHubs: HUBS_MAP_TYPE) {
   const hubs = getHubs();
-  for (var hub of Object.values(hubs)) {
+  for (var hub: HUB_TYPE of (Object.values(hubs):any) ) {
     if (hub.selected) {
       const selectedNewHub = newHubs[hub.id]
       if (selectedNewHub) {
@@ -198,12 +182,10 @@ function setSelectedHubs(newHubs) {
 }
 
 
-/**
- * Fetch Hub keys by given authKey and start fetching hub meta datas
- * @param  {string} authKey   - user authKey got from login
- * @return {Promise<Object>}
+/*
+ * Fetch Hub keys by user authKey and start fetching hub meta datas
  */
-export function fetchHubs( ): Promise<Object> {
+function fetchHubs(): Promise<Object> {
   const authKey = storedUser().authKey;
   return new Promise( (resolve, reject) => {
 
@@ -231,31 +213,34 @@ export function fetchHubs( ): Promise<Object> {
   });
 }
 
-/**
- * Discovery of hubs and local ones every 30s
- * @type {Object}
- */
-let discoveryInterval = undefined
 
-export function startDiscoveringHubs() {
-  if (!discoveryInterval) {
+let _discoveryInterval: ?Object = undefined;
+
+/*
+ * Start discovering hubs every DISCOVERY_INTERVAL_MS
+ */
+function startDiscoveringHubs() {
+  if (!_discoveryInterval) {
     fetchHubs(); // call immediately and then every 30s
-    discoveryInterval = setInterval(fetchHubs, DISCOVERY_INTERVAL_MS);
+    //_discoveryInterval = setInterval(fetchHubs, DISCOVERY_INTERVAL_MS);
   }
 }
 
-export function stopDiscoveringHubs() {
-  clearInterval(discoveryInterval);
+/*
+ * Stop discovering hubs
+ */
+function stopDiscoveringHubs() {
+  clearInterval(_discoveryInterval);
 }
 
 
 /**
- * Un select hub by id
- * @param  {string} selectedId   - id to be selected
+ * Unselect hub by id, starts hub polling
+ * @param  {string} selectedId   - hub id to be selected
  */
 export function unSelectHubById( selectedId: string ) {
-  const hubs = getHubs();
-  for (var hub of Object.values(hubs)) {
+  const hubs: HUBS_MAP_TYPE = getHubs();
+  for (var hub: HUB_TYPE of (Object.values(hubs):any) ) {
     if (selectedId === hub.id) {
       store.dispatch(hubsState.actions.unSelectHub(hub.id));
       stopPolling(hub.id);
@@ -263,16 +248,17 @@ export function unSelectHubById( selectedId: string ) {
   }
 }
 
+
 /**
- * Select hub by id
- * @param  {string} selectedId   - id to be selected
+ * Select hub by id, stops hub polling
+ * @param  {string} selectedId   - hub id to be selected
  */
 export function selectHubById( selectedId: string ) {
-  const hubs = getHubs();
-  for (var hub of Object.values(hubs)) {
+  const hubs: HUBS_MAP_TYPE = getHubs();
+  for (var hub: HUB_TYPE of (Object.values(hubs):any) ) {
     if (selectedId === hub.id) {
       store.dispatch(hubsState.actions.selectHub(hub.id));
-      startPolling(hub);
+      startPolling(hub.id);
     }
   }
 }
@@ -281,48 +267,52 @@ export function selectHubById( selectedId: string ) {
 
 /*
 ** Polling
+*/
+
+let _pollIntervals: Object= {};
+let _pollTimeStamp: number = 0;
+let _pollInAction: boolean = false;
+let _secondPoll: boolean = false;
+
+/*
+ * Do poll if hub connection is ok
  */
+function doPoll(hubId: string){
 
-let pollIntervals = {};
-let pollTimeStamp = 0;
-let pollInAction = false;
-let secondPoll = false
-export function doPoll(hubId: string){
-
-
-
-  const hub = getHubs()[hubId];
+  const hub: HUB_TYPE = getHubs()[hubId];
   if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE){
     return;
   }
 
   //just return every second -> not doing so often as in local connection
   if (hub.connectionState === HUB_CONNECTION_STATES.REMOTE){
-    if (secondPoll) {
-      secondPoll = false;
+    if (_secondPoll) {
+      _secondPoll = false;
       return
     }
-    secondPoll = true;
+    _secondPoll = true;
   }
 
   const authKey = storedUser().authKey;
   const hubKey = hub.hubKey;
 
-  if (pollInAction) {
+  if (_pollInAction) {
     return;
   }
-  pollInAction = true
+  _pollInAction = true
 
-  let reset = pollTimeStamp === 0 ? true : false
-  send( {command: COMMANDS.POLL, hubId:hubId, authKey: authKey, hubKey: hubKey, localUrl: hub.url, data: {ts:pollTimeStamp} })
+  let reset = _pollTimeStamp === 0 ? true : false
+  send( {command: COMMANDS.POLL, hubId:hubId, authKey: authKey, hubKey: hubKey, localUrl: hub.url, data: {ts:_pollTimeStamp} })
   .then((deltas) => {
     if (deltas) {
       //console.log(JSON.stringify(deltas));
-      pollTimeStamp = deltas.timestamp
       // Return can be null poll, even if not asked that
-      if (pollTimeStamp === 0 || deltas.full) {
+      if (_pollTimeStamp === 0 || deltas.full) {
         reset = true
       }
+
+      _pollTimeStamp = deltas.timestamp
+
       for (let delta of deltas.polls) {
         switch(delta.type) {
           case "DEVICE_DELTA": {
@@ -356,36 +346,48 @@ export function doPoll(hubId: string){
         }
       }
     }
-    pollInAction = false;
+    _pollInAction = false;
   })
   .catch((error) => {
     //store.dispatch(hubsState.actions.hubPollFailed())
     console.error("doPoll error: ", error.message);
-    pollInAction = false;
+    _pollInAction = false;
   });
 }
 
-export function startPolling(hub) {
-  const intervalTime = POLL_INTERVAL_MS
-  pollIntervals[hub.id] = setInterval(doPoll, intervalTime, hub.id);
+/*
+ * Start polling of given hub
+ */
+export function startPolling(hubId: string) {
+  const intervalTime = POLL_INTERVAL_MS;
+  _pollIntervals[hubId] = setInterval(doPoll, intervalTime, hubId);
 }
 
+/*
+ * Stop polling of given hub
+ */
 export function stopPolling(hubId: string) {
-  clearInterval(pollIntervals[hubId]);
-}
-
-
-
-function storedUser() {
-  return userState.selectors.getUser(store.getState());
-}
-
-export function getHubs() {
-  return hubsState.selectors.getHubs(store.getState());
+  clearInterval(_pollIntervals[hubId]);
 }
 
 
 /**
+ * Helper to get current user from state
+ */
+function storedUser(): Object {
+  return userState.selectors.getUser(store.getState());
+}
+
+/**
+ * Helper to get current hubs from state
+ * @return {Object} - hubs
+ */
+export function getHubs(): HUBS_MAP_TYPE {
+  return hubsState.selectors.getHubs(store.getState());
+}
+
+
+/*
  * Listener of User state changes
  */
 watchChanges('user.state', (newState, oldState) => {
