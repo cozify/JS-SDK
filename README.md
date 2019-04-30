@@ -20,8 +20,9 @@
 
 #### React-projects (should use es-version)
 ```
-import { state } from 'cozify-sdk'
-console.log(`Initial connection state now ${state.connectionState}`);
+import { LANGUAGES, USER_STATES, getUserState } from 'cozify-sdk'
+console.info(`Initial user state ${getUserState()}`);
+CozifySDK.changeLanguage(LANGUAGES.FI_FI);
 
 ... more in /example
 
@@ -29,8 +30,11 @@ console.log(`Initial connection state now ${state.connectionState}`);
 
 #### Node-projects (should use cjs-version)
 ```
-import { state } from 'cozify-sdk'
-console.log(`Initial connection state now ${state.connectionState}`);
+const CozifySDK = require('../dist/sdk-node.js');
+let LANGUAGES = CozifySDK.LANGUAGES;
+let USER_STATES = CozifySDK.USER_STATES;
+console.info(`Initial user state ${CozifySDK.getUserState()}`);
+CozifySDK.changeLanguage(LANGUAGES.FI_FI);
 
 ... more in /node-example
 
