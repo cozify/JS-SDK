@@ -76,8 +76,8 @@ export function doPwLogin(email, password) {
 /**
  * Get state of user state-machine
  */
- export function getUserState() {
+export function getUserState() {
   return storedUser().state
- }
+}
 
 

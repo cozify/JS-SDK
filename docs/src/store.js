@@ -15,7 +15,7 @@ export const store = configureStore({
   //preloadedState
   //enhancers: [reduxBatch]
 });
-console.log("Initial state", store.getState())
+console.log("Store Initial State: ", store.getState())
 
 function watchState (getState, objectPath) {
   var currentValue = get(getState(), objectPath)

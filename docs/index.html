@@ -93,9 +93,10 @@
 <h3 id="usage">Usage</h3><h4 id="browsers--should-use-iife-version-">Browsers (should use iife-version)</h4><pre><code><code class="source-code prettyprint">&lt;script src=&quot;https://unpkg.com/axios/dist/axios.min.js&quot;&gt;&lt;/script&gt;
 &lt;script type=&quot;text/javascript&quot; src=&quot;../dist/sdk-browser.js&quot;&gt;&lt;/script&gt;
 &lt;script type=&quot;text/javascript&quot;&gt;
-      let state = CozifySDK.state;
-      console.log(`Initial connection state now ${state.connectionState}`);
-
+      let LANGUAGES = CozifySDK.LANGUAGES;
+      let USER_STATES = CozifySDK.USER_STATES;
+      console.info(`Initial user state ${CozifySDK.getUserState()}`);
+      CozifySDK.changeLanguage(LANGUAGES.FI_FI);
       ... more in /browser-example
 </code>
 </code></pre><h4 id="react-projects--should-use-es-version-">React-projects (should use es-version)</h4><pre><code><code class="source-code prettyprint">import { state } from &apos;cozify-sdk&apos;

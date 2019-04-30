@@ -5966,7 +5966,7 @@ const store = configureStore({
   //enhancers: [reduxBatch]
 
 });
-console.log("Initial state", store.getState());
+console.log("Store Initial State: ", store.getState());
 
 function watchState(getState, objectPath) {
   var currentValue = getValue$1(getState(), objectPath);
@@ -6501,7 +6501,7 @@ function testSSLCertificate(remoteConnection) {
       _ongoingSSLCertificateCheck = true;
       _lastSSLCertificateCheckTime = now; // Cordova plugin?
 
-      if (window && window.plugins && window.plugins.sslCertificateChecker) {
+      if (!isNode && window && window.plugins && window.plugins.sslCertificateChecker) {
         window.plugins.sslCertificateChecker.check(successMsg => {
           _ongoingSSLCertificateCheck = false;
           resolve(true);
@@ -6757,8 +6757,8 @@ function send({
     headers: {
       'Accept': 'application/json, application/binary, text/plain, */*',
       'Content-Type': 'application/json;charset=UTF-8',
-      'Authorization': authKey,
-      'X-Hub-Key': hubKey
+      'Authorization': authKey ? authKey : null,
+      'X-Hub-Key': hubKey ? hubKey : null
     },
     crossDomain: true,
     responseType: 'application/json',

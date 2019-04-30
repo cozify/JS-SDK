@@ -25,9 +25,9 @@
       "expectCount": 6,
       "actualCount": 3,
       "undocumentLines": [
-        6,
-        64,
-        65
+        7,
+        65,
+        66
       ]
     },
     "src/connection/send.js": {

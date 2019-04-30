@@ -78,8 +78,8 @@ export function doPwLogin(email: string, password: string): Promise<Object> {
 /**
  * Get state of user state-machine
  */
- export function getUserState() {
+export function getUserState() {
   return storedUser().state
- }
+}
 
 

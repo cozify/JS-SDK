@@ -206,8 +206,8 @@ export function send({command, localUrl, hubId, url, method, authKey, hubKey, ty
     headers: {
       'Accept': 'application/json, application/binary, text/plain, */*',
       'Content-Type': 'application/json;charset=UTF-8',
-      'Authorization': authKey,
-      'X-Hub-Key': hubKey
+      'Authorization': authKey ? authKey : null,
+      'X-Hub-Key': hubKey ? hubKey : null
     },
     crossDomain: true,
     responseType: 'application/json',

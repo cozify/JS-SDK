@@ -10,9 +10,10 @@
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script type="text/javascript" src="../dist/sdk-browser.js"></script>
 <script type="text/javascript">
-      let state = CozifySDK.state;
-      console.log(`Initial connection state now ${state.connectionState}`);
-
+      let LANGUAGES = CozifySDK.LANGUAGES;
+      let USER_STATES = CozifySDK.USER_STATES;
+      console.info(`Initial user state ${CozifySDK.getUserState()}`);
+      CozifySDK.changeLanguage(LANGUAGES.FI_FI);
       ... more in /browser-example
 
 ```

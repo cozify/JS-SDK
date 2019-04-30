@@ -2,58 +2,80 @@
 const CozifySDK = require('../dist/sdk-node.js');
 console.log('Testing Cozify SDK from node.js')
 
-let fixedUsername = 'vesa@cozify.fi'
-let fixedPassword = 'Fortum!123'
+let fixedUsername = '...@cozify.fi'
+let fixedPassword = 'xxx'
+let fixedHubId = 'xxxx-xxxx'
+let fixedDeviceId = 'abcd-efgh'
 
-let state = CozifySDK.state;
-let user = CozifySDK.user;
+
 let LANGUAGES = CozifySDK.LANGUAGES;
-let events = CozifySDK.events;
-let EVENTS = CozifySDK.EVENTS;
 let USER_STATES = CozifySDK.USER_STATES;
 
-console.log(`Initial connection state now ${state.connectionState}`);
-console.log(`Initial user state ${user.getState()}`);
-console.log(`--1--`);
+console.info(`Initial user state ${CozifySDK.getUserState()}`);
+console.info(`--1--`);
 
-user.changeLanguage(LANGUAGES.FI_FI);
-console.log(`--2--`);
-
+CozifySDK.changeLanguage(LANGUAGES.FI_FI);
+console.info(`--2--`);
 
 
-user.doPwLogin( fixedUsername, fixedPassword )
+CozifySDK.doPwLogin( fixedUsername, fixedPassword )
   .then((response) => {
-    user.acceptEula();
-    console.log(`--3--`);
+    CozifySDK.acceptEula();
+    console.info(`--3--`);
 
-    //user.doLogout();
-    //console.log(`-----`);
+    //CozifySDK.doLogout();
+    //console.info(`--4--`);
 
   })
   .catch(function (error) {
-    console.log(`User state ${user.getState()}`);
+    console.info(`Pw failure when user state ${CozifySDK.getCloudConnectionState()}`, error);
   })
 
 
+/** Listener for specific changes */
+CozifySDK.watchChanges('connections.cloudState', (newState, oldState) => {
+  console.log('connections.cloudState changed from %s to %s', oldState, newState);
+});
 
-/**
- * Listener of User state changes
- */
-const unbindUserStateChangedListener = events.on(EVENTS.USER_STATE_CHANGED, state => {
-  console.log("USER_STATE CHANGED: ", state);
-  if (state === USER_STATES.AUTHENTICATED){
-    CozifySDK.fetchHubTokens(user.authKey);
+CozifySDK.watchChanges('user.state', (newState, oldState) => {
+  console.log('user.state changed from %s to %s', oldState, newState);
+});
+
+CozifySDK.watchChanges('hubs', (newHubsState, oldHubsState) => {
+  if (newHubsState[fixedHubId] && !newHubsState[fixedHubId].selected) {
+    CozifySDK.selectHubById(fixedHubId);
+    /*
+    setTimeout(function() {
+      CozifySDK.unSelectHubById(fixedHubId);
+    }, 10000);
+    */
+  };
+
+  if (newHubsState[fixedHubId] && oldHubsState[fixedHubId]){
+    if (newHubsState[fixedHubId].connectionState !== oldHubsState[fixedHubId].connectionState) {
+      console.log('Hub connectionState changed from %s to %s', oldHubsState[fixedHubId].connectionState, newHubsState[fixedHubId].connectionState);
+    }
+  }
+
+});
+
+let deviceStateChanged = false;
+CozifySDK.watchChanges('devices', (newDevicesState, oldDevicesState) => {
+  if ( newDevicesState[fixedHubId] && newDevicesState[fixedHubId][fixedDeviceId] && newDevicesState[fixedHubId][fixedDeviceId].state ) {
+    if (!deviceStateChanged) {
+      deviceStateChanged = true;
+      let state = newDevicesState[fixedHubId][fixedDeviceId].state;
+      state.isOn = !state.isOn;
+      CozifySDK.sendDeviceCmd(fixedHubId, fixedDeviceId, state);
+    }
   }
 });
 
 
-/**
- * Listener of HUB list changes
- */
-const unbindHubListCahngeListener = events.on(EVENTS.HUBS_LIST_CHANGED, eventHubs => {
-  const hubs = CozifySDK.getHubs(); // Optional because eventHubs contains same info
-  for (let key in hubs) {
-    console.log(` Hub name: ${hubs[key].name} - role: ${hubs[key].roleString}`);
-  }
-});
-
+/** Listener for store changes like React will internally do */
+CozifySDK.store.subscribe(() => {
+  const storeNow = CozifySDK.store.getState()
+  console.info("Hub connection:", CozifySDK.getHubConnectionState(fixedHubId));
+  //console.info("Hubs", storeNow.hubs)
+  //console.info("Devices:", JSON.stringify(CozifySDK.getDevices()[fixedHubId]));
+})

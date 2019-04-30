@@ -1,6 +1,7 @@
 // 
 
 import { CLOUD_CONNECTION_STATES, HUB_CONNECTION_STATES, CLOUD_FINGERPRINTS_SHA1, CLOUD_HOST } from './constants'
+import { isNode } from '../utils.js'
 
 
 const SSL_CHECK_INTERVALL = 1000 * 60  * 60 //One hour
@@ -83,7 +84,7 @@ export function testSSLCertificate(remoteConnection) {
       _lastSSLCertificateCheckTime = now
 
       // Cordova plugin?
-      if (window && window.plugins && window.plugins.sslCertificateChecker) {
+      if (!isNode && window && window.plugins && window.plugins.sslCertificateChecker) {
           window.plugins.sslCertificateChecker.check(
               (successMsg) => {
                   _ongoingSSLCertificateCheck = false;
