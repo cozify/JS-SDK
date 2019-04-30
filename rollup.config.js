@@ -56,7 +56,7 @@ export default {
     , babel({
       exclude: 'node_modules/**',
       runtimeHelpers: true,
-      comments: false
+      comments: true
     })
     //Convert CommonJS modules to ES6, so they can be included in a Rollup bundle
     , json()
@@ -64,13 +64,11 @@ export default {
       include: ['node_modules/**']
     })
     // copy Flow definitions from source to destination directory
-    /*
-    ,
-    copy({
+    , copy({
       files: ['src/*.flow'],
-      dest: 'lib',
+      dest: 'dist',
     }),
-    */
+
   ],
   external: ['axios']
 }

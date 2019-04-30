@@ -1,32 +1,50 @@
 window.esdocSearchIndex = [
   [
-    "cozify-sdk/src/connection/send.js~commands",
-    "variable/index.html#static-variable-COMMANDS",
-    "<span>COMMANDS</span> <span class=\"search-result-import-path\">cozify-sdk/src/connection/send.js</span>",
+    "cozify-sdk/src/connection/constants.js~cloud_api_version",
+    "variable/index.html#static-variable-CLOUD_API_VERSION",
+    "<span>CLOUD_API_VERSION</span> <span class=\"search-result-import-path\">cozify-sdk/src/connection/constants.js</span>",
     "variable"
   ],
   [
-    "cozify-sdk/src/state/state.js~connection_states",
-    "variable/index.html#static-variable-CONNECTION_STATES",
-    "<span>CONNECTION_STATES</span> <span class=\"search-result-import-path\">cozify-sdk/src/state/state.js</span>",
+    "cozify-sdk/src/connection/constants.js~cloud_fingerprints_sha1",
+    "variable/index.html#static-variable-CLOUD_FINGERPRINTS_SHA1",
+    "<span>CLOUD_FINGERPRINTS_SHA1</span> <span class=\"search-result-import-path\">cozify-sdk/src/connection/constants.js</span>",
     "variable"
   ],
   [
-    "cozify-sdk/src/events/constants.js~events",
-    "variable/index.html#static-variable-EVENTS",
-    "<span>EVENTS</span> <span class=\"search-result-import-path\">cozify-sdk/src/events/constants.js</span>",
+    "cozify-sdk/src/connection/constants.js~cloud_host",
+    "variable/index.html#static-variable-CLOUD_HOST",
+    "<span>CLOUD_HOST</span> <span class=\"search-result-import-path\">cozify-sdk/src/connection/constants.js</span>",
     "variable"
   ],
   [
-    "cozify-sdk/src/hub/constants.js~hub_states",
+    "cozify-sdk/src/connection/constants.js~cloud_url",
+    "variable/index.html#static-variable-CLOUD_URL",
+    "<span>CLOUD_URL</span> <span class=\"search-result-import-path\">cozify-sdk/src/connection/constants.js</span>",
+    "variable"
+  ],
+  [
+    "cozify-sdk/src/hubs/constants.js~discovery_interval_ms",
+    "variable/index.html#static-variable-DISCOVERY_INTERVAL_MS",
+    "<span>DISCOVERY_INTERVAL_MS</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/constants.js</span>",
+    "variable"
+  ],
+  [
+    "cozify-sdk/src/hubs/constants.js~hub_port",
+    "variable/index.html#static-variable-HUB_PORT",
+    "<span>HUB_PORT</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/constants.js</span>",
+    "variable"
+  ],
+  [
+    "cozify-sdk/src/hubs/constants.js~hub_protocol",
+    "variable/index.html#static-variable-HUB_PROTOCOL",
+    "<span>HUB_PROTOCOL</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/constants.js</span>",
+    "variable"
+  ],
+  [
+    "cozify-sdk/src/hubs/constants.js~hub_states",
     "variable/index.html#static-variable-HUB_STATES",
-    "<span>HUB_STATES</span> <span class=\"search-result-import-path\">cozify-sdk/src/hub/constants.js</span>",
-    "variable"
-  ],
-  [
-    "cozify-sdk/src/person/constants.js~languages",
-    "variable/index.html#static-variable-LANGUAGES",
-    "<span>LANGUAGES</span> <span class=\"search-result-import-path\">cozify-sdk/src/person/constants.js</span>",
+    "<span>HUB_STATES</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/constants.js</span>",
     "variable"
   ],
   [
@@ -36,10 +54,10 @@ window.esdocSearchIndex = [
     "variable"
   ],
   [
-    "cozify-sdk/src/person/person.js~person",
-    "class/src/person/person.js~Person.html",
-    "<span>Person</span> <span class=\"search-result-import-path\">cozify-sdk/src/person/person.js</span>",
-    "class"
+    "cozify-sdk/src/hubs/constants.js~poll_interval_ms",
+    "variable/index.html#static-variable-POLL_INTERVAL_MS",
+    "<span>POLL_INTERVAL_MS</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/constants.js</span>",
+    "variable"
   ],
   [
     "cozify-sdk/src/user/constants.js~roles",
@@ -54,28 +72,106 @@ window.esdocSearchIndex = [
     "variable"
   ],
   [
-    "cozify-sdk/src/user/user.js~user",
-    "class/src/user/user.js~User.html",
-    "<span>User</span> <span class=\"search-result-import-path\">cozify-sdk/src/user/user.js</span>",
-    "class"
+    "cozify-sdk/src/user/user.js~accepteula",
+    "function/index.html#static-function-acceptEula",
+    "<span>acceptEula</span> <span class=\"search-result-import-path\">cozify-sdk/src/user/user.js</span>",
+    "function"
   ],
   [
-    "cozify-sdk/src/events/events.js~events",
-    "variable/index.html#static-variable-events",
-    "<span>events</span> <span class=\"search-result-import-path\">cozify-sdk/src/events/events.js</span>",
+    "cozify-sdk/src/user/user.js~changelanguage",
+    "function/index.html#static-function-changeLanguage",
+    "<span>changeLanguage</span> <span class=\"search-result-import-path\">cozify-sdk/src/user/user.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/reducers/user.js~changestate",
+    "variable/index.html#static-variable-changeState",
+    "<span>changeState</span> <span class=\"search-result-import-path\">cozify-sdk/src/reducers/user.js</span>",
     "variable"
   ],
   [
-    "cozify-sdk/src/hub/hubs.js~fetchhubtokens",
-    "function/index.html#static-function-fetchHubTokens",
-    "<span>fetchHubTokens</span> <span class=\"search-result-import-path\">cozify-sdk/src/hub/hubs.js</span>",
+    "cozify-sdk/src/connection/send-utilities.js~clouderrorstate",
+    "function/index.html#static-function-cloudErrorState",
+    "<span>cloudErrorState</span> <span class=\"search-result-import-path\">cozify-sdk/src/connection/send-utilities.js</span>",
     "function"
   ],
   [
-    "cozify-sdk/src/hub/hubs.js~gethubs",
-    "function/index.html#static-function-getHubs",
-    "<span>getHubs</span> <span class=\"search-result-import-path\">cozify-sdk/src/hub/hubs.js</span>",
+    "cozify-sdk/src/reducers/connections.js~connectionsstate",
+    "variable/index.html#static-variable-connectionsState",
+    "<span>connectionsState</span> <span class=\"search-result-import-path\">cozify-sdk/src/reducers/connections.js</span>",
+    "variable"
+  ],
+  [
+    "cozify-sdk/src/devices/devices.js~devicedeltahandler",
+    "function/index.html#static-function-deviceDeltaHandler",
+    "<span>deviceDeltaHandler</span> <span class=\"search-result-import-path\">cozify-sdk/src/devices/devices.js</span>",
     "function"
+  ],
+  [
+    "cozify-sdk/src/reducers/devices.js~devicesstate",
+    "variable/index.html#static-variable-devicesState",
+    "<span>devicesState</span> <span class=\"search-result-import-path\">cozify-sdk/src/reducers/devices.js</span>",
+    "variable"
+  ],
+  [
+    "cozify-sdk/src/user/user.js~dopwlogin",
+    "function/index.html#static-function-doPwLogin",
+    "<span>doPwLogin</span> <span class=\"search-result-import-path\">cozify-sdk/src/user/user.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/connection/state.js~getcloudconnectionstate",
+    "function/index.html#static-function-getCloudConnectionState",
+    "<span>getCloudConnectionState</span> <span class=\"search-result-import-path\">cozify-sdk/src/connection/state.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/devices/devices.js~getdevices",
+    "function/index.html#static-function-getDevices",
+    "<span>getDevices</span> <span class=\"search-result-import-path\">cozify-sdk/src/devices/devices.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/connection/state.js~gethubconnectionstate",
+    "function/index.html#static-function-getHubConnectionState",
+    "<span>getHubConnectionState</span> <span class=\"search-result-import-path\">cozify-sdk/src/connection/state.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/devices/devices.js~gethubdevices",
+    "function/index.html#static-function-getHubDevices",
+    "<span>getHubDevices</span> <span class=\"search-result-import-path\">cozify-sdk/src/devices/devices.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/hubs/hubs.js~gethubs",
+    "function/index.html#static-function-getHubs",
+    "<span>getHubs</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/hubs.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/user/user.js~getuserstate",
+    "function/index.html#static-function-getUserState",
+    "<span>getUserState</span> <span class=\"search-result-import-path\">cozify-sdk/src/user/user.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/connection/send-utilities.js~huberrorstate",
+    "function/index.html#static-function-hubErrorState",
+    "<span>hubErrorState</span> <span class=\"search-result-import-path\">cozify-sdk/src/connection/send-utilities.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/reducers/hubs.js~hubsreducer",
+    "variable/index.html#static-variable-hubsReducer",
+    "<span>hubsReducer</span> <span class=\"search-result-import-path\">cozify-sdk/src/reducers/hubs.js</span>",
+    "variable"
+  ],
+  [
+    "cozify-sdk/src/reducers/hubs.js~hubsstate",
+    "variable/index.html#static-variable-hubsState",
+    "<span>hubsState</span> <span class=\"search-result-import-path\">cozify-sdk/src/reducers/hubs.js</span>",
+    "variable"
   ],
   [
     "cozify-sdk/src/utils.js~isnode",
@@ -84,22 +180,124 @@ window.esdocSearchIndex = [
     "variable"
   ],
   [
+    "cozify-sdk/src/connection/send-retry.js~retrycondition",
+    "function/index.html#static-function-retryCondition",
+    "<span>retryCondition</span> <span class=\"search-result-import-path\">cozify-sdk/src/connection/send-retry.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/reducers/index.js~rootreducer",
+    "variable/index.html#static-variable-rootReducer",
+    "<span>rootReducer</span> <span class=\"search-result-import-path\">cozify-sdk/src/reducers/index.js</span>",
+    "variable"
+  ],
+  [
+    "cozify-sdk/src/hubs/hubs.js~selecthubbyid",
+    "function/index.html#static-function-selectHubById",
+    "<span>selectHubById</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/hubs.js</span>",
+    "function"
+  ],
+  [
     "cozify-sdk/src/connection/send.js~send",
     "function/index.html#static-function-send",
     "<span>send</span> <span class=\"search-result-import-path\">cozify-sdk/src/connection/send.js</span>",
     "function"
   ],
   [
-    "cozify-sdk/src/state/state.js~state",
-    "variable/index.html#static-variable-state",
-    "<span>state</span> <span class=\"search-result-import-path\">cozify-sdk/src/state/state.js</span>",
+    "cozify-sdk/src/connection/send.js~sendall",
+    "function/index.html#static-function-sendAll",
+    "<span>sendAll</span> <span class=\"search-result-import-path\">cozify-sdk/src/connection/send.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/devices/device.js~senddevicecmd",
+    "function/index.html#static-function-sendDeviceCmd",
+    "<span>sendDeviceCmd</span> <span class=\"search-result-import-path\">cozify-sdk/src/devices/device.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/connection/state.js~setcloudconnectionstate",
+    "function/index.html#static-function-setCloudConnectionState",
+    "<span>setCloudConnectionState</span> <span class=\"search-result-import-path\">cozify-sdk/src/connection/state.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/reducers/connections.js~setcloudconnectionstate",
+    "variable/index.html#static-variable-setCloudConnectionState",
+    "<span>setCloudConnectionState</span> <span class=\"search-result-import-path\">cozify-sdk/src/reducers/connections.js</span>",
     "variable"
   ],
   [
-    "cozify-sdk/src/user/user.js~user",
-    "variable/index.html#static-variable-user",
-    "<span>user</span> <span class=\"search-result-import-path\">cozify-sdk/src/user/user.js</span>",
+    "cozify-sdk/src/reducers/devices.js~setdevices",
+    "variable/index.html#static-variable-setDevices",
+    "<span>setDevices</span> <span class=\"search-result-import-path\">cozify-sdk/src/reducers/devices.js</span>",
     "variable"
+  ],
+  [
+    "cozify-sdk/src/connection/state.js~sethubconnectionstate",
+    "function/index.html#static-function-setHubConnectionState",
+    "<span>setHubConnectionState</span> <span class=\"search-result-import-path\">cozify-sdk/src/connection/state.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/hubs/hubs.js~startdiscoveringhubs",
+    "function/index.html#static-function-startDiscoveringHubs",
+    "<span>startDiscoveringHubs</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/hubs.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/hubs/hubs.js~stopdiscoveringhubs",
+    "function/index.html#static-function-stopDiscoveringHubs",
+    "<span>stopDiscoveringHubs</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/hubs.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/store.js~store",
+    "variable/index.html#static-variable-store",
+    "<span>store</span> <span class=\"search-result-import-path\">cozify-sdk/src/store.js</span>",
+    "variable"
+  ],
+  [
+    "cozify-sdk/src/connection/send-utilities.js~testsslcertificate",
+    "function/index.html#static-function-testSSLCertificate",
+    "<span>testSSLCertificate</span> <span class=\"search-result-import-path\">cozify-sdk/src/connection/send-utilities.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/hubs/hubs.js~unselecthubbyid",
+    "function/index.html#static-function-unSelectHubById",
+    "<span>unSelectHubById</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/hubs.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/reducers/hubs.js~updatehubs",
+    "variable/index.html#static-variable-updateHubs",
+    "<span>updateHubs</span> <span class=\"search-result-import-path\">cozify-sdk/src/reducers/hubs.js</span>",
+    "variable"
+  ],
+  [
+    "cozify-sdk/src/utils.js~urlbase64decode",
+    "function/index.html#static-function-urlBase64Decode",
+    "<span>urlBase64Decode</span> <span class=\"search-result-import-path\">cozify-sdk/src/utils.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/reducers/user.js~userreducer",
+    "variable/index.html#static-variable-userReducer",
+    "<span>userReducer</span> <span class=\"search-result-import-path\">cozify-sdk/src/reducers/user.js</span>",
+    "variable"
+  ],
+  [
+    "cozify-sdk/src/reducers/user.js~userstate",
+    "variable/index.html#static-variable-userState",
+    "<span>userState</span> <span class=\"search-result-import-path\">cozify-sdk/src/reducers/user.js</span>",
+    "variable"
+  ],
+  [
+    "cozify-sdk/src/store.js~watchchanges",
+    "function/index.html#static-function-watchChanges",
+    "<span>watchChanges</span> <span class=\"search-result-import-path\">cozify-sdk/src/store.js</span>",
+    "function"
   ],
   [
     "src/.external-ecmascript.js~array",
@@ -384,33 +582,87 @@ window.esdocSearchIndex = [
     "external"
   ],
   [
+    "src/connection/constants.js",
+    "file/src/connection/constants.js.html",
+    "src/connection/constants.js",
+    "file"
+  ],
+  [
+    "src/connection/constants.js~cloud_connection_state_type",
+    "typedef/index.html#static-typedef-CLOUD_CONNECTION_STATE_TYPE",
+    "src/connection/constants.js~CLOUD_CONNECTION_STATE_TYPE",
+    "typedef"
+  ],
+  [
+    "src/connection/constants.js~commands_type",
+    "typedef/index.html#static-typedef-COMMANDS_TYPE",
+    "src/connection/constants.js~COMMANDS_TYPE",
+    "typedef"
+  ],
+  [
+    "src/connection/constants.js~commands_type",
+    "typedef/index.html#static-typedef-COMMANDS_TYPE",
+    "src/connection/constants.js~COMMANDS_TYPE",
+    "typedef"
+  ],
+  [
+    "src/connection/constants.js~hub_connection_state_type",
+    "typedef/index.html#static-typedef-HUB_CONNECTION_STATE_TYPE",
+    "src/connection/constants.js~HUB_CONNECTION_STATE_TYPE",
+    "typedef"
+  ],
+  [
+    "src/connection/send-retry.js",
+    "file/src/connection/send-retry.js.html",
+    "src/connection/send-retry.js",
+    "file"
+  ],
+  [
+    "src/connection/send-utilities.js",
+    "file/src/connection/send-utilities.js.html",
+    "src/connection/send-utilities.js",
+    "file"
+  ],
+  [
     "src/connection/send.js",
     "file/src/connection/send.js.html",
     "src/connection/send.js",
     "file"
   ],
   [
-    "src/events/constants.js",
-    "file/src/events/constants.js.html",
-    "src/events/constants.js",
+    "src/connection/state.js",
+    "file/src/connection/state.js.html",
+    "src/connection/state.js",
     "file"
   ],
   [
-    "src/events/events.js",
-    "file/src/events/events.js.html",
-    "src/events/events.js",
+    "src/devices/constants.js",
+    "file/src/devices/constants.js.html",
+    "src/devices/constants.js",
     "file"
   ],
   [
-    "src/hub/constants.js",
-    "file/src/hub/constants.js.html",
-    "src/hub/constants.js",
+    "src/devices/device.js",
+    "file/src/devices/device.js.html",
+    "src/devices/device.js",
     "file"
   ],
   [
-    "src/hub/hubs.js",
-    "file/src/hub/hubs.js.html",
-    "src/hub/hubs.js",
+    "src/devices/devices.js",
+    "file/src/devices/devices.js.html",
+    "src/devices/devices.js",
+    "file"
+  ],
+  [
+    "src/hubs/constants.js",
+    "file/src/hubs/constants.js.html",
+    "src/hubs/constants.js",
+    "file"
+  ],
+  [
+    "src/hubs/hubs.js",
+    "file/src/hubs/hubs.js.html",
+    "src/hubs/hubs.js",
     "file"
   ],
   [
@@ -420,63 +672,39 @@ window.esdocSearchIndex = [
     "file"
   ],
   [
-    "src/person/constants.js",
-    "file/src/person/constants.js.html",
-    "src/person/constants.js",
+    "src/reducers/connections.js",
+    "file/src/reducers/connections.js.html",
+    "src/reducers/connections.js",
     "file"
   ],
   [
-    "src/person/person.js",
-    "file/src/person/person.js.html",
-    "src/person/person.js",
+    "src/reducers/devices.js",
+    "file/src/reducers/devices.js.html",
+    "src/reducers/devices.js",
     "file"
   ],
   [
-    "src/person/person.js~person#constructor",
-    "class/src/person/person.js~Person.html#instance-constructor-constructor",
-    "src/person/person.js~Person#constructor",
-    "method"
+    "src/reducers/hubs.js",
+    "file/src/reducers/hubs.js.html",
+    "src/reducers/hubs.js",
+    "file"
   ],
   [
-    "src/person/person.js~person#email",
-    "class/src/person/person.js~Person.html#instance-member-email",
-    "src/person/person.js~Person#email",
-    "member"
+    "src/reducers/index.js",
+    "file/src/reducers/index.js.html",
+    "src/reducers/index.js",
+    "file"
   ],
   [
-    "src/person/person.js~person#firstname",
-    "class/src/person/person.js~Person.html#instance-member-firstName",
-    "src/person/person.js~Person#firstName",
-    "member"
+    "src/reducers/user.js",
+    "file/src/reducers/user.js.html",
+    "src/reducers/user.js",
+    "file"
   ],
   [
-    "src/person/person.js~person#language",
-    "class/src/person/person.js~Person.html#instance-member-language",
-    "src/person/person.js~Person#language",
-    "member"
-  ],
-  [
-    "src/person/person.js~person#lastname",
-    "class/src/person/person.js~Person.html#instance-member-lastName",
-    "src/person/person.js~Person#lastName",
-    "member"
-  ],
-  [
-    "src/person/person.js~person#print",
-    "class/src/person/person.js~Person.html#instance-method-print",
-    "src/person/person.js~Person#print",
-    "method"
-  ],
-  [
-    "src/person/person.js~person#tostring",
-    "class/src/person/person.js~Person.html#instance-method-toString",
-    "src/person/person.js~Person#toString",
-    "method"
-  ],
-  [
-    "src/state/state.js",
-    "file/src/state/state.js.html",
-    "src/state/state.js",
+    "src/store.js",
+    "file/src/store.js.html",
+    "src/store.js",
     "file"
   ],
   [
@@ -490,78 +718,6 @@ window.esdocSearchIndex = [
     "file/src/user/user.js.html",
     "src/user/user.js",
     "file"
-  ],
-  [
-    "src/user/user.js~user#accepteula",
-    "class/src/user/user.js~User.html#instance-method-acceptEula",
-    "src/user/user.js~User#acceptEula",
-    "method"
-  ],
-  [
-    "src/user/user.js~user#authkey",
-    "class/src/user/user.js~User.html#instance-member-authKey",
-    "src/user/user.js~User#authKey",
-    "member"
-  ],
-  [
-    "src/user/user.js~user#changelanguage",
-    "class/src/user/user.js~User.html#instance-method-changeLanguage",
-    "src/user/user.js~User#changeLanguage",
-    "method"
-  ],
-  [
-    "src/user/user.js~user#constructor",
-    "class/src/user/user.js~User.html#instance-constructor-constructor",
-    "src/user/user.js~User#constructor",
-    "method"
-  ],
-  [
-    "src/user/user.js~user#dologout",
-    "class/src/user/user.js~User.html#instance-method-doLogout",
-    "src/user/user.js~User#doLogout",
-    "method"
-  ],
-  [
-    "src/user/user.js~user#dopwlogin",
-    "class/src/user/user.js~User.html#instance-method-doPwLogin",
-    "src/user/user.js~User#doPwLogin",
-    "method"
-  ],
-  [
-    "src/user/user.js~user#eulaacceted",
-    "class/src/user/user.js~User.html#instance-member-eulaAcceted",
-    "src/user/user.js~User#eulaAcceted",
-    "member"
-  ],
-  [
-    "src/user/user.js~user#getstate",
-    "class/src/user/user.js~User.html#instance-method-getState",
-    "src/user/user.js~User#getState",
-    "method"
-  ],
-  [
-    "src/user/user.js~user#language",
-    "class/src/user/user.js~User.html#instance-member-language",
-    "src/user/user.js~User#language",
-    "member"
-  ],
-  [
-    "src/user/user.js~user#password",
-    "class/src/user/user.js~User.html#instance-member-password",
-    "src/user/user.js~User#password",
-    "member"
-  ],
-  [
-    "src/user/user.js~user#role",
-    "class/src/user/user.js~User.html#instance-member-role",
-    "src/user/user.js~User#role",
-    "member"
-  ],
-  [
-    "src/user/user.js~user#setstate",
-    "class/src/user/user.js~User.html#instance-method-setState",
-    "src/user/user.js~User#setState",
-    "method"
   ],
   [
     "src/utils.js",

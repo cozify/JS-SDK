@@ -7,12 +7,27 @@ import { CLOUD_CONNECTION_STATES } from '../connection/constants.js';
 import type { CLOUD_CONNECTION_STATE_TYPE } from '../connection/constants.js';
 
 
-const connectionsState = createSlice({
+/**
+ * Connections action creators object
+ * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
+ * @return { {
+ *   slice : string,
+ *   reducer : ReducerFunction,
+ *   actions : Object<string, ActionCreator},
+ *   selectors : Object<string, Selector>
+ *   }}
+ */
+export const connectionsState = createSlice({
   slice: 'connections',
   initialState: {
     cloudState: CLOUD_CONNECTION_STATES.UNCONNECTED
   },
   reducers: {
+    /*
+     * Reducer action of cloud connection state
+     * @param {Object} state
+     * @param {CLOUD_CONNECTION_STATES} action
+     */
     setCloudConnectionState(state, action) {
       const newState = action.payload
       const oldState = state.cloudState
@@ -20,7 +35,6 @@ const connectionsState = createSlice({
         if (oldState !== newState) {
           console.log ("CLOUD connection state " + oldState + " -> " + newState)
           state.cloudState = newState
-
         }
       }
     },
@@ -31,11 +45,11 @@ const connectionsState = createSlice({
 
 
 const { actions, reducer } = connectionsState
-const connectionsReducer = reducer
-// Extract the action creators object
-export { connectionsState }
-// Export the reducer
-export { connectionsReducer }
+/**
+ * Connections reducer
+ * @type {function} reducer
+ */
+export {reducer as connectionsReducer}
 
 // Extract and export each action creator by name
 export const { setCloudConnectionState } = actions

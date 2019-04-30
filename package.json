@@ -16,8 +16,6 @@
   "scripts": {
     "build": "rollup -c",
     "start": "rollup -c -w",
-    "buildall": "rollup -c rollup-all.config.js",
-    "startall": "rollup -c rollup-all.config.js -w",
     "test": "jest src",
     "test:watch": "jest src --watch --notify",
     "cover": "jest src --coverage",
@@ -26,7 +24,7 @@
     "flow:status": "flow status",
     "flow:coverage": "flow-coverage-report --config .flowcoverage.json",
     "flow:deps": "flow-typed install",
-    "docs": " ./node_modules/.bin/esdoc",
+    "docs": "./node_modules/.bin/flow-remove-types src/ -d docs/src/ -p | ./node_modules/.bin/esdoc | rm -rf docs/src/",
     "deploy": "gh-pages -d example/build",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
@@ -87,6 +85,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "axios-retry": "^3.1.2",
+    "esdoc-ecmascript-proposal-plugin": "^1.0.0",
     "get-value": "^3.0.1",
     "lodash": "^4.17.11",
     "redux": "^4.0.1",

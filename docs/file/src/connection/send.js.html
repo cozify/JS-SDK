@@ -29,83 +29,262 @@
 <nav class="navigation" data-ice="nav"><div>
   <ul>
     
-  <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-isNode">isNode</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#connection">connection</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-send">send</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-COMMANDS">COMMANDS</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#events">events</a><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-EVENTS">EVENTS</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-events">events</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#hub">hub</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-fetchHubTokens">fetchHubTokens</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubs">getHubs</a></span></span></li>
+  <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-watchChanges">watchChanges</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-urlBase64Decode">urlBase64Decode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-store">store</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-isNode">isNode</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#connection">connection</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-retryCondition">retryCondition</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-cloudErrorState">cloudErrorState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hubErrorState">hubErrorState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-testSSLCertificate">testSSLCertificate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-send">send</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sendAll">sendAll</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getCloudConnectionState">getCloudConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubConnectionState">getHubConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setCloudConnectionState">setCloudConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setHubConnectionState">setHubConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_API_VERSION">CLOUD_API_VERSION</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_FINGERPRINTS_SHA1">CLOUD_FINGERPRINTS_SHA1</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_HOST">CLOUD_HOST</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_URL">CLOUD_URL</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-CLOUD_CONNECTION_STATE_TYPE">CLOUD_CONNECTION_STATE_TYPE</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-COMMANDS_TYPE">COMMANDS_TYPE</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-COMMANDS_TYPE">COMMANDS_TYPE</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-HUB_CONNECTION_STATE_TYPE">HUB_CONNECTION_STATE_TYPE</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#devices">devices</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sendDeviceCmd">sendDeviceCmd</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-deviceDeltaHandler">deviceDeltaHandler</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDevices">getDevices</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubDevices">getHubDevices</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#hubs">hubs</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubs">getHubs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-selectHubById">selectHubById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-startDiscoveringHubs">startDiscoveringHubs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-stopDiscoveringHubs">stopDiscoveringHubs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-unSelectHubById">unSelectHubById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-DISCOVERY_INTERVAL_MS">DISCOVERY_INTERVAL_MS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-HUB_PORT">HUB_PORT</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-HUB_PROTOCOL">HUB_PROTOCOL</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-HUB_STATES">HUB_STATES</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#person">person</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/person/person.js~Person.html">Person</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-LANGUAGES">LANGUAGES</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#state">state</a><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CONNECTION_STATES">CONNECTION_STATES</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-state">state</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#user">user</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/user/user.js~User.html">User</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-POLL_INTERVAL_MS">POLL_INTERVAL_MS</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#reducers">reducers</a><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-connectionsState">connectionsState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setCloudConnectionState">setCloudConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-devicesState">devicesState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setDevices">setDevices</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-hubsReducer">hubsReducer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-hubsState">hubsState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-updateHubs">updateHubs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-rootReducer">rootReducer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-changeState">changeState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-userReducer">userReducer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-userState">userState</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#user">user</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-acceptEula">acceptEula</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-changeLanguage">changeLanguage</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-doPwLogin">doPwLogin</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getUserState">getUserState</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-LANGUAGES">LANGUAGES</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ROLES">ROLES</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-USER_STATES">USER_STATES</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-user">user</a></span></span></li>
 </ul>
 </div>
 </nav>
 
 <div class="content" data-ice="content"><h1 data-ice="title">src/connection/send.js</h1>
-<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">// @flow
-import isEmpty from &apos;lodash/isEmpty&apos;;
-import axios from &apos;axios&apos;;
-import axiosRetry from &apos;axios-retry&apos;;
-import {isNode} from &apos;../utils.js&apos;
-const CLOUD_URL: string = &quot;https://cloud.cozify.fi/ui/0.2/&quot;;
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">// 
+import isEmpty from &apos;lodash/isEmpty&apos;
+import isArray from &apos;lodash/isArray&apos;
+import axios from &apos;axios&apos;
+import axiosRetry from &apos;axios-retry&apos;
+import { urlBase64Decode } from &apos;../utils.js&apos;
+import { COMMANDS, CLOUD_CONNECTION_STATES, CLOUD_HOST, CLOUD_URL, CLOUD_API_VERSION, CLOUD_FINGERPRINTS_SHA1, HUB_CONNECTION_STATES } from &apos;./constants&apos;
+import { cloudErrorState, hubErrorState, testSSLCertificate } from &apos;./send-utilities&apos;
+import { setCloudConnectionState, setHubConnectionState } from &apos;./state&apos;
+import { userState } from &quot;../reducers/user&quot;;
+import { store } from &quot;../store&quot;
 
-export const COMMANDS = Object.freeze({
-  USER_LOGIN: { method: &apos;POST&apos;, url: CLOUD_URL + &quot;user/login&quot;, params: [&apos;password&apos;, &apos;email&apos;], config:{responseType: isNode ? &apos;blob&apos; : &apos;stream&apos;, timeout: 5000} },
-  HUB_KEYS: { method: &apos;GET&apos;, url: CLOUD_URL + &quot;user/hubkeys&quot;}
-});
+import {retryCondition} from &apos;./send-retry&apos;
 
 
 
-type ST = {
-  command?: Object,
-  url?: string,
-  method?: string,
-  authKey?: string,
-  hubKey?: string,
-  config?: Object,
-  data?: Object
+export {COMMANDS}
+
+let _refreshingToken = false;
+
+/*
+ * Refresh Auth key call
+ */
+function refreshAuthKey(authKey) {
+  if (!_refreshingToken) {
+    _refreshingToken = true
+    send( {command: COMMANDS.REFRESH_AUTHKEY, authKey: authKey} )
+    .then((response) =&gt; {
+      setTimeout(function() { _refreshingToken = false; }, 1000 * 60  * 10); //10min
+      if (response.length &gt; 10) {
+          store.dispatch(userState.actions.setAuthKey(response));
+      }
+    })
+    .catch((error) =&gt; {
+      _refreshingToken = false
+    });
+  }
+}
+
+/*
+ * Token refresh
+ */
+function testAndRefreshToken(key) {
+    let exp = null;
+    let header = {};
+    let payload = {};
+    let diff = null;
+
+    if (key) {
+        const tokenParts = key.split(&apos;.&apos;);
+        header = JSON.parse(urlBase64Decode(tokenParts[0]));
+        payload = JSON.parse(urlBase64Decode(tokenParts[1]));
+    }
+
+    if ((header &amp;&amp; header.exp) || (payload != null &amp;&amp; payload.exp)) {
+        exp = header.exp ? header.exp : payload.exp
+    }
+
+    if (exp) {
+        diff = exp - Math.round(new Date().getTime() / 1000)
+    }
+
+    if (!diff || diff &lt; 0) {
+      // User is unauthenticated
+      setCloudConnectionState(CLOUD_CONNECTION_STATES.UNAUTHENTICATED);
+    } else if (diff &amp;&amp; diff &lt;  5 * 24 * 60 * 60) {
+      // refresh if &lt; 5 days to exp date
+      refreshAuthKey(key);
+    }
+
 }
 
 /**
- * Send method for REST API
- * @param  {Object} command         Optional command like USER_LOGIN
- * @param  {String} url             Optional url
- * @param  {String} method          Optional method
- * @param  {String} authKey         Optional authKey
- * @param  {String} hubKey          Optional hubKey
- * @param  {Object} config          Optional config that might have timeout or responseType configs to be used over defaults
- * @param  {Object} data            Optional data to be sent
- * @return {Promise}                Promise of results or error
+ * Send multiple requests
+ * @param  {Array&lt;Oject&gt;} requests - requests to be send
+ * @return {Promise}
  */
-export function send({command = {}, url = &apos;&apos;, method = &apos;GET&apos;, authKey = &apos;&apos; , hubKey = &apos;&apos;, config ={}, data = {}}: ST): Promise&lt;Object&gt; {
-  let body = {}
+export function sendAll(requests) {
+  return new Promise( (resolve, reject) =&gt; {
 
+    Promise.all(requests)
+    .then(results =&gt; {
+        // Use the data from the results like so:
+        // results[0].data
+        // results[1].data
+      resolve()
+    })
+    .catch(error =&gt; {
+        // do whatever
+      resolve()
+    });
+
+  });
+
+}
+
+/* Flag to indicate SSL failures */
+let _permanentSSLFailure = false;
+
+/**
+ * Send method for REST API
+ * @param {COMMAND_TYPE} params
+ *
+ * @return {Promise}
+ *
+ * @example
+ *   send( {command: COMMANDS.USER_LOGIN,  data:{email:email, password:password} })
+ *   .then((response) =&gt; {...});
+ *
+ * @example
+ *   send( {command: COMMANDS.CMD_DEVICE, authKey: authKey, hubKey: hubKey, data:[{id:deviceId, state:state}] })
+ *   .then((response) =&gt; {...});
+ *
+ * @example
+ *   send( {url: hubURL + &quot;/hub&quot;} )
+ *   .then((hubData) =&gt; {...});
+ *
+ */
+export function send({command, localUrl, hubId, url, method, authKey, hubKey, type, config, data}) {
+  if (method == null) {
+    method = &apos;GET&apos;;
+  }
+
+  let body = data;
+  /*
+  if (isArray(data)) {
+    body = [];
+    body.push({});
+  }
+  */
   //console.log(&quot;send: command &quot;, command);
+  // Flag to indicate are we using remote (vrs.local) connection
+  let remoteConnection = false;
+
+  // Flag to indicate are we sending hub command meaning using commandAPI (vrs. some cloud/videocloud command like login, log etc)
+  const hubCommand = isEmpty(hubId) ? false : true;
 
   if (typeof command != &quot;undefined&quot; &amp;&amp; command){
     if (command.method) {
       method = command.method;
     }
-    if (command.url) {
+    if (isEmpty(url) &amp;&amp; command.url) {
       url = command.url;
     }
+
+    if (url){
+      var parts = url.split(&apos;hub/remote&apos;)
+      if (parts &amp;&amp; parts[1]){
+        if (localUrl) {
+            url = localUrl + parts[1]
+            if (hubKey) {
+              authKey = hubKey;
+              hubKey = null;
+            }
+          }
+      }
+    }
+
+    if (url &amp;&amp; url.indexOf(CLOUD_URL) &gt; -1) {
+      remoteConnection = true;
+    }
+
+    if (command.type &amp;&amp; body) {
+        if (isArray(body)) {
+          body[0][&apos;type&apos;] = command.type;
+        } else {
+          body[&apos;type&apos;] = command.type;
+        }
+    }
+
+    /*
     if (command.params) {
       command.params.forEach(param =&gt; {
+        if (isArray(data)){
+          body[0][param] = data[param];
+        } else {
           body[param] = data[param];
+        }
       });
+    } */
+
+    if (command.urlParams) {
+      let params = [];
+      command.urlParams.forEach(param =&gt; {
+          if (data &amp;&amp; data[param] !== undefined){
+            params.push(encodeURIComponent(param) + &apos;=&apos; + encodeURIComponent(data[param]));
+          }
+      });
+      if (url &amp;&amp; params.length &gt; 0) {
+        url = url + &quot;?&quot; + params.join(&apos;&amp;&apos;);
+      }
     }
+
     if (command.config) {
       config = command.config;
     }
+
   }
 
   const bodyString = JSON.stringify(body);
@@ -117,18 +296,19 @@ export function send({command = {}, url = &apos;&apos;, method = &apos;GET&apos;
     headers: {
       &apos;Accept&apos;: &apos;application/json, application/binary, text/plain, */*&apos;,
       &apos;Content-Type&apos;: &apos;application/json;charset=UTF-8&apos;,
-      &apos;Authorization&apos;: authKey
+      &apos;Authorization&apos;: authKey,
+      &apos;X-Hub-Key&apos;: hubKey
     },
     crossDomain: true,
     responseType: &apos;application/json&apos;,
     url: url,
-    data: isEmpty(bodyString)? null : bodyString
+    data: isEmpty(bodyString) ? null : bodyString
   }
 
   Object.assign(reqConf, config);
 
   return new Promise( (resolve, reject) =&gt; {
-    if (command) {
+    if (command || url) {
 
       axios.interceptors.response.use(response =&gt; {
         if(response.headers[&apos;content-type&apos;] === &apos;application/json&apos; || response.headers[&apos;content-type&apos;] === &apos;application/binary&apos;) {
@@ -141,28 +321,97 @@ export function send({command = {}, url = &apos;&apos;, method = &apos;GET&apos;
         }
       }, error =&gt; Promise.reject(error));
 
+      //retries if it is a network error or a 5xx error on an idempotent request (GET, HEAD, OPTIONS, PUT or DELETE).
+      axiosRetry(axios, { retries: 3, shouldResetTimeout: true, retryCondition: retryCondition });
 
-      axiosRetry(axios, { retries: 3, shouldResetTimeout: true });
+      testSSLCertificate(remoteConnection)
+      .then(function (status) {
+        // Cancel request if SSL Certificate status is invalid
+        if (!status || _permanentSSLFailure) {
 
-      // See options: https://github.com/axios/axios#request-config
-      axios(reqConf)
-        .then(function (response) {
-          // console.error(&quot;send: response &quot;, response);
-          resolve(response.data);
+          _permanentSSLFailure = true;
+          reject(new Error(&apos;SDK Error: SSL failure.&apos;));
 
-        })
-        .catch(function (error) {
-          console.log(error);
-          reject(error);
-        });
+        } else {
 
+          // SSL is ok,
+          // check if auth Key needs to be refreshed
+          if (authKey) {
+            testAndRefreshToken(authKey);
+          }
+
+          // Send command
+          // See options: https://github.com/axios/axios#request-config
+          axios(reqConf)
+          .then(function (response) {
+            // console.error(&quot;send: response &quot;, response);
+            if (remoteConnection){
+              setCloudConnectionState(CLOUD_CONNECTION_STATES.CONNECTED)
+            } else if (hubId) {
+              setHubConnectionState({hubId: hubId, state:HUB_CONNECTION_STATES.LOCAL})
+            }
+            resolve(response.data);
+
+          })
+          .catch(function (error) {
+            if (error &amp;&amp; error.response){
+              // The request was made and the server responded with a status code
+              // that falls out of the range of 2xx
+              if (remoteConnection) {
+                  if (command !== COMMANDS.CLOUD_META){
+                    setCloudConnectionState(cloudErrorState(error))
+                  }
+                  if (hubCommand &amp;&amp; hubId) {
+                    setHubConnectionState({hubId: hubId, state: hubErrorState(error)})
+                  }
+              } else {
+                // Local connection
+                // 401 means also cloud auth refresh is required
+                if (error &amp;&amp; error.response &amp;&amp; error.response.status === 401) {
+                  setCloudConnectionState(cloudErrorState(error))
+                }
+                if (hubCommand &amp;&amp; hubId) {
+                  setHubConnectionState({hubId: hubId, state: hubErrorState(error)})
+                }
+              }
+            } else if (error.request) {
+              // The request was made but no response was received
+              // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+              // http.ClientRequest in node.js
+              if (remoteConnection) {
+                setCloudConnectionState(CLOUD_CONNECTION_STATES.UNCONNECTED)
+                if (hubCommand &amp;&amp; hubId) {
+                    setHubConnectionState({hubId: hubId, state: HUB_CONNECTION_STATES.UNCONNECTED})
+                }
+              } else {
+                // Local connection
+                if (hubCommand &amp;&amp; hubId) {
+                  setHubConnectionState({hubId: hubId, state: HUB_CONNECTION_STATES.UNCONNECTED})
+                }
+              }
+            } else {
+              // Something happened in setting up the request that triggered an Error
+              if (remoteConnection) {
+                setCloudConnectionState(CLOUD_CONNECTION_STATES.UNCONNECTED)
+                if (hubCommand &amp;&amp; hubId) {
+                    setHubConnectionState({hubId: hubId, state: HUB_CONNECTION_STATES.UNCONNECTED})
+                }
+              } else {
+                // Local connection
+                if (hubCommand &amp;&amp; hubId) {
+                  setHubConnectionState({hubId: hubId, state: HUB_CONNECTION_STATES.UNCONNECTED})
+                }
+              }
+            }
+            console.error(&apos;SDK send: error &apos;, error);
+            reject(new Error(&apos;SDK Error: Send error&apos;));
+          });
+        }
+      });
     } else {
-      reject(new Error(&apos;Command not found.&apos;));
+      reject(new Error(&apos;SDK Error: Command or Command API URL not found.&apos;));
     }
   });
-
-  //headers: {&quot;Authorization&quot; : userToken},
-  //contentType: &quot;application/json;charset=utf-8&quot;,
 
 
 }

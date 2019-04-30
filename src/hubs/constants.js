@@ -7,7 +7,6 @@
   * @enum {string}
   */
 export const HUB_STATES = Object.freeze({
-  LOST: 'lost',
   UNCLAIMED: 'unclaimed',
   CLAIMED: 'claimed',
   TOO_NEW_VERSION: 'new version',
@@ -37,7 +36,7 @@ export type HUBS_MAP_TYPE = {[hubId: string]: HUB_TYPE}
 /*
  * Intervall defining how often hubkeys and metadatas are fetched
  */
-export const DISCOVERY_INTERVAL_MS: number = 20 * 1000
+export const DISCOVERY_INTERVAL_MS: number = 45 * 1000
 
 /*
  * Interval defining how often hubs are polled at max

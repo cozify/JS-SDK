@@ -19,8 +19,12 @@ export const CLOUD_URL: string = CLOUD_HOST + "/" + CLOUD_API_VERSION;
 
 
 /**
- * Supported API commands
- */
+ *  Enumeration of supported API commands, that could be
+ *  USER_LOGIN, HUB_KEYS, REFRESH_AUTHKEY, CLOUD_IP, CLOUD_META, POLL, CMD_DEVICE
+ *  @typedef {Object} COMMANDS_TYPE
+ *  @readonly
+ *
+  */
 export const COMMANDS = Object.freeze({
   USER_LOGIN: { method: 'POST', url: CLOUD_URL + "user/login", params: ['password', 'email'], config:{responseType: isNode ? 'blob' : 'stream', timeout: 5000} },
   HUB_KEYS: { method: 'GET', url: CLOUD_URL + "user/hubkeys"},
@@ -31,8 +35,25 @@ export const COMMANDS = Object.freeze({
   CMD_DEVICE: {method: 'PUT', url: CLOUD_URL + "hub/remote/cc/1.11" + "/devices/command", type: 'CMD_DEVICE', params: ['id', 'state']}
 });
 
+export type COMMANDS_TYPE = $Values<typeof COMMANDS>;
+
+
+/**
+ * COMMAND_TYPE
+ *  @typedef {Object} COMMANDS_TYPE
+ *  @property {COMMANDS_TYPE} [command]      - Optional command like USER_LOGIN,
+ *  @property {string} [localUrl]     - Optional localUrl for direct hub access
+ *  @property {string} [hubId]        - Optional hub Id when messaging to hub
+ *  @property {string} [url]          - Optional url
+ *  @property {string} [method]       - Optional method
+ *  @property {string} [authKey]      - Optional authKey
+ *  @property {string} [hubKey]       - Optional hubKey
+ *  @property {string} [type]         - Optional type that defaults to 'application/json',
+ *  @property {Object} [config]       - Optional config that might have 'timeout' or 'responseType' configs to be used over defaults,
+ *  @property {Object} [data]         - Optional data to be sent over url or body parameters (depending command)
+ */
 export type COMMAND_TYPE = {
-  command?: ?Object,
+  command?: ?COMMANDS_TYPE,
   localUrl?: ?string,
   url?: ?string,
   method?: ?string,
@@ -49,6 +70,7 @@ export type COMMAND_TYPE = {
   * UNCONNECTED, UNAUTHENTICATED, UNAUTHORIZED, OBSOLETE_API_VERSION, LATE_PAYMENT or CONNECTED
   * @readonly
   * @enum {string}
+  * @typedef {string} CLOUD_CONNECTION_STATE_TYPE
   */
 export const CLOUD_CONNECTION_STATES = Object.freeze({
   UNCONNECTED: 'no connection',
@@ -58,6 +80,7 @@ export const CLOUD_CONNECTION_STATES = Object.freeze({
   LATE_PAYMENT: 'late payment',
   CONNECTED: 'connected'
 });
+
 export type CLOUD_CONNECTION_STATE_TYPE = $Values<typeof CLOUD_CONNECTION_STATES>;
 
 /**
@@ -65,6 +88,7 @@ export type CLOUD_CONNECTION_STATE_TYPE = $Values<typeof CLOUD_CONNECTION_STATES
   * UNCONNECTED, UNAUTHENTICATED, UNAUTHORIZED, OBSOLETE_API_VERSION, REMOTE or LOCAL
   * @readonly
   * @enum {string}
+  * @typedef {string} HUB_CONNECTION_STATE_TYPE
   */
 export const HUB_CONNECTION_STATES = Object.freeze({
   UNCONNECTED: 'no connection',

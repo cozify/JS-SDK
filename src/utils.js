@@ -2,8 +2,8 @@
 
 /**
  * Helper method to Base64 decode
- * @param  {string} str - string to be decoded
- * @return {<string>}  - decoded string
+ * @param  {string} encoded - string to be decoded
+ * @return {string}  - decoded string
  */
 export function urlBase64Decode(encoded:string): string {
   let str = encoded.replace(/-/g, "+").replace(/_/g, "/");
@@ -43,7 +43,10 @@ export function urlBase64Decode(encoded:string): string {
 
 }
 
-/* Helper to check run environment */
+/**
+ * Helper to check if run environment is Node
+ * @type {Boolean}
+ */
 export let isNode: boolean = false;
 if (typeof process === 'object') {
   if (typeof process.versions === 'object') {

@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">src/hubs/hubs.js | Cozify SDK</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Cozify UI SDK for REST aPI"><meta property="og:type" content="website"><meta property="og:url" content="http://my-library.org"><meta property="og:site_name" content="Cozify SDK"><meta property="og:title" content="Cozify SDK"><meta property="og:image" content="http://my-library.org/logo.png"><meta property="og:description" content="Cozify UI SDK for REST aPI"><meta property="og:author" content="https://twitter.com/foo"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="Cozify SDK"><meta property="twitter:description" content="Cozify UI SDK for REST aPI"><meta property="twitter:image" content="http://my-library.org/logo.png"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./" style="display: flex; align-items: center;"><img src="./image/brand_logo.png" style="width:34px;"></a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/foo/bar"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-watchChanges">watchChanges</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-urlBase64Decode">urlBase64Decode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-store">store</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-isNode">isNode</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#connection">connection</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-retryCondition">retryCondition</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-cloudErrorState">cloudErrorState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hubErrorState">hubErrorState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-testSSLCertificate">testSSLCertificate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-send">send</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sendAll">sendAll</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getCloudConnectionState">getCloudConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubConnectionState">getHubConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setCloudConnectionState">setCloudConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setHubConnectionState">setHubConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_API_VERSION">CLOUD_API_VERSION</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_FINGERPRINTS_SHA1">CLOUD_FINGERPRINTS_SHA1</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_HOST">CLOUD_HOST</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_URL">CLOUD_URL</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-CLOUD_CONNECTION_STATE_TYPE">CLOUD_CONNECTION_STATE_TYPE</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-COMMANDS_TYPE">COMMANDS_TYPE</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-COMMANDS_TYPE">COMMANDS_TYPE</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-HUB_CONNECTION_STATE_TYPE">HUB_CONNECTION_STATE_TYPE</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#devices">devices</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sendDeviceCmd">sendDeviceCmd</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-deviceDeltaHandler">deviceDeltaHandler</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDevices">getDevices</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubDevices">getHubDevices</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#hubs">hubs</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubs">getHubs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-selectHubById">selectHubById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-startDiscoveringHubs">startDiscoveringHubs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-stopDiscoveringHubs">stopDiscoveringHubs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-unSelectHubById">unSelectHubById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-DISCOVERY_INTERVAL_MS">DISCOVERY_INTERVAL_MS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-HUB_PORT">HUB_PORT</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-HUB_PROTOCOL">HUB_PROTOCOL</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-HUB_STATES">HUB_STATES</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-POLL_INTERVAL_MS">POLL_INTERVAL_MS</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#reducers">reducers</a><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-connectionsState">connectionsState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setCloudConnectionState">setCloudConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-devicesState">devicesState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setDevices">setDevices</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-hubsReducer">hubsReducer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-hubsState">hubsState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-updateHubs">updateHubs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-rootReducer">rootReducer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-changeState">changeState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-userReducer">userReducer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-userState">userState</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#user">user</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-acceptEula">acceptEula</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-changeLanguage">changeLanguage</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-doPwLogin">doPwLogin</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getUserState">getUserState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-LANGUAGES">LANGUAGES</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ROLES">ROLES</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-USER_STATES">USER_STATES</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/hubs/hubs.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">// 
+import isEmpty from &apos;lodash/isEmpty&apos;
+import { HUB_STATES, POLL_INTERVAL_MS, HUB_PROTOCOL, HUB_PORT, DISCOVERY_INTERVAL_MS } from &apos;./constants&apos;
+import { USER_STATES } from &apos;../user/constants&apos;;
+import { HUB_CONNECTION_STATES } from &apos;../connection/constants&apos;
+import { COMMANDS, send, sendAll } from &apos;../connection/send&apos;
+import { getHubConnectionState } from &apos;../connection/state&apos;
+import { ROLES } from &apos;../user/constants&apos;
+import { deviceDeltaHandler } from &apos;../devices/devices&apos;
+import { isNode, urlBase64Decode } from &apos;../utils&apos;
+import { store, watchChanges } from &quot;../store&quot;
+import { hubsState, hubsReducer } from &quot;../reducers/hubs&quot;
+import { userState, userReducer } from &quot;../reducers/user&quot;
+
+
+
+
+
+
+let _hubs = {}
+
+
+/*
+ * Helper method to extract hub info from JWT based hub keys
+ */
+function extractHubInfo(HUBKeys) {
+  let hubs = {};
+  for (let key in HUBKeys) {
+      let coded = HUBKeys[key].split(&apos;.&apos;)[1];
+      let decoded = urlBase64Decode(coded);
+      let payload = JSON.parse(decoded);
+      let info = {};
+      info.id = payload.hubId || payload.hub_id;
+      info.name = payload.hubName || payload.hub_name;
+      info.hubKey = HUBKeys[key];
+      info.connectionState = HUB_CONNECTION_STATES.UNCONNECTED;
+      if (payload.role){
+          info.role = payload.role;
+          info.roleString = &apos;&apos;
+          Object.keys(ROLES).forEach( (key)=&gt; {
+            if (ROLES[key] === info.role)
+              info.roleString = key
+          });
+      }
+      hubs[ info.id ] = info;
+  }
+  return hubs;
+}
+
+
+/*
+ * Hub metadata is received and will be stored
+ */
+function updateFoundHub(hubURL, foundHub) {
+  // Hub keys returns ids, idQuerys return hubId
+  if(foundHub.hubId){
+    foundHub.id = foundHub.hubId;
+    delete foundHub.hubId;
+  }
+  _hubs[foundHub.id].connected = foundHub.connected;
+  _hubs[foundHub.id].features = foundHub.features;
+  _hubs[foundHub.id].state = foundHub.state;
+  _hubs[foundHub.id].version = foundHub.version;
+  _hubs[foundHub.id].connectionState = foundHub.connected ? HUB_CONNECTION_STATES.REMOTE : HUB_CONNECTION_STATES.UNCONNECTED;
+  if (hubURL) {
+    _hubs[foundHub.id].connectionState = HUB_CONNECTION_STATES.LOCAL;
+    _hubs[foundHub.id].url =  hubURL
+  } else {
+    _hubs[foundHub.id].url =  undefined
+  }
+
+
+}
+
+/*
+ * Remote hub metamata request for version etc information
+ */
+function doRemoteIdQuery(hubId, authKey, hubKey) {
+  return new Promise( (resolve, reject) =&gt; {
+    send( {command: COMMANDS.CLOUD_META, authKey: authKey, hubKey: hubKey, hubId: hubId })
+    .then((hubData) =&gt; {
+      updateFoundHub(undefined, hubData);
+      resolve(hubId);
+    })
+    .catch((error) =&gt; {
+      console.log(`doRemoteIdQuery ${hubId} error `, error.message);
+      reject(hubId);
+    });
+  });
+}
+
+/*
+ * Local hub metadata request for version etc information
+ */
+function doLocalIdQuery(ip) {
+  return new Promise( (resolve, reject) =&gt; {
+    if (ip) {
+      const hubURL = HUB_PROTOCOL + ip + &quot;:&quot; + HUB_PORT
+      const url = hubURL + &quot;/hub&quot;;
+      send( {url: url} )
+      .then((hubData) =&gt; {
+        updateFoundHub(hubURL, hubData)
+        resolve(ip)
+      })
+      .catch((error) =&gt; {
+        console.log(`doLocalIdQuery ${ip} error `, error.message);
+        resolve(ip);
+      });
+    } else {
+      resolve()
+    }
+  });
+}
+
+/*
+ * Fetch HUB IP addresses in the same network
+ */
+function doCloudDiscovery() {
+  return new Promise( (resolve, reject) =&gt; {
+    send( {command: COMMANDS.CLOUD_IP })
+    .then((ips) =&gt; {
+      let queries = []
+      if (ips &amp;&amp; !isEmpty(ips)) {
+        for(var ip of ips){
+          queries.push(doLocalIdQuery(ip));
+        }
+      }
+      sendAll(queries)
+      .finally(() =&gt; {
+        // mark selected hubs to be selected after
+        setSelectedHubs(_hubs);
+        store.dispatch(hubsState.actions.updateHubs(_hubs));
+        resolve(&apos;ok&apos;);
+      });
+    })
+    .catch((error) =&gt; {
+      console.error(&quot;doCloudDiscovery error: &quot;, error.message);
+      store.dispatch(hubsState.actions.updateHubs(_hubs));
+      resolve(&apos;error&apos;);
+    });
+  });
+}
+
+/*
+ * Fetch hub metadatas
+ */
+function fetchMetaData(hubs, authKey) {
+  return new Promise( (resolve, reject) =&gt; {
+    let queries = []
+    for (var hub of (Object.values(hubs)) ) {
+      if (hub.hubKey){
+        queries.push(doRemoteIdQuery(hub.id, authKey, hub.hubKey));
+      }
+    }
+    sendAll(queries)
+    .then( values =&gt; {
+      //console.log(values);
+    })
+    .catch(error =&gt; {
+      //console.log(error);
+    })
+    .finally(() =&gt; {
+        resolve();
+    });
+  });
+}
+
+/*
+ * Check hubs that are currently selected and mark them selected also in map of given hubs
+ */
+function setSelectedHubs(newHubs) {
+  const hubs = getHubs();
+  for (var hub of (Object.values(hubs)) ) {
+    if (hub.selected) {
+      const selectedNewHub = newHubs[hub.id]
+      if (selectedNewHub) {
+        selectedNewHub.selected = true
+      }
+    }
+  }
+}
+
+
+/*
+ * Fetch Hub keys by user authKey and start fetching hub meta datas
+ */
+function fetchHubs() {
+  const authKey = storedUser().authKey;
+  return new Promise( (resolve, reject) =&gt; {
+
+    if (!authKey) {
+      reject(&apos;No userKey!&apos;);
+      return;
+    }
+    send({ command: COMMANDS.HUB_KEYS,  authKey: authKey })
+    .then((tokens) =&gt; {
+      if (tokens) {
+        _hubs = extractHubInfo(tokens);
+        fetchMetaData(_hubs, authKey)
+        .finally(() =&gt; {
+          doCloudDiscovery();
+          resolve(getHubs());
+        });
+      } else {
+        resolve(getHubs());
+      }
+    })
+    .catch((error) =&gt; {
+      console.error(&quot;fetchHubTokens error: &quot;, error.message);
+      reject(error)
+    });
+  });
+}
+
+
+let _discoveryInterval = undefined;
+
+/**
+ * Start discovering hubs every DISCOVERY_INTERVAL_MS
+ * Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local meta-infos
+ */
+export function startDiscoveringHubs() {
+  if (!_discoveryInterval) {
+    fetchHubs(); // call immediately and then every 30s
+    //_discoveryInterval = setInterval(fetchHubs, DISCOVERY_INTERVAL_MS);
+  }
+}
+
+/**
+ * Stop discovering hubs
+ */
+export function stopDiscoveringHubs() {
+  clearInterval(_discoveryInterval);
+}
+
+
+/**
+ * Unselect hub by id, stops hub polling
+ * @param  {string} selectedId   - hub id to be selected
+ */
+export function unSelectHubById( selectedId ) {
+  const hubs = getHubs();
+  for (var hub of (Object.values(hubs)) ) {
+    if (selectedId === hub.id) {
+      store.dispatch(hubsState.actions.unSelectHub(hub.id));
+      stopPolling(hub.id);
+    }
+  }
+}
+
+
+/**
+ * Select hub by id, starts hub polling
+ * @param  {string} selectedId   - hub id to be selected
+ */
+export function selectHubById( selectedId ) {
+  const hubs = getHubs();
+  for (var hub of (Object.values(hubs)) ) {
+    if (selectedId === hub.id) {
+      store.dispatch(hubsState.actions.selectHub(hub.id));
+      startPolling(hub.id);
+    }
+  }
+}
+
+
+
+/*
+** Polling
+*/
+
+let _pollIntervals= {};
+let _pollTimeStamp = 0;
+let _pollInAction = false;
+let _secondPoll = false;
+
+/*
+ * Do poll if hub connection is ok
+ * Remote poll is executed only every second call
+ */
+function doPoll(hubId){
+
+  const hub = getHubs()[hubId];
+  if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL &amp;&amp; hub.connectionState !== HUB_CONNECTION_STATES.REMOTE){
+    return;
+  }
+
+  //just return every second -&gt; not doing so often as in local connection
+  if (hub.connectionState === HUB_CONNECTION_STATES.REMOTE){
+    if (_secondPoll) {
+      _secondPoll = false;
+      return
+    }
+    _secondPoll = true;
+  }
+
+  const authKey = storedUser().authKey;
+  const hubKey = hub.hubKey;
+
+  if (_pollInAction) {
+    return;
+  }
+  _pollInAction = true
+
+  let reset = _pollTimeStamp === 0 ? true : false
+  send( {command: COMMANDS.POLL, hubId:hubId, authKey: authKey, hubKey: hubKey, localUrl: hub.url, data: {ts:_pollTimeStamp} })
+  .then((deltas) =&gt; {
+    if (deltas) {
+      //console.log(JSON.stringify(deltas));
+      // Return can be null poll, even if not asked that
+      if (_pollTimeStamp === 0 || deltas.full) {
+        reset = true
+      }
+
+      _pollTimeStamp = deltas.timestamp
+
+      for (let delta of deltas.polls) {
+        switch(delta.type) {
+          case &quot;DEVICE_DELTA&quot;: {
+            deviceDeltaHandler(hubId, reset, delta.devices)
+            break;
+          }
+          case &quot;GROUP_DELTA&quot;: {
+            break;
+          }
+          case &quot;SCENE_DELTA&quot;: {
+            break;
+          }
+          case &quot;RULE_DELTA&quot;: {
+            break;
+          }
+          case &quot;USERS_DELTA&quot;: {
+            break;
+          }
+          case &quot;ROOM_DELTA&quot;: {
+            break;
+          }
+          case &quot;ZONE_DELTA&quot;: {
+            break;
+          }
+          case &quot;ALARM_DELTA&quot;: {
+            break;
+          }
+          default: {
+            break;
+          }
+        }
+      }
+    }
+    _pollInAction = false;
+  })
+  .catch((error) =&gt; {
+    //store.dispatch(hubsState.actions.hubPollFailed())
+    console.error(&quot;doPoll error: &quot;, error.message);
+    _pollInAction = false;
+  });
+}
+
+/*
+ * Start polling of given hub
+ */
+function startPolling(hubId) {
+  const intervalTime = POLL_INTERVAL_MS;
+  _pollIntervals[hubId] = setInterval(doPoll, intervalTime, hubId);
+}
+
+/*
+ * Stop polling of given hub
+ */
+function stopPolling(hubId) {
+  clearInterval(_pollIntervals[hubId]);
+}
+
+
+/**
+ * Helper to get current user from state
+ */
+function storedUser() {
+  return userState.selectors.getUser(store.getState());
+}
+
+/**
+ * Helper to get current hubs from state
+ * @return {HUBS_MAP_TYPE} - hubs
+ */
+export function getHubs() {
+  return hubsState.selectors.getHubs(store.getState());
+}
+
+
+/*
+ * Listener of User state changes
+ * Hub discovery is started when user&apos;s new state is AUTHENTICATED
+ */
+watchChanges(&apos;user.state&apos;, (newState, oldState) =&gt; {
+  // Start discovery when user is authenticated
+  if (newState === USER_STATES.AUTHENTICATED) {
+    startDiscoveringHubs();
+  }
+});
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

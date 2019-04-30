@@ -11,10 +11,12 @@ import { USER_STATES, ROLES, LANGUAGES } from './constants.js';
 import type { USER_STATE_TYPE, ROLES_TYPE } from './constants.js';
 import type { LANGUAGES_TYPE } from '../user/constants.js';
 
+/*
+ * Helper to get user
+ * @return {Object} user
+ */
 function storedUser() {
-  const stateNow = store.getState()
-  const storedUser = userState.selectors.getUser(stateNow)
-  return storedUser;
+  return userState.selectors.getUser(store.getState());
 }
 
 
@@ -50,8 +52,8 @@ export function acceptEula(): boolean {
 
 /**
  * User action to log in
- * @param {string} email
- * @param {password} email  - fixed password
+ * @param {string} email - email address
+ * @param {password} password  - fixed password
  */
 export function doPwLogin(email: string, password: string): Promise<Object> {
   return new Promise( (resolve, reject) => {

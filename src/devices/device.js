@@ -7,7 +7,7 @@ import { userState } from "../reducers/user"
 import { hubsState } from "../reducers/hubs"
 
 /**
- * Device command
+ * Device command to be sent
  * @param  {string} hubId
  * @param  {string} deviceId
  * @param  {Object} state

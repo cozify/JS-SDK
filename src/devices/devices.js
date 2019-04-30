@@ -1,6 +1,5 @@
 //@flow
 
-//import { COMMANDS, send, sendAll } from '../connection/send'
 import { ROLES } from '../user/constants'
 import { store } from '../store'
 import { devicesState, devicesReducer } from '../reducers/devices'
@@ -11,7 +10,7 @@ import type {DEVICE_TYPE, DEVICES_MAP_TYPE, HUB_DEVICES_MAP_TYPE} from './consta
  * Device handler for poll delta results
  * @param  {string} hubId
  * @param  {boolean} reset
- * @param  {Object} devices:
+ * @param  {Object} devices
  */
 export function deviceDeltaHandler(hubId: string, reset: boolean, devices: Object) {
   let oldHubDevices: DEVICES_MAP_TYPE = {}
@@ -43,7 +42,11 @@ export function deviceDeltaHandler(hubId: string, reset: boolean, devices: Objec
   }
 }
 
-
+/**
+ * Get devices of given hub
+ * @param  {string} hubId
+ * @return {DEVICES_MAP_TYPE}
+ */
 export function getHubDevices(hubId: string): ?DEVICES_MAP_TYPE {
   let retVal: ?DEVICES_MAP_TYPE  = undefined;
   const devices: HUB_DEVICES_MAP_TYPE = getDevices();
@@ -53,6 +56,10 @@ export function getHubDevices(hubId: string): ?DEVICES_MAP_TYPE {
   return retVal;
 }
 
+/**
+ * Get devices of all selected hubs
+ * @return {HUB_DEVICES_MAP_TYPE}
+ */
 export function getDevices(): HUB_DEVICES_MAP_TYPE {
   const stateNow = store.getState();
   return devicesState.selectors.getDevices(stateNow)

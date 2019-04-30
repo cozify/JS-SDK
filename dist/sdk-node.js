@@ -5226,6 +5226,13 @@ function isEmpty(value) {
 
 var isEmpty_1 = isEmpty;
 
+//      
+
+/**
+ * Helper method to Base64 decode
+ * @param  {string} encoded - string to be decoded
+ * @return {string}  - decoded string
+ */
 function urlBase64Decode(encoded) {
   let str = encoded.replace(/-/g, "+").replace(/_/g, "/");
   let output = str;
@@ -5268,6 +5275,11 @@ function urlBase64Decode(encoded) {
 
   return retVal;
 }
+/**
+ * Helper to check if run environment is Node
+ * @type {Boolean}
+ */
+
 let isNode = false;
 
 if (typeof process === 'object') {
@@ -5281,10 +5293,34 @@ if (typeof process === 'object') {
   }
 }
 
+//      
+/*
+* Cloud servers SSL cretification fingerprints to be checked if possible
+* Fingerprint could be found by opening the server URL like https://testapi.cozify.fi/ui/0.2/hub/lan_ip in Chrome.
+* Then click the green certificate in front of the URL, click 'Connection', 'Certificate details', expand the details
+* and scroll down to the SHA1 fingerprint.
+* testapi 91 30 CF 20 17 F7 D7 EC F7 BA 43 30 8E 19 83 B4 CF DE 5A CC
+* cloud & cloud2 26 B0 20 FA AB E8 A3 81 63 37 C6 B7 EF 94 4D 40 3D 1B 85 10
+*/
+
 const CLOUD_FINGERPRINTS_SHA1 = ["91 30 CF 20 17 F7 D7 EC F7 BA 43 30 8E 19 83 B4 CF DE 5A CC", "26 B0 20 FA AB E8 A3 81 63 37 C6 B7 EF 94 4D 40 3D 1B 85 10"];
+/* Cloud HTTPS host name */
+
 const CLOUD_HOST = 'https://testapi.cozify.fi';
+/* Cloud API VERSION */
+
 const CLOUD_API_VERSION = "ui/0.2/";
+/* Cloud URL */
+
 const CLOUD_URL = CLOUD_HOST + "/" + CLOUD_API_VERSION;
+/**
+ *  Enumeration of supported API commands, that could be
+ *  USER_LOGIN, HUB_KEYS, REFRESH_AUTHKEY, CLOUD_IP, CLOUD_META, POLL, CMD_DEVICE
+ *  @typedef {Object} COMMANDS_TYPE
+ *  @readonly
+ *
+  */
+
 const COMMANDS = Object.freeze({
   USER_LOGIN: {
     method: 'POST',
@@ -5323,6 +5359,29 @@ const COMMANDS = Object.freeze({
     params: ['id', 'state']
   }
 });
+/**
+ * COMMAND_TYPE
+ *  @typedef {Object} COMMANDS_TYPE
+ *  @property {COMMANDS_TYPE} [command]      - Optional command like USER_LOGIN,
+ *  @property {string} [localUrl]     - Optional localUrl for direct hub access
+ *  @property {string} [hubId]        - Optional hub Id when messaging to hub
+ *  @property {string} [url]          - Optional url
+ *  @property {string} [method]       - Optional method
+ *  @property {string} [authKey]      - Optional authKey
+ *  @property {string} [hubKey]       - Optional hubKey
+ *  @property {string} [type]         - Optional type that defaults to 'application/json',
+ *  @property {Object} [config]       - Optional config that might have 'timeout' or 'responseType' configs to be used over defaults,
+ *  @property {Object} [data]         - Optional data to be sent over url or body parameters (depending command)
+ */
+
+/**
+  * Enumeration of cloud connection state, that could be
+  * UNCONNECTED, UNAUTHENTICATED, UNAUTHORIZED, OBSOLETE_API_VERSION, LATE_PAYMENT or CONNECTED
+  * @readonly
+  * @enum {string}
+  * @typedef {string} CLOUD_CONNECTION_STATE_TYPE
+  */
+
 const CLOUD_CONNECTION_STATES = Object.freeze({
   UNCONNECTED: 'no connection',
   UNAUTHENTICATED: 'unauthenticated',
@@ -5331,6 +5390,14 @@ const CLOUD_CONNECTION_STATES = Object.freeze({
   LATE_PAYMENT: 'late payment',
   CONNECTED: 'connected'
 });
+/**
+  * Enumeration of HUB connection state, that could be
+  * UNCONNECTED, UNAUTHENTICATED, UNAUTHORIZED, OBSOLETE_API_VERSION, REMOTE or LOCAL
+  * @readonly
+  * @enum {string}
+  * @typedef {string} HUB_CONNECTION_STATE_TYPE
+  */
+
 const HUB_CONNECTION_STATES = Object.freeze({
   UNCONNECTED: 'no connection',
   UNAUTHENTICATED: 'unauthenticated',
@@ -5340,12 +5407,29 @@ const HUB_CONNECTION_STATES = Object.freeze({
   LOCAL: 'local'
 });
 
+//      
+/**
+ * Connections action creators object
+ * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
+ * @return { {
+ *   slice : string,
+ *   reducer : ReducerFunction,
+ *   actions : Object<string, ActionCreator},
+ *   selectors : Object<string, Selector>
+ *   }}
+ */
+
 const connectionsState = createSlice({
   slice: 'connections',
   initialState: {
     cloudState: CLOUD_CONNECTION_STATES.UNCONNECTED
   },
   reducers: {
+    /*
+     * Reducer action of cloud connection state
+     * @param {Object} state
+     * @param {CLOUD_CONNECTION_STATES} action
+     */
     setCloudConnectionState(state, action) {
       const newState = action.payload;
       const oldState = state.cloudState;
@@ -5364,7 +5448,6 @@ const {
   actions,
   reducer
 } = connectionsState;
-const connectionsReducer = reducer;
 
 function _defineProperty$3(obj, key, value) {
   if (key in obj) {
@@ -5404,10 +5487,26 @@ function _objectSpread$2(target) {
 
 var objectSpread = _objectSpread$2;
 
+/**
+ * Devices action creators object
+ * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
+ * @return { {
+ *   slice : string,
+ *   reducer : ReducerFunction,
+ *   actions : Object<string, ActionCreator},
+ *   selectors : Object<string, Selector>
+ *   }}
+ */
+
 const devicesState = createSlice({
   slice: 'devices',
   initialState: {},
   reducers: {
+    /*
+     * Reducer action of setting devices state - sets all given devices of given hub, keeps existing states
+     * @param {Object} state
+     * @param {Object} action
+     */
     setDevices(state, action) {
       const hubId = action.payload.hubId;
       const devices = action.payload.devices;
@@ -5420,6 +5519,11 @@ const devicesState = createSlice({
       state[hubId] = objectSpread({}, hubDevices);
     },
 
+    /*
+     * Reducer action of setting device state - sets all given devices of given hub, keeps existing states
+     * @param {Object} state
+     * @param {payload:{Object{hubId:string, device:Object}}} action
+     */
     setDevice(state, action) {
       const hubId = action.payload.hubId;
       const device = action.payload.device;
@@ -5429,6 +5533,11 @@ const devicesState = createSlice({
       }
     },
 
+    /*
+     * Reducer action to remove device from state - sets all given devices of given hub, keeps existing states
+     * @param {Object} state
+     * @param {payload:{Object{hubId:string, device:Object}}} action
+     */
     deleteDevice(state, action) {
       const hubId = action.payload.hubId;
       const device = action.payload.device;
@@ -5444,34 +5553,70 @@ const {
   actions: actions$1,
   reducer: reducer$1
 } = devicesState;
-const devicesReducer = reducer$1;
+
+/*
+console.log(addDevice({ id: 123, name: 'Unnamed device' }))
+{type : "devices/addDevice", payload : {id : 123, name: 'Unnamed device' }}
+*/
+
 const {
   setDevices,
   deleteDevice
 } = actions$1;
 
+/**
+ * Hubs action creators object
+ * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
+ * @return { {
+ *   slice : string,
+ *   reducer : ReducerFunction,
+ *   actions : Object<string, ActionCreator},
+ *   selectors : Object<string, Selector>
+ *   }}
+ */
+
 const hubsState = createSlice({
   slice: 'hubs',
   initialState: {},
   reducers: {
+    /*
+     * Reducer action of setting many hubs to state
+     * @param  {Object} state
+     * @param  {payload:{hubs:HUBS_MAP_TYPE}} action
+     */
     updateHubs(state, action) {
       for (const [id, hub] of Object.entries(action.payload)) {
         state[id] = objectSpread({}, state[id], hub);
       }
     },
 
+    /*
+     * Reducer action of setting hub state to selected
+     * @param  {Object} state
+     * @param  {payload:{hubId:string}} action
+     */
     selectHub(state, action) {
       if (state[action.payload]) {
-        state[action.payload].selected = true;
+        state[action.payload].selected = true; //console.log("selectHub", state[action.payload]);
       }
     },
 
+    /*
+     * Reducer action of setting hub state to unselected
+     * @param  {Object} state
+     * @param  {payload:{hubId:string}} action
+     */
     unSelectHub(state, action) {
       if (state[action.payload]) {
-        state[action.payload].selected = false;
+        state[action.payload].selected = false; //console.log("selectHub", state[action.payload]);
       }
     },
 
+    /*
+     * Reducer action of setting hub connection state
+     * @param  {Object} state
+     * @param  {payload:{hubId:string, state:HUB_STATES_TYPE}} action
+     */
     setHubConnectionState(state, action) {
       const hubId = action.payload.hubId;
       const newState = action.payload.state;
@@ -5479,19 +5624,25 @@ const hubsState = createSlice({
 
       if (Object.values(HUB_CONNECTION_STATES).indexOf(newState) > -1) {
         if (oldState && oldState !== newState) {
-          console.log(`HUB ${hubId} connection state ${oldState} -> ${newState}`);
+          //console.log (`HUB ${hubId} connection state ${oldState} -> ${newState}`);
           state[hubId].connectionState = newState;
         }
       }
     }
 
   }
-});
+}); //console.log('hubsState ', hubsState)
+
 const {
   actions: actions$2,
   reducer: reducer$2
 } = hubsState;
-const hubsReducer = reducer$2;
+
+/*
+console.log(updateHubs({ id: 123, name: 'Unnamed device' }))
+{type : "hubs/updateHubs, payload : {id : 123, name: 'Unnamed device' }}
+*/
+
 const {
   updateHubs,
   selectHub,
@@ -5499,11 +5650,26 @@ const {
   setHubConnectionState
 } = actions$2;
 
+//      
+
+/**
+  * Enumeration of language, that could be
+  * NONE, EN_UK or FI_FI
+  * @readonly
+  * @enum {string}
+  */
 const LANGUAGES = Object.freeze({
   NONE: 'none',
   EN_UK: 'en-uk',
   FI_FI: 'fi-fi'
 });
+/**
+  * Enumeration of user state, that could be
+  * WAITING_LANGUAGE, LANGUAGE_SET, WAITING_LOGIN, LOGIN_DONE, WAITING_EULA, EULA_ACCEPTED, AUTHENTICATED or LOGGED_OUT
+  * @readonly
+  * @enum {string}
+  */
+
 const USER_STATES = Object.freeze({
   WAITING_LANGUAGE: 'wait language',
   LANGUAGE_SET: 'language set',
@@ -5514,12 +5680,31 @@ const USER_STATES = Object.freeze({
   AUTHENTICATED: 'logged in',
   LOGGED_OUT: 'loged out'
 });
+/**
+  * Enumeration of ROLES, that could be
+  * ADMIN, USER, GUEST or ANONYMOUS
+  * @readonly
+  * @enum {string}
+  */
+
 const ROLES = Object.freeze({
   ADMIN: 32,
   USER: 8,
   GUEST: 2,
   ANONYMOUS: 1
 });
+
+//      
+/**
+ * User action creators object
+ * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
+ * @return { {
+ *   slice : string,
+ *   reducer : ReducerFunction,
+ *   actions : Object<string, ActionCreator},
+ *   selectors : Object<string, Selector>
+ *   }}
+ */
 
 const userState = createSlice({
   slice: 'user',
@@ -5534,6 +5719,11 @@ const userState = createSlice({
     state: USER_STATES.WAITING_LANGUAGE
   },
   reducers: {
+    /*
+     * Reducer action of setting user's state
+     * @param  {Object} state
+     * @param  {payload:{state:USER_STATE_TYPE}} action
+     */
     changeState(state, action) {
       const newState = action.payload;
       const oldState = state.state;
@@ -5586,36 +5776,66 @@ const userState = createSlice({
 
         default:
           {
+            // statements;
             break;
           }
       }
     },
 
+    /*
+     * Reducer action of setting user's eula to accepted
+     * @param  {Object} state
+     * @param  {payload:boolean} action
+     */
     setEula(state, action) {
       state.eulaAccepted = action.payload;
     },
 
+    /*
+     * Reducer action of setting user's language
+     * @param  {Object} state
+     * @param  {payload:LANGUAGES_TYPE} action
+     */
     setLanguage(state, action) {
       state.language = action.payload;
     },
 
+    /*
+     * Reducer action of setting user's authKey
+     * @param  {Object} state
+     * @param  {payload:string} action
+     */
     setAuthKey(state, action) {
       state.authKey = action.payload;
     }
 
   }
 });
+/*
+console.log(user)
+{
+    actions : {
+        setState
+    },
+    reducer
+}
+*/
+
 const {
   actions: actions$3,
   reducer: reducer$3
 } = userState;
-const userReducer = reducer$3;
+
+/**
+ * Root reducer
+ * @type {Object}
+ */
 
 const rootReducer = {
-  connections: connectionsReducer,
-  devices: devicesReducer,
-  hubs: hubsReducer,
-  user: userReducer
+  connections: reducer,
+  devices: reducer$1,
+  hubs: reducer$2,
+  user: reducer$3
 };
 
 /*!
@@ -5740,8 +5960,17 @@ function isValidObject(val) {
   return isobject(val) || Array.isArray(val) || typeof val === 'function';
 }
 
+/**
+ * store as a redux state store
+ * @type {Object}
+ */
+
 const store = configureStore({
-  reducer: rootReducer
+  reducer: rootReducer //middleware: [...getDefaultMiddleware(), logger]
+  // default true like: devTools: 'production' !== 'production'
+  //preloadedState
+  //enhancers: [reduxBatch]
+
 });
 console.log("Initial state", store.getState());
 
@@ -5759,6 +5988,13 @@ function watchState(getState, objectPath) {
     };
   };
 }
+/**
+ * Helper to subscribe to store changes
+ * @param  {string} path - attribute path to watch changes, e.g. 'user.state'
+ * @param  {function} changed - function to handle changes
+ * @param  {Object} optionalStore - optional store for unit tests etc.
+ */
+
 
 function watchChanges(path, changed, optionalStore) {
   let selectedStore = optionalStore ? optionalStore : store;
@@ -5766,28 +6002,58 @@ function watchChanges(path, changed, optionalStore) {
   selectedStore.subscribe(watchFn(changed));
 }
 
+//      
+//
+
+/**
+  * Enumeration of hub state, that could be
+  * UNCLAIMED, CLAIMED, TOO_NEW_VERSION, NO_ACCESS or CONNECTED
+  * @readonly
+  * @enum {string}
+  */
 const HUB_STATES = Object.freeze({
-  LOST: 'lost',
   UNCLAIMED: 'unclaimed',
   CLAIMED: 'claimed',
   TOO_NEW_VERSION: 'new version',
   NO_ACCESS: 'no access',
   CONNECTED: 'connected'
 });
+/*
+ * Interval defining how often hubs are polled at max
+ * This value is used as is in local connection, and multiplied in remote connection
+ */
+
 const POLL_INTERVAL_MS = 1 * 1000;
 const HUB_PROTOCOL = 'http://';
 const HUB_PORT = '8893';
 
-function setCloudConnectionState(value) {
-  store.dispatch(connectionsState.actions.setCloudConnectionState(value));
+//      
+/**
+ * Change Cloud connection state
+ * @param {HUB_CONNECTION_STATE_TYPE} state
+ */
+
+function setCloudConnectionState(state) {
+  store.dispatch(connectionsState.actions.setCloudConnectionState(state));
 }
+/**
+ * Get Cloud connection state
+ * @return {CLOUD_CONNECTION_STATE_TYPE}
+ */
+
 function getCloudConnectionState() {
   const stateNow = store.getState();
   return connectionsState.selectors.getConnections(stateNow).cloudState;
 }
+/**
+ * Change hub connection state
+ * @param {{hubId: string, state: HUB_CONNECTION_STATE_TYPE}} hubAndState - hubId and new state
+ */
+
 function setHubConnectionState$1(hubAndState) {
   const stateNow = store.getState();
   const storedHubs = hubsState.selectors.getHubs(stateNow);
+  /* If hub is unconnected, lets try remote */
 
   if (hubAndState.state === HUB_CONNECTION_STATES.UNCONNECTED && storedHubs[hubAndState.hubId]) {
     if (storedHubs[hubAndState.hubId].connectionState === HUB_CONNECTION_STATES.REMOTE) {
@@ -5797,6 +6063,12 @@ function setHubConnectionState$1(hubAndState) {
 
   store.dispatch(hubsState.actions.setHubConnectionState(hubAndState));
 }
+/**
+ * Get hub connection state by hub id
+ * @param  {string} hubId
+ * @return {HUB_CONNECTION_STATE_TYPE}
+ */
+
 function getHubConnectionState(hubId) {
   const stateNow = store.getState();
 
@@ -6156,38 +6428,58 @@ var lib_6 = lib.exponentialDelay;
 
 var axiosRetry = lib.default;
 
-const SSL_CHECK_INTERVALL = 1000 * 60 * 60;
+//      
+const SSL_CHECK_INTERVALL = 1000 * 60 * 60; //One hour
+
+/*
+* Return cloud connection state based on error
+*/
+
 function cloudErrorState(error) {
   let retVal = CLOUD_CONNECTION_STATES.UNCONNECTED;
 
   if (error && error.response && error.response.status === 401) {
+    // 401 Authentication information missing or expired.
     retVal = CLOUD_CONNECTION_STATES.UNAUTHENTICATED;
     console.error("send: authentication error ", error);
   } else if (error && error.response && error.response.status === 403) {
+    // 402 Late payment - > no remote access
     retVal = CLOUD_CONNECTION_STATES.LATE_PAYMENT;
     console.error("send: unauhorized error ", error);
   } else if (error && error.response && error.response.status === 403) {
+    // 403 Unauthorized
     retVal = CLOUD_CONNECTION_STATES.UNAUTHORIZED;
     console.error("send: unauhorized error ", error);
   } else if (error && error.response && error.response.status === 410) {
+    // 410 Version problem
     retVal = CLOUD_CONNECTION_STATES.OBSOLETE_API_VERSION;
     console.error("send: version error ", error);
   }
 
   return retVal;
 }
+/*
+ * Return hub connection state based on given error
+ * @param  {Object} error
+ * @return {string} hub's connectionState
+ */
+
 function hubErrorState(error) {
   let retVal = HUB_CONNECTION_STATES.UNCONNECTED;
 
   if (error && error.response && error.response.status === 400) {
+    // no connection to offline hub
     console.log("send: no-connection error ", error);
   } else if (error && error.response && error.response.status === 401) {
+    // 401 Authentication information missing or expired.
     retVal = HUB_CONNECTION_STATES.UNAUTHENTICATED;
     console.error("send: authentication error ", error);
   } else if (error && error.response && error.response.status === 403) {
+    // 403 Unauthorized
     retVal = HUB_CONNECTION_STATES.UNAUTHORIZED;
     console.error("send: unauhorized error ", error);
   } else if (error && error.response && error.response.status === 410) {
+    // 410 Version problem
     retVal = HUB_CONNECTION_STATES.OBSOLETE_API_VERSION;
     console.error("send: version error ", error);
   }
@@ -6196,9 +6488,15 @@ function hubErrorState(error) {
 }
 let _ongoingSSLCertificateCheck = false;
 let _lastSSLCertificateCheckTime = null;
+/*
+ * Palceholder function for certificate checker
+ * @return {Promise}
+ */
+
 function testSSLCertificate(remoteConnection) {
   return new Promise((resolve, reject) => {
     if (!remoteConnection) {
+      // All requests are now complete
       resolve(true);
       return;
     }
@@ -6207,7 +6505,7 @@ function testSSLCertificate(remoteConnection) {
 
     if (!_ongoingSSLCertificateCheck && (!_lastSSLCertificateCheckTime || now - _lastSSLCertificateCheckTime > SSL_CHECK_INTERVALL)) {
       _ongoingSSLCertificateCheck = true;
-      _lastSSLCertificateCheckTime = now;
+      _lastSSLCertificateCheckTime = now; // Cordova plugin?
 
       if (window && window.plugins && window.plugins.sslCertificateChecker) {
         window.plugins.sslCertificateChecker.check(successMsg => {
@@ -6237,20 +6535,35 @@ function testSSLCertificate(remoteConnection) {
 
 const SAFE_HTTP_METHODS = ['get', 'head', 'options'];
 const IDEMPOTENT_HTTP_METHODS = SAFE_HTTP_METHODS.concat(['put', 'delete']);
+/*
+ * @param  {Error}  error
+ * @return {boolean}
+ */
+
 
 function isRetryableError(error) {
   return error.code !== 'ECONNABORTED' && (!error.response || error.response.status >= 500 && error.response.status <= 599);
 }
+/*
+ * @param  {Error}  error
+ * @return {boolean}
+ */
+
 
 function retryCondition(error) {
   if (!error.config) {
+    // Cannot determine if the request can be retried
     return false;
   }
 
   return isRetryableError(error) && IDEMPOTENT_HTTP_METHODS.indexOf(error.config.method) !== -1;
 }
 
+//      
 let _refreshingToken = false;
+/*
+ * Refresh Auth key call
+ */
 
 function refreshAuthKey(authKey) {
   if (!_refreshingToken) {
@@ -6261,7 +6574,7 @@ function refreshAuthKey(authKey) {
     }).then(response => {
       setTimeout(function () {
         _refreshingToken = false;
-      }, 1000 * 60 * 10);
+      }, 1000 * 60 * 10); //10min
 
       if (response.length > 10) {
         store.dispatch(userState.actions.setAuthKey(response));
@@ -6271,6 +6584,10 @@ function refreshAuthKey(authKey) {
     });
   }
 }
+/*
+ * Token refresh
+ */
+
 
 function testAndRefreshToken(key) {
   let exp = null;
@@ -6293,22 +6610,56 @@ function testAndRefreshToken(key) {
   }
 
   if (!diff || diff < 0) {
+    // User is unauthenticated
     setCloudConnectionState(CLOUD_CONNECTION_STATES.UNAUTHENTICATED);
   } else if (diff && diff < 5 * 24 * 60 * 60) {
+    // refresh if < 5 days to exp date
     refreshAuthKey(key);
   }
 }
+/**
+ * Send multiple requests
+ * @param  {Array<Oject>} requests - requests to be send
+ * @return {Promise}
+ */
+
 
 function sendAll(requests) {
   return new Promise((resolve, reject) => {
     Promise.all(requests).then(results => {
+      // Use the data from the results like so:
+      // results[0].data
+      // results[1].data
       resolve();
     }).catch(error => {
+      // do whatever
       resolve();
     });
   });
 }
+/* Flag to indicate SSL failures */
+
 let _permanentSSLFailure = false;
+/**
+ * Send method for REST API
+ * @param {COMMAND_TYPE} params
+ *
+ * @return {Promise}
+ *
+ * @example
+ *   send( {command: COMMANDS.USER_LOGIN,  data:{email:email, password:password} })
+ *   .then((response) => {...});
+ *
+ * @example
+ *   send( {command: COMMANDS.CMD_DEVICE, authKey: authKey, hubKey: hubKey, data:[{id:deviceId, state:state}] })
+ *   .then((response) => {...});
+ *
+ * @example
+ *   send( {url: hubURL + "/hub"} )
+ *   .then((hubData) => {...});
+ *
+ */
+
 function send({
   command,
   localUrl,
@@ -6326,7 +6677,17 @@ function send({
   }
 
   let body = data;
-  let remoteConnection = false;
+  /*
+  if (isArray(data)) {
+    body = [];
+    body.push({});
+  }
+  */
+  //console.log("send: command ", command);
+  // Flag to indicate are we using remote (vrs.local) connection
+
+  let remoteConnection = false; // Flag to indicate are we sending hub command meaning using commandAPI (vrs. some cloud/videocloud command like login, log etc)
+
   const hubCommand = isEmpty_1(hubId) ? false : true;
 
   if (typeof command != "undefined" && command) {
@@ -6364,6 +6725,17 @@ function send({
         body['type'] = command.type;
       }
     }
+    /*
+    if (command.params) {
+      command.params.forEach(param => {
+        if (isArray(data)){
+          body[0][param] = data[param];
+        } else {
+          body[param] = data[param];
+        }
+      });
+    } */
+
 
     if (command.urlParams) {
       let params = [];
@@ -6387,6 +6759,7 @@ function send({
   const reqConf = {
     timeout: 1000,
     method: method,
+    //withCredentials: false,
     headers: {
       'Accept': 'application/json, application/binary, text/plain, */*',
       'Content-Type': 'application/json;charset=UTF-8',
@@ -6409,22 +6782,29 @@ function send({
           debugger;
           return Promise.reject(response);
         }
-      }, error => Promise.reject(error));
+      }, error => Promise.reject(error)); //retries if it is a network error or a 5xx error on an idempotent request (GET, HEAD, OPTIONS, PUT or DELETE).
+
       axiosRetry(axios, {
         retries: 3,
         shouldResetTimeout: true,
         retryCondition: retryCondition
       });
       testSSLCertificate(remoteConnection).then(function (status) {
+        // Cancel request if SSL Certificate status is invalid
         if (!status || _permanentSSLFailure) {
           _permanentSSLFailure = true;
           reject(new Error('SDK Error: SSL failure.'));
         } else {
+          // SSL is ok,
+          // check if auth Key needs to be refreshed
           if (authKey) {
             testAndRefreshToken(authKey);
-          }
+          } // Send command
+          // See options: https://github.com/axios/axios#request-config
+
 
           axios(reqConf).then(function (response) {
+            // console.error("send: response ", response);
             if (remoteConnection) {
               setCloudConnectionState(CLOUD_CONNECTION_STATES.CONNECTED);
             } else if (hubId) {
@@ -6437,6 +6817,8 @@ function send({
             resolve(response.data);
           }).catch(function (error) {
             if (error && error.response) {
+              // The request was made and the server responded with a status code
+              // that falls out of the range of 2xx
               if (remoteConnection) {
                 if (command !== COMMANDS.CLOUD_META) {
                   setCloudConnectionState(cloudErrorState(error));
@@ -6449,6 +6831,8 @@ function send({
                   });
                 }
               } else {
+                // Local connection
+                // 401 means also cloud auth refresh is required
                 if (error && error.response && error.response.status === 401) {
                   setCloudConnectionState(cloudErrorState(error));
                 }
@@ -6461,6 +6845,9 @@ function send({
                 }
               }
             } else if (error.request) {
+              // The request was made but no response was received
+              // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+              // http.ClientRequest in node.js
               if (remoteConnection) {
                 setCloudConnectionState(CLOUD_CONNECTION_STATES.UNCONNECTED);
 
@@ -6471,6 +6858,7 @@ function send({
                   });
                 }
               } else {
+                // Local connection
                 if (hubCommand && hubId) {
                   setHubConnectionState$1({
                     hubId: hubId,
@@ -6479,6 +6867,7 @@ function send({
                 }
               }
             } else {
+              // Something happened in setting up the request that triggered an Error
               if (remoteConnection) {
                 setCloudConnectionState(CLOUD_CONNECTION_STATES.UNCONNECTED);
 
@@ -6489,6 +6878,7 @@ function send({
                   });
                 }
               } else {
+                // Local connection
                 if (hubCommand && hubId) {
                   setHubConnectionState$1({
                     hubId: hubId,
@@ -6509,11 +6899,20 @@ function send({
   });
 }
 
+//      
+/*
+ * Helper to get user
+ * @return {Object} user
+ */
+
 function storedUser() {
-  const stateNow = store.getState();
-  const storedUser = userState.selectors.getUser(stateNow);
-  return storedUser;
+  return userState.selectors.getUser(store.getState());
 }
+/**
+ * User action to change current language
+ * @type {LANGUAGES_TYPE}
+ */
+
 
 function changeLanguage(newLanguage) {
   let retVel = false;
@@ -6530,6 +6929,10 @@ function changeLanguage(newLanguage) {
 
   return retVel;
 }
+/**
+ * User action to accept EULA
+ */
+
 function acceptEula() {
   let retVel = false;
   store.dispatch(userState.actions.setEula(true));
@@ -6541,6 +6944,12 @@ function acceptEula() {
   retVel = true;
   return retVel;
 }
+/**
+ * User action to log in
+ * @param {string} email - email address
+ * @param {password} password  - fixed password
+ */
+
 function doPwLogin(email, password) {
   return new Promise((resolve, reject) => {
     send({
@@ -6560,13 +6969,26 @@ function doPwLogin(email, password) {
 
       resolve(response);
     }).catch(error => {
+      //console.error(error);
       reject(false);
     });
   });
 }
+/**
+ * Get state of user state-machine
+ */
+
 function getUserState() {
   return storedUser().state;
 }
+
+//     
+/**
+ * Device handler for poll delta results
+ * @param  {string} hubId
+ * @param  {boolean} reset
+ * @param  {Object} devices
+ */
 
 function deviceDeltaHandler(hubId, reset, devices) {
   let oldHubDevices = {};
@@ -6577,12 +6999,14 @@ function deviceDeltaHandler(hubId, reset, devices) {
   }
 
   if (reset) {
+    // If reset then set  devices as they are received
     const stateDevices = {
       hubId: hubId,
       devices: devices
     };
     store.dispatch(devicesState.actions.setDevices(stateDevices));
   } else {
+    // Loop devices to check could it be added or should be removed
     Object.entries(devices).forEach(([key, device]) => {
       const stateDevice = {
         hubId: hubId,
@@ -6597,6 +7021,12 @@ function deviceDeltaHandler(hubId, reset, devices) {
     });
   }
 }
+/**
+ * Get devices of given hub
+ * @param  {string} hubId
+ * @return {DEVICES_MAP_TYPE}
+ */
+
 function getHubDevices(hubId) {
   let retVal = undefined;
   const devices = getDevices();
@@ -6607,12 +7037,21 @@ function getHubDevices(hubId) {
 
   return retVal;
 }
+/**
+ * Get devices of all selected hubs
+ * @return {HUB_DEVICES_MAP_TYPE}
+ */
+
 function getDevices() {
   const stateNow = store.getState();
   return devicesState.selectors.getDevices(stateNow);
 }
 
+//      
 let _hubs = {};
+/*
+ * Helper method to extract hub info from JWT based hub keys
+ */
 
 function extractHubInfo(HUBKeys) {
   let hubs = {};
@@ -6640,8 +7079,13 @@ function extractHubInfo(HUBKeys) {
 
   return hubs;
 }
+/*
+ * Hub metadata is received and will be stored
+ */
+
 
 function updateFoundHub(hubURL, foundHub) {
+  // Hub keys returns ids, idQuerys return hubId
   if (foundHub.hubId) {
     foundHub.id = foundHub.hubId;
     delete foundHub.hubId;
@@ -6660,6 +7104,10 @@ function updateFoundHub(hubURL, foundHub) {
     _hubs[foundHub.id].url = undefined;
   }
 }
+/*
+ * Remote hub metamata request for version etc information
+ */
+
 
 function doRemoteIdQuery(hubId, authKey, hubKey) {
   return new Promise((resolve, reject) => {
@@ -6677,6 +7125,10 @@ function doRemoteIdQuery(hubId, authKey, hubKey) {
     });
   });
 }
+/*
+ * Local hub metadata request for version etc information
+ */
+
 
 function doLocalIdQuery(ip) {
   return new Promise((resolve, reject) => {
@@ -6697,6 +7149,10 @@ function doLocalIdQuery(ip) {
     }
   });
 }
+/*
+ * Fetch HUB IP addresses in the same network
+ */
+
 
 function doCloudDiscovery() {
   return new Promise((resolve, reject) => {
@@ -6712,6 +7168,7 @@ function doCloudDiscovery() {
       }
 
       sendAll(queries).finally(() => {
+        // mark selected hubs to be selected after
         setSelectedHubs(_hubs);
         store.dispatch(hubsState.actions.updateHubs(_hubs));
         resolve('ok');
@@ -6723,6 +7180,10 @@ function doCloudDiscovery() {
     });
   });
 }
+/*
+ * Fetch hub metadatas
+ */
+
 
 function fetchMetaData(hubs, authKey) {
   return new Promise((resolve, reject) => {
@@ -6734,11 +7195,17 @@ function fetchMetaData(hubs, authKey) {
       }
     }
 
-    sendAll(queries).then(values => {}).catch(error => {}).finally(() => {
+    sendAll(queries).then(values => {//console.log(values);
+    }).catch(error => {//console.log(error);
+    }).finally(() => {
       resolve();
     });
   });
 }
+/*
+ * Check hubs that are currently selected and mark them selected also in map of given hubs
+ */
+
 
 function setSelectedHubs(newHubs) {
   const hubs = getHubs();
@@ -6753,6 +7220,10 @@ function setSelectedHubs(newHubs) {
     }
   }
 }
+/*
+ * Fetch Hub keys by user authKey and start fetching hub meta datas
+ */
+
 
 function fetchHubs() {
   const authKey = storedUser$1().authKey;
@@ -6781,12 +7252,21 @@ function fetchHubs() {
     });
   });
 }
+/**
+ * Start discovering hubs every DISCOVERY_INTERVAL_MS
+ * Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local meta-infos
+ */
 
 function startDiscoveringHubs() {
   {
-    fetchHubs();
+    fetchHubs(); // call immediately and then every 30s
+    //_discoveryInterval = setInterval(fetchHubs, DISCOVERY_INTERVAL_MS);
   }
 }
+/**
+ * Unselect hub by id, stops hub polling
+ * @param  {string} selectedId   - hub id to be selected
+ */
 
 function unSelectHubById(selectedId) {
   const hubs = getHubs();
@@ -6798,6 +7278,11 @@ function unSelectHubById(selectedId) {
     }
   }
 }
+/**
+ * Select hub by id, starts hub polling
+ * @param  {string} selectedId   - hub id to be selected
+ */
+
 function selectHubById(selectedId) {
   const hubs = getHubs();
 
@@ -6808,17 +7293,26 @@ function selectHubById(selectedId) {
     }
   }
 }
+/*
+** Polling
+*/
+
 let _pollIntervals = {};
 let _pollTimeStamp = 0;
 let _pollInAction = false;
 let _secondPoll = false;
+/*
+ * Do poll if hub connection is ok
+ * Remote poll is executed only every second call
+ */
 
 function doPoll(hubId) {
   const hub = getHubs()[hubId];
 
   if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
     return;
-  }
+  } //just return every second -> not doing so often as in local connection
+
 
   if (hub.connectionState === HUB_CONNECTION_STATES.REMOTE) {
     if (_secondPoll) {
@@ -6849,6 +7343,8 @@ function doPoll(hubId) {
     }
   }).then(deltas => {
     if (deltas) {
+      //console.log(JSON.stringify(deltas));
+      // Return can be null poll, even if not asked that
       if (_pollTimeStamp === 0 || deltas.full) {
         reset = true;
       }
@@ -6908,31 +7404,65 @@ function doPoll(hubId) {
 
     _pollInAction = false;
   }).catch(error => {
+    //store.dispatch(hubsState.actions.hubPollFailed())
     console.error("doPoll error: ", error.message);
     _pollInAction = false;
   });
 }
+/*
+ * Start polling of given hub
+ */
+
 
 function startPolling(hubId) {
   const intervalTime = POLL_INTERVAL_MS;
   _pollIntervals[hubId] = setInterval(doPoll, intervalTime, hubId);
 }
+/*
+ * Stop polling of given hub
+ */
+
+
 function stopPolling(hubId) {
   clearInterval(_pollIntervals[hubId]);
 }
+/**
+ * Helper to get current user from state
+ */
+
 
 function storedUser$1() {
   return userState.selectors.getUser(store.getState());
 }
+/**
+ * Helper to get current hubs from state
+ * @return {HUBS_MAP_TYPE} - hubs
+ */
+
 
 function getHubs() {
   return hubsState.selectors.getHubs(store.getState());
 }
+/*
+ * Listener of User state changes
+ * Hub discovery is started when user's new state is AUTHENTICATED
+ */
+
 watchChanges('user.state', (newState, oldState) => {
+  // Start discovery when user is authenticated
   if (newState === USER_STATES.AUTHENTICATED) {
     startDiscoveringHubs();
   }
 });
+
+//     
+/**
+ * Device command to be sent
+ * @param  {string} hubId
+ * @param  {string} deviceId
+ * @param  {Object} state
+ * @return {Promise}
+ */
 
 function sendDeviceCmd(hubId, deviceId, state) {
   return new Promise((resolve, reject) => {
@@ -6964,10 +7494,13 @@ function sendDeviceCmd(hubId, deviceId, state) {
     }).then(response => {
       resolve(response);
     }).catch(error => {
+      //console.error(error);
       reject(new Error("Device command error: send failed"));
     });
   });
 }
+
+//
 
 exports.CLOUD_CONNECTION_STATES = CLOUD_CONNECTION_STATES;
 exports.HUB_CONNECTION_STATES = HUB_CONNECTION_STATES;

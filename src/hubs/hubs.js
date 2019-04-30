@@ -216,26 +216,27 @@ function fetchHubs(): Promise<Object> {
 
 let _discoveryInterval: ?Object = undefined;
 
-/*
+/**
  * Start discovering hubs every DISCOVERY_INTERVAL_MS
+ * Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local meta-infos
  */
-function startDiscoveringHubs() {
+export function startDiscoveringHubs() {
   if (!_discoveryInterval) {
     fetchHubs(); // call immediately and then every 30s
     //_discoveryInterval = setInterval(fetchHubs, DISCOVERY_INTERVAL_MS);
   }
 }
 
-/*
+/**
  * Stop discovering hubs
  */
-function stopDiscoveringHubs() {
+export function stopDiscoveringHubs() {
   clearInterval(_discoveryInterval);
 }
 
 
 /**
- * Unselect hub by id, starts hub polling
+ * Unselect hub by id, stops hub polling
  * @param  {string} selectedId   - hub id to be selected
  */
 export function unSelectHubById( selectedId: string ) {
@@ -250,7 +251,7 @@ export function unSelectHubById( selectedId: string ) {
 
 
 /**
- * Select hub by id, stops hub polling
+ * Select hub by id, starts hub polling
  * @param  {string} selectedId   - hub id to be selected
  */
 export function selectHubById( selectedId: string ) {
@@ -276,6 +277,7 @@ let _secondPoll: boolean = false;
 
 /*
  * Do poll if hub connection is ok
+ * Remote poll is executed only every second call
  */
 function doPoll(hubId: string){
 
@@ -358,7 +360,7 @@ function doPoll(hubId: string){
 /*
  * Start polling of given hub
  */
-export function startPolling(hubId: string) {
+function startPolling(hubId: string) {
   const intervalTime = POLL_INTERVAL_MS;
   _pollIntervals[hubId] = setInterval(doPoll, intervalTime, hubId);
 }
@@ -366,7 +368,7 @@ export function startPolling(hubId: string) {
 /*
  * Stop polling of given hub
  */
-export function stopPolling(hubId: string) {
+function stopPolling(hubId: string) {
   clearInterval(_pollIntervals[hubId]);
 }
 
@@ -380,7 +382,7 @@ function storedUser(): Object {
 
 /**
  * Helper to get current hubs from state
- * @return {Object} - hubs
+ * @return {HUBS_MAP_TYPE} - hubs
  */
 export function getHubs(): HUBS_MAP_TYPE {
   return hubsState.selectors.getHubs(store.getState());
@@ -389,6 +391,7 @@ export function getHubs(): HUBS_MAP_TYPE {
 
 /*
  * Listener of User state changes
+ * Hub discovery is started when user's new state is AUTHENTICATED
  */
 watchChanges('user.state', (newState, oldState) => {
   // Start discovery when user is authenticated

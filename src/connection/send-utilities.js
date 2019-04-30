@@ -7,7 +7,7 @@ import type { CLOUD_CONNECTION_STATE_TYPE, HUB_CONNECTION_STATE_TYPE } from './c
 const SSL_CHECK_INTERVALL = 1000 * 60  * 60 //One hour
 
 
- /**
+ /*
  * Return cloud connection state based on error
  */
 export function cloudErrorState(error: Object) {
@@ -34,7 +34,7 @@ export function cloudErrorState(error: Object) {
 }
 
 
-/**
+/*
  * Return hub connection state based on given error
  * @param  {Object} error
  * @return {string} hub's connectionState
@@ -64,7 +64,8 @@ export function hubErrorState(error: Object) {
 
 let _ongoingSSLCertificateCheck: boolean = false;
 let _lastSSLCertificateCheckTime: ?number = null;
-/**
+
+/*
  * Palceholder function for certificate checker
  * @return {Promise}
  */

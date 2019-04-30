@@ -8,7 +8,17 @@ import type { LANGUAGES_TYPE } from '../user/constants.js';
 import isEmpty  from 'lodash/isEmpty';
 
 
-const userState = createSlice({
+/**
+ * User action creators object
+ * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
+ * @return { {
+ *   slice : string,
+ *   reducer : ReducerFunction,
+ *   actions : Object<string, ActionCreator},
+ *   selectors : Object<string, Selector>
+ *   }}
+ */
+export const userState = createSlice({
   slice: 'user',
   initialState: {
     firstName: '',
@@ -21,6 +31,11 @@ const userState = createSlice({
     state: USER_STATES.WAITING_LANGUAGE
   },
   reducers: {
+    /*
+     * Reducer action of setting user's state
+     * @param  {Object} state
+     * @param  {payload:{state:USER_STATE_TYPE}} action
+     */
     changeState(state, action) {
       const newState = action.payload
       const oldState = state.state
@@ -65,15 +80,29 @@ const userState = createSlice({
       }
     },
 
-
+    /*
+     * Reducer action of setting user's eula to accepted
+     * @param  {Object} state
+     * @param  {payload:boolean} action
+     */
     setEula(state, action) {
       state.eulaAccepted = action.payload
     },
 
+    /*
+     * Reducer action of setting user's language
+     * @param  {Object} state
+     * @param  {payload:LANGUAGES_TYPE} action
+     */
     setLanguage(state, action) {
       state.language = action.payload
     },
 
+    /*
+     * Reducer action of setting user's authKey
+     * @param  {Object} state
+     * @param  {payload:string} action
+     */
     setAuthKey(state, action) {
       state.authKey = action.payload
     }
@@ -94,10 +123,13 @@ console.log(user)
 
 const { actions, reducer } = userState
 const userReducer = reducer
-// Extract the action creators object
-export {userState}
-// Export the reducer
-export {userReducer}
+
+/**
+ * Hubs reducer
+ * @type {function} reducer
+ */
+export {reducer as userReducer}
+
 
 // Extract and export each action creator by name
 export const { changeState, setEula, setLanguage, setAuthKey } = actions

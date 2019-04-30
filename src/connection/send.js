@@ -72,9 +72,9 @@ function testAndRefreshToken(key: string) {
 }
 
 /**
- * Sen multiple requests
- * @param  {[Oject]} requests - requests to be send
- * @return {Promise} promise object
+ * Send multiple requests
+ * @param  {Array<Oject>} requests - requests to be send
+ * @return {Promise}
  */
 export function sendAll(requests: Array<any>): Promise<any> {
   return new Promise( (resolve, reject) => {
@@ -100,18 +100,24 @@ let _permanentSSLFailure = false;
 
 /**
  * Send method for REST API
- * @param  {Object} command         Optional command like USER_LOGIN
- * @param  {String} localUrl        Optional localUrl for direct hub access
- * @param  {String} localUrl        hub Id when messaging to hub
- * @param  {String} url             Optional url
- * @param  {String} method          Optional method
- * @param  {String} authKey         Optional authKey
- * @param  {String} hubKey          Optional hubKey
- * @param  {Object} config          Optional config that might have timeout or responseType configs to be used over defaults
- * @param  {Object} data            Optional data to be sent
- * @return {Promise}                Promise of results or error
+ * @param {COMMAND_TYPE} params
+ *
+ * @return {Promise}
+ *
+ * @example
+ *   send( {command: COMMANDS.USER_LOGIN,  data:{email:email, password:password} })
+ *   .then((response) => {...});
+ *
+ * @example
+ *   send( {command: COMMANDS.CMD_DEVICE, authKey: authKey, hubKey: hubKey, data:[{id:deviceId, state:state}] })
+ *   .then((response) => {...});
+ *
+ * @example
+ *   send( {url: hubURL + "/hub"} )
+ *   .then((hubData) => {...});
+ *
  */
-export function send({command, localUrl, hubId, url, method, authKey , hubKey, type, config, data}: COMMAND_TYPE): Promise<any> {
+export function send({command, localUrl, hubId, url, method, authKey, hubKey, type, config, data}: COMMAND_TYPE): Promise<any> {
   if (method == null) {
     method = 'GET';
   }

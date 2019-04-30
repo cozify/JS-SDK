@@ -4,15 +4,24 @@
 import { createSlice } from 'redux-starter-kit'
 import { HUB_CONNECTION_STATES } from '../connection/constants';
 
-const hubsState = createSlice({
+/**
+ * Hubs action creators object
+ * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
+ * @return { {
+ *   slice : string,
+ *   reducer : ReducerFunction,
+ *   actions : Object<string, ActionCreator},
+ *   selectors : Object<string, Selector>
+ *   }}
+ */
+export const hubsState = createSlice({
   slice: 'hubs',
   initialState: {},
   reducers: {
-    /**
-     * Sets hub information from hub-tokens to state
-     * @param  {[type]} state  [description]
-     * @param  {[type]} action [description]
-     * @return {[type]}        [description]
+    /*
+     * Reducer action of setting many hubs to state
+     * @param  {Object} state
+     * @param  {payload:{hubs:HUBS_MAP_TYPE}} action
      */
     updateHubs(state, action) {
       for (const [id, hub] of Object.entries(action.payload)) {
@@ -21,6 +30,11 @@ const hubsState = createSlice({
     },
 
 
+    /*
+     * Reducer action of setting hub state to selected
+     * @param  {Object} state
+     * @param  {payload:{hubId:string}} action
+     */
     selectHub(state, action) {
       if (state[action.payload]) {
         state[action.payload].selected = true;
@@ -28,6 +42,11 @@ const hubsState = createSlice({
       }
     },
 
+    /*
+     * Reducer action of setting hub state to unselected
+     * @param  {Object} state
+     * @param  {payload:{hubId:string}} action
+     */
     unSelectHub(state, action) {
       if (state[action.payload]) {
         state[action.payload].selected = false;
@@ -35,13 +54,18 @@ const hubsState = createSlice({
       }
     },
 
+    /*
+     * Reducer action of setting hub connection state
+     * @param  {Object} state
+     * @param  {payload:{hubId:string, state:HUB_STATES_TYPE}} action
+     */
     setHubConnectionState(state, action) {
       const hubId = action.payload.hubId
       const newState = action.payload.state
       const oldState = state[hubId] ? state[hubId].connectionState : undefined
       if (Object.values(HUB_CONNECTION_STATES).indexOf(newState) > -1) {
         if (oldState && oldState !== newState) {
-          console.log (`HUB ${hubId} connection state ${oldState} -> ${newState}`);
+          //console.log (`HUB ${hubId} connection state ${oldState} -> ${newState}`);
           state[hubId].connectionState = newState;
         }
       }
@@ -53,10 +77,13 @@ const hubsState = createSlice({
 //console.log('hubsState ', hubsState)
 const { actions, reducer } = hubsState
 const hubsReducer = reducer
-// Extract the action creators object
-export {hubsState}
-// Export the reducer
-export {hubsReducer}
+
+/**
+ * Hubs reducer
+ * @type {function} reducer
+ */
+export {reducer as hubsReducer}
+
 // Extract and export each action creator by name
 /*
 console.log(updateHubs({ id: 123, name: 'Unnamed device' }))
