@@ -87,7 +87,7 @@
     "axios-retry": "^3.1.2",
     "esdoc-ecmascript-proposal-plugin": "^1.0.0",
     "get-value": "^3.0.1",
-    "lodash": "^4.17.13",
+    "lodash": "^4.17.14",
     "redux": "^4.0.1",
     "redux-devtools-extension": "^2.13.8",
     "redux-starter-kit": "^0.4.3"
