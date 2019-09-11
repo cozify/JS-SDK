@@ -1,10 +1,10 @@
 {
   "name": "cozify-sdk",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "JavaScript SDK for Cozify REST API",
   "author": "tech-admin",
   "license": "MIT",
-  "repository": "tech-admin/cozify-sdk",
+  "repository": "cozify/JS-SDK",
   "module": "dist/index.es.js",
   "node": "dist/sdk-node.js",
   "browser": "dist/sdk-browser.js",
