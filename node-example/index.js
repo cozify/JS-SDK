@@ -44,11 +44,11 @@ CozifySDK.watchChanges('user.state', (newState, oldState) => {
 CozifySDK.watchChanges('hubs', (newHubsState, oldHubsState) => {
   if (newHubsState[fixedHubId] && !newHubsState[fixedHubId].selected) {
     CozifySDK.selectHubById(fixedHubId);
-    /*
+
     setTimeout(function() {
       CozifySDK.unSelectHubById(fixedHubId);
     }, 10000);
-    */
+
   };
 
   if (newHubsState[fixedHubId] && oldHubsState[fixedHubId]){
@@ -66,7 +66,7 @@ CozifySDK.watchChanges('devices', (newDevicesState, oldDevicesState) => {
       deviceStateChanged = true;
       let state = newDevicesState[fixedHubId][fixedDeviceId].state;
       state.isOn = !state.isOn;
-      CozifySDK.sendDeviceCmd(fixedHubId, fixedDeviceId, state);
+      CozifySDK.sendDeviceCmd(fixedHubId, fixedDeviceId, state, ['isOn', 'type']);
     }
   }
 });
@@ -77,5 +77,5 @@ CozifySDK.store.subscribe(() => {
   const storeNow = CozifySDK.store.getState()
   console.info("Hub connection:", CozifySDK.getHubConnectionState(fixedHubId));
   //console.info("Hubs", storeNow.hubs)
-  //console.info("Devices:", JSON.stringify(CozifySDK.getDevices()[fixedHubId]));
+  console.info("Devices:", JSON.stringify(CozifySDK.getDevices()[fixedHubId]));
 })

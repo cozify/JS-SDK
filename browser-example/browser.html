@@ -15,6 +15,7 @@
       let fixedHubId = 'xxxx-xxxx'
       let fixedDeviceId = 'abcd-efgh'
 
+
       let LANGUAGES = CozifySDK.LANGUAGES;
       let USER_STATES = CozifySDK.USER_STATES;
 
@@ -52,11 +53,11 @@
       CozifySDK.watchChanges('hubs', (newHubsState, oldHubsState) => {
         if (newHubsState[fixedHubId] && !newHubsState[fixedHubId].selected) {
           CozifySDK.selectHubById(fixedHubId);
-          /*
+
           setTimeout(function() {
             CozifySDK.unSelectHubById(fixedHubId);
           }, 10000);
-          */
+
         };
 
         if (newHubsState[fixedHubId] && oldHubsState[fixedHubId]){
@@ -74,7 +75,7 @@
             deviceStateChanged = true;
             let state = newDevicesState[fixedHubId][fixedDeviceId].state;
             state.isOn = !state.isOn;
-            CozifySDK.sendDeviceCmd(fixedHubId, fixedDeviceId, state);
+            CozifySDK.sendDeviceCmd(fixedHubId, fixedDeviceId, state, ['isOn', 'type']);
           }
         }
       });
