@@ -1,6 +1,6 @@
 {
   "name": "cozify-sdk",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "JavaScript SDK for Cozify REST API",
   "author": "tech-admin",
   "license": "MIT",
@@ -25,13 +25,13 @@
     "flow:coverage": "flow-coverage-report --config .flowcoverage.json",
     "flow:deps": "flow-typed install",
     "docs": "./node_modules/.bin/flow-remove-types src/ -d docs/src/ -p | ./node_modules/.bin/esdoc | rm -rf docs/src/",
-    "deploy": "gh-pages -d example/build",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
+    "deploy": "gh-pages -d example/build",
     "prepare": "npm run build",
     "predeploy": "cd example && npm install && npm run build",
     "precommit": "flow src && npm lint && npm test",
-    "prepublishOnly": "npm clean && npm lint && npm test && npm build"
+    "prepublishOnly": "npm test && npm run build"
   },
   "peerDependencies": {},
   "devDependencies": {

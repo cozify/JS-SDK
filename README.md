@@ -3,7 +3,10 @@
 > JavaScript SDK for Cozify REST API
 
 
-### Usage
+### Usage - install using npm
+```
+npm install cozify-sdk
+```
 
 #### Browsers (should use iife-version)
 ```
