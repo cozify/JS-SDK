@@ -33,8 +33,10 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-urlBase64Decode">urlBase64Decode</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-store">store</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-isNode">isNode</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#connection">connection</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-retryCondition">retryCondition</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#connection">connection</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-resetRetry">resetRetry</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-retryCondition">retryCondition</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-cloudErrorState">cloudErrorState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getAPIversion">getAPIversion</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hubErrorState">hubErrorState</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-testSSLCertificate">testSSLCertificate</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-send">send</a></span></span></li>
@@ -47,6 +49,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_FINGERPRINTS_SHA1">CLOUD_FINGERPRINTS_SHA1</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_HOST">CLOUD_HOST</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_URL">CLOUD_URL</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-MAX_API_VERSION">MAX_API_VERSION</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-CLOUD_CONNECTION_STATE_TYPE">CLOUD_CONNECTION_STATE_TYPE</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-COMMANDS_TYPE">COMMANDS_TYPE</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-COMMANDS_TYPE">COMMANDS_TYPE</a></span></span></li>
@@ -67,6 +70,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-POLL_INTERVAL_MS">POLL_INTERVAL_MS</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#reducers">reducers</a><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-connectionsState">connectionsState</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setCloudConnectionState">setCloudConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-devicesReducer">devicesReducer</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-devicesState">devicesState</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setDevices">setDevices</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-hubsReducer">hubsReducer</a></span></span></li>
@@ -91,7 +95,7 @@
 <pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">// 
 
 // This actionreducer uses internally https://github.com/mweststrate/immer, so it&apos;s safe to modify given state directly
-import { createSlice } from &apos;redux-starter-kit&apos;
+import { createSlice } from &apos;redux-starter-kit&apos;;
 
 /**
  * Devices action creators object
@@ -113,13 +117,17 @@ export const devicesState = createSlice({
      * @param {Object} action
      */
     setDevices(state, action) {
-      const hubId = action.payload.hubId;
-      const devices = action.payload.devices;
-      const hubDevices = {}
-      for (const [id, device] of Object.entries(devices)) {
-        hubDevices[id] = {...device};
-      }
-      state[hubId] = {...hubDevices};
+      const stateToSet = state;
+      const { hubId } = action.payload;
+      const { devices } = action.payload;
+      const hubDevices = {};
+
+
+      Object.entries(devices).forEach((entry) =&gt; {
+        const [id, device] = entry;
+        hubDevices[id] = { ...device };
+      });
+      stateToSet[hubId] = { ...hubDevices };
     },
 
     /*
@@ -128,10 +136,11 @@ export const devicesState = createSlice({
      * @param {payload:{Object{hubId:string, device:Object}}} action
      */
     setDevice(state, action) {
-      const hubId = action.payload.hubId;
-      const device = action.payload.device;
-      if(state[hubId]) {
-        state[hubId][device.id] = {...device}
+      const stateToSet = state;
+      const { hubId } = action.payload;
+      const { device } = action.payload;
+      if (stateToSet[hubId]) {
+        stateToSet[hubId][device.id] = { ...device };
       }
     },
 
@@ -141,23 +150,23 @@ export const devicesState = createSlice({
      * @param {payload:{Object{hubId:string, device:Object}}} action
      */
     deleteDevice(state, action) {
-      const hubId = action.payload.hubId;
-      const device = action.payload.device;
-      if(state[hubId]) {
-        delete state[hubId][device.id]
+      const stateToSet = state;
+      const { hubId } = action.payload;
+      const { device } = action.payload;
+      if (stateToSet[hubId]) {
+        delete stateToSet[hubId][device.id];
       }
-    }
-  }
-})
+    },
+  },
+});
 
-const { actions, reducer } = devicesState
-
+const { actions, reducer } = devicesState;
+const devicesReducer = reducer;
 /**
  * Devices reducer
  * @type {function} reducer
  */
-export {reducer as devicesReducer}
-
+export { reducer as devicesReducer };
 
 
 // Extract and export each action creator by name
@@ -165,9 +174,7 @@ export {reducer as devicesReducer}
 console.log(addDevice({ id: 123, name: &apos;Unnamed device&apos; }))
 {type : &quot;devices/addDevice&quot;, payload : {id : 123, name: &apos;Unnamed device&apos; }}
 */
-export const { setDevices, deleteDevice } = actions
-
-
+export const { setDevices, deleteDevice } = actions;
 </code></pre>
 
 </div>

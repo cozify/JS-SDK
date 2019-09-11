@@ -33,8 +33,10 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-urlBase64Decode">urlBase64Decode</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-store">store</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-isNode">isNode</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#connection">connection</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-retryCondition">retryCondition</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#connection">connection</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-resetRetry">resetRetry</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-retryCondition">retryCondition</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-cloudErrorState">cloudErrorState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getAPIversion">getAPIversion</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hubErrorState">hubErrorState</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-testSSLCertificate">testSSLCertificate</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-send">send</a></span></span></li>
@@ -47,6 +49,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_FINGERPRINTS_SHA1">CLOUD_FINGERPRINTS_SHA1</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_HOST">CLOUD_HOST</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_URL">CLOUD_URL</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-MAX_API_VERSION">MAX_API_VERSION</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-CLOUD_CONNECTION_STATE_TYPE">CLOUD_CONNECTION_STATE_TYPE</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-COMMANDS_TYPE">COMMANDS_TYPE</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-COMMANDS_TYPE">COMMANDS_TYPE</a></span></span></li>
@@ -67,6 +70,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-POLL_INTERVAL_MS">POLL_INTERVAL_MS</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#reducers">reducers</a><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-connectionsState">connectionsState</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setCloudConnectionState">setCloudConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-devicesReducer">devicesReducer</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-devicesState">devicesState</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setDevices">setDevices</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-hubsReducer">hubsReducer</a></span></span></li>
@@ -229,6 +233,34 @@
         
         <div data-ice="description"><p>User action to log in</p>
 </div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-getAPIversion">getAPIversion</a></span></span><span class="code" data-ice="signature">(hubVersion: <span>*</span>, maxVersion: <span>*</span>): <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
       </div>
     </td>
     <td>
@@ -452,6 +484,34 @@
           
           
           
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-resetRetry">resetRetry</a></span></span><span class="code" data-ice="signature">(url: <span>*</span>)</span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
           <span class="code" data-ice="name"><span><a href="function/index.html#static-function-retryCondition">retryCondition</a></span></span><span class="code" data-ice="signature">(error: <span>*</span>): <span>*</span></span>
         </p>
       </div>
@@ -567,7 +627,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-sendDeviceCmd">sendDeviceCmd</a></span></span><span class="code" data-ice="signature">(hubId: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, deviceId: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, state: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></span></span>
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-sendDeviceCmd">sendDeviceCmd</a></span></span><span class="code" data-ice="signature">(hubId: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, deviceId: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, state: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>, properties: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>&gt;): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></span></span>
         </p>
       </div>
       <div>
@@ -959,11 +1019,11 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/connection/send-utilities.js.html#lineNumber13">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/connection/send-utilities.js.html#lineNumber51">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {cloudErrorState} from &apos;<span><a href="file/src/connection/send-utilities.js.html#lineNumber13">cozify-sdk/src/connection/send-utilities.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {cloudErrorState} from &apos;<span><a href="file/src/connection/send-utilities.js.html#lineNumber51">cozify-sdk/src/connection/send-utilities.js</a></span>&apos;</code></pre></div>
   
   
   
@@ -1030,11 +1090,11 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/devices/devices.js.html#lineNumber14">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/devices/devices.js.html#lineNumber36">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {deviceDeltaHandler} from &apos;<span><a href="file/src/devices/devices.js.html#lineNumber14">cozify-sdk/src/devices/devices.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {deviceDeltaHandler} from &apos;<span><a href="file/src/devices/devices.js.html#lineNumber36">cozify-sdk/src/devices/devices.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Device handler for poll delta results</p>
@@ -1171,6 +1231,83 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
   
 </div>
 <div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="static-function-getAPIversion">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    
+    <span class="code" data-ice="name">getAPIversion</span><span class="code" data-ice="signature">(hubVersion: <span>*</span>, maxVersion: <span>*</span>): <span>*</span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/connection/send-utilities.js.html#lineNumber33">source</a></span></span>
+    </span>
+  </h3>
+
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getAPIversion} from &apos;<span><a href="file/src/connection/send-utilities.js.html#lineNumber33">cozify-sdk/src/connection/send-utilities.js</a></span>&apos;</code></pre></div>
+  
+  
+  
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">hubVersion</td>
+      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">maxVersion</td>
+      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  <div class="return-params" data-ice="returnParams">
+    <h4>Return:</h4>
+    <table>
+      <tbody>
+        <tr>
+          <td class="return-type code" data-ice="returnType"><span>*</span></td>
+          
+        </tr>
+      </tbody>
+    </table>
+    <div data-ice="returnProperties">
+</div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
   <h3 data-ice="anchor" id="static-function-getCloudConnectionState">
     <span class="access" data-ice="access">public</span>
     
@@ -1238,11 +1375,11 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/devices/devices.js.html#lineNumber62">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/devices/devices.js.html#lineNumber11">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getDevices} from &apos;<span><a href="file/src/devices/devices.js.html#lineNumber62">cozify-sdk/src/devices/devices.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getDevices} from &apos;<span><a href="file/src/devices/devices.js.html#lineNumber11">cozify-sdk/src/devices/devices.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Get devices of all selected hubs</p>
@@ -1294,11 +1431,11 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/connection/state.js.html#lineNumber46">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/connection/state.js.html#lineNumber47">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getHubConnectionState} from &apos;<span><a href="file/src/connection/state.js.html#lineNumber46">cozify-sdk/src/connection/state.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getHubConnectionState} from &apos;<span><a href="file/src/connection/state.js.html#lineNumber47">cozify-sdk/src/connection/state.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Get hub connection state by hub id</p>
@@ -1366,11 +1503,11 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/devices/devices.js.html#lineNumber49">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/devices/devices.js.html#lineNumber21">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getHubDevices} from &apos;<span><a href="file/src/devices/devices.js.html#lineNumber49">cozify-sdk/src/devices/devices.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getHubDevices} from &apos;<span><a href="file/src/devices/devices.js.html#lineNumber21">cozify-sdk/src/devices/devices.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Get devices of given hub</p>
@@ -1438,11 +1575,11 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber386">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber129">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getHubs} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber386">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getHubs} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber129">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Helper to get current hubs from state</p>
@@ -1551,11 +1688,11 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/connection/send-utilities.js.html#lineNumber42">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/connection/send-utilities.js.html#lineNumber80">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {hubErrorState} from &apos;<span><a href="file/src/connection/send-utilities.js.html#lineNumber42">cozify-sdk/src/connection/send-utilities.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {hubErrorState} from &apos;<span><a href="file/src/connection/send-utilities.js.html#lineNumber80">cozify-sdk/src/connection/send-utilities.js</a></span>&apos;</code></pre></div>
   
   
   
@@ -1611,6 +1748,65 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
   
 </div>
 <div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="static-function-resetRetry">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    
+    <span class="code" data-ice="name">resetRetry</span><span class="code" data-ice="signature">(url: <span>*</span>)</span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/connection/send-retry.js.html#lineNumber51">source</a></span></span>
+    </span>
+  </h3>
+
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {resetRetry} from &apos;<span><a href="file/src/connection/send-retry.js.html#lineNumber51">cozify-sdk/src/connection/send-retry.js</a></span>&apos;</code></pre></div>
+  
+  
+  
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">url</td>
+      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
   <h3 data-ice="anchor" id="static-function-retryCondition">
     <span class="access" data-ice="access">public</span>
     
@@ -1622,11 +1818,11 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/connection/send-retry.js.html#lineNumber45">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/connection/send-retry.js.html#lineNumber61">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {retryCondition} from &apos;<span><a href="file/src/connection/send-retry.js.html#lineNumber45">cozify-sdk/src/connection/send-retry.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {retryCondition} from &apos;<span><a href="file/src/connection/send-retry.js.html#lineNumber61">cozify-sdk/src/connection/send-retry.js</a></span>&apos;</code></pre></div>
   
   
   
@@ -1693,11 +1889,11 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber256">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber392">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {selectHubById} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber256">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {selectHubById} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber392">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Select hub by id, starts hub polling</p>
@@ -1754,11 +1950,11 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/connection/send.js.html#lineNumber119">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/connection/send.js.html#lineNumber133">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {send} from &apos;<span><a href="file/src/connection/send.js.html#lineNumber119">cozify-sdk/src/connection/send.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {send} from &apos;<span><a href="file/src/connection/send.js.html#lineNumber133">cozify-sdk/src/connection/send.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Send method for REST API</p>
@@ -1844,11 +2040,11 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/connection/send.js.html#lineNumber78">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/connection/send.js.html#lineNumber84">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {sendAll} from &apos;<span><a href="file/src/connection/send.js.html#lineNumber78">cozify-sdk/src/connection/send.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {sendAll} from &apos;<span><a href="file/src/connection/send.js.html#lineNumber84">cozify-sdk/src/connection/send.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Send multiple requests</p>
@@ -1913,15 +2109,15 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     
     
     
-    <span class="code" data-ice="name">sendDeviceCmd</span><span class="code" data-ice="signature">(hubId: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, deviceId: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, state: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></span></span>
+    <span class="code" data-ice="name">sendDeviceCmd</span><span class="code" data-ice="signature">(hubId: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, deviceId: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, state: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>, properties: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>&gt;): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/devices/device.js.html#lineNumber16">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/devices/device.js.html#lineNumber21">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {sendDeviceCmd} from &apos;<span><a href="file/src/devices/device.js.html#lineNumber16">cozify-sdk/src/devices/device.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {sendDeviceCmd} from &apos;<span><a href="file/src/devices/device.js.html#lineNumber21">cozify-sdk/src/devices/device.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Device command to be sent</p>
@@ -1954,6 +2150,13 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
       <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">properties</td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>&gt;</td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"><p>optional properties</p>
+</td>
     </tr>
 </tbody>
   </table>
@@ -2122,11 +2325,11 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber222">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber248">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {startDiscoveringHubs} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber222">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {startDiscoveringHubs} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber248">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Start discovering hubs every DISCOVERY_INTERVAL_MS
@@ -2167,11 +2370,11 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber232">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber260">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {stopDiscoveringHubs} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber232">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {stopDiscoveringHubs} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber260">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Stop discovering hubs</p>
@@ -2211,11 +2414,11 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/connection/send-utilities.js.html#lineNumber72">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/connection/send-utilities.js.html#lineNumber110">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {testSSLCertificate} from &apos;<span><a href="file/src/connection/send-utilities.js.html#lineNumber72">cozify-sdk/src/connection/send-utilities.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {testSSLCertificate} from &apos;<span><a href="file/src/connection/send-utilities.js.html#lineNumber110">cozify-sdk/src/connection/send-utilities.js</a></span>&apos;</code></pre></div>
   
   
   
@@ -2282,11 +2485,11 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber241">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber377">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {unSelectHubById} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber241">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {unSelectHubById} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber377">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Unselect hub by id, stops hub polling</p>
@@ -2343,11 +2546,11 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/utils.js.html#lineNumber8">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/utils.js.html#lineNumber27">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {urlBase64Decode} from &apos;<span><a href="file/src/utils.js.html#lineNumber8">cozify-sdk/src/utils.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {urlBase64Decode} from &apos;<span><a href="file/src/utils.js.html#lineNumber27">cozify-sdk/src/utils.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Helper method to Base64 decode</p>

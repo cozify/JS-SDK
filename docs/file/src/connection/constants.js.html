@@ -33,8 +33,10 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-urlBase64Decode">urlBase64Decode</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-store">store</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-isNode">isNode</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#connection">connection</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-retryCondition">retryCondition</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#connection">connection</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-resetRetry">resetRetry</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-retryCondition">retryCondition</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-cloudErrorState">cloudErrorState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getAPIversion">getAPIversion</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hubErrorState">hubErrorState</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-testSSLCertificate">testSSLCertificate</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-send">send</a></span></span></li>
@@ -47,6 +49,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_FINGERPRINTS_SHA1">CLOUD_FINGERPRINTS_SHA1</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_HOST">CLOUD_HOST</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_URL">CLOUD_URL</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-MAX_API_VERSION">MAX_API_VERSION</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-CLOUD_CONNECTION_STATE_TYPE">CLOUD_CONNECTION_STATE_TYPE</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-COMMANDS_TYPE">COMMANDS_TYPE</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-COMMANDS_TYPE">COMMANDS_TYPE</a></span></span></li>
@@ -67,6 +70,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-POLL_INTERVAL_MS">POLL_INTERVAL_MS</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#reducers">reducers</a><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-connectionsState">connectionsState</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setCloudConnectionState">setCloudConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-devicesReducer">devicesReducer</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-devicesState">devicesState</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setDevices">setDevices</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-hubsReducer">hubsReducer</a></span></span></li>
@@ -89,7 +93,7 @@
 
 <div class="content" data-ice="content"><h1 data-ice="title">src/connection/constants.js</h1>
 <pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">// 
-import { isNode } from &apos;../utils.js&apos;
+import { isNode } from &apos;../utils&apos;;
 
 /*
 * Cloud servers SSL cretification fingerprints to be checked if possible
@@ -99,15 +103,18 @@ import { isNode } from &apos;../utils.js&apos;
 * testapi 91 30 CF 20 17 F7 D7 EC F7 BA 43 30 8E 19 83 B4 CF DE 5A CC
 * cloud &amp; cloud2 26 B0 20 FA AB E8 A3 81 63 37 C6 B7 EF 94 4D 40 3D 1B 85 10
 */
-export const CLOUD_FINGERPRINTS_SHA1 = [&quot;91 30 CF 20 17 F7 D7 EC F7 BA 43 30 8E 19 83 B4 CF DE 5A CC&quot;, &quot;26 B0 20 FA AB E8 A3 81 63 37 C6 B7 EF 94 4D 40 3D 1B 85 10&quot;];
+export const CLOUD_FINGERPRINTS_SHA1 = [
+  &apos;91 30 CF 20 17 F7 D7 EC F7 BA 43 30 8E 19 83 B4 CF DE 5A CC&apos;,
+  &apos;26 B0 20 FA AB E8 A3 81 63 37 C6 B7 EF 94 4D 40 3D 1B 85 10&apos;,
+];
 /* Cloud HTTPS host name */
 export const CLOUD_HOST = &apos;https://testapi.cozify.fi&apos;;
 /* Cloud API VERSION */
-export const CLOUD_API_VERSION = &quot;ui/0.2/&quot;;
+export const CLOUD_API_VERSION = &apos;ui/0.2/&apos;;
 /* Cloud URL */
-export const CLOUD_URL = CLOUD_HOST + &quot;/&quot; + CLOUD_API_VERSION;
+export const CLOUD_URL = `${CLOUD_HOST}/${CLOUD_API_VERSION}`;
 
-
+export const MAX_API_VERSION = &apos;1.12&apos;;
 /**
  *  Enumeration of supported API commands, that could be
  *  USER_LOGIN, HUB_KEYS, REFRESH_AUTHKEY, CLOUD_IP, CLOUD_META, POLL, CMD_DEVICE
@@ -116,13 +123,17 @@ export const CLOUD_URL = CLOUD_HOST + &quot;/&quot; + CLOUD_API_VERSION;
  *
   */
 export const COMMANDS = Object.freeze({
-  USER_LOGIN: { method: &apos;POST&apos;, url: CLOUD_URL + &quot;user/login&quot;, params: [&apos;password&apos;, &apos;email&apos;], config:{responseType: isNode ? &apos;blob&apos; : &apos;stream&apos;, timeout: 5000} },
-  HUB_KEYS: { method: &apos;GET&apos;, url: CLOUD_URL + &quot;user/hubkeys&quot;},
-  REFRESH_AUTHKEY: { method: &apos;GET&apos;, url: CLOUD_URL + &quot;user/refreshsession&quot;},
-  CLOUD_IP: {method: &apos;GET&apos;, url: CLOUD_URL + &quot;hub/lan_ip&quot;},
-  CLOUD_META: {method: &apos;GET&apos;, url: CLOUD_URL + &quot;hub/remote/hub&quot;},
-  POLL: {method: &apos;GET&apos;, url: CLOUD_URL + &quot;hub/remote/cc/1.11&quot; + &quot;/hub/poll&quot; , urlParams: [&apos;ts&apos;]},
-  CMD_DEVICE: {method: &apos;PUT&apos;, url: CLOUD_URL + &quot;hub/remote/cc/1.11&quot; + &quot;/devices/command&quot;, type: &apos;CMD_DEVICE&apos;, params: [&apos;id&apos;, &apos;state&apos;]}
+  USER_LOGIN: {
+    method: &apos;POST&apos;, url: `${CLOUD_URL}user/login`, params: [&apos;password&apos;, &apos;email&apos;], config: { responseType: isNode ? &apos;blob&apos; : &apos;stream&apos;, timeout: 5000 },
+  },
+  HUB_KEYS: { method: &apos;GET&apos;, url: `${CLOUD_URL}user/hubkeys` },
+  REFRESH_AUTHKEY: { method: &apos;GET&apos;, url: `${CLOUD_URL}user/refreshsession` },
+  CLOUD_IP: { method: &apos;GET&apos;, url: `${CLOUD_URL}hub/lan_ip` },
+  CLOUD_META: { method: &apos;GET&apos;, url: `${CLOUD_URL}hub/remote/hub` },
+  POLL: { method: &apos;GET&apos;, url: `${CLOUD_URL}hub/remote/cc/$API_VER/hub/poll`, urlParams: [&apos;ts&apos;] },
+  CMD_DEVICE: {
+    method: &apos;PUT&apos;, url: `${CLOUD_URL}hub/remote/cc/$API_VER/devices/command`, type: &apos;CMD_DEVICE&apos;, params: [&apos;id&apos;, &apos;state&apos;],
+  },
 });
 
 
@@ -130,16 +141,17 @@ export const COMMANDS = Object.freeze({
 /**
  * COMMAND_TYPE
  *  @typedef {Object} COMMANDS_TYPE
- *  @property {COMMANDS_TYPE} [command]      - Optional command like USER_LOGIN,
- *  @property {string} [localUrl]     - Optional localUrl for direct hub access
- *  @property {string} [hubId]        - Optional hub Id when messaging to hub
- *  @property {string} [url]          - Optional url
- *  @property {string} [method]       - Optional method
- *  @property {string} [authKey]      - Optional authKey
- *  @property {string} [hubKey]       - Optional hubKey
- *  @property {string} [type]         - Optional type that defaults to &apos;application/json&apos;,
- *  @property {Object} [config]       - Optional config that might have &apos;timeout&apos; or &apos;responseType&apos; configs to be used over defaults,
- *  @property {Object} [data]         - Optional data to be sent over url or body parameters (depending command)
+ *  @property {COMMANDS_TYPE} [command]   - Optional command like USER_LOGIN,
+ *  @property {string} [localUrl]         - Optional localUrl for direct hub access
+ *  @property {string} [url]              - Optional url
+ *  @property {number} [timeout]          - Optional timeout
+ *  @property {string} [method]           - Optional method
+ *  @property {string} [authKey]          - Optional authKey
+ *  @property {string} [hubKey]           - Optional hubKey
+ *  @property {Object} [config]           - Optional config that might have &apos;timeout&apos; or &apos;responseType&apos; configs to be used over defaults,
+ *  @property {Object} [data]             - Optional data to be sent over url or body parameters (depending command)
+ *  @property {string} [type]             - Optional type that defaults to &apos;application/json&apos;,
+ *  @property {string} [hubId]            - Optional hub Id when messaging to hub
  */
 
 /**
@@ -155,7 +167,7 @@ export const CLOUD_CONNECTION_STATES = Object.freeze({
   UNAUTHORIZED: &apos;unauthorized&apos;,
   OBSOLETE_API_VERSION: &apos;obsolete api version&apos;,
   LATE_PAYMENT: &apos;late payment&apos;,
-  CONNECTED: &apos;connected&apos;
+  CONNECTED: &apos;connected&apos;,
 });
 
 
@@ -172,10 +184,8 @@ export const HUB_CONNECTION_STATES = Object.freeze({
   UNAUTHORIZED: &apos;unauthorized&apos;,
   OBSOLETE_API_VERSION: &apos;obsolete api version&apos;,
   REMOTE: &apos;remote&apos;,
-  LOCAL: &apos;local&apos;
+  LOCAL: &apos;local&apos;,
 });
-
-
 </code></pre>
 
 </div>

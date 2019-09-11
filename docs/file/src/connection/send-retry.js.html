@@ -33,8 +33,10 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-urlBase64Decode">urlBase64Decode</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-store">store</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-isNode">isNode</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#connection">connection</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-retryCondition">retryCondition</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#connection">connection</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-resetRetry">resetRetry</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-retryCondition">retryCondition</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-cloudErrorState">cloudErrorState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getAPIversion">getAPIversion</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hubErrorState">hubErrorState</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-testSSLCertificate">testSSLCertificate</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-send">send</a></span></span></li>
@@ -47,6 +49,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_FINGERPRINTS_SHA1">CLOUD_FINGERPRINTS_SHA1</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_HOST">CLOUD_HOST</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_URL">CLOUD_URL</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-MAX_API_VERSION">MAX_API_VERSION</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-CLOUD_CONNECTION_STATE_TYPE">CLOUD_CONNECTION_STATE_TYPE</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-COMMANDS_TYPE">COMMANDS_TYPE</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-COMMANDS_TYPE">COMMANDS_TYPE</a></span></span></li>
@@ -67,6 +70,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-POLL_INTERVAL_MS">POLL_INTERVAL_MS</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#reducers">reducers</a><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-connectionsState">connectionsState</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setCloudConnectionState">setCloudConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-devicesReducer">devicesReducer</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-devicesState">devicesState</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setDevices">setDevices</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-hubsReducer">hubsReducer</a></span></span></li>
@@ -88,29 +92,37 @@
 </nav>
 
 <div class="content" data-ice="content"><h1 data-ice="title">src/connection/send-retry.js</h1>
-<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">const SAFE_HTTP_METHODS = [&apos;get&apos;, &apos;head&apos;, &apos;options&apos;];
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">// import isRetryAllowed from &apos;is-retry-allowed&apos;;
+
+const SAFE_HTTP_METHODS = [&apos;get&apos;, &apos;head&apos;, &apos;options&apos;];
 const IDEMPOTENT_HTTP_METHODS = SAFE_HTTP_METHODS.concat([&apos;put&apos;, &apos;delete&apos;]);
+const ALL_HTTP_METHODS = IDEMPOTENT_HTTP_METHODS.concat([&apos;post&apos;]);
 
 /*
  * @param  {Error}  error
  * @return {boolean}
- */
+
 function isNetworkError(error) {
   return (
-    !error.response &amp;&amp;
-    isRetryAllowed(error) &amp;&amp; // Prevents retrying unsafe errors
-    !(Boolean(error.code) &amp;&amp; error.code == &apos;ECONNABORTED&apos;) // Prevents retrying timed out requests
+    !error.response
+    &amp;&amp; isRetryAllowed(error) // Prevents retrying unsafe errors
+    &amp;&amp; !(Boolean(error.code) &amp;&amp; error.code === &apos;ECONNABORTED&apos;) // Prevents retrying timed out requests
   );
 }
-
+*/
 
 /*
  * @param  {Error}  error
  * @return {boolean}
  */
 function isRetryableError(error) {
+  /*
   return (
-    error.code !== &apos;ECONNABORTED&apos; &amp;&amp;
+    error.code !== &apos;ECONNABORTED&apos;
+    &amp;&amp; (!error.response || (error.response.status &gt;= 500 &amp;&amp; error.response.status &lt;= 599))
+  );
+  */
+  return (
     (!error.response || (error.response.status &gt;= 500 &amp;&amp; error.response.status &lt;= 599))
   );
 }
@@ -124,30 +136,56 @@ function isSafeRequestError(error) {
     // Cannot determine if the request can be retried
     return false;
   }
-
-  return isRetryableError(error) &amp;&amp; SAFE_HTTP_METHODS.indexOf(error.config.method) !== -1;
+  return isRetryableError(error) &amp;&amp; ALL_HTTP_METHODS.indexOf(error.config.method) !== -1;
 }
 
+const httpRetries = {};
+const RETRY_COUNT = 1;
+
+export function resetRetry(url) {
+  if (httpRetries[url]) {
+    httpRetries[url] = 0;
+    delete httpRetries[url];
+  }
+}
 /*
  * @param  {Error}  error
  * @return {boolean}
  */
 export function retryCondition(error) {
-  if (!error.config) {
+  // if (error.config.url.indexOf(&apos;192.168.1.119&apos;) !== -1) debugger;
+  if (error &amp;&amp; error.config &amp;&amp; error.config.url) {
+    if (httpRetries[error.config.url]) {
+      if (httpRetries[error.config.url] &gt;= RETRY_COUNT) {
+        httpRetries[error.config.url] = 0;
+        return false;
+      }
+      httpRetries[error.config.url] += httpRetries[error.config.url];
+    } else {
+      httpRetries[error.config.url] = 1;
+    }
+  } else {
+    console.error(&apos;retryCondition unknown&apos;, error);
     // Cannot determine if the request can be retried
     return false;
   }
 
-  return isRetryableError(error) &amp;&amp; IDEMPOTENT_HTTP_METHODS.indexOf(error.config.method) !== -1;
+  if (isSafeRequestError(error) &amp;&amp; IDEMPOTENT_HTTP_METHODS.indexOf(error.config.method) !== -1) {
+    console.error(&apos;retryCondition condition true&apos;, error.config);
+  } else {
+    console.error(&apos;retryCondition condition false&apos;, error.config);
+    httpRetries[error.config.url] = 0;
+  }
+  return isSafeRequestError(error) &amp;&amp; IDEMPOTENT_HTTP_METHODS.indexOf(error.config.method) !== -1;
 }
 
 /*
  * @param  {Error}  error
  * @return {boolean}
- */
 function isNetworkOrIdempotentRequestError(error) {
   return isNetworkError(error) || isIdempotentRequestError(error);
 }
+ */
 </code></pre>
 
 </div>

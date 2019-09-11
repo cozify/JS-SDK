@@ -33,8 +33,10 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-urlBase64Decode">urlBase64Decode</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-store">store</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-isNode">isNode</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#connection">connection</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-retryCondition">retryCondition</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#connection">connection</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-resetRetry">resetRetry</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-retryCondition">retryCondition</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-cloudErrorState">cloudErrorState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getAPIversion">getAPIversion</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hubErrorState">hubErrorState</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-testSSLCertificate">testSSLCertificate</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-send">send</a></span></span></li>
@@ -47,6 +49,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_FINGERPRINTS_SHA1">CLOUD_FINGERPRINTS_SHA1</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_HOST">CLOUD_HOST</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_URL">CLOUD_URL</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-MAX_API_VERSION">MAX_API_VERSION</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-CLOUD_CONNECTION_STATE_TYPE">CLOUD_CONNECTION_STATE_TYPE</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-COMMANDS_TYPE">COMMANDS_TYPE</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-COMMANDS_TYPE">COMMANDS_TYPE</a></span></span></li>
@@ -67,6 +70,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-POLL_INTERVAL_MS">POLL_INTERVAL_MS</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#reducers">reducers</a><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-connectionsState">connectionsState</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setCloudConnectionState">setCloudConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-devicesReducer">devicesReducer</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-devicesState">devicesState</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setDevices">setDevices</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-hubsReducer">hubsReducer</a></span></span></li>
@@ -90,37 +94,75 @@
 <div class="content" data-ice="content"><h1 data-ice="title">src/connection/send-utilities.js</h1>
 <pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">// 
 
-import { CLOUD_CONNECTION_STATES, HUB_CONNECTION_STATES, CLOUD_FINGERPRINTS_SHA1, CLOUD_HOST } from &apos;./constants&apos;
-import { isNode } from &apos;../utils.js&apos;
+import {
+  CLOUD_CONNECTION_STATES, HUB_CONNECTION_STATES, CLOUD_FINGERPRINTS_SHA1, CLOUD_HOST,
+} from &apos;./constants&apos;;
+import { isNode } from &apos;../utils&apos;;
 
 
-const SSL_CHECK_INTERVALL = 1000 * 60  * 60 //One hour
+const SSL_CHECK_INTERVALL = 1000 * 60 * 60; // One hour
 
+/*
+ * Returns &gt; 0 if v1 &gt; v2 and &lt; 0 if v1 &lt; v2 and 0 if v1 == v2
+ */
+function compareVersions(v1, v2) {
+  const v1Parts = v1.split(&apos;.&apos;);
+  const v2Parts = v2.split(&apos;.&apos;);
+  const minLength = Math.min(v1Parts.length, v2Parts.length);
+  if (minLength &gt; 0) {
+    for (let idx = 0; idx &lt; minLength - 1; idx += 1) {
+      const diff = Number(v1Parts[idx]) - Number(v2Parts[idx]);
+      if (diff !== 0) {
+        return diff;
+      }
+    }
+  }
+  return v1Parts.length - v2Parts.length;
+}
 
- /*
+/*
+ * Get API version, or given MAX version, from given hubVersion string
+ * e.g. 1.12.0.5
+ */
+export function getAPIversion(hubVersion, maxVersion) {
+  let retVal = &apos;0.0&apos;;
+  const majorEnd = hubVersion.indexOf(&apos;.&apos;);
+  let minorEnd = -1;
+  if (majorEnd !== -1) {
+    minorEnd = hubVersion.indexOf(&apos;.&apos;, majorEnd + 1);
+  }
+  if (minorEnd !== -1) {
+    retVal = hubVersion.substring(0, minorEnd);
+  }
+  if (compareVersions(retVal, maxVersion) &gt; 0) {
+    retVal = maxVersion;
+  }
+  return retVal;
+}
+/*
  * Return cloud connection state based on error
  */
 export function cloudErrorState(error) {
-  let retVal = CLOUD_CONNECTION_STATES.UNCONNECTED
+  let retVal = CLOUD_CONNECTION_STATES.UNCONNECTED;
   if (error &amp;&amp; error.response &amp;&amp; error.response.status === 401) {
     // 401 Authentication information missing or expired.
-    retVal = CLOUD_CONNECTION_STATES.UNAUTHENTICATED
-    console.error(&quot;send: authentication error &quot;, error);
+    retVal = CLOUD_CONNECTION_STATES.UNAUTHENTICATED;
+    console.error(&apos;send: authentication error &apos;, error);
   } else if (error &amp;&amp; error.response &amp;&amp; error.response.status === 403) {
     // 402 Late payment - &gt; no remote access
-    retVal = CLOUD_CONNECTION_STATES.LATE_PAYMENT
-    console.error(&quot;send: unauhorized error &quot;, error);
+    retVal = CLOUD_CONNECTION_STATES.LATE_PAYMENT;
+    console.error(&apos;send: unauhorized error &apos;, error);
   } else if (error &amp;&amp; error.response &amp;&amp; error.response.status === 403) {
     // 403 Unauthorized
-    retVal = CLOUD_CONNECTION_STATES.UNAUTHORIZED
-    console.error(&quot;send: unauhorized error &quot;, error);
+    retVal = CLOUD_CONNECTION_STATES.UNAUTHORIZED;
+    console.error(&apos;send: unauhorized error &apos;, error);
   } else if (error &amp;&amp; error.response &amp;&amp; error.response.status === 410) {
     // 410 Version problem
-    retVal = CLOUD_CONNECTION_STATES.OBSOLETE_API_VERSION
-    console.error(&quot;send: version error &quot;, error);
+    retVal = CLOUD_CONNECTION_STATES.OBSOLETE_API_VERSION;
+    console.error(&apos;send: version error &apos;, error);
   }
 
-  return retVal
+  return retVal;
 }
 
 
@@ -130,85 +172,77 @@ export function cloudErrorState(error) {
  * @return {string} hub&apos;s connectionState
  */
 export function hubErrorState(error) {
-  let retVal = HUB_CONNECTION_STATES.UNCONNECTED
+  let retVal = HUB_CONNECTION_STATES.UNCONNECTED;
   if (error &amp;&amp; error.response &amp;&amp; error.response.status === 400) {
     // no connection to offline hub
-    console.log(&quot;send: no-connection error &quot;, error);
+    console.log(&apos;send: no-connection error &apos;, error);
   } else if (error &amp;&amp; error.response &amp;&amp; error.response.status === 401) {
     // 401 Authentication information missing or expired.
-    retVal = HUB_CONNECTION_STATES.UNAUTHENTICATED
-    console.error(&quot;send: authentication error &quot;, error);
+    retVal = HUB_CONNECTION_STATES.UNAUTHENTICATED;
+    console.error(&apos;send: authentication error &apos;, error);
   } else if (error &amp;&amp; error.response &amp;&amp; error.response.status === 403) {
     // 403 Unauthorized
-    retVal = HUB_CONNECTION_STATES.UNAUTHORIZED
-    console.error(&quot;send: unauhorized error &quot;, error);
+    retVal = HUB_CONNECTION_STATES.UNAUTHORIZED;
+    console.error(&apos;send: unauhorized error &apos;, error);
   } else if (error &amp;&amp; error.response &amp;&amp; error.response.status === 410) {
     // 410 Version problem
-    retVal = HUB_CONNECTION_STATES.OBSOLETE_API_VERSION
-    console.error(&quot;send: version error &quot;, error);
+    retVal = HUB_CONNECTION_STATES.OBSOLETE_API_VERSION;
+    console.error(&apos;send: version error &apos;, error);
   }
 
-  return retVal
+  return retVal;
 }
 
 
-let _ongoingSSLCertificateCheck = false;
-let _lastSSLCertificateCheckTime = null;
+let ongoingSSLCertificateCheck = false;
+let lastSSLCertificateCheckTime = null;
 
 /*
  * Palceholder function for certificate checker
  * @return {Promise}
  */
 export function testSSLCertificate(remoteConnection) {
-  return new Promise( (resolve, reject) =&gt; {
-
-    if(!remoteConnection) {
+  return new Promise((resolve) =&gt; {
+    if (!remoteConnection) {
       // All requests are now complete
       resolve(true);
       return;
     }
 
-    let now = new Date().getTime()
-    if (!_ongoingSSLCertificateCheck &amp;&amp; ( !_lastSSLCertificateCheckTime || (now - _lastSSLCertificateCheckTime  &gt;  SSL_CHECK_INTERVALL ) ) ){
-      _ongoingSSLCertificateCheck = true
-      _lastSSLCertificateCheckTime = now
+    const now = new Date().getTime();
+    if (!ongoingSSLCertificateCheck &amp;&amp; (!lastSSLCertificateCheckTime || (now - lastSSLCertificateCheckTime &gt; SSL_CHECK_INTERVALL))) {
+      ongoingSSLCertificateCheck = true;
+      lastSSLCertificateCheckTime = now;
 
       // Cordova plugin?
       if (!isNode &amp;&amp; window &amp;&amp; window.plugins &amp;&amp; window.plugins.sslCertificateChecker) {
-          window.plugins.sslCertificateChecker.check(
-              (successMsg) =&gt; {
-                  _ongoingSSLCertificateCheck = false;
-                  resolve(true);
-              }
-              ,(errorMsg) =&gt; {
-                  if (errorMsg === &quot;CONNECTION_NOT_SECURE&quot;) {
-                    _ongoingSSLCertificateCheck = false
-                    resolve(false);
-                  }
-                  else{
-                    _ongoingSSLCertificateCheck = false
-                    _lastSSLCertificateCheckTime = undefined
-                    resolve(true);
-                  }
-              }
-              , CLOUD_HOST
-              , CLOUD_FINGERPRINTS_SHA1
-          )
+        window.plugins.sslCertificateChecker.check(
+          () =&gt; {
+            ongoingSSLCertificateCheck = false;
+            resolve(true);
+          },
+          (errorMsg) =&gt; {
+            if (errorMsg === &apos;CONNECTION_NOT_SECURE&apos;) {
+              ongoingSSLCertificateCheck = false;
+              resolve(false);
+            } else {
+              ongoingSSLCertificateCheck = false;
+              lastSSLCertificateCheckTime = undefined;
+              resolve(true);
+            }
+          },
+          CLOUD_HOST,
+          CLOUD_FINGERPRINTS_SHA1,
+        );
       } else {
-          setTimeout(function() {_ongoingSSLCertificateCheck = false}, SSL_CHECK_INTERVALL);
-          resolve(true);
+        setTimeout(() =&gt; { ongoingSSLCertificateCheck = false; }, SSL_CHECK_INTERVALL);
+        resolve(true);
       }
     } else {
       resolve(true);
     }
-
   });
-
 }
-
-
-
-
 </code></pre>
 
 </div>

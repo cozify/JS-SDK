@@ -567,9 +567,9 @@
     "__docId__": 48,
     "kind": "file",
     "name": "src/connection/constants.js",
-    "content": "// \nimport { isNode } from '../utils.js'\n\n/*\n* Cloud servers SSL cretification fingerprints to be checked if possible\n* Fingerprint could be found by opening the server URL like https://testapi.cozify.fi/ui/0.2/hub/lan_ip in Chrome.\n* Then click the green certificate in front of the URL, click 'Connection', 'Certificate details', expand the details\n* and scroll down to the SHA1 fingerprint.\n* testapi 91 30 CF 20 17 F7 D7 EC F7 BA 43 30 8E 19 83 B4 CF DE 5A CC\n* cloud & cloud2 26 B0 20 FA AB E8 A3 81 63 37 C6 B7 EF 94 4D 40 3D 1B 85 10\n*/\nexport const CLOUD_FINGERPRINTS_SHA1 = [\"91 30 CF 20 17 F7 D7 EC F7 BA 43 30 8E 19 83 B4 CF DE 5A CC\", \"26 B0 20 FA AB E8 A3 81 63 37 C6 B7 EF 94 4D 40 3D 1B 85 10\"];\n/* Cloud HTTPS host name */\nexport const CLOUD_HOST = 'https://testapi.cozify.fi';\n/* Cloud API VERSION */\nexport const CLOUD_API_VERSION = \"ui/0.2/\";\n/* Cloud URL */\nexport const CLOUD_URL = CLOUD_HOST + \"/\" + CLOUD_API_VERSION;\n\n\n/**\n *  Enumeration of supported API commands, that could be\n *  USER_LOGIN, HUB_KEYS, REFRESH_AUTHKEY, CLOUD_IP, CLOUD_META, POLL, CMD_DEVICE\n *  @typedef {Object} COMMANDS_TYPE\n *  @readonly\n *\n  */\nexport const COMMANDS = Object.freeze({\n  USER_LOGIN: { method: 'POST', url: CLOUD_URL + \"user/login\", params: ['password', 'email'], config:{responseType: isNode ? 'blob' : 'stream', timeout: 5000} },\n  HUB_KEYS: { method: 'GET', url: CLOUD_URL + \"user/hubkeys\"},\n  REFRESH_AUTHKEY: { method: 'GET', url: CLOUD_URL + \"user/refreshsession\"},\n  CLOUD_IP: {method: 'GET', url: CLOUD_URL + \"hub/lan_ip\"},\n  CLOUD_META: {method: 'GET', url: CLOUD_URL + \"hub/remote/hub\"},\n  POLL: {method: 'GET', url: CLOUD_URL + \"hub/remote/cc/1.11\" + \"/hub/poll\" , urlParams: ['ts']},\n  CMD_DEVICE: {method: 'PUT', url: CLOUD_URL + \"hub/remote/cc/1.11\" + \"/devices/command\", type: 'CMD_DEVICE', params: ['id', 'state']}\n});\n\n\n\n/**\n * COMMAND_TYPE\n *  @typedef {Object} COMMANDS_TYPE\n *  @property {COMMANDS_TYPE} [command]      - Optional command like USER_LOGIN,\n *  @property {string} [localUrl]     - Optional localUrl for direct hub access\n *  @property {string} [hubId]        - Optional hub Id when messaging to hub\n *  @property {string} [url]          - Optional url\n *  @property {string} [method]       - Optional method\n *  @property {string} [authKey]      - Optional authKey\n *  @property {string} [hubKey]       - Optional hubKey\n *  @property {string} [type]         - Optional type that defaults to 'application/json',\n *  @property {Object} [config]       - Optional config that might have 'timeout' or 'responseType' configs to be used over defaults,\n *  @property {Object} [data]         - Optional data to be sent over url or body parameters (depending command)\n */\n\n/**\n  * Enumeration of cloud connection state, that could be\n  * UNCONNECTED, UNAUTHENTICATED, UNAUTHORIZED, OBSOLETE_API_VERSION, LATE_PAYMENT or CONNECTED\n  * @readonly\n  * @enum {string}\n  * @typedef {string} CLOUD_CONNECTION_STATE_TYPE\n  */\nexport const CLOUD_CONNECTION_STATES = Object.freeze({\n  UNCONNECTED: 'no connection',\n  UNAUTHENTICATED: 'unauthenticated',\n  UNAUTHORIZED: 'unauthorized',\n  OBSOLETE_API_VERSION: 'obsolete api version',\n  LATE_PAYMENT: 'late payment',\n  CONNECTED: 'connected'\n});\n\n\n/**\n  * Enumeration of HUB connection state, that could be\n  * UNCONNECTED, UNAUTHENTICATED, UNAUTHORIZED, OBSOLETE_API_VERSION, REMOTE or LOCAL\n  * @readonly\n  * @enum {string}\n  * @typedef {string} HUB_CONNECTION_STATE_TYPE\n  */\nexport const HUB_CONNECTION_STATES = Object.freeze({\n  UNCONNECTED: 'no connection',\n  UNAUTHENTICATED: 'unauthenticated',\n  UNAUTHORIZED: 'unauthorized',\n  OBSOLETE_API_VERSION: 'obsolete api version',\n  REMOTE: 'remote',\n  LOCAL: 'local'\n});\n\n\n",
+    "content": "// \nimport { isNode } from '../utils';\n\n/*\n* Cloud servers SSL cretification fingerprints to be checked if possible\n* Fingerprint could be found by opening the server URL like https://testapi.cozify.fi/ui/0.2/hub/lan_ip in Chrome.\n* Then click the green certificate in front of the URL, click 'Connection', 'Certificate details', expand the details\n* and scroll down to the SHA1 fingerprint.\n* testapi 91 30 CF 20 17 F7 D7 EC F7 BA 43 30 8E 19 83 B4 CF DE 5A CC\n* cloud & cloud2 26 B0 20 FA AB E8 A3 81 63 37 C6 B7 EF 94 4D 40 3D 1B 85 10\n*/\nexport const CLOUD_FINGERPRINTS_SHA1 = [\n  '91 30 CF 20 17 F7 D7 EC F7 BA 43 30 8E 19 83 B4 CF DE 5A CC',\n  '26 B0 20 FA AB E8 A3 81 63 37 C6 B7 EF 94 4D 40 3D 1B 85 10',\n];\n/* Cloud HTTPS host name */\nexport const CLOUD_HOST = 'https://testapi.cozify.fi';\n/* Cloud API VERSION */\nexport const CLOUD_API_VERSION = 'ui/0.2/';\n/* Cloud URL */\nexport const CLOUD_URL = `${CLOUD_HOST}/${CLOUD_API_VERSION}`;\n\nexport const MAX_API_VERSION = '1.12';\n/**\n *  Enumeration of supported API commands, that could be\n *  USER_LOGIN, HUB_KEYS, REFRESH_AUTHKEY, CLOUD_IP, CLOUD_META, POLL, CMD_DEVICE\n *  @typedef {Object} COMMANDS_TYPE\n *  @readonly\n *\n  */\nexport const COMMANDS = Object.freeze({\n  USER_LOGIN: {\n    method: 'POST', url: `${CLOUD_URL}user/login`, params: ['password', 'email'], config: { responseType: isNode ? 'blob' : 'stream', timeout: 5000 },\n  },\n  HUB_KEYS: { method: 'GET', url: `${CLOUD_URL}user/hubkeys` },\n  REFRESH_AUTHKEY: { method: 'GET', url: `${CLOUD_URL}user/refreshsession` },\n  CLOUD_IP: { method: 'GET', url: `${CLOUD_URL}hub/lan_ip` },\n  CLOUD_META: { method: 'GET', url: `${CLOUD_URL}hub/remote/hub` },\n  POLL: { method: 'GET', url: `${CLOUD_URL}hub/remote/cc/$API_VER/hub/poll`, urlParams: ['ts'] },\n  CMD_DEVICE: {\n    method: 'PUT', url: `${CLOUD_URL}hub/remote/cc/$API_VER/devices/command`, type: 'CMD_DEVICE', params: ['id', 'state'],\n  },\n});\n\n\n\n/**\n * COMMAND_TYPE\n *  @typedef {Object} COMMANDS_TYPE\n *  @property {COMMANDS_TYPE} [command]   - Optional command like USER_LOGIN,\n *  @property {string} [localUrl]         - Optional localUrl for direct hub access\n *  @property {string} [url]              - Optional url\n *  @property {number} [timeout]          - Optional timeout\n *  @property {string} [method]           - Optional method\n *  @property {string} [authKey]          - Optional authKey\n *  @property {string} [hubKey]           - Optional hubKey\n *  @property {Object} [config]           - Optional config that might have 'timeout' or 'responseType' configs to be used over defaults,\n *  @property {Object} [data]             - Optional data to be sent over url or body parameters (depending command)\n *  @property {string} [type]             - Optional type that defaults to 'application/json',\n *  @property {string} [hubId]            - Optional hub Id when messaging to hub\n */\n\n/**\n  * Enumeration of cloud connection state, that could be\n  * UNCONNECTED, UNAUTHENTICATED, UNAUTHORIZED, OBSOLETE_API_VERSION, LATE_PAYMENT or CONNECTED\n  * @readonly\n  * @enum {string}\n  * @typedef {string} CLOUD_CONNECTION_STATE_TYPE\n  */\nexport const CLOUD_CONNECTION_STATES = Object.freeze({\n  UNCONNECTED: 'no connection',\n  UNAUTHENTICATED: 'unauthenticated',\n  UNAUTHORIZED: 'unauthorized',\n  OBSOLETE_API_VERSION: 'obsolete api version',\n  LATE_PAYMENT: 'late payment',\n  CONNECTED: 'connected',\n});\n\n\n/**\n  * Enumeration of HUB connection state, that could be\n  * UNCONNECTED, UNAUTHENTICATED, UNAUTHORIZED, OBSOLETE_API_VERSION, REMOTE or LOCAL\n  * @readonly\n  * @enum {string}\n  * @typedef {string} HUB_CONNECTION_STATE_TYPE\n  */\nexport const HUB_CONNECTION_STATES = Object.freeze({\n  UNCONNECTED: 'no connection',\n  UNAUTHENTICATED: 'unauthenticated',\n  UNAUTHORIZED: 'unauthorized',\n  OBSOLETE_API_VERSION: 'obsolete api version',\n  REMOTE: 'remote',\n  LOCAL: 'local',\n});\n",
     "static": true,
-    "longname": "/Users/vesalindfors/Code/JS-SDK/docs/src/connection/constants.js",
+    "longname": "/Users/vesa/code/JS-SDK/docs/src/connection/constants.js",
     "access": "public",
     "description": null,
     "lineNumber": 1
@@ -606,7 +606,7 @@
     "importPath": "cozify-sdk/src/connection/constants.js",
     "importStyle": "{CLOUD_HOST}",
     "description": null,
-    "lineNumber": 14,
+    "lineNumber": 17,
     "undocument": true,
     "type": {
       "types": [
@@ -626,7 +626,7 @@
     "importPath": "cozify-sdk/src/connection/constants.js",
     "importStyle": "{CLOUD_API_VERSION}",
     "description": null,
-    "lineNumber": 16,
+    "lineNumber": 19,
     "undocument": true,
     "type": {
       "types": [
@@ -646,16 +646,36 @@
     "importPath": "cozify-sdk/src/connection/constants.js",
     "importStyle": "{CLOUD_URL}",
     "description": null,
-    "lineNumber": 18,
+    "lineNumber": 21,
     "undocument": true,
     "type": {
       "types": [
-        "*"
+        "string"
       ]
     }
   },
   {
     "__docId__": 53,
+    "kind": "variable",
+    "name": "MAX_API_VERSION",
+    "memberof": "src/connection/constants.js",
+    "static": true,
+    "longname": "src/connection/constants.js~MAX_API_VERSION",
+    "access": "public",
+    "export": true,
+    "importPath": "cozify-sdk/src/connection/constants.js",
+    "importStyle": "{MAX_API_VERSION}",
+    "description": null,
+    "lineNumber": 23,
+    "undocument": true,
+    "type": {
+      "types": [
+        "string"
+      ]
+    }
+  },
+  {
+    "__docId__": 54,
     "kind": "typedef",
     "name": "COMMANDS_TYPE",
     "memberof": "src/connection/constants.js",
@@ -663,7 +683,7 @@
     "longname": "src/connection/constants.js~COMMANDS_TYPE",
     "access": "public",
     "description": " Enumeration of supported API commands, that could be\n USER_LOGIN, HUB_KEYS, REFRESH_AUTHKEY, CLOUD_IP, CLOUD_META, POLL, CMD_DEVICE",
-    "lineNumber": 28,
+    "lineNumber": 31,
     "unknown": [
       {
         "tagName": "@readonly",
@@ -679,7 +699,7 @@
     }
   },
   {
-    "__docId__": 54,
+    "__docId__": 55,
     "kind": "typedef",
     "name": "COMMANDS_TYPE",
     "memberof": "src/connection/constants.js",
@@ -715,18 +735,18 @@
         ],
         "spread": false,
         "optional": true,
-        "name": "hubId",
-        "description": "Optional hub Id when messaging to hub"
+        "name": "url",
+        "description": "Optional url"
       },
       {
         "nullable": null,
         "types": [
-          "string"
+          "number"
         ],
         "spread": false,
         "optional": true,
-        "name": "url",
-        "description": "Optional url"
+        "name": "timeout",
+        "description": "Optional timeout"
       },
       {
         "nullable": null,
@@ -761,16 +781,6 @@
       {
         "nullable": null,
         "types": [
-          "string"
-        ],
-        "spread": false,
-        "optional": true,
-        "name": "type",
-        "description": "Optional type that defaults to 'application/json',"
-      },
-      {
-        "nullable": null,
-        "types": [
           "Object"
         ],
         "spread": false,
@@ -787,6 +797,26 @@
         "optional": true,
         "name": "data",
         "description": "Optional data to be sent over url or body parameters (depending command)"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": true,
+        "name": "type",
+        "description": "Optional type that defaults to 'application/json',"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": true,
+        "name": "hubId",
+        "description": "Optional hub Id when messaging to hub"
       }
     ],
     "type": {
@@ -798,7 +828,7 @@
     }
   },
   {
-    "__docId__": 55,
+    "__docId__": 56,
     "kind": "typedef",
     "name": "CLOUD_CONNECTION_STATE_TYPE",
     "memberof": "src/connection/constants.js",
@@ -806,7 +836,7 @@
     "longname": "src/connection/constants.js~CLOUD_CONNECTION_STATE_TYPE",
     "access": "public",
     "description": "Enumeration of cloud connection state, that could be\nUNCONNECTED, UNAUTHENTICATED, UNAUTHORIZED, OBSOLETE_API_VERSION, LATE_PAYMENT or CONNECTED",
-    "lineNumber": 62,
+    "lineNumber": 70,
     "unknown": [
       {
         "tagName": "@readonly",
@@ -826,7 +856,7 @@
     }
   },
   {
-    "__docId__": 56,
+    "__docId__": 57,
     "kind": "typedef",
     "name": "HUB_CONNECTION_STATE_TYPE",
     "memberof": "src/connection/constants.js",
@@ -834,7 +864,7 @@
     "longname": "src/connection/constants.js~HUB_CONNECTION_STATE_TYPE",
     "access": "public",
     "description": "Enumeration of HUB connection state, that could be\nUNCONNECTED, UNAUTHENTICATED, UNAUTHORIZED, OBSOLETE_API_VERSION, REMOTE or LOCAL",
-    "lineNumber": 79,
+    "lineNumber": 87,
     "unknown": [
       {
         "tagName": "@readonly",
@@ -854,18 +884,18 @@
     }
   },
   {
-    "__docId__": 57,
+    "__docId__": 58,
     "kind": "file",
     "name": "src/connection/send-retry.js",
-    "content": "const SAFE_HTTP_METHODS = ['get', 'head', 'options'];\nconst IDEMPOTENT_HTTP_METHODS = SAFE_HTTP_METHODS.concat(['put', 'delete']);\n\n/*\n * @param  {Error}  error\n * @return {boolean}\n */\nfunction isNetworkError(error) {\n  return (\n    !error.response &&\n    isRetryAllowed(error) && // Prevents retrying unsafe errors\n    !(Boolean(error.code) && error.code == 'ECONNABORTED') // Prevents retrying timed out requests\n  );\n}\n\n\n/*\n * @param  {Error}  error\n * @return {boolean}\n */\nfunction isRetryableError(error) {\n  return (\n    error.code !== 'ECONNABORTED' &&\n    (!error.response || (error.response.status >= 500 && error.response.status <= 599))\n  );\n}\n\n/*\n * @param  {Error}  error\n * @return {boolean}\n */\nfunction isSafeRequestError(error) {\n  if (!error.config) {\n    // Cannot determine if the request can be retried\n    return false;\n  }\n\n  return isRetryableError(error) && SAFE_HTTP_METHODS.indexOf(error.config.method) !== -1;\n}\n\n/*\n * @param  {Error}  error\n * @return {boolean}\n */\nexport function retryCondition(error) {\n  if (!error.config) {\n    // Cannot determine if the request can be retried\n    return false;\n  }\n\n  return isRetryableError(error) && IDEMPOTENT_HTTP_METHODS.indexOf(error.config.method) !== -1;\n}\n\n/*\n * @param  {Error}  error\n * @return {boolean}\n */\nfunction isNetworkOrIdempotentRequestError(error) {\n  return isNetworkError(error) || isIdempotentRequestError(error);\n}\n",
+    "content": "// import isRetryAllowed from 'is-retry-allowed';\n\nconst SAFE_HTTP_METHODS = ['get', 'head', 'options'];\nconst IDEMPOTENT_HTTP_METHODS = SAFE_HTTP_METHODS.concat(['put', 'delete']);\nconst ALL_HTTP_METHODS = IDEMPOTENT_HTTP_METHODS.concat(['post']);\n\n/*\n * @param  {Error}  error\n * @return {boolean}\n\nfunction isNetworkError(error) {\n  return (\n    !error.response\n    && isRetryAllowed(error) // Prevents retrying unsafe errors\n    && !(Boolean(error.code) && error.code === 'ECONNABORTED') // Prevents retrying timed out requests\n  );\n}\n*/\n\n/*\n * @param  {Error}  error\n * @return {boolean}\n */\nfunction isRetryableError(error) {\n  /*\n  return (\n    error.code !== 'ECONNABORTED'\n    && (!error.response || (error.response.status >= 500 && error.response.status <= 599))\n  );\n  */\n  return (\n    (!error.response || (error.response.status >= 500 && error.response.status <= 599))\n  );\n}\n\n/*\n * @param  {Error}  error\n * @return {boolean}\n */\nfunction isSafeRequestError(error) {\n  if (!error.config) {\n    // Cannot determine if the request can be retried\n    return false;\n  }\n  return isRetryableError(error) && ALL_HTTP_METHODS.indexOf(error.config.method) !== -1;\n}\n\nconst httpRetries = {};\nconst RETRY_COUNT = 1;\n\nexport function resetRetry(url) {\n  if (httpRetries[url]) {\n    httpRetries[url] = 0;\n    delete httpRetries[url];\n  }\n}\n/*\n * @param  {Error}  error\n * @return {boolean}\n */\nexport function retryCondition(error) {\n  // if (error.config.url.indexOf('192.168.1.119') !== -1) debugger;\n  if (error && error.config && error.config.url) {\n    if (httpRetries[error.config.url]) {\n      if (httpRetries[error.config.url] >= RETRY_COUNT) {\n        httpRetries[error.config.url] = 0;\n        return false;\n      }\n      httpRetries[error.config.url] += httpRetries[error.config.url];\n    } else {\n      httpRetries[error.config.url] = 1;\n    }\n  } else {\n    console.error('retryCondition unknown', error);\n    // Cannot determine if the request can be retried\n    return false;\n  }\n\n  if (isSafeRequestError(error) && IDEMPOTENT_HTTP_METHODS.indexOf(error.config.method) !== -1) {\n    console.error('retryCondition condition true', error.config);\n  } else {\n    console.error('retryCondition condition false', error.config);\n    httpRetries[error.config.url] = 0;\n  }\n  return isSafeRequestError(error) && IDEMPOTENT_HTTP_METHODS.indexOf(error.config.method) !== -1;\n}\n\n/*\n * @param  {Error}  error\n * @return {boolean}\nfunction isNetworkOrIdempotentRequestError(error) {\n  return isNetworkError(error) || isIdempotentRequestError(error);\n}\n */\n",
     "static": true,
-    "longname": "/Users/vesalindfors/Code/JS-SDK/docs/src/connection/send-retry.js",
+    "longname": "/Users/vesa/code/JS-SDK/docs/src/connection/send-retry.js",
     "access": "public",
     "description": null,
     "lineNumber": 1
   },
   {
-    "__docId__": 58,
+    "__docId__": 59,
     "kind": "variable",
     "name": "SAFE_HTTP_METHODS",
     "memberof": "src/connection/send-retry.js",
@@ -876,7 +906,7 @@
     "importPath": "cozify-sdk/src/connection/send-retry.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 1,
+    "lineNumber": 3,
     "undocument": true,
     "type": {
       "types": [
@@ -886,7 +916,7 @@
     "ignore": true
   },
   {
-    "__docId__": 59,
+    "__docId__": 60,
     "kind": "variable",
     "name": "IDEMPOTENT_HTTP_METHODS",
     "memberof": "src/connection/send-retry.js",
@@ -897,7 +927,7 @@
     "importPath": "cozify-sdk/src/connection/send-retry.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 2,
+    "lineNumber": 4,
     "undocument": true,
     "type": {
       "types": [
@@ -907,33 +937,20 @@
     "ignore": true
   },
   {
-    "__docId__": 60,
-    "kind": "function",
-    "name": "isNetworkError",
+    "__docId__": 61,
+    "kind": "variable",
+    "name": "ALL_HTTP_METHODS",
     "memberof": "src/connection/send-retry.js",
-    "generator": false,
-    "async": false,
     "static": true,
-    "longname": "src/connection/send-retry.js~isNetworkError",
+    "longname": "src/connection/send-retry.js~ALL_HTTP_METHODS",
     "access": "public",
     "export": false,
     "importPath": "cozify-sdk/src/connection/send-retry.js",
     "importStyle": null,
-    "description": "",
-    "lineNumber": 8,
-    "params": [
-      {
-        "nullable": null,
-        "types": [
-          "*"
-        ],
-        "spread": false,
-        "optional": false,
-        "name": "error",
-        "description": ""
-      }
-    ],
-    "return": {
+    "description": null,
+    "lineNumber": 5,
+    "undocument": true,
+    "type": {
       "types": [
         "*"
       ]
@@ -941,7 +958,7 @@
     "ignore": true
   },
   {
-    "__docId__": 61,
+    "__docId__": 62,
     "kind": "function",
     "name": "isRetryableError",
     "memberof": "src/connection/send-retry.js",
@@ -954,41 +971,7 @@
     "importPath": "cozify-sdk/src/connection/send-retry.js",
     "importStyle": null,
     "description": "",
-    "lineNumber": 21,
-    "params": [
-      {
-        "nullable": null,
-        "types": [
-          "*"
-        ],
-        "spread": false,
-        "optional": false,
-        "name": "error",
-        "description": ""
-      }
-    ],
-    "return": {
-      "types": [
-        "*"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 62,
-    "kind": "function",
-    "name": "isSafeRequestError",
-    "memberof": "src/connection/send-retry.js",
-    "generator": false,
-    "async": false,
-    "static": true,
-    "longname": "src/connection/send-retry.js~isSafeRequestError",
-    "access": "public",
-    "export": false,
-    "importPath": "cozify-sdk/src/connection/send-retry.js",
-    "importStyle": null,
-    "description": "",
-    "lineNumber": 32,
+    "lineNumber": 24,
     "params": [
       {
         "nullable": null,
@@ -1011,6 +994,111 @@
   {
     "__docId__": 63,
     "kind": "function",
+    "name": "isSafeRequestError",
+    "memberof": "src/connection/send-retry.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/connection/send-retry.js~isSafeRequestError",
+    "access": "public",
+    "export": false,
+    "importPath": "cozify-sdk/src/connection/send-retry.js",
+    "importStyle": null,
+    "description": "",
+    "lineNumber": 40,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "error",
+        "description": ""
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 64,
+    "kind": "variable",
+    "name": "httpRetries",
+    "memberof": "src/connection/send-retry.js",
+    "static": true,
+    "longname": "src/connection/send-retry.js~httpRetries",
+    "access": "public",
+    "export": false,
+    "importPath": "cozify-sdk/src/connection/send-retry.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 48,
+    "undocument": true,
+    "type": {
+      "types": [
+        "{}"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 65,
+    "kind": "variable",
+    "name": "RETRY_COUNT",
+    "memberof": "src/connection/send-retry.js",
+    "static": true,
+    "longname": "src/connection/send-retry.js~RETRY_COUNT",
+    "access": "public",
+    "export": false,
+    "importPath": "cozify-sdk/src/connection/send-retry.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 49,
+    "undocument": true,
+    "type": {
+      "types": [
+        "number"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 66,
+    "kind": "function",
+    "name": "resetRetry",
+    "memberof": "src/connection/send-retry.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/connection/send-retry.js~resetRetry",
+    "access": "public",
+    "export": true,
+    "importPath": "cozify-sdk/src/connection/send-retry.js",
+    "importStyle": "{resetRetry}",
+    "description": "",
+    "lineNumber": 51,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "url",
+        "description": ""
+      }
+    ],
+    "return": null
+  },
+  {
+    "__docId__": 67,
+    "kind": "function",
     "name": "retryCondition",
     "memberof": "src/connection/send-retry.js",
     "generator": false,
@@ -1022,106 +1110,7 @@
     "importPath": "cozify-sdk/src/connection/send-retry.js",
     "importStyle": "{retryCondition}",
     "description": "",
-    "lineNumber": 45,
-    "params": [
-      {
-        "nullable": null,
-        "types": [
-          "*"
-        ],
-        "spread": false,
-        "optional": false,
-        "name": "error",
-        "description": ""
-      }
-    ],
-    "return": {
-      "types": [
-        "*"
-      ]
-    }
-  },
-  {
-    "__docId__": 64,
-    "kind": "function",
-    "name": "isNetworkOrIdempotentRequestError",
-    "memberof": "src/connection/send-retry.js",
-    "generator": false,
-    "async": false,
-    "static": true,
-    "longname": "src/connection/send-retry.js~isNetworkOrIdempotentRequestError",
-    "access": "public",
-    "export": false,
-    "importPath": "cozify-sdk/src/connection/send-retry.js",
-    "importStyle": null,
-    "description": "",
-    "lineNumber": 58,
-    "params": [
-      {
-        "nullable": null,
-        "types": [
-          "*"
-        ],
-        "spread": false,
-        "optional": false,
-        "name": "error",
-        "description": ""
-      }
-    ],
-    "return": {
-      "types": [
-        "*"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 65,
-    "kind": "file",
-    "name": "src/connection/send-utilities.js",
-    "content": "// \n\nimport { CLOUD_CONNECTION_STATES, HUB_CONNECTION_STATES, CLOUD_FINGERPRINTS_SHA1, CLOUD_HOST } from './constants'\nimport { isNode } from '../utils.js'\n\n\nconst SSL_CHECK_INTERVALL = 1000 * 60  * 60 //One hour\n\n\n /*\n * Return cloud connection state based on error\n */\nexport function cloudErrorState(error) {\n  let retVal = CLOUD_CONNECTION_STATES.UNCONNECTED\n  if (error && error.response && error.response.status === 401) {\n    // 401 Authentication information missing or expired.\n    retVal = CLOUD_CONNECTION_STATES.UNAUTHENTICATED\n    console.error(\"send: authentication error \", error);\n  } else if (error && error.response && error.response.status === 403) {\n    // 402 Late payment - > no remote access\n    retVal = CLOUD_CONNECTION_STATES.LATE_PAYMENT\n    console.error(\"send: unauhorized error \", error);\n  } else if (error && error.response && error.response.status === 403) {\n    // 403 Unauthorized\n    retVal = CLOUD_CONNECTION_STATES.UNAUTHORIZED\n    console.error(\"send: unauhorized error \", error);\n  } else if (error && error.response && error.response.status === 410) {\n    // 410 Version problem\n    retVal = CLOUD_CONNECTION_STATES.OBSOLETE_API_VERSION\n    console.error(\"send: version error \", error);\n  }\n\n  return retVal\n}\n\n\n/*\n * Return hub connection state based on given error\n * @param  {Object} error\n * @return {string} hub's connectionState\n */\nexport function hubErrorState(error) {\n  let retVal = HUB_CONNECTION_STATES.UNCONNECTED\n  if (error && error.response && error.response.status === 400) {\n    // no connection to offline hub\n    console.log(\"send: no-connection error \", error);\n  } else if (error && error.response && error.response.status === 401) {\n    // 401 Authentication information missing or expired.\n    retVal = HUB_CONNECTION_STATES.UNAUTHENTICATED\n    console.error(\"send: authentication error \", error);\n  } else if (error && error.response && error.response.status === 403) {\n    // 403 Unauthorized\n    retVal = HUB_CONNECTION_STATES.UNAUTHORIZED\n    console.error(\"send: unauhorized error \", error);\n  } else if (error && error.response && error.response.status === 410) {\n    // 410 Version problem\n    retVal = HUB_CONNECTION_STATES.OBSOLETE_API_VERSION\n    console.error(\"send: version error \", error);\n  }\n\n  return retVal\n}\n\n\nlet _ongoingSSLCertificateCheck = false;\nlet _lastSSLCertificateCheckTime = null;\n\n/*\n * Palceholder function for certificate checker\n * @return {Promise}\n */\nexport function testSSLCertificate(remoteConnection) {\n  return new Promise( (resolve, reject) => {\n\n    if(!remoteConnection) {\n      // All requests are now complete\n      resolve(true);\n      return;\n    }\n\n    let now = new Date().getTime()\n    if (!_ongoingSSLCertificateCheck && ( !_lastSSLCertificateCheckTime || (now - _lastSSLCertificateCheckTime  >  SSL_CHECK_INTERVALL ) ) ){\n      _ongoingSSLCertificateCheck = true\n      _lastSSLCertificateCheckTime = now\n\n      // Cordova plugin?\n      if (!isNode && window && window.plugins && window.plugins.sslCertificateChecker) {\n          window.plugins.sslCertificateChecker.check(\n              (successMsg) => {\n                  _ongoingSSLCertificateCheck = false;\n                  resolve(true);\n              }\n              ,(errorMsg) => {\n                  if (errorMsg === \"CONNECTION_NOT_SECURE\") {\n                    _ongoingSSLCertificateCheck = false\n                    resolve(false);\n                  }\n                  else{\n                    _ongoingSSLCertificateCheck = false\n                    _lastSSLCertificateCheckTime = undefined\n                    resolve(true);\n                  }\n              }\n              , CLOUD_HOST\n              , CLOUD_FINGERPRINTS_SHA1\n          )\n      } else {\n          setTimeout(function() {_ongoingSSLCertificateCheck = false}, SSL_CHECK_INTERVALL);\n          resolve(true);\n      }\n    } else {\n      resolve(true);\n    }\n\n  });\n\n}\n\n\n\n\n",
-    "static": true,
-    "longname": "/Users/vesalindfors/Code/JS-SDK/docs/src/connection/send-utilities.js",
-    "access": "public",
-    "description": null,
-    "lineNumber": 1
-  },
-  {
-    "__docId__": 66,
-    "kind": "variable",
-    "name": "SSL_CHECK_INTERVALL",
-    "memberof": "src/connection/send-utilities.js",
-    "static": true,
-    "longname": "src/connection/send-utilities.js~SSL_CHECK_INTERVALL",
-    "access": "public",
-    "export": false,
-    "importPath": "cozify-sdk/src/connection/send-utilities.js",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 7,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 67,
-    "kind": "function",
-    "name": "cloudErrorState",
-    "memberof": "src/connection/send-utilities.js",
-    "generator": false,
-    "async": false,
-    "static": true,
-    "longname": "src/connection/send-utilities.js~cloudErrorState",
-    "access": "public",
-    "export": true,
-    "importPath": "cozify-sdk/src/connection/send-utilities.js",
-    "importStyle": "{cloudErrorState}",
-    "description": "",
-    "lineNumber": 13,
+    "lineNumber": 61,
     "params": [
       {
         "nullable": null,
@@ -1142,19 +1131,138 @@
   },
   {
     "__docId__": 68,
+    "kind": "file",
+    "name": "src/connection/send-utilities.js",
+    "content": "// \n\nimport {\n  CLOUD_CONNECTION_STATES, HUB_CONNECTION_STATES, CLOUD_FINGERPRINTS_SHA1, CLOUD_HOST,\n} from './constants';\nimport { isNode } from '../utils';\n\n\nconst SSL_CHECK_INTERVALL = 1000 * 60 * 60; // One hour\n\n/*\n * Returns > 0 if v1 > v2 and < 0 if v1 < v2 and 0 if v1 == v2\n */\nfunction compareVersions(v1, v2) {\n  const v1Parts = v1.split('.');\n  const v2Parts = v2.split('.');\n  const minLength = Math.min(v1Parts.length, v2Parts.length);\n  if (minLength > 0) {\n    for (let idx = 0; idx < minLength - 1; idx += 1) {\n      const diff = Number(v1Parts[idx]) - Number(v2Parts[idx]);\n      if (diff !== 0) {\n        return diff;\n      }\n    }\n  }\n  return v1Parts.length - v2Parts.length;\n}\n\n/*\n * Get API version, or given MAX version, from given hubVersion string\n * e.g. 1.12.0.5\n */\nexport function getAPIversion(hubVersion, maxVersion) {\n  let retVal = '0.0';\n  const majorEnd = hubVersion.indexOf('.');\n  let minorEnd = -1;\n  if (majorEnd !== -1) {\n    minorEnd = hubVersion.indexOf('.', majorEnd + 1);\n  }\n  if (minorEnd !== -1) {\n    retVal = hubVersion.substring(0, minorEnd);\n  }\n  if (compareVersions(retVal, maxVersion) > 0) {\n    retVal = maxVersion;\n  }\n  return retVal;\n}\n/*\n * Return cloud connection state based on error\n */\nexport function cloudErrorState(error) {\n  let retVal = CLOUD_CONNECTION_STATES.UNCONNECTED;\n  if (error && error.response && error.response.status === 401) {\n    // 401 Authentication information missing or expired.\n    retVal = CLOUD_CONNECTION_STATES.UNAUTHENTICATED;\n    console.error('send: authentication error ', error);\n  } else if (error && error.response && error.response.status === 403) {\n    // 402 Late payment - > no remote access\n    retVal = CLOUD_CONNECTION_STATES.LATE_PAYMENT;\n    console.error('send: unauhorized error ', error);\n  } else if (error && error.response && error.response.status === 403) {\n    // 403 Unauthorized\n    retVal = CLOUD_CONNECTION_STATES.UNAUTHORIZED;\n    console.error('send: unauhorized error ', error);\n  } else if (error && error.response && error.response.status === 410) {\n    // 410 Version problem\n    retVal = CLOUD_CONNECTION_STATES.OBSOLETE_API_VERSION;\n    console.error('send: version error ', error);\n  }\n\n  return retVal;\n}\n\n\n/*\n * Return hub connection state based on given error\n * @param  {Object} error\n * @return {string} hub's connectionState\n */\nexport function hubErrorState(error) {\n  let retVal = HUB_CONNECTION_STATES.UNCONNECTED;\n  if (error && error.response && error.response.status === 400) {\n    // no connection to offline hub\n    console.log('send: no-connection error ', error);\n  } else if (error && error.response && error.response.status === 401) {\n    // 401 Authentication information missing or expired.\n    retVal = HUB_CONNECTION_STATES.UNAUTHENTICATED;\n    console.error('send: authentication error ', error);\n  } else if (error && error.response && error.response.status === 403) {\n    // 403 Unauthorized\n    retVal = HUB_CONNECTION_STATES.UNAUTHORIZED;\n    console.error('send: unauhorized error ', error);\n  } else if (error && error.response && error.response.status === 410) {\n    // 410 Version problem\n    retVal = HUB_CONNECTION_STATES.OBSOLETE_API_VERSION;\n    console.error('send: version error ', error);\n  }\n\n  return retVal;\n}\n\n\nlet ongoingSSLCertificateCheck = false;\nlet lastSSLCertificateCheckTime = null;\n\n/*\n * Palceholder function for certificate checker\n * @return {Promise}\n */\nexport function testSSLCertificate(remoteConnection) {\n  return new Promise((resolve) => {\n    if (!remoteConnection) {\n      // All requests are now complete\n      resolve(true);\n      return;\n    }\n\n    const now = new Date().getTime();\n    if (!ongoingSSLCertificateCheck && (!lastSSLCertificateCheckTime || (now - lastSSLCertificateCheckTime > SSL_CHECK_INTERVALL))) {\n      ongoingSSLCertificateCheck = true;\n      lastSSLCertificateCheckTime = now;\n\n      // Cordova plugin?\n      if (!isNode && window && window.plugins && window.plugins.sslCertificateChecker) {\n        window.plugins.sslCertificateChecker.check(\n          () => {\n            ongoingSSLCertificateCheck = false;\n            resolve(true);\n          },\n          (errorMsg) => {\n            if (errorMsg === 'CONNECTION_NOT_SECURE') {\n              ongoingSSLCertificateCheck = false;\n              resolve(false);\n            } else {\n              ongoingSSLCertificateCheck = false;\n              lastSSLCertificateCheckTime = undefined;\n              resolve(true);\n            }\n          },\n          CLOUD_HOST,\n          CLOUD_FINGERPRINTS_SHA1,\n        );\n      } else {\n        setTimeout(() => { ongoingSSLCertificateCheck = false; }, SSL_CHECK_INTERVALL);\n        resolve(true);\n      }\n    } else {\n      resolve(true);\n    }\n  });\n}\n",
+    "static": true,
+    "longname": "/Users/vesa/code/JS-SDK/docs/src/connection/send-utilities.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 69,
+    "kind": "variable",
+    "name": "SSL_CHECK_INTERVALL",
+    "memberof": "src/connection/send-utilities.js",
+    "static": true,
+    "longname": "src/connection/send-utilities.js~SSL_CHECK_INTERVALL",
+    "access": "public",
+    "export": false,
+    "importPath": "cozify-sdk/src/connection/send-utilities.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 9,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 70,
     "kind": "function",
-    "name": "hubErrorState",
+    "name": "compareVersions",
     "memberof": "src/connection/send-utilities.js",
     "generator": false,
     "async": false,
     "static": true,
-    "longname": "src/connection/send-utilities.js~hubErrorState",
+    "longname": "src/connection/send-utilities.js~compareVersions",
+    "access": "public",
+    "export": false,
+    "importPath": "cozify-sdk/src/connection/send-utilities.js",
+    "importStyle": null,
+    "description": "",
+    "lineNumber": 14,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "v1",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "v2",
+        "description": ""
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 71,
+    "kind": "function",
+    "name": "getAPIversion",
+    "memberof": "src/connection/send-utilities.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/connection/send-utilities.js~getAPIversion",
     "access": "public",
     "export": true,
     "importPath": "cozify-sdk/src/connection/send-utilities.js",
-    "importStyle": "{hubErrorState}",
+    "importStyle": "{getAPIversion}",
     "description": "",
-    "lineNumber": 42,
+    "lineNumber": 33,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "hubVersion",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "maxVersion",
+        "description": ""
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 72,
+    "kind": "function",
+    "name": "cloudErrorState",
+    "memberof": "src/connection/send-utilities.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/connection/send-utilities.js~cloudErrorState",
+    "access": "public",
+    "export": true,
+    "importPath": "cozify-sdk/src/connection/send-utilities.js",
+    "importStyle": "{cloudErrorState}",
+    "description": "",
+    "lineNumber": 51,
     "params": [
       {
         "nullable": null,
@@ -1174,18 +1282,51 @@
     }
   },
   {
-    "__docId__": 69,
+    "__docId__": 73,
+    "kind": "function",
+    "name": "hubErrorState",
+    "memberof": "src/connection/send-utilities.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/connection/send-utilities.js~hubErrorState",
+    "access": "public",
+    "export": true,
+    "importPath": "cozify-sdk/src/connection/send-utilities.js",
+    "importStyle": "{hubErrorState}",
+    "description": "",
+    "lineNumber": 80,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "error",
+        "description": ""
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 74,
     "kind": "variable",
-    "name": "_ongoingSSLCertificateCheck",
+    "name": "ongoingSSLCertificateCheck",
     "memberof": "src/connection/send-utilities.js",
     "static": true,
-    "longname": "src/connection/send-utilities.js~_ongoingSSLCertificateCheck",
-    "access": "private",
+    "longname": "src/connection/send-utilities.js~ongoingSSLCertificateCheck",
+    "access": "public",
     "export": false,
     "importPath": "cozify-sdk/src/connection/send-utilities.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 65,
+    "lineNumber": 103,
     "undocument": true,
     "type": {
       "types": [
@@ -1195,18 +1336,18 @@
     "ignore": true
   },
   {
-    "__docId__": 70,
+    "__docId__": 75,
     "kind": "variable",
-    "name": "_lastSSLCertificateCheckTime",
+    "name": "lastSSLCertificateCheckTime",
     "memberof": "src/connection/send-utilities.js",
     "static": true,
-    "longname": "src/connection/send-utilities.js~_lastSSLCertificateCheckTime",
-    "access": "private",
+    "longname": "src/connection/send-utilities.js~lastSSLCertificateCheckTime",
+    "access": "public",
     "export": false,
     "importPath": "cozify-sdk/src/connection/send-utilities.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 66,
+    "lineNumber": 104,
     "undocument": true,
     "type": {
       "types": [
@@ -1216,7 +1357,7 @@
     "ignore": true
   },
   {
-    "__docId__": 71,
+    "__docId__": 76,
     "kind": "function",
     "name": "testSSLCertificate",
     "memberof": "src/connection/send-utilities.js",
@@ -1229,7 +1370,7 @@
     "importPath": "cozify-sdk/src/connection/send-utilities.js",
     "importStyle": "{testSSLCertificate}",
     "description": "",
-    "lineNumber": 72,
+    "lineNumber": 110,
     "params": [
       {
         "nullable": null,
@@ -1249,29 +1390,29 @@
     }
   },
   {
-    "__docId__": 72,
+    "__docId__": 77,
     "kind": "file",
     "name": "src/connection/send.js",
-    "content": "// \nimport isEmpty from 'lodash/isEmpty'\nimport isArray from 'lodash/isArray'\nimport axios from 'axios'\nimport axiosRetry from 'axios-retry'\nimport { urlBase64Decode } from '../utils.js'\nimport { COMMANDS, CLOUD_CONNECTION_STATES, CLOUD_HOST, CLOUD_URL, CLOUD_API_VERSION, CLOUD_FINGERPRINTS_SHA1, HUB_CONNECTION_STATES } from './constants'\nimport { cloudErrorState, hubErrorState, testSSLCertificate } from './send-utilities'\nimport { setCloudConnectionState, setHubConnectionState } from './state'\nimport { userState } from \"../reducers/user\";\nimport { store } from \"../store\"\n\nimport {retryCondition} from './send-retry'\n\n\n\nexport {COMMANDS}\n\nlet _refreshingToken = false;\n\n/*\n * Refresh Auth key call\n */\nfunction refreshAuthKey(authKey) {\n  if (!_refreshingToken) {\n    _refreshingToken = true\n    send( {command: COMMANDS.REFRESH_AUTHKEY, authKey: authKey} )\n    .then((response) => {\n      setTimeout(function() { _refreshingToken = false; }, 1000 * 60  * 10); //10min\n      if (response.length > 10) {\n          store.dispatch(userState.actions.setAuthKey(response));\n      }\n    })\n    .catch((error) => {\n      _refreshingToken = false\n    });\n  }\n}\n\n/*\n * Token refresh\n */\nfunction testAndRefreshToken(key) {\n    let exp = null;\n    let header = {};\n    let payload = {};\n    let diff = null;\n\n    if (key) {\n        const tokenParts = key.split('.');\n        header = JSON.parse(urlBase64Decode(tokenParts[0]));\n        payload = JSON.parse(urlBase64Decode(tokenParts[1]));\n    }\n\n    if ((header && header.exp) || (payload != null && payload.exp)) {\n        exp = header.exp ? header.exp : payload.exp\n    }\n\n    if (exp) {\n        diff = exp - Math.round(new Date().getTime() / 1000)\n    }\n\n    if (!diff || diff < 0) {\n      // User is unauthenticated\n      setCloudConnectionState(CLOUD_CONNECTION_STATES.UNAUTHENTICATED);\n    } else if (diff && diff <  5 * 24 * 60 * 60) {\n      // refresh if < 5 days to exp date\n      refreshAuthKey(key);\n    }\n\n}\n\n/**\n * Send multiple requests\n * @param  {Array<Oject>} requests - requests to be send\n * @return {Promise}\n */\nexport function sendAll(requests) {\n  return new Promise( (resolve, reject) => {\n\n    Promise.all(requests)\n    .then(results => {\n        // Use the data from the results like so:\n        // results[0].data\n        // results[1].data\n      resolve()\n    })\n    .catch(error => {\n        // do whatever\n      resolve()\n    });\n\n  });\n\n}\n\n/* Flag to indicate SSL failures */\nlet _permanentSSLFailure = false;\n\n/**\n * Send method for REST API\n * @param {COMMAND_TYPE} params\n *\n * @return {Promise}\n *\n * @example\n *   send( {command: COMMANDS.USER_LOGIN,  data:{email:email, password:password} })\n *   .then((response) => {...});\n *\n * @example\n *   send( {command: COMMANDS.CMD_DEVICE, authKey: authKey, hubKey: hubKey, data:[{id:deviceId, state:state}] })\n *   .then((response) => {...});\n *\n * @example\n *   send( {url: hubURL + \"/hub\"} )\n *   .then((hubData) => {...});\n *\n */\nexport function send({command, localUrl, hubId, url, method, authKey, hubKey, type, config, data}) {\n  if (method == null) {\n    method = 'GET';\n  }\n\n  let body = data;\n  /*\n  if (isArray(data)) {\n    body = [];\n    body.push({});\n  }\n  */\n  //console.log(\"send: command \", command);\n  // Flag to indicate are we using remote (vrs.local) connection\n  let remoteConnection = false;\n\n  // Flag to indicate are we sending hub command meaning using commandAPI (vrs. some cloud/videocloud command like login, log etc)\n  const hubCommand = isEmpty(hubId) ? false : true;\n\n  if (typeof command != \"undefined\" && command){\n    if (command.method) {\n      method = command.method;\n    }\n    if (isEmpty(url) && command.url) {\n      url = command.url;\n    }\n\n    if (url){\n      var parts = url.split('hub/remote')\n      if (parts && parts[1]){\n        if (localUrl) {\n            url = localUrl + parts[1]\n            if (hubKey) {\n              authKey = hubKey;\n              hubKey = null;\n            }\n          }\n      }\n    }\n\n    if (url && url.indexOf(CLOUD_URL) > -1) {\n      remoteConnection = true;\n    }\n\n    if (command.type && body) {\n        if (isArray(body)) {\n          body[0]['type'] = command.type;\n        } else {\n          body['type'] = command.type;\n        }\n    }\n\n    /*\n    if (command.params) {\n      command.params.forEach(param => {\n        if (isArray(data)){\n          body[0][param] = data[param];\n        } else {\n          body[param] = data[param];\n        }\n      });\n    } */\n\n    if (command.urlParams) {\n      let params = [];\n      command.urlParams.forEach(param => {\n          if (data && data[param] !== undefined){\n            params.push(encodeURIComponent(param) + '=' + encodeURIComponent(data[param]));\n          }\n      });\n      if (url && params.length > 0) {\n        url = url + \"?\" + params.join('&');\n      }\n    }\n\n    if (command.config) {\n      config = command.config;\n    }\n\n  }\n\n  const bodyString = JSON.stringify(body);\n\n  const reqConf ={\n    timeout: 1000,\n    method: method,\n    //withCredentials: false,\n    headers: {\n      'Accept': 'application/json, application/binary, text/plain, */*',\n      'Content-Type': 'application/json;charset=UTF-8',\n      'Authorization': authKey ? authKey : null,\n      'X-Hub-Key': hubKey ? hubKey : null\n    },\n    crossDomain: true,\n    responseType: 'application/json',\n    url: url,\n    data: isEmpty(bodyString) ? null : bodyString\n  }\n\n  Object.assign(reqConf, config);\n\n  return new Promise( (resolve, reject) => {\n    if (command || url) {\n\n      axios.interceptors.response.use(response => {\n        if(response.headers['content-type'] === 'application/json' || response.headers['content-type'] === 'application/binary') {\n          return response\n        }\n        else {\n         console.error(\"send: unknown response type\");\n         debugger;\n         return Promise.reject(response);\n        }\n      }, error => Promise.reject(error));\n\n      //retries if it is a network error or a 5xx error on an idempotent request (GET, HEAD, OPTIONS, PUT or DELETE).\n      axiosRetry(axios, { retries: 3, shouldResetTimeout: true, retryCondition: retryCondition });\n\n      testSSLCertificate(remoteConnection)\n      .then(function (status) {\n        // Cancel request if SSL Certificate status is invalid\n        if (!status || _permanentSSLFailure) {\n\n          _permanentSSLFailure = true;\n          reject(new Error('SDK Error: SSL failure.'));\n\n        } else {\n\n          // SSL is ok,\n          // check if auth Key needs to be refreshed\n          if (authKey) {\n            testAndRefreshToken(authKey);\n          }\n\n          // Send command\n          // See options: https://github.com/axios/axios#request-config\n          axios(reqConf)\n          .then(function (response) {\n            // console.error(\"send: response \", response);\n            if (remoteConnection){\n              setCloudConnectionState(CLOUD_CONNECTION_STATES.CONNECTED)\n            } else if (hubId) {\n              setHubConnectionState({hubId: hubId, state:HUB_CONNECTION_STATES.LOCAL})\n            }\n            resolve(response.data);\n\n          })\n          .catch(function (error) {\n            if (error && error.response){\n              // The request was made and the server responded with a status code\n              // that falls out of the range of 2xx\n              if (remoteConnection) {\n                  if (command !== COMMANDS.CLOUD_META){\n                    setCloudConnectionState(cloudErrorState(error))\n                  }\n                  if (hubCommand && hubId) {\n                    setHubConnectionState({hubId: hubId, state: hubErrorState(error)})\n                  }\n              } else {\n                // Local connection\n                // 401 means also cloud auth refresh is required\n                if (error && error.response && error.response.status === 401) {\n                  setCloudConnectionState(cloudErrorState(error))\n                }\n                if (hubCommand && hubId) {\n                  setHubConnectionState({hubId: hubId, state: hubErrorState(error)})\n                }\n              }\n            } else if (error.request) {\n              // The request was made but no response was received\n              // `error.request` is an instance of XMLHttpRequest in the browser and an instance of\n              // http.ClientRequest in node.js\n              if (remoteConnection) {\n                setCloudConnectionState(CLOUD_CONNECTION_STATES.UNCONNECTED)\n                if (hubCommand && hubId) {\n                    setHubConnectionState({hubId: hubId, state: HUB_CONNECTION_STATES.UNCONNECTED})\n                }\n              } else {\n                // Local connection\n                if (hubCommand && hubId) {\n                  setHubConnectionState({hubId: hubId, state: HUB_CONNECTION_STATES.UNCONNECTED})\n                }\n              }\n            } else {\n              // Something happened in setting up the request that triggered an Error\n              if (remoteConnection) {\n                setCloudConnectionState(CLOUD_CONNECTION_STATES.UNCONNECTED)\n                if (hubCommand && hubId) {\n                    setHubConnectionState({hubId: hubId, state: HUB_CONNECTION_STATES.UNCONNECTED})\n                }\n              } else {\n                // Local connection\n                if (hubCommand && hubId) {\n                  setHubConnectionState({hubId: hubId, state: HUB_CONNECTION_STATES.UNCONNECTED})\n                }\n              }\n            }\n            console.error('SDK send: error ', error);\n            reject(new Error('SDK Error: Send error'));\n          });\n        }\n      });\n    } else {\n      reject(new Error('SDK Error: Command or Command API URL not found.'));\n    }\n  });\n\n\n}\n",
+    "content": "// \nimport isEmpty from 'lodash/isEmpty';\nimport isArray from 'lodash/isArray';\nimport axios from 'axios';\nimport axiosRetry from 'axios-retry';\n// import rax from 'retry-axios';\nimport { urlBase64Decode } from '../utils';\nimport {\n  COMMANDS, CLOUD_CONNECTION_STATES, CLOUD_URL, HUB_CONNECTION_STATES, MAX_API_VERSION,\n} from './constants';\nimport {\n  cloudErrorState, hubErrorState, testSSLCertificate, getAPIversion,\n} from './send-utilities';\nimport { setCloudConnectionState, setHubConnectionState } from './state';\nimport { userState } from '../reducers/user';\nimport { hubsState } from '../reducers/hubs';\nimport { store } from '../store';\n\nimport { retryCondition, resetRetry } from './send-retry';\n\n\n\nexport { COMMANDS };\n\nlet refreshingToken = false;\n\n/* eslint no-use-before-define: [\"error\", { \"functions\": false }] */\n/*\n * Refresh Auth key call\n */\nfunction refreshAuthKey(authKey) {\n  if (!refreshingToken) {\n    refreshingToken = true;\n    send({ command: COMMANDS.REFRESH_AUTHKEY, authKey })\n      .then((response) => {\n        setTimeout(() => { refreshingToken = false; }, 1000 * 60 * 10); // 10min\n        if (response.length > 10) {\n          store.dispatch(userState.actions.setAuthKey(response));\n        }\n      })\n      .catch(() => {\n        refreshingToken = false;\n      });\n  }\n}\n\n/*\n * Token refresh\n */\nfunction testAndRefreshToken(key) {\n  let exp = null;\n  let header = {};\n  let payload = {};\n  let diff = null;\n\n  if (key) {\n    const tokenParts = key.split('.');\n    header = JSON.parse(urlBase64Decode(tokenParts[0]));\n    payload = JSON.parse(urlBase64Decode(tokenParts[1]));\n  }\n\n  if ((header && header.exp) || (payload != null && payload.exp)) {\n    exp = header.exp ? header.exp : payload.exp;\n  }\n\n  if (exp) {\n    diff = exp - Math.round(new Date().getTime() / 1000);\n  }\n\n  if (!diff || diff < 0) {\n    // User is unauthenticated\n    setCloudConnectionState(CLOUD_CONNECTION_STATES.UNAUTHENTICATED);\n  } else if (diff && diff < 5 * 24 * 60 * 60) {\n    // refresh if < 5 days to exp date\n    refreshAuthKey(key);\n  }\n}\n\n/**\n * Send multiple requests\n * @param  {Array<Oject>} requests - requests to be send\n * @return {Promise}\n */\nexport function sendAll(requests) {\n  return new Promise((resolve) => {\n    Promise.all(requests)\n      .then(() => {\n        // Use the data from the results like so:\n        // results[0].data\n        // results[1].data\n        resolve();\n      })\n      .catch(() => {\n        // do whatever\n        resolve();\n      });\n  });\n}\n\naxiosRetry(axios, {\n  // retries: 1, DOESN'T WORK, see send_retry.js\n  retryCondition,\n  shouldResetTimeout: true,\n  retryDelay: (retryCount, error) => {\n    // console.error('axiosRetry ', retryCount); DOESN'T WORK , see send_retry.js\n    console.error('axiosRetry ', error);\n    return 1000; // retryCount * 1000;\n  },\n});\n\n/* Flag to indicate SSL failures */\nlet permanentSSLFailure = false;\n\n/**\n * Send method for REST API\n * @param {COMMAND_TYPE} params\n *\n * @return {Promise}\n *\n * @example\n *   send( {command: COMMANDS.USER_LOGIN,  data:{email:email, password:password} })\n *   .then((response) => {...});\n *\n * @example\n *   send( {command: COMMANDS.CMD_DEVICE, authKey: authKey, hubKey: hubKey, data:[{id:deviceId, state:state}] })\n *   .then((response) => {...});\n *\n * @example\n *   send( {url: hubURL + \"/hub\"} )\n *   .then((hubData) => {...});\n *\n */\nexport function send({\n  command, localUrl, url, timeout, method, authKey, hubKey, type, config, data, hubId,\n}) {\n  let sendMethod = method;\n  let sendUrl = url;\n  let sendAuthKey = authKey;\n  let sendHubKey = hubKey;\n  let sendConfig = config;\n  let sendType = type;\n\n  if (sendMethod == null) {\n    sendMethod = 'GET';\n  }\n  if (sendType == null) {\n    sendType = 'application/json;charset=UTF-8';\n  }\n  const body = data;\n  /*\n  if (isArray(data)) {\n    body = [];\n    body.push({});\n  }\n  */\n  // console.log(\"send: command \", command);\n  // Flag to indicate are we using remote (vrs.local) connection\n  let remoteConnection = false;\n\n  // Flag to indicate are we sending hub command meaning using commandAPI (vrs. some cloud/videocloud command like login, log etc)\n  const hubCommand = !isEmpty(hubId);\n\n\n  if (typeof command !== 'undefined' && command) {\n    if (command.method) {\n      sendMethod = command.method;\n    }\n    if (isEmpty(sendUrl) && command.url) {\n      // command with Hub API version\n      if (command.url.indexOf('$API_VER') !== -1) {\n        const stateNow = store.getState();\n        const hubs = hubsState.selectors.getHubs(stateNow);\n        if (!hubs[hubId] || !hubs[hubId].hubKey) {\n          return new Promise((resolve, reject) => {\n            reject(new Error('SDK Error: Send - No Hub id error'));\n          });\n        }\n        const hub = hubs[hubId];\n        if (!hub.version || (hub.connectionState === HUB_CONNECTION_STATES.UNCONNECTED && command.url.indexOf('hub/remote/hub') === -1)) {\n          return new Promise((resolve, reject) => {\n            reject(new Error('SDK Error: Send - No Hub connection error'));\n          });\n        }\n        const hubVersion = getAPIversion(hub.version, MAX_API_VERSION);\n        sendUrl = command.url.replace('$API_VER', hubVersion);\n      } else {\n        sendUrl = command.url;\n      }\n    }\n\n    if (sendUrl) {\n      const parts = sendUrl.split('hub/remote');\n      if (parts && parts[1]) {\n        if (localUrl) {\n          sendUrl = localUrl + parts[1];\n          if (sendHubKey) {\n            sendAuthKey = sendHubKey;\n            sendHubKey = null;\n          }\n        }\n      }\n    }\n\n    if (sendUrl && sendUrl.indexOf(CLOUD_URL) > -1) {\n      remoteConnection = true;\n    }\n\n    if (command.type && body) {\n      if (isArray(body)) {\n        body[0].type = command.type;\n      } else {\n        body.type = command.type;\n      }\n    }\n\n    /*\n    if (command.params) {\n      command.params.forEach(param => {\n        if (isArray(data)){\n          body[0][param] = data[param];\n        } else {\n          body[param] = data[param];\n        }\n      });\n    } */\n\n    if (command.urlParams) {\n      const params = [];\n      command.urlParams.forEach((param) => {\n        if (data && data[param] !== undefined) {\n          params.push(`${encodeURIComponent(param)}=${encodeURIComponent(data[param])}`);\n        }\n      });\n      if (sendUrl && params.length > 0) {\n        sendUrl = `${sendUrl}?${params.join('&')}`;\n      }\n    }\n\n    if (command.config) {\n      sendConfig = command.config;\n    }\n  }\n\n  const bodyString = JSON.stringify(body);\n\n  const reqConf = {\n    timeout: timeout || 1000,\n    method: sendMethod,\n    // withCredentials: false,\n    headers: {\n      Accept: 'application/json, application/binary, text/plain, */*',\n      'Content-Type': sendType,\n      Authorization: sendAuthKey || null,\n      'X-Hub-Key': sendHubKey || null,\n    },\n    crossDomain: true,\n    responseType: 'application/json',\n    url: sendUrl,\n    data: isEmpty(bodyString) ? null : bodyString,\n  };\n\n  Object.assign(reqConf, sendConfig);\n\n  return new Promise((resolve, reject) => {\n    if (command || sendUrl) {\n      axios.interceptors.response.use((response) => {\n        if (response.headers['content-type'] === 'application/json' || response.headers['content-type'] === 'application/binary') {\n          resetRetry(sendUrl);\n          return response;\n        }\n        console.error('send: unknown response type');\n        return Promise.reject(response);\n      }, (error) => Promise.reject(error));\n      /*\n      axios.interceptors.request.use((reqConfig) => {\n        //if (reqConfig.url.indexOf('192.168.1.119') !== -1) debugger;\n        const rConfig = reqConfig;\n        const retryState = rConfig['axios-retry'] || {};\n        if (retryState.retryCount > 0) {\n          rConfig.headers['x-retry-count'] = retryState.retryCount;\n        }\n        return rConfig;\n      });\n      */\n      // retries if it is a network error or a 5xx error on an idempotent request (GET, HEAD, OPTIONS, PUT or DELETE).\n      // axiosRetry(axios, {\n      //  retries: 3, shouldResetTimeout: false, retryDelay: axiosRetry.exponentialDelay, retryCondition,\n      // });\n      //\n\n      testSSLCertificate(remoteConnection)\n        .then((status) => {\n        // Cancel request if SSL Certificate status is invalid\n          if (!status || permanentSSLFailure) {\n            permanentSSLFailure = true;\n            reject(new Error('SDK Error: SSL failure.'));\n          } else {\n          // SSL is ok,\n            // check if auth Key needs to be refreshed\n            if (sendAuthKey) {\n              testAndRefreshToken(sendAuthKey);\n            }\n\n            // Send command\n            // See options: https://github.com/axios/axios#request-config\n            axios(reqConf)\n              .then((response) => {\n                // console.error(\"send: response \", response);\n                if (remoteConnection) {\n                  setCloudConnectionState(CLOUD_CONNECTION_STATES.CONNECTED);\n                } else if (hubId) {\n                  setHubConnectionState({ hubId, state: HUB_CONNECTION_STATES.LOCAL });\n                }\n                resolve(response.data);\n              })\n              .catch((error) => {\n                if (error && error.response) {\n                  // The request was made and the server responded with a status code\n                  // that falls out of the range of 2xx\n                  if (remoteConnection) {\n                    if (command !== COMMANDS.CLOUD_META) {\n                      setCloudConnectionState(cloudErrorState(error));\n                    }\n                    if (hubCommand && hubId) {\n                      setHubConnectionState({ hubId, state: hubErrorState(error) });\n                    }\n                  } else {\n                    // Local connection\n                    // 401 means also cloud auth refresh is required\n                    if (error && error.response && error.response.status === 401) {\n                      setCloudConnectionState(cloudErrorState(error));\n                    }\n                    if (hubCommand && hubId) {\n                      setHubConnectionState({ hubId, state: hubErrorState(error) });\n                    }\n                  }\n                } else if (error.request) {\n                  // The request was made but no response was received\n                  // `error.request` is an instance of XMLHttpRequest in the browser and an instance of\n                  // http.ClientRequest in node.js\n                  if (remoteConnection) {\n                    setCloudConnectionState(CLOUD_CONNECTION_STATES.UNCONNECTED);\n                    if (hubCommand && hubId) {\n                      setHubConnectionState({ hubId, state: HUB_CONNECTION_STATES.UNCONNECTED });\n                    }\n                  } else if (hubCommand && hubId) {\n                    // Local connection\n                    setHubConnectionState({ hubId, state: HUB_CONNECTION_STATES.UNCONNECTED });\n                  }\n                } else if (remoteConnection) {\n                  // Something happened in setting up the request that triggered an Error\n                  setCloudConnectionState(CLOUD_CONNECTION_STATES.UNCONNECTED);\n                  if (hubCommand && hubId) {\n                    setHubConnectionState({ hubId, state: HUB_CONNECTION_STATES.UNCONNECTED });\n                  }\n                } else if (hubCommand && hubId) {\n                  // Local connection\n                  setHubConnectionState({ hubId, state: HUB_CONNECTION_STATES.UNCONNECTED });\n                }\n                console.error('SDK send: error ', error);\n                reject(new Error('SDK Error: Send error'));\n              });\n          }\n        });\n    } else {\n      reject(new Error('SDK Error: Command or Command API URL not found.'));\n    }\n  });\n}\n",
     "static": true,
-    "longname": "/Users/vesalindfors/Code/JS-SDK/docs/src/connection/send.js",
+    "longname": "/Users/vesa/code/JS-SDK/docs/src/connection/send.js",
     "access": "public",
     "description": null,
     "lineNumber": 1
   },
   {
-    "__docId__": 73,
+    "__docId__": 78,
     "kind": "variable",
-    "name": "_refreshingToken",
+    "name": "refreshingToken",
     "memberof": "src/connection/send.js",
     "static": true,
-    "longname": "src/connection/send.js~_refreshingToken",
-    "access": "private",
+    "longname": "src/connection/send.js~refreshingToken",
+    "access": "public",
     "export": false,
     "importPath": "cozify-sdk/src/connection/send.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 19,
+    "lineNumber": 25,
     "undocument": true,
     "type": {
       "types": [
@@ -1281,7 +1422,7 @@
     "ignore": true
   },
   {
-    "__docId__": 74,
+    "__docId__": 79,
     "kind": "function",
     "name": "refreshAuthKey",
     "memberof": "src/connection/send.js",
@@ -1294,7 +1435,7 @@
     "importPath": "cozify-sdk/src/connection/send.js",
     "importStyle": null,
     "description": "",
-    "lineNumber": 24,
+    "lineNumber": 31,
     "params": [
       {
         "nullable": null,
@@ -1311,7 +1452,7 @@
     "ignore": true
   },
   {
-    "__docId__": 75,
+    "__docId__": 80,
     "kind": "function",
     "name": "testAndRefreshToken",
     "memberof": "src/connection/send.js",
@@ -1324,7 +1465,7 @@
     "importPath": "cozify-sdk/src/connection/send.js",
     "importStyle": null,
     "description": "",
-    "lineNumber": 43,
+    "lineNumber": 50,
     "params": [
       {
         "nullable": null,
@@ -1341,7 +1482,7 @@
     "ignore": true
   },
   {
-    "__docId__": 76,
+    "__docId__": 81,
     "kind": "function",
     "name": "sendAll",
     "memberof": "src/connection/send.js",
@@ -1354,7 +1495,7 @@
     "importPath": "cozify-sdk/src/connection/send.js",
     "importStyle": "{sendAll}",
     "description": "Send multiple requests",
-    "lineNumber": 78,
+    "lineNumber": 84,
     "params": [
       {
         "nullable": null,
@@ -1377,18 +1518,18 @@
     }
   },
   {
-    "__docId__": 77,
+    "__docId__": 82,
     "kind": "variable",
-    "name": "_permanentSSLFailure",
+    "name": "permanentSSLFailure",
     "memberof": "src/connection/send.js",
     "static": true,
-    "longname": "src/connection/send.js~_permanentSSLFailure",
-    "access": "private",
+    "longname": "src/connection/send.js~permanentSSLFailure",
+    "access": "public",
     "export": false,
     "importPath": "cozify-sdk/src/connection/send.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 98,
+    "lineNumber": 112,
     "undocument": true,
     "type": {
       "types": [
@@ -1398,7 +1539,7 @@
     "ignore": true
   },
   {
-    "__docId__": 78,
+    "__docId__": 83,
     "kind": "function",
     "name": "send",
     "memberof": "src/connection/send.js",
@@ -1416,7 +1557,7 @@
       "  send( {command: COMMANDS.CMD_DEVICE, authKey: authKey, hubKey: hubKey, data:[{id:deviceId, state:state}] })\n  .then((response) => {...});",
       "  send( {url: hubURL + \"/hub\"} )\n  .then((hubData) => {...});"
     ],
-    "lineNumber": 119,
+    "lineNumber": 133,
     "params": [
       {
         "nullable": null,
@@ -1439,18 +1580,18 @@
     }
   },
   {
-    "__docId__": 79,
+    "__docId__": 84,
     "kind": "file",
     "name": "src/connection/state.js",
-    "content": "// \n\nimport { connectionsState, connectionsReducer } from \"../reducers/connections\";\nimport { hubsState, hubsReducer } from \"../reducers/hubs\"\nimport { store } from \"../store\"\nimport { CLOUD_CONNECTION_STATES, HUB_CONNECTION_STATES } from './constants'\n\n\n/**\n * Change Cloud connection state\n * @param {HUB_CONNECTION_STATE_TYPE} state\n */\nexport function setCloudConnectionState(state) {\n    store.dispatch(connectionsState.actions.setCloudConnectionState(state));\n}\n\n/**\n * Get Cloud connection state\n * @return {CLOUD_CONNECTION_STATE_TYPE}\n */\nexport function getCloudConnectionState(){\n  const stateNow = store.getState();\n  return connectionsState.selectors.getConnections(stateNow).cloudState;\n}\n\n/**\n * Change hub connection state\n * @param {{hubId: string, state: HUB_CONNECTION_STATE_TYPE}} hubAndState - hubId and new state\n */\nexport function setHubConnectionState(hubAndState) {\n    const stateNow = store.getState()\n    const storedHubs = hubsState.selectors.getHubs(stateNow)\n    /* If hub is unconnected, lets try remote */\n    if (hubAndState.state === HUB_CONNECTION_STATES.UNCONNECTED && storedHubs[hubAndState.hubId]){\n      if (storedHubs[hubAndState.hubId].connectionState === HUB_CONNECTION_STATES.REMOTE){\n        hubAndState.state = HUB_CONNECTION_STATES.LOCAL\n      }\n    }\n    store.dispatch(hubsState.actions.setHubConnectionState(hubAndState));\n}\n/**\n * Get hub connection state by hub id\n * @param  {string} hubId\n * @return {HUB_CONNECTION_STATE_TYPE}\n */\nexport function getHubConnectionState(hubId) {\n  const stateNow = store.getState();\n  if (hubsState.selectors.getHubs(stateNow)[hubId]){\n    return hubsState.selectors.getHubs(stateNow)[hubId].connectionState;\n  }\n  return HUB_CONNECTION_STATES.UNCONNECTED\n}\n\n\n",
+    "content": "// \n\nimport { connectionsState } from '../reducers/connections';\nimport { hubsState } from '../reducers/hubs';\nimport { store } from '../store';\nimport { HUB_CONNECTION_STATES } from './constants';\n\n\n/**\n * Change Cloud connection state\n * @param {HUB_CONNECTION_STATE_TYPE} state\n */\nexport function setCloudConnectionState(state) {\n  store.dispatch(connectionsState.actions.setCloudConnectionState(state));\n}\n\n/**\n * Get Cloud connection state\n * @return {CLOUD_CONNECTION_STATE_TYPE}\n */\nexport function getCloudConnectionState() {\n  const stateNow = store.getState();\n  return connectionsState.selectors.getConnections(stateNow).cloudState;\n}\n\n/**\n * Change hub connection state\n * @param {{hubId: string, state: HUB_CONNECTION_STATE_TYPE}} hubAndState - hubId and new state\n */\nexport function setHubConnectionState(paramHubAndState) {\n  const stateNow = store.getState();\n  const storedHubs = hubsState.selectors.getHubs(stateNow);\n  const hubAndState = paramHubAndState;\n  /* If hub is unconnected, lets try remote */\n  if (hubAndState.state === HUB_CONNECTION_STATES.UNCONNECTED && storedHubs[hubAndState.hubId]) {\n    if (storedHubs[hubAndState.hubId].connectionState === HUB_CONNECTION_STATES.REMOTE) {\n      hubAndState.state = HUB_CONNECTION_STATES.LOCAL;\n    }\n  }\n  store.dispatch(hubsState.actions.setHubConnectionState(hubAndState));\n}\n/**\n * Get hub connection state by hub id\n * @param  {string} hubId\n * @return {HUB_CONNECTION_STATE_TYPE}\n */\nexport function getHubConnectionState(hubId) {\n  const stateNow = store.getState();\n  if (hubsState.selectors.getHubs(stateNow)[hubId]) {\n    return hubsState.selectors.getHubs(stateNow)[hubId].connectionState;\n  }\n  return HUB_CONNECTION_STATES.UNCONNECTED;\n}\n",
     "static": true,
-    "longname": "/Users/vesalindfors/Code/JS-SDK/docs/src/connection/state.js",
+    "longname": "/Users/vesa/code/JS-SDK/docs/src/connection/state.js",
     "access": "public",
     "description": null,
     "lineNumber": 1
   },
   {
-    "__docId__": 80,
+    "__docId__": 85,
     "kind": "function",
     "name": "setCloudConnectionState",
     "memberof": "src/connection/state.js",
@@ -1479,7 +1620,7 @@
     "return": null
   },
   {
-    "__docId__": 81,
+    "__docId__": 86,
     "kind": "function",
     "name": "getCloudConnectionState",
     "memberof": "src/connection/state.js",
@@ -1504,7 +1645,7 @@
     "params": []
   },
   {
-    "__docId__": 82,
+    "__docId__": 87,
     "kind": "function",
     "name": "setHubConnectionState",
     "memberof": "src/connection/state.js",
@@ -1533,7 +1674,7 @@
     "return": null
   },
   {
-    "__docId__": 83,
+    "__docId__": 88,
     "kind": "function",
     "name": "getHubConnectionState",
     "memberof": "src/connection/state.js",
@@ -1546,7 +1687,7 @@
     "importPath": "cozify-sdk/src/connection/state.js",
     "importStyle": "{getHubConnectionState}",
     "description": "Get hub connection state by hub id",
-    "lineNumber": 46,
+    "lineNumber": 47,
     "params": [
       {
         "nullable": null,
@@ -1569,29 +1710,29 @@
     }
   },
   {
-    "__docId__": 84,
+    "__docId__": 89,
     "kind": "file",
     "name": "src/devices/constants.js",
     "content": "// \n//\n\n\n",
     "static": true,
-    "longname": "/Users/vesalindfors/Code/JS-SDK/docs/src/devices/constants.js",
+    "longname": "/Users/vesa/code/JS-SDK/docs/src/devices/constants.js",
     "access": "public",
     "description": null,
     "lineNumber": 1
   },
   {
-    "__docId__": 85,
+    "__docId__": 90,
     "kind": "file",
     "name": "src/devices/device.js",
-    "content": "\n//\n\nimport { send, COMMANDS } from '../connection/send.js'\nimport { store } from \"../store.js\"\nimport { userState } from \"../reducers/user\"\nimport { hubsState } from \"../reducers/hubs\"\n\n/**\n * Device command to be sent\n * @param  {string} hubId\n * @param  {string} deviceId\n * @param  {Object} state\n * @return {Promise}\n */\nexport function sendDeviceCmd(hubId, deviceId, state) {\n  return new Promise( (resolve, reject) => {\n    const stateNow = store.getState()\n\n    const user = userState.selectors.getUser(stateNow);\n    if (!user || !user.authKey) {\n      reject(new Error(\"Device command error: No userKey!\"));\n      return;\n    }\n\n    const hubs = hubsState.selectors.getHubs(stateNow)\n    if (!hubs[hubId] || !hubs[hubId].hubKey) {\n      reject(new Error(\"Device command error: No hubKey!\"));\n      return;\n    }\n\n    const authKey = user.authKey;\n    const hubKey = hubs[hubId].hubKey;\n\n    send( {command: COMMANDS.CMD_DEVICE, authKey: authKey, hubKey: hubKey, data:[{id:deviceId, state:state}] })\n      .then((response) => {\n        resolve(response);\n      })\n      .catch((error) => {\n        //console.error(error);\n        reject(new Error(\"Device command error: send failed\"));\n      });\n  });\n}\n\n",
+    "content": "\n// \nimport isEmpty from 'lodash/isEmpty';\nimport pick from 'lodash/pick';\n\n\nimport { send, COMMANDS } from '../connection/send';\nimport { store } from '../store';\nimport { userState } from '../reducers/user';\nimport { hubsState } from '../reducers/hubs';\n\n\n/**\n * Device command to be sent\n * @param  {string} hubId\n * @param  {string} deviceId\n * @param  {Object} state\n * @param  {Array<string>} properties - optional properties\n * @return {Promise}\n */\nexport function sendDeviceCmd(hubId, deviceId, state, properties) {\n  return new Promise((resolve, reject) => {\n    const stateNow = store.getState();\n    const user = userState.selectors.getUser(stateNow);\n    if (!user || !user.authKey) {\n      reject(new Error('Device command error: No userKey!'));\n      return;\n    }\n\n    const hubs = hubsState.selectors.getHubs(stateNow);\n    if (!hubs[hubId] || !hubs[hubId].hubKey) {\n      reject(new Error('Device command error: No hubKey!'));\n      return;\n    }\n\n    const { authKey } = user;\n    const { hubKey } = hubs[hubId];\n    let sendState = state;\n    if (!isEmpty(properties)) {\n      sendState = pick(sendState, properties);\n    }\n\n    send({\n      command: COMMANDS.CMD_DEVICE, authKey, hubId, hubKey, data: [{ id: deviceId, state: sendState }],\n    })\n      .then((response) => {\n        console.debug('sendDeviceCmd ok', response);\n        resolve(response);\n      })\n      .catch((error) => {\n        console.error(error);\n        reject(new Error('Device command error!'));\n      });\n  });\n}\n",
     "static": true,
-    "longname": "/Users/vesalindfors/Code/JS-SDK/docs/src/devices/device.js",
+    "longname": "/Users/vesa/code/JS-SDK/docs/src/devices/device.js",
     "access": "public",
     "description": null,
     "lineNumber": 1
   },
   {
-    "__docId__": 86,
+    "__docId__": 91,
     "kind": "function",
     "name": "sendDeviceCmd",
     "memberof": "src/devices/device.js",
@@ -1604,7 +1745,7 @@
     "importPath": "cozify-sdk/src/devices/device.js",
     "importStyle": "{sendDeviceCmd}",
     "description": "Device command to be sent",
-    "lineNumber": 16,
+    "lineNumber": 21,
     "params": [
       {
         "nullable": null,
@@ -1635,6 +1776,16 @@
         "optional": false,
         "name": "state",
         "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Array<string>"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "properties",
+        "description": "optional properties"
       }
     ],
     "return": {
@@ -1647,18 +1798,79 @@
     }
   },
   {
-    "__docId__": 87,
+    "__docId__": 92,
     "kind": "file",
     "name": "src/devices/devices.js",
-    "content": "//\n\nimport { ROLES } from '../user/constants'\nimport { store } from '../store'\nimport { devicesState, devicesReducer } from '../reducers/devices'\n\n\n/**\n * Device handler for poll delta results\n * @param  {string} hubId\n * @param  {boolean} reset\n * @param  {Object} devices\n */\nexport function deviceDeltaHandler(hubId, reset, devices) {\n  let oldHubDevices = {}\n  const storedDevices = getDevices()\n  if (storedDevices && storedDevices[hubId]) {\n    oldHubDevices = storedDevices[hubId];\n  }\n\n  if (reset) {\n    // If reset then set  devices as they are received\n    const stateDevices = {\n      hubId: hubId,\n      devices: devices\n    };\n    store.dispatch(devicesState.actions.setDevices(stateDevices));\n  } else {\n    // Loop devices to check could it be added or should be removed\n    Object.entries(devices).forEach(([key, device]) => {\n      const stateDevice = {\n        hubId: hubId,\n        device: device\n      };\n      if (key && device) {\n        store.dispatch(devicesState.actions.setDevice(stateDevice));\n      } else if (key && oldHubDevices[key]) {\n        store.dispatch(devicesState.actions.deleteDevice(stateDevice));\n      }\n    });\n  }\n}\n\n/**\n * Get devices of given hub\n * @param  {string} hubId\n * @return {DEVICES_MAP_TYPE}\n */\nexport function getHubDevices(hubId) {\n  let retVal  = undefined;\n  const devices = getDevices();\n  if (devices && devices[hubId]) {\n    retVal = devices[hubId];\n  }\n  return retVal;\n}\n\n/**\n * Get devices of all selected hubs\n * @return {HUB_DEVICES_MAP_TYPE}\n */\nexport function getDevices() {\n  const stateNow = store.getState();\n  return devicesState.selectors.getDevices(stateNow)\n}\n\n",
+    "content": "// \nimport { store } from '../store';\nimport { devicesState } from '../reducers/devices';\n\n\n\n/**\n * Get devices of all selected hubs\n * @return {HUB_DEVICES_MAP_TYPE}\n */\nexport function getDevices() {\n  const stateNow = store.getState();\n  return devicesState.selectors.getDevices(stateNow);\n}\n\n/**\n * Get devices of given hub\n * @param  {string} hubId\n * @return {DEVICES_MAP_TYPE}\n */\nexport function getHubDevices(hubId) {\n  let retVal;\n  const devices = getDevices();\n  if (devices && devices[hubId]) {\n    retVal = devices[hubId];\n  }\n  return retVal;\n}\n\n/**\n * Device handler for poll delta results\n * @param  {string} hubId\n * @param  {boolean} reset\n * @param  {Object} devices\n */\nexport function deviceDeltaHandler(hubId, reset, devices) {\n  let oldHubDevices = {};\n  const storedDevices = getDevices();\n  if (storedDevices && storedDevices[hubId]) {\n    oldHubDevices = storedDevices[hubId];\n  }\n\n  if (reset) {\n    // If reset then set  devices as they are received\n    const stateDevices = {\n      hubId,\n      devices,\n    };\n    store.dispatch(devicesState.actions.setDevices(stateDevices));\n  } else {\n    // Loop devices to check could it be added or should be removed\n    Object.entries(devices).forEach(([key, device]) => {\n      const stateDevice = {\n        hubId,\n        device,\n      };\n      if (key && device) {\n        store.dispatch(devicesState.actions.setDevice(stateDevice));\n      } else if (key && oldHubDevices[key]) {\n        store.dispatch(devicesState.actions.deleteDevice(stateDevice));\n      }\n    });\n  }\n}\n",
     "static": true,
-    "longname": "/Users/vesalindfors/Code/JS-SDK/docs/src/devices/devices.js",
+    "longname": "/Users/vesa/code/JS-SDK/docs/src/devices/devices.js",
     "access": "public",
     "description": null,
     "lineNumber": 1
   },
   {
-    "__docId__": 88,
+    "__docId__": 93,
+    "kind": "function",
+    "name": "getDevices",
+    "memberof": "src/devices/devices.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/devices/devices.js~getDevices",
+    "access": "public",
+    "export": true,
+    "importPath": "cozify-sdk/src/devices/devices.js",
+    "importStyle": "{getDevices}",
+    "description": "Get devices of all selected hubs",
+    "lineNumber": 11,
+    "return": {
+      "nullable": null,
+      "types": [
+        "HUB_DEVICES_MAP_TYPE"
+      ],
+      "spread": false,
+      "description": ""
+    },
+    "params": []
+  },
+  {
+    "__docId__": 94,
+    "kind": "function",
+    "name": "getHubDevices",
+    "memberof": "src/devices/devices.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/devices/devices.js~getHubDevices",
+    "access": "public",
+    "export": true,
+    "importPath": "cozify-sdk/src/devices/devices.js",
+    "importStyle": "{getHubDevices}",
+    "description": "Get devices of given hub",
+    "lineNumber": 21,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "hubId",
+        "description": ""
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "DEVICES_MAP_TYPE"
+      ],
+      "spread": false,
+      "description": ""
+    }
+  },
+  {
+    "__docId__": 95,
     "kind": "function",
     "name": "deviceDeltaHandler",
     "memberof": "src/devices/devices.js",
@@ -1671,7 +1883,7 @@
     "importPath": "cozify-sdk/src/devices/devices.js",
     "importStyle": "{deviceDeltaHandler}",
     "description": "Device handler for poll delta results",
-    "lineNumber": 14,
+    "lineNumber": 36,
     "params": [
       {
         "nullable": null,
@@ -1707,79 +1919,18 @@
     "return": null
   },
   {
-    "__docId__": 89,
-    "kind": "function",
-    "name": "getHubDevices",
-    "memberof": "src/devices/devices.js",
-    "generator": false,
-    "async": false,
-    "static": true,
-    "longname": "src/devices/devices.js~getHubDevices",
-    "access": "public",
-    "export": true,
-    "importPath": "cozify-sdk/src/devices/devices.js",
-    "importStyle": "{getHubDevices}",
-    "description": "Get devices of given hub",
-    "lineNumber": 49,
-    "params": [
-      {
-        "nullable": null,
-        "types": [
-          "string"
-        ],
-        "spread": false,
-        "optional": false,
-        "name": "hubId",
-        "description": ""
-      }
-    ],
-    "return": {
-      "nullable": null,
-      "types": [
-        "DEVICES_MAP_TYPE"
-      ],
-      "spread": false,
-      "description": ""
-    }
-  },
-  {
-    "__docId__": 90,
-    "kind": "function",
-    "name": "getDevices",
-    "memberof": "src/devices/devices.js",
-    "generator": false,
-    "async": false,
-    "static": true,
-    "longname": "src/devices/devices.js~getDevices",
-    "access": "public",
-    "export": true,
-    "importPath": "cozify-sdk/src/devices/devices.js",
-    "importStyle": "{getDevices}",
-    "description": "Get devices of all selected hubs",
-    "lineNumber": 62,
-    "return": {
-      "nullable": null,
-      "types": [
-        "HUB_DEVICES_MAP_TYPE"
-      ],
-      "spread": false,
-      "description": ""
-    },
-    "params": []
-  },
-  {
-    "__docId__": 91,
+    "__docId__": 96,
     "kind": "file",
     "name": "src/hubs/constants.js",
-    "content": "// \n//\n/**\n  * Enumeration of hub state, that could be\n  * UNCLAIMED, CLAIMED, TOO_NEW_VERSION, NO_ACCESS or CONNECTED\n  * @readonly\n  * @enum {string}\n  */\nexport const HUB_STATES = Object.freeze({\n  UNCLAIMED: 'unclaimed',\n  CLAIMED: 'claimed',\n  TOO_NEW_VERSION: 'new version',\n  NO_ACCESS: 'no access',\n  CONNECTED: 'connected',\n});\n\n\n\n/*\n * Intervall defining how often hubkeys and metadatas are fetched\n */\nexport const DISCOVERY_INTERVAL_MS = 45 * 1000\n\n/*\n * Interval defining how often hubs are polled at max\n * This value is used as is in local connection, and multiplied in remote connection\n */\nexport const POLL_INTERVAL_MS = 1 * 1000\n\nexport const HUB_PROTOCOL = 'http://'\nexport const HUB_PORT = '8893'\n\n",
+    "content": "// \n//\n/**\n  * Enumeration of hub state, that could be\n  * UNCLAIMED, CLAIMED, TOO_NEW_VERSION, NO_ACCESS or CONNECTED\n  * @readonly\n  * @enum {string}\n  */\nexport const HUB_STATES = Object.freeze({\n  UNCLAIMED: 'unclaimed',\n  CLAIMED: 'claimed',\n  TOO_NEW_VERSION: 'new version',\n  NO_ACCESS: 'no access',\n  CONNECTED: 'connected',\n});\n\n\n\n/*\n * Intervall defining how often hubkeys and metadatas are fetched\n */\nexport const DISCOVERY_INTERVAL_MS = 45 * 1000;\n\n/*\n * Interval defining how often hubs are polled at max\n * This value is used as is in local connection, and multiplied in remote connection\n */\nexport const POLL_INTERVAL_MS = 1 * 1000;\n\nexport const HUB_PROTOCOL = 'http://';\nexport const HUB_PORT = '8893';\n",
     "static": true,
-    "longname": "/Users/vesalindfors/Code/JS-SDK/docs/src/hubs/constants.js",
+    "longname": "/Users/vesa/code/JS-SDK/docs/src/hubs/constants.js",
     "access": "public",
     "description": null,
     "lineNumber": 1
   },
   {
-    "__docId__": 92,
+    "__docId__": 97,
     "kind": "variable",
     "name": "HUB_STATES",
     "memberof": "src/hubs/constants.js",
@@ -1808,7 +1959,7 @@
     }
   },
   {
-    "__docId__": 93,
+    "__docId__": 98,
     "kind": "variable",
     "name": "DISCOVERY_INTERVAL_MS",
     "memberof": "src/hubs/constants.js",
@@ -1828,7 +1979,7 @@
     }
   },
   {
-    "__docId__": 94,
+    "__docId__": 99,
     "kind": "variable",
     "name": "POLL_INTERVAL_MS",
     "memberof": "src/hubs/constants.js",
@@ -1848,7 +1999,7 @@
     }
   },
   {
-    "__docId__": 95,
+    "__docId__": 100,
     "kind": "variable",
     "name": "HUB_PROTOCOL",
     "memberof": "src/hubs/constants.js",
@@ -1868,7 +2019,7 @@
     }
   },
   {
-    "__docId__": 96,
+    "__docId__": 101,
     "kind": "variable",
     "name": "HUB_PORT",
     "memberof": "src/hubs/constants.js",
@@ -1888,29 +2039,29 @@
     }
   },
   {
-    "__docId__": 97,
+    "__docId__": 102,
     "kind": "file",
     "name": "src/hubs/hubs.js",
-    "content": "// \nimport isEmpty from 'lodash/isEmpty'\nimport { HUB_STATES, POLL_INTERVAL_MS, HUB_PROTOCOL, HUB_PORT, DISCOVERY_INTERVAL_MS } from './constants'\nimport { USER_STATES } from '../user/constants';\nimport { HUB_CONNECTION_STATES } from '../connection/constants'\nimport { COMMANDS, send, sendAll } from '../connection/send'\nimport { getHubConnectionState } from '../connection/state'\nimport { ROLES } from '../user/constants'\nimport { deviceDeltaHandler } from '../devices/devices'\nimport { isNode, urlBase64Decode } from '../utils'\nimport { store, watchChanges } from \"../store\"\nimport { hubsState, hubsReducer } from \"../reducers/hubs\"\nimport { userState, userReducer } from \"../reducers/user\"\n\n\n\n\n\n\nlet _hubs = {}\n\n\n/*\n * Helper method to extract hub info from JWT based hub keys\n */\nfunction extractHubInfo(HUBKeys) {\n  let hubs = {};\n  for (let key in HUBKeys) {\n      let coded = HUBKeys[key].split('.')[1];\n      let decoded = urlBase64Decode(coded);\n      let payload = JSON.parse(decoded);\n      let info = {};\n      info.id = payload.hubId || payload.hub_id;\n      info.name = payload.hubName || payload.hub_name;\n      info.hubKey = HUBKeys[key];\n      info.connectionState = HUB_CONNECTION_STATES.UNCONNECTED;\n      if (payload.role){\n          info.role = payload.role;\n          info.roleString = ''\n          Object.keys(ROLES).forEach( (key)=> {\n            if (ROLES[key] === info.role)\n              info.roleString = key\n          });\n      }\n      hubs[ info.id ] = info;\n  }\n  return hubs;\n}\n\n\n/*\n * Hub metadata is received and will be stored\n */\nfunction updateFoundHub(hubURL, foundHub) {\n  // Hub keys returns ids, idQuerys return hubId\n  if(foundHub.hubId){\n    foundHub.id = foundHub.hubId;\n    delete foundHub.hubId;\n  }\n  _hubs[foundHub.id].connected = foundHub.connected;\n  _hubs[foundHub.id].features = foundHub.features;\n  _hubs[foundHub.id].state = foundHub.state;\n  _hubs[foundHub.id].version = foundHub.version;\n  _hubs[foundHub.id].connectionState = foundHub.connected ? HUB_CONNECTION_STATES.REMOTE : HUB_CONNECTION_STATES.UNCONNECTED;\n  if (hubURL) {\n    _hubs[foundHub.id].connectionState = HUB_CONNECTION_STATES.LOCAL;\n    _hubs[foundHub.id].url =  hubURL\n  } else {\n    _hubs[foundHub.id].url =  undefined\n  }\n\n\n}\n\n/*\n * Remote hub metamata request for version etc information\n */\nfunction doRemoteIdQuery(hubId, authKey, hubKey) {\n  return new Promise( (resolve, reject) => {\n    send( {command: COMMANDS.CLOUD_META, authKey: authKey, hubKey: hubKey, hubId: hubId })\n    .then((hubData) => {\n      updateFoundHub(undefined, hubData);\n      resolve(hubId);\n    })\n    .catch((error) => {\n      console.log(`doRemoteIdQuery ${hubId} error `, error.message);\n      reject(hubId);\n    });\n  });\n}\n\n/*\n * Local hub metadata request for version etc information\n */\nfunction doLocalIdQuery(ip) {\n  return new Promise( (resolve, reject) => {\n    if (ip) {\n      const hubURL = HUB_PROTOCOL + ip + \":\" + HUB_PORT\n      const url = hubURL + \"/hub\";\n      send( {url: url} )\n      .then((hubData) => {\n        updateFoundHub(hubURL, hubData)\n        resolve(ip)\n      })\n      .catch((error) => {\n        console.log(`doLocalIdQuery ${ip} error `, error.message);\n        resolve(ip);\n      });\n    } else {\n      resolve()\n    }\n  });\n}\n\n/*\n * Fetch HUB IP addresses in the same network\n */\nfunction doCloudDiscovery() {\n  return new Promise( (resolve, reject) => {\n    send( {command: COMMANDS.CLOUD_IP })\n    .then((ips) => {\n      let queries = []\n      if (ips && !isEmpty(ips)) {\n        for(var ip of ips){\n          queries.push(doLocalIdQuery(ip));\n        }\n      }\n      sendAll(queries)\n      .finally(() => {\n        // mark selected hubs to be selected after\n        setSelectedHubs(_hubs);\n        store.dispatch(hubsState.actions.updateHubs(_hubs));\n        resolve('ok');\n      });\n    })\n    .catch((error) => {\n      console.error(\"doCloudDiscovery error: \", error.message);\n      store.dispatch(hubsState.actions.updateHubs(_hubs));\n      resolve('error');\n    });\n  });\n}\n\n/*\n * Fetch hub metadatas\n */\nfunction fetchMetaData(hubs, authKey) {\n  return new Promise( (resolve, reject) => {\n    let queries = []\n    for (var hub of (Object.values(hubs)) ) {\n      if (hub.hubKey){\n        queries.push(doRemoteIdQuery(hub.id, authKey, hub.hubKey));\n      }\n    }\n    sendAll(queries)\n    .then( values => {\n      //console.log(values);\n    })\n    .catch(error => {\n      //console.log(error);\n    })\n    .finally(() => {\n        resolve();\n    });\n  });\n}\n\n/*\n * Check hubs that are currently selected and mark them selected also in map of given hubs\n */\nfunction setSelectedHubs(newHubs) {\n  const hubs = getHubs();\n  for (var hub of (Object.values(hubs)) ) {\n    if (hub.selected) {\n      const selectedNewHub = newHubs[hub.id]\n      if (selectedNewHub) {\n        selectedNewHub.selected = true\n      }\n    }\n  }\n}\n\n\n/*\n * Fetch Hub keys by user authKey and start fetching hub meta datas\n */\nfunction fetchHubs() {\n  const authKey = storedUser().authKey;\n  return new Promise( (resolve, reject) => {\n\n    if (!authKey) {\n      reject('No userKey!');\n      return;\n    }\n    send({ command: COMMANDS.HUB_KEYS,  authKey: authKey })\n    .then((tokens) => {\n      if (tokens) {\n        _hubs = extractHubInfo(tokens);\n        fetchMetaData(_hubs, authKey)\n        .finally(() => {\n          doCloudDiscovery();\n          resolve(getHubs());\n        });\n      } else {\n        resolve(getHubs());\n      }\n    })\n    .catch((error) => {\n      console.error(\"fetchHubTokens error: \", error.message);\n      reject(error)\n    });\n  });\n}\n\n\nlet _discoveryInterval = undefined;\n\n/**\n * Start discovering hubs every DISCOVERY_INTERVAL_MS\n * Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local meta-infos\n */\nexport function startDiscoveringHubs() {\n  if (!_discoveryInterval) {\n    fetchHubs(); // call immediately and then every 30s\n    //_discoveryInterval = setInterval(fetchHubs, DISCOVERY_INTERVAL_MS);\n  }\n}\n\n/**\n * Stop discovering hubs\n */\nexport function stopDiscoveringHubs() {\n  clearInterval(_discoveryInterval);\n}\n\n\n/**\n * Unselect hub by id, stops hub polling\n * @param  {string} selectedId   - hub id to be selected\n */\nexport function unSelectHubById( selectedId ) {\n  const hubs = getHubs();\n  for (var hub of (Object.values(hubs)) ) {\n    if (selectedId === hub.id) {\n      store.dispatch(hubsState.actions.unSelectHub(hub.id));\n      stopPolling(hub.id);\n    }\n  }\n}\n\n\n/**\n * Select hub by id, starts hub polling\n * @param  {string} selectedId   - hub id to be selected\n */\nexport function selectHubById( selectedId ) {\n  const hubs = getHubs();\n  for (var hub of (Object.values(hubs)) ) {\n    if (selectedId === hub.id) {\n      store.dispatch(hubsState.actions.selectHub(hub.id));\n      startPolling(hub.id);\n    }\n  }\n}\n\n\n\n/*\n** Polling\n*/\n\nlet _pollIntervals= {};\nlet _pollTimeStamp = 0;\nlet _pollInAction = false;\nlet _secondPoll = false;\n\n/*\n * Do poll if hub connection is ok\n * Remote poll is executed only every second call\n */\nfunction doPoll(hubId){\n\n  const hub = getHubs()[hubId];\n  if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE){\n    return;\n  }\n\n  //just return every second -> not doing so often as in local connection\n  if (hub.connectionState === HUB_CONNECTION_STATES.REMOTE){\n    if (_secondPoll) {\n      _secondPoll = false;\n      return\n    }\n    _secondPoll = true;\n  }\n\n  const authKey = storedUser().authKey;\n  const hubKey = hub.hubKey;\n\n  if (_pollInAction) {\n    return;\n  }\n  _pollInAction = true\n\n  let reset = _pollTimeStamp === 0 ? true : false\n  send( {command: COMMANDS.POLL, hubId:hubId, authKey: authKey, hubKey: hubKey, localUrl: hub.url, data: {ts:_pollTimeStamp} })\n  .then((deltas) => {\n    if (deltas) {\n      //console.log(JSON.stringify(deltas));\n      // Return can be null poll, even if not asked that\n      if (_pollTimeStamp === 0 || deltas.full) {\n        reset = true\n      }\n\n      _pollTimeStamp = deltas.timestamp\n\n      for (let delta of deltas.polls) {\n        switch(delta.type) {\n          case \"DEVICE_DELTA\": {\n            deviceDeltaHandler(hubId, reset, delta.devices)\n            break;\n          }\n          case \"GROUP_DELTA\": {\n            break;\n          }\n          case \"SCENE_DELTA\": {\n            break;\n          }\n          case \"RULE_DELTA\": {\n            break;\n          }\n          case \"USERS_DELTA\": {\n            break;\n          }\n          case \"ROOM_DELTA\": {\n            break;\n          }\n          case \"ZONE_DELTA\": {\n            break;\n          }\n          case \"ALARM_DELTA\": {\n            break;\n          }\n          default: {\n            break;\n          }\n        }\n      }\n    }\n    _pollInAction = false;\n  })\n  .catch((error) => {\n    //store.dispatch(hubsState.actions.hubPollFailed())\n    console.error(\"doPoll error: \", error.message);\n    _pollInAction = false;\n  });\n}\n\n/*\n * Start polling of given hub\n */\nfunction startPolling(hubId) {\n  const intervalTime = POLL_INTERVAL_MS;\n  _pollIntervals[hubId] = setInterval(doPoll, intervalTime, hubId);\n}\n\n/*\n * Stop polling of given hub\n */\nfunction stopPolling(hubId) {\n  clearInterval(_pollIntervals[hubId]);\n}\n\n\n/**\n * Helper to get current user from state\n */\nfunction storedUser() {\n  return userState.selectors.getUser(store.getState());\n}\n\n/**\n * Helper to get current hubs from state\n * @return {HUBS_MAP_TYPE} - hubs\n */\nexport function getHubs() {\n  return hubsState.selectors.getHubs(store.getState());\n}\n\n\n/*\n * Listener of User state changes\n * Hub discovery is started when user's new state is AUTHENTICATED\n */\nwatchChanges('user.state', (newState, oldState) => {\n  // Start discovery when user is authenticated\n  if (newState === USER_STATES.AUTHENTICATED) {\n    startDiscoveringHubs();\n  }\n});\n",
+    "content": "// \nimport isEmpty from 'lodash/isEmpty';\nimport {\n  POLL_INTERVAL_MS, HUB_PROTOCOL, HUB_PORT,\n} from './constants';\nimport { USER_STATES, ROLES } from '../user/constants';\nimport { HUB_CONNECTION_STATES } from '../connection/constants';\nimport { COMMANDS, send, sendAll } from '../connection/send';\n\nimport { deviceDeltaHandler } from '../devices/devices';\nimport { urlBase64Decode } from '../utils';\nimport { store, watchChanges } from '../store';\nimport { hubsState } from '../reducers/hubs';\nimport { userState } from '../reducers/user';\n\n\n\nlet hubsMap = {};\n\n\n/*\n * Helper method to extract hub info from JWT based hub keys\n */\nfunction extractHubInfo(HUBKeys) {\n  const hubs = {};\n  if (HUBKeys) {\n    Object.keys(HUBKeys).forEach((hubKey) => {\n      const coded = HUBKeys[hubKey].split('.')[1];\n      const decoded = urlBase64Decode(coded);\n      const payload = JSON.parse(decoded);\n      const info = {};\n      info.id = payload.hubId || payload.hub_id;\n      info.name = payload.hubName || payload.hub_name;\n      info.hubKey = HUBKeys[hubKey];\n      info.connectionState = HUB_CONNECTION_STATES.UNCONNECTED;\n      if (payload.role) {\n        info.role = payload.role;\n        info.roleString = '';\n        Object.keys(ROLES).forEach((roleKey) => {\n          if (ROLES[hubKey] === info.role) info.roleString = roleKey;\n        });\n      }\n      hubs[info.id] = info;\n    });\n  }\n  return hubs;\n}\n\n\n/*\n * Hub metadata is received and will be stored\n */\nfunction updateFoundHub(hubURL, hub) {\n  const foundHub = hub;\n  // Hub keys returns ids, idQuerys return hubId\n  if (foundHub.hubId) {\n    foundHub.id = foundHub.hubId;\n    delete foundHub.hubId;\n  }\n  if (!foundHub.id) {\n    return;\n  }\n\n  if (!hubsMap[foundHub.id]) {\n    hubsMap[foundHub.id] = {\n      id: foundHub.id,\n      name: foundHub.name || '',\n    };\n  }\n  hubsMap[foundHub.id].connected = foundHub.connected;\n  hubsMap[foundHub.id].features = foundHub.features;\n  hubsMap[foundHub.id].state = foundHub.state;\n  hubsMap[foundHub.id].version = foundHub.version;\n  hubsMap[foundHub.id].connectionState = foundHub.connected ? HUB_CONNECTION_STATES.REMOTE : HUB_CONNECTION_STATES.UNCONNECTED;\n  if (hubURL) {\n    hubsMap[foundHub.id].connectionState = HUB_CONNECTION_STATES.LOCAL;\n    hubsMap[foundHub.id].url = hubURL;\n  } else {\n    hubsMap[foundHub.id].url = undefined;\n  }\n}\n\n/*\n * Remote hub metamata request for version etc information\n */\nfunction doRemoteIdQuery(hubId, authKey, hubKey) {\n  return new Promise((resolve, reject) => {\n    send({\n      command: COMMANDS.CLOUD_META, authKey, hubKey, hubId,\n    })\n      .then((hubData) => {\n        updateFoundHub(undefined, hubData);\n        resolve(hubId);\n      })\n      .catch((error) => {\n        console.log(`doRemoteIdQuery ${hubId} error `, error.message);\n        reject(hubId);\n      });\n  });\n}\n\n/*\n * Local hub metadata request for version etc information\n */\nfunction doLocalIdQuery(ip) {\n  return new Promise((resolve) => {\n    if (ip) {\n      const hubURL = `${HUB_PROTOCOL + ip}:${HUB_PORT}`;\n      const url = `${hubURL}/hub`;\n      send({ url, timeout: 500 })\n        .then((hubData) => {\n          updateFoundHub(hubURL, hubData);\n          resolve(ip);\n        })\n        .catch((error) => {\n          console.log(`doLocalIdQuery ${ip} error `, error.message);\n          resolve(ip);\n        });\n    } else {\n      resolve();\n    }\n  });\n}\n\n/**\n * Helper to get current hubs from state\n * @return {HUBS_MAP_TYPE} - hubs\n */\nexport function getHubs() {\n  return hubsState.selectors.getHubs(store.getState());\n}\n\n/*\n * Check hubs that are currently selected and mark them selected also in map of given hubs\n */\nfunction setSelectedHubs(newHubs) {\n  const hubs = getHubs();\n  (Object.values(hubs)).forEach((hub) => {\n    if (hub.selected) {\n      const selectedNewHub = newHubs[hub.id];\n      if (selectedNewHub) {\n        selectedNewHub.selected = true;\n      }\n    }\n  });\n}\n\n/*\n * Fetch HUB IP addresses in the same network\n */\nfunction doCloudDiscovery() {\n  return new Promise((resolve) => {\n    send({ command: COMMANDS.CLOUD_IP })\n      .then((ips) => {\n        const queries = [];\n        if (ips && !isEmpty(ips)) {\n          ips.forEach((ip) => {\n            queries.push(doLocalIdQuery(ip));\n          });\n        }\n        sendAll(queries)\n          .finally(() => {\n            // mark selected hubs to be selected after\n            setSelectedHubs(hubsMap);\n            store.dispatch(hubsState.actions.updateHubs(hubsMap));\n            resolve('ok');\n          });\n      })\n      .catch((error) => {\n        console.error('doCloudDiscovery error: ', error.message);\n        store.dispatch(hubsState.actions.updateHubs(hubsMap));\n        resolve('error');\n      });\n  });\n}\n\n/*\n * Fetch hub metadatas\n */\nfunction fetchMetaData(hubs, authKey) {\n  return new Promise((resolve) => {\n    const queries = [];\n    (Object.values(hubs)).forEach((hub) => {\n      if (hub.hubKey) {\n        queries.push(doRemoteIdQuery(hub.id, authKey, hub.hubKey));\n      }\n    });\n    sendAll(queries)\n      .then((values) => {\n        console.debug('fetchMetaData values', values);\n      })\n      .catch((error) => {\n        console.debug('fetchMetaData error', error);\n      })\n      .finally(() => {\n        resolve();\n      });\n  });\n}\n\n\n/**\n * Helper to get current user from state\n */\nfunction storedUser() {\n  return userState.selectors.getUser(store.getState());\n}\n\n\n/*\n * Fetch Hub keys by user authKey and start fetching hub meta datas\n */\nfunction fetchHubs() {\n  const { authKey } = storedUser();\n  return new Promise((resolve, reject) => {\n    if (!authKey) {\n      reject(new Error('No userKey!'));\n      return;\n    }\n    send({ command: COMMANDS.HUB_KEYS, authKey })\n      .then((tokens) => {\n        if (tokens) {\n          hubsMap = extractHubInfo(tokens);\n          store.dispatch(hubsState.actions.updateHubs(hubsMap));\n          fetchMetaData(hubsMap, authKey)\n            .finally(() => {\n              doCloudDiscovery();\n              resolve(getHubs());\n            });\n        } else {\n          resolve(getHubs());\n        }\n      })\n      .catch((error) => {\n        console.error('fetchHubTokens error: ', error.message);\n        reject(error);\n      });\n  });\n}\n\n\nconst discoveryInterval = undefined;\n\n/**\n * Start discovering hubs every DISCOVERY_INTERVAL_MS\n * Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local meta-infos\n */\nexport function startDiscoveringHubs() {\n  if (!discoveryInterval) {\n    // call immediately...\n    fetchHubs();\n    // and then every DISCOVERY_INTERVAL_MS (30s?)\n    // discoveryInterval = setInterval(fetchHubs, DISCOVERY_INTERVAL_MS);\n  }\n}\n\n/**\n * Stop discovering hubs\n */\nexport function stopDiscoveringHubs() {\n  clearInterval(discoveryInterval);\n}\n\n\n/*\n** Polling\n*/\n\nconst pollIntervals = {};\nlet pollTimeStamp = 0;\nlet pollInAction = false;\nlet secondPoll = false;\n\n/*\n * Do poll if hub connection is ok\n * Remote poll is executed only every second call\n */\nfunction doPoll(hubId) {\n  const hub = getHubs()[hubId];\n  console.error('doPoll connection state: ', hub.connectionState);\n  if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {\n    return;\n  }\n\n  // just return every second -> not doing so often as in local connection\n  if (hub.connectionState === HUB_CONNECTION_STATES.REMOTE) {\n    if (secondPoll) {\n      secondPoll = false;\n      return;\n    }\n    secondPoll = true;\n  }\n\n  const { authKey } = storedUser();\n  const { hubKey } = hub;\n\n  if (pollInAction) {\n    return;\n  }\n  pollInAction = true;\n\n  let reset = pollTimeStamp === 0;\n  send({\n    command: COMMANDS.POLL, hubId, authKey, hubKey, localUrl: hub.url, data: { ts: pollTimeStamp },\n  })\n    .then((deltas) => {\n      if (deltas) {\n      // console.log(JSON.stringify(deltas));\n      // Return can be null poll, even if not asked that\n        if (pollTimeStamp === 0 || deltas.full) {\n          reset = true;\n        }\n\n        pollTimeStamp = deltas.timestamp;\n\n        deltas.polls.forEach((delta) => {\n          switch (delta.type) {\n            case 'DEVICE_DELTA': {\n              deviceDeltaHandler(hubId, reset, delta.devices);\n              break;\n            }\n            case 'GROUP_DELTA': {\n              break;\n            }\n            case 'SCENE_DELTA': {\n              break;\n            }\n            case 'RULE_DELTA': {\n              break;\n            }\n            case 'USERS_DELTA': {\n              break;\n            }\n            case 'ROOM_DELTA': {\n              break;\n            }\n            case 'ZONE_DELTA': {\n              break;\n            }\n            case 'ALARM_DELTA': {\n              break;\n            }\n            default: {\n              break;\n            }\n          }\n        });\n      }\n      pollInAction = false;\n    })\n    .catch((error) => {\n    // store.dispatch(hubsState.actions.hubPollFailed())\n      console.error('doPoll error: ', error.message);\n      pollInAction = false;\n    });\n}\n\n/*\n * Start polling of given hub\n */\nfunction startPolling(hubId) {\n  const intervalTime = POLL_INTERVAL_MS;\n  pollIntervals[hubId] = setInterval(doPoll, intervalTime, hubId);\n}\n\n/*\n * Stop polling of given hub\n */\nfunction stopPolling(hubId) {\n  clearInterval(pollIntervals[hubId]);\n}\n\n/**\n * Unselect hub by id, stops hub polling\n * @param  {string} selectedId   - hub id to be selected\n */\nexport function unSelectHubById(selectedId) {\n  const hubs = getHubs();\n  (Object.values(hubs)).forEach((hub) => {\n    if (selectedId === hub.id) {\n      store.dispatch(hubsState.actions.unSelectHub({ hubId: hub.id }));\n      stopPolling(hub.id);\n    }\n  });\n}\n\n\n/**\n * Select hub by id, starts hub polling\n * @param  {string} selectedId   - hub id to be selected\n */\nexport function selectHubById(selectedId) {\n  const hubs = getHubs();\n  (Object.values(hubs)).forEach((hub) => {\n    if (selectedId === hub.id) {\n      store.dispatch(hubsState.actions.selectHub({ hubId: hub.id }));\n      startPolling(hub.id);\n    }\n  });\n}\n\n\n/*\n * Listener of User state changes\n * Hub discovery is started when user's new state is AUTHENTICATED\n */\nwatchChanges('user.state', (newState) => {\n  // Start discovery when user is authenticated\n  if (newState === USER_STATES.AUTHENTICATED) {\n    startDiscoveringHubs();\n  }\n});\n",
     "static": true,
-    "longname": "/Users/vesalindfors/Code/JS-SDK/docs/src/hubs/hubs.js",
+    "longname": "/Users/vesa/code/JS-SDK/docs/src/hubs/hubs.js",
     "access": "public",
     "description": null,
     "lineNumber": 1
   },
   {
-    "__docId__": 98,
+    "__docId__": 103,
     "kind": "variable",
-    "name": "_hubs",
+    "name": "hubsMap",
     "memberof": "src/hubs/hubs.js",
     "static": true,
-    "longname": "src/hubs/hubs.js~_hubs",
-    "access": "private",
+    "longname": "src/hubs/hubs.js~hubsMap",
+    "access": "public",
     "export": false,
     "importPath": "cozify-sdk/src/hubs/hubs.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 20,
+    "lineNumber": 18,
     "undocument": true,
     "type": {
       "types": [
@@ -1920,7 +2071,7 @@
     "ignore": true
   },
   {
-    "__docId__": 99,
+    "__docId__": 104,
     "kind": "function",
     "name": "extractHubInfo",
     "memberof": "src/hubs/hubs.js",
@@ -1933,7 +2084,7 @@
     "importPath": "cozify-sdk/src/hubs/hubs.js",
     "importStyle": null,
     "description": "",
-    "lineNumber": 26,
+    "lineNumber": 24,
     "params": [
       {
         "nullable": null,
@@ -1954,7 +2105,7 @@
     "ignore": true
   },
   {
-    "__docId__": 100,
+    "__docId__": 105,
     "kind": "function",
     "name": "updateFoundHub",
     "memberof": "src/hubs/hubs.js",
@@ -1967,7 +2118,7 @@
     "importPath": "cozify-sdk/src/hubs/hubs.js",
     "importStyle": null,
     "description": "",
-    "lineNumber": 54,
+    "lineNumber": 53,
     "params": [
       {
         "nullable": null,
@@ -1986,7 +2137,7 @@
         ],
         "spread": false,
         "optional": false,
-        "name": "foundHub",
+        "name": "hub",
         "description": ""
       }
     ],
@@ -1994,7 +2145,7 @@
     "ignore": true
   },
   {
-    "__docId__": 101,
+    "__docId__": 106,
     "kind": "function",
     "name": "doRemoteIdQuery",
     "memberof": "src/hubs/hubs.js",
@@ -2007,7 +2158,7 @@
     "importPath": "cozify-sdk/src/hubs/hubs.js",
     "importStyle": null,
     "description": "",
-    "lineNumber": 78,
+    "lineNumber": 86,
     "params": [
       {
         "nullable": null,
@@ -2048,7 +2199,7 @@
     "ignore": true
   },
   {
-    "__docId__": 102,
+    "__docId__": 107,
     "kind": "function",
     "name": "doLocalIdQuery",
     "memberof": "src/hubs/hubs.js",
@@ -2061,7 +2212,7 @@
     "importPath": "cozify-sdk/src/hubs/hubs.js",
     "importStyle": null,
     "description": "",
-    "lineNumber": 95,
+    "lineNumber": 105,
     "params": [
       {
         "nullable": null,
@@ -2082,7 +2233,62 @@
     "ignore": true
   },
   {
-    "__docId__": 103,
+    "__docId__": 108,
+    "kind": "function",
+    "name": "getHubs",
+    "memberof": "src/hubs/hubs.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/hubs/hubs.js~getHubs",
+    "access": "public",
+    "export": true,
+    "importPath": "cozify-sdk/src/hubs/hubs.js",
+    "importStyle": "{getHubs}",
+    "description": "Helper to get current hubs from state",
+    "lineNumber": 129,
+    "return": {
+      "nullable": null,
+      "types": [
+        "HUBS_MAP_TYPE"
+      ],
+      "spread": false,
+      "description": "hubs"
+    },
+    "params": []
+  },
+  {
+    "__docId__": 109,
+    "kind": "function",
+    "name": "setSelectedHubs",
+    "memberof": "src/hubs/hubs.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/hubs/hubs.js~setSelectedHubs",
+    "access": "public",
+    "export": false,
+    "importPath": "cozify-sdk/src/hubs/hubs.js",
+    "importStyle": null,
+    "description": "",
+    "lineNumber": 136,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "newHubs",
+        "description": ""
+      }
+    ],
+    "return": null,
+    "ignore": true
+  },
+  {
+    "__docId__": 110,
     "kind": "function",
     "name": "doCloudDiscovery",
     "memberof": "src/hubs/hubs.js",
@@ -2095,7 +2301,7 @@
     "importPath": "cozify-sdk/src/hubs/hubs.js",
     "importStyle": null,
     "description": "",
-    "lineNumber": 118,
+    "lineNumber": 151,
     "params": [],
     "return": {
       "types": [
@@ -2105,7 +2311,7 @@
     "ignore": true
   },
   {
-    "__docId__": 104,
+    "__docId__": 111,
     "kind": "function",
     "name": "fetchMetaData",
     "memberof": "src/hubs/hubs.js",
@@ -2118,7 +2324,7 @@
     "importPath": "cozify-sdk/src/hubs/hubs.js",
     "importStyle": null,
     "description": "",
-    "lineNumber": 147,
+    "lineNumber": 180,
     "params": [
       {
         "nullable": null,
@@ -2149,349 +2355,7 @@
     "ignore": true
   },
   {
-    "__docId__": 105,
-    "kind": "function",
-    "name": "setSelectedHubs",
-    "memberof": "src/hubs/hubs.js",
-    "generator": false,
-    "async": false,
-    "static": true,
-    "longname": "src/hubs/hubs.js~setSelectedHubs",
-    "access": "public",
-    "export": false,
-    "importPath": "cozify-sdk/src/hubs/hubs.js",
-    "importStyle": null,
-    "description": "",
-    "lineNumber": 171,
-    "params": [
-      {
-        "nullable": null,
-        "types": [
-          "*"
-        ],
-        "spread": false,
-        "optional": false,
-        "name": "newHubs",
-        "description": ""
-      }
-    ],
-    "return": null,
-    "ignore": true
-  },
-  {
-    "__docId__": 106,
-    "kind": "function",
-    "name": "fetchHubs",
-    "memberof": "src/hubs/hubs.js",
-    "generator": false,
-    "async": false,
-    "static": true,
-    "longname": "src/hubs/hubs.js~fetchHubs",
-    "access": "public",
-    "export": false,
-    "importPath": "cozify-sdk/src/hubs/hubs.js",
-    "importStyle": null,
-    "description": "",
-    "lineNumber": 187,
-    "params": [],
-    "return": {
-      "types": [
-        "*"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 107,
-    "kind": "variable",
-    "name": "_discoveryInterval",
-    "memberof": "src/hubs/hubs.js",
-    "static": true,
-    "longname": "src/hubs/hubs.js~_discoveryInterval",
-    "access": "private",
-    "export": false,
-    "importPath": "cozify-sdk/src/hubs/hubs.js",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 216,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 108,
-    "kind": "function",
-    "name": "startDiscoveringHubs",
-    "memberof": "src/hubs/hubs.js",
-    "generator": false,
-    "async": false,
-    "static": true,
-    "longname": "src/hubs/hubs.js~startDiscoveringHubs",
-    "access": "public",
-    "export": true,
-    "importPath": "cozify-sdk/src/hubs/hubs.js",
-    "importStyle": "{startDiscoveringHubs}",
-    "description": "Start discovering hubs every DISCOVERY_INTERVAL_MS\nSequence includes requests of hub-keys, remote meta-infos, lan-ips and local meta-infos",
-    "lineNumber": 222,
-    "params": [],
-    "return": null
-  },
-  {
-    "__docId__": 109,
-    "kind": "function",
-    "name": "stopDiscoveringHubs",
-    "memberof": "src/hubs/hubs.js",
-    "generator": false,
-    "async": false,
-    "static": true,
-    "longname": "src/hubs/hubs.js~stopDiscoveringHubs",
-    "access": "public",
-    "export": true,
-    "importPath": "cozify-sdk/src/hubs/hubs.js",
-    "importStyle": "{stopDiscoveringHubs}",
-    "description": "Stop discovering hubs",
-    "lineNumber": 232,
-    "params": [],
-    "return": null
-  },
-  {
-    "__docId__": 110,
-    "kind": "function",
-    "name": "unSelectHubById",
-    "memberof": "src/hubs/hubs.js",
-    "generator": false,
-    "async": false,
-    "static": true,
-    "longname": "src/hubs/hubs.js~unSelectHubById",
-    "access": "public",
-    "export": true,
-    "importPath": "cozify-sdk/src/hubs/hubs.js",
-    "importStyle": "{unSelectHubById}",
-    "description": "Unselect hub by id, stops hub polling",
-    "lineNumber": 241,
-    "params": [
-      {
-        "nullable": null,
-        "types": [
-          "string"
-        ],
-        "spread": false,
-        "optional": false,
-        "name": "selectedId",
-        "description": "hub id to be selected"
-      }
-    ],
-    "return": null
-  },
-  {
-    "__docId__": 111,
-    "kind": "function",
-    "name": "selectHubById",
-    "memberof": "src/hubs/hubs.js",
-    "generator": false,
-    "async": false,
-    "static": true,
-    "longname": "src/hubs/hubs.js~selectHubById",
-    "access": "public",
-    "export": true,
-    "importPath": "cozify-sdk/src/hubs/hubs.js",
-    "importStyle": "{selectHubById}",
-    "description": "Select hub by id, starts hub polling",
-    "lineNumber": 256,
-    "params": [
-      {
-        "nullable": null,
-        "types": [
-          "string"
-        ],
-        "spread": false,
-        "optional": false,
-        "name": "selectedId",
-        "description": "hub id to be selected"
-      }
-    ],
-    "return": null
-  },
-  {
     "__docId__": 112,
-    "kind": "variable",
-    "name": "_pollIntervals",
-    "memberof": "src/hubs/hubs.js",
-    "static": true,
-    "longname": "src/hubs/hubs.js~_pollIntervals",
-    "access": "private",
-    "export": false,
-    "importPath": "cozify-sdk/src/hubs/hubs.js",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 272,
-    "undocument": true,
-    "type": {
-      "types": [
-        "{}"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 113,
-    "kind": "variable",
-    "name": "_pollTimeStamp",
-    "memberof": "src/hubs/hubs.js",
-    "static": true,
-    "longname": "src/hubs/hubs.js~_pollTimeStamp",
-    "access": "private",
-    "export": false,
-    "importPath": "cozify-sdk/src/hubs/hubs.js",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 273,
-    "undocument": true,
-    "type": {
-      "types": [
-        "number"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 114,
-    "kind": "variable",
-    "name": "_pollInAction",
-    "memberof": "src/hubs/hubs.js",
-    "static": true,
-    "longname": "src/hubs/hubs.js~_pollInAction",
-    "access": "private",
-    "export": false,
-    "importPath": "cozify-sdk/src/hubs/hubs.js",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 274,
-    "undocument": true,
-    "type": {
-      "types": [
-        "boolean"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 115,
-    "kind": "variable",
-    "name": "_secondPoll",
-    "memberof": "src/hubs/hubs.js",
-    "static": true,
-    "longname": "src/hubs/hubs.js~_secondPoll",
-    "access": "private",
-    "export": false,
-    "importPath": "cozify-sdk/src/hubs/hubs.js",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 275,
-    "undocument": true,
-    "type": {
-      "types": [
-        "boolean"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 116,
-    "kind": "function",
-    "name": "doPoll",
-    "memberof": "src/hubs/hubs.js",
-    "generator": false,
-    "async": false,
-    "static": true,
-    "longname": "src/hubs/hubs.js~doPoll",
-    "access": "public",
-    "export": false,
-    "importPath": "cozify-sdk/src/hubs/hubs.js",
-    "importStyle": null,
-    "description": "",
-    "lineNumber": 281,
-    "params": [
-      {
-        "nullable": null,
-        "types": [
-          "*"
-        ],
-        "spread": false,
-        "optional": false,
-        "name": "hubId",
-        "description": ""
-      }
-    ],
-    "return": null,
-    "ignore": true
-  },
-  {
-    "__docId__": 117,
-    "kind": "function",
-    "name": "startPolling",
-    "memberof": "src/hubs/hubs.js",
-    "generator": false,
-    "async": false,
-    "static": true,
-    "longname": "src/hubs/hubs.js~startPolling",
-    "access": "public",
-    "export": false,
-    "importPath": "cozify-sdk/src/hubs/hubs.js",
-    "importStyle": null,
-    "description": "",
-    "lineNumber": 362,
-    "params": [
-      {
-        "nullable": null,
-        "types": [
-          "*"
-        ],
-        "spread": false,
-        "optional": false,
-        "name": "hubId",
-        "description": ""
-      }
-    ],
-    "return": null,
-    "ignore": true
-  },
-  {
-    "__docId__": 118,
-    "kind": "function",
-    "name": "stopPolling",
-    "memberof": "src/hubs/hubs.js",
-    "generator": false,
-    "async": false,
-    "static": true,
-    "longname": "src/hubs/hubs.js~stopPolling",
-    "access": "public",
-    "export": false,
-    "importPath": "cozify-sdk/src/hubs/hubs.js",
-    "importStyle": null,
-    "description": "",
-    "lineNumber": 370,
-    "params": [
-      {
-        "nullable": null,
-        "types": [
-          "*"
-        ],
-        "spread": false,
-        "optional": false,
-        "name": "hubId",
-        "description": ""
-      }
-    ],
-    "return": null,
-    "ignore": true
-  },
-  {
-    "__docId__": 119,
     "kind": "function",
     "name": "storedUser",
     "memberof": "src/hubs/hubs.js",
@@ -2504,7 +2368,7 @@
     "importPath": "cozify-sdk/src/hubs/hubs.js",
     "importStyle": null,
     "description": "Helper to get current user from state ",
-    "lineNumber": 378,
+    "lineNumber": 205,
     "params": [],
     "return": {
       "types": [
@@ -2514,54 +2378,341 @@
     "ignore": true
   },
   {
-    "__docId__": 120,
+    "__docId__": 113,
     "kind": "function",
-    "name": "getHubs",
+    "name": "fetchHubs",
     "memberof": "src/hubs/hubs.js",
     "generator": false,
     "async": false,
     "static": true,
-    "longname": "src/hubs/hubs.js~getHubs",
+    "longname": "src/hubs/hubs.js~fetchHubs",
+    "access": "public",
+    "export": false,
+    "importPath": "cozify-sdk/src/hubs/hubs.js",
+    "importStyle": null,
+    "description": "",
+    "lineNumber": 213,
+    "params": [],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 114,
+    "kind": "variable",
+    "name": "discoveryInterval",
+    "memberof": "src/hubs/hubs.js",
+    "static": true,
+    "longname": "src/hubs/hubs.js~discoveryInterval",
+    "access": "public",
+    "export": false,
+    "importPath": "cozify-sdk/src/hubs/hubs.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 242,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 115,
+    "kind": "function",
+    "name": "startDiscoveringHubs",
+    "memberof": "src/hubs/hubs.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/hubs/hubs.js~startDiscoveringHubs",
     "access": "public",
     "export": true,
     "importPath": "cozify-sdk/src/hubs/hubs.js",
-    "importStyle": "{getHubs}",
-    "description": "Helper to get current hubs from state",
-    "lineNumber": 386,
-    "return": {
-      "nullable": null,
+    "importStyle": "{startDiscoveringHubs}",
+    "description": "Start discovering hubs every DISCOVERY_INTERVAL_MS\nSequence includes requests of hub-keys, remote meta-infos, lan-ips and local meta-infos",
+    "lineNumber": 248,
+    "params": [],
+    "return": null
+  },
+  {
+    "__docId__": 116,
+    "kind": "function",
+    "name": "stopDiscoveringHubs",
+    "memberof": "src/hubs/hubs.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/hubs/hubs.js~stopDiscoveringHubs",
+    "access": "public",
+    "export": true,
+    "importPath": "cozify-sdk/src/hubs/hubs.js",
+    "importStyle": "{stopDiscoveringHubs}",
+    "description": "Stop discovering hubs",
+    "lineNumber": 260,
+    "params": [],
+    "return": null
+  },
+  {
+    "__docId__": 117,
+    "kind": "variable",
+    "name": "pollIntervals",
+    "memberof": "src/hubs/hubs.js",
+    "static": true,
+    "longname": "src/hubs/hubs.js~pollIntervals",
+    "access": "public",
+    "export": false,
+    "importPath": "cozify-sdk/src/hubs/hubs.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 269,
+    "undocument": true,
+    "type": {
       "types": [
-        "HUBS_MAP_TYPE"
-      ],
-      "spread": false,
-      "description": "hubs"
+        "{}"
+      ]
     },
-    "params": []
+    "ignore": true
+  },
+  {
+    "__docId__": 118,
+    "kind": "variable",
+    "name": "pollTimeStamp",
+    "memberof": "src/hubs/hubs.js",
+    "static": true,
+    "longname": "src/hubs/hubs.js~pollTimeStamp",
+    "access": "public",
+    "export": false,
+    "importPath": "cozify-sdk/src/hubs/hubs.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 270,
+    "undocument": true,
+    "type": {
+      "types": [
+        "number"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 119,
+    "kind": "variable",
+    "name": "pollInAction",
+    "memberof": "src/hubs/hubs.js",
+    "static": true,
+    "longname": "src/hubs/hubs.js~pollInAction",
+    "access": "public",
+    "export": false,
+    "importPath": "cozify-sdk/src/hubs/hubs.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 271,
+    "undocument": true,
+    "type": {
+      "types": [
+        "boolean"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 120,
+    "kind": "variable",
+    "name": "secondPoll",
+    "memberof": "src/hubs/hubs.js",
+    "static": true,
+    "longname": "src/hubs/hubs.js~secondPoll",
+    "access": "public",
+    "export": false,
+    "importPath": "cozify-sdk/src/hubs/hubs.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 272,
+    "undocument": true,
+    "type": {
+      "types": [
+        "boolean"
+      ]
+    },
+    "ignore": true
   },
   {
     "__docId__": 121,
-    "kind": "file",
-    "name": "src/index.js",
-    "content": "// \n\n//try { process.env.NODE_ENV } catch(e) { var process = { env: { NODE_ENV: 'production' } }; }\n\n\nexport {store, watchChanges} from \"./store\"\n\n\n//import logger from 'redux-logger'\n//const middleware = [...getDefaultMiddleware(), logger]\n\nexport { CLOUD_CONNECTION_STATES, HUB_CONNECTION_STATES} from './connection/constants';\nexport { LANGUAGES, USER_STATES, ROLES } from './user/constants';\nexport { HUB_STATES } from './hubs/constants';\n\nexport { getCloudConnectionState, getHubConnectionState } from \"./connection/state\"\nexport { changeLanguage, doPwLogin, acceptEula, getUserState } from \"./user/user\"\nexport { getHubs, selectHubById, unSelectHubById } from './hubs/hubs';\nexport { getDevices, getHubDevices} from './devices/devices';\nexport { sendDeviceCmd} from './devices/device';\n\n\n\nexport { devicesState, setDevices, deleteDevice } from \"./reducers/devices\";\nexport { hubsState, updateHubs } from \"./reducers/hubs\";\n\n\n\n\n\n\n",
+    "kind": "function",
+    "name": "doPoll",
+    "memberof": "src/hubs/hubs.js",
+    "generator": false,
+    "async": false,
     "static": true,
-    "longname": "/Users/vesalindfors/Code/JS-SDK/docs/src/index.js",
+    "longname": "src/hubs/hubs.js~doPoll",
     "access": "public",
-    "description": null,
-    "lineNumber": 1
+    "export": false,
+    "importPath": "cozify-sdk/src/hubs/hubs.js",
+    "importStyle": null,
+    "description": "",
+    "lineNumber": 278,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "hubId",
+        "description": ""
+      }
+    ],
+    "return": null,
+    "ignore": true
   },
   {
     "__docId__": 122,
-    "kind": "file",
-    "name": "src/reducers/connections.js",
-    "content": "// \n\n// This actionreducer uses internally https://github.com/mweststrate/immer, so it's safe to modify given state directly\nimport isEmpty  from 'lodash/isEmpty';\nimport { createSlice } from 'redux-starter-kit'\nimport { CLOUD_CONNECTION_STATES } from '../connection/constants.js';\n\n\n/**\n * Connections action creators object\n * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md\n * @return { {\n *   slice : string,\n *   reducer : ReducerFunction,\n *   actions : Object<string, ActionCreator},\n *   selectors : Object<string, Selector>\n *   }}\n */\nexport const connectionsState = createSlice({\n  slice: 'connections',\n  initialState: {\n    cloudState: CLOUD_CONNECTION_STATES.UNCONNECTED\n  },\n  reducers: {\n    /*\n     * Reducer action of cloud connection state\n     * @param {Object} state\n     * @param {CLOUD_CONNECTION_STATES} action\n     */\n    setCloudConnectionState(state, action) {\n      const newState = action.payload\n      const oldState = state.cloudState\n      if (Object.values(CLOUD_CONNECTION_STATES).indexOf(newState) > -1) {\n        if (oldState !== newState) {\n          console.log (\"CLOUD connection state \" + oldState + \" -> \" + newState)\n          state.cloudState = newState\n        }\n      }\n    },\n\n\n  }\n})\n\n\nconst { actions, reducer } = connectionsState\n/**\n * Connections reducer\n * @type {function} reducer\n */\nexport {reducer as connectionsReducer}\n\n// Extract and export each action creator by name\nexport const { setCloudConnectionState } = actions\n\n\n",
+    "kind": "function",
+    "name": "startPolling",
+    "memberof": "src/hubs/hubs.js",
+    "generator": false,
+    "async": false,
     "static": true,
-    "longname": "/Users/vesalindfors/Code/JS-SDK/docs/src/reducers/connections.js",
+    "longname": "src/hubs/hubs.js~startPolling",
+    "access": "public",
+    "export": false,
+    "importPath": "cozify-sdk/src/hubs/hubs.js",
+    "importStyle": null,
+    "description": "",
+    "lineNumber": 361,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "hubId",
+        "description": ""
+      }
+    ],
+    "return": null,
+    "ignore": true
+  },
+  {
+    "__docId__": 123,
+    "kind": "function",
+    "name": "stopPolling",
+    "memberof": "src/hubs/hubs.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/hubs/hubs.js~stopPolling",
+    "access": "public",
+    "export": false,
+    "importPath": "cozify-sdk/src/hubs/hubs.js",
+    "importStyle": null,
+    "description": "",
+    "lineNumber": 369,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "hubId",
+        "description": ""
+      }
+    ],
+    "return": null,
+    "ignore": true
+  },
+  {
+    "__docId__": 124,
+    "kind": "function",
+    "name": "unSelectHubById",
+    "memberof": "src/hubs/hubs.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/hubs/hubs.js~unSelectHubById",
+    "access": "public",
+    "export": true,
+    "importPath": "cozify-sdk/src/hubs/hubs.js",
+    "importStyle": "{unSelectHubById}",
+    "description": "Unselect hub by id, stops hub polling",
+    "lineNumber": 377,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "selectedId",
+        "description": "hub id to be selected"
+      }
+    ],
+    "return": null
+  },
+  {
+    "__docId__": 125,
+    "kind": "function",
+    "name": "selectHubById",
+    "memberof": "src/hubs/hubs.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/hubs/hubs.js~selectHubById",
+    "access": "public",
+    "export": true,
+    "importPath": "cozify-sdk/src/hubs/hubs.js",
+    "importStyle": "{selectHubById}",
+    "description": "Select hub by id, starts hub polling",
+    "lineNumber": 392,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "selectedId",
+        "description": "hub id to be selected"
+      }
+    ],
+    "return": null
+  },
+  {
+    "__docId__": 126,
+    "kind": "file",
+    "name": "src/index.js",
+    "content": "// \n\n// try { process.env.NODE_ENV } catch(e) { var process = { env: { NODE_ENV: 'production' } }; }\n\n\nexport { store, watchChanges } from './store';\n\n\n// import logger from 'redux-logger'\n// const middleware = [...getDefaultMiddleware(), logger]\n\nexport { CLOUD_CONNECTION_STATES, HUB_CONNECTION_STATES } from './connection/constants';\nexport { LANGUAGES, USER_STATES, ROLES } from './user/constants';\nexport { HUB_STATES } from './hubs/constants';\n\nexport { getCloudConnectionState, getHubConnectionState } from './connection/state';\nexport {\n  changeLanguage, doPwLogin, acceptEula, getUserState,\n} from './user/user';\nexport { getHubs, selectHubById, unSelectHubById } from './hubs/hubs';\nexport { getDevices, getHubDevices } from './devices/devices';\nexport { sendDeviceCmd } from './devices/device';\n\n\nexport { devicesState, setDevices, deleteDevice } from './reducers/devices';\nexport { hubsState, updateHubs } from './reducers/hubs';\n",
+    "static": true,
+    "longname": "/Users/vesa/code/JS-SDK/docs/src/index.js",
     "access": "public",
     "description": null,
     "lineNumber": 1
   },
   {
-    "__docId__": 123,
+    "__docId__": 127,
+    "kind": "file",
+    "name": "src/reducers/connections.js",
+    "content": "// \n\n// This actionreducer uses internally https://github.com/mweststrate/immer, so it's safe to modify given state directly\nimport { createSlice } from 'redux-starter-kit';\nimport { CLOUD_CONNECTION_STATES } from '../connection/constants';\n// import type { CLOUD_CONNECTION_STATE_TYPE } from '../connection/constants';\n\n\n/**\n * Connections action creators object\n * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md\n * @return { {\n *   slice : string,\n *   reducer : ReducerFunction,\n *   actions : Object<string, ActionCreator},\n *   selectors : Object<string, Selector>\n *   }}\n */\nexport const connectionsState = createSlice({\n  slice: 'connections',\n  initialState: {\n    cloudState: CLOUD_CONNECTION_STATES.UNCONNECTED,\n  },\n  reducers: {\n    /*\n     * Reducer action of cloud connection state\n     * @param {Object} state\n     * @param {CLOUD_CONNECTION_STATES} action\n     */\n    setCloudConnectionState(state, action) {\n      const stateToSet = state;\n      const newState = action.payload;\n      const oldState = state.cloudState;\n      if (Object.values(CLOUD_CONNECTION_STATES).indexOf(newState) > -1) {\n        if (oldState !== newState) {\n          console.log(`CLOUD connection state ${oldState} -> ${newState}`);\n          stateToSet.cloudState = newState;\n        }\n      }\n    },\n\n\n  },\n});\n\n\nconst { actions, reducer } = connectionsState;\n/**\n * Connections reducer\n * @type {function} reducer\n */\nexport { reducer as connectionsReducer };\n\n// Extract and export each action creator by name\nexport const { setCloudConnectionState } = actions;\n",
+    "static": true,
+    "longname": "/Users/vesa/code/JS-SDK/docs/src/reducers/connections.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 128,
     "kind": "variable",
     "name": "connectionsState",
     "memberof": "src/reducers/connections.js",
@@ -2591,7 +2742,7 @@
     }
   },
   {
-    "__docId__": 124,
+    "__docId__": 129,
     "kind": "variable",
     "name": "actions",
     "memberof": "src/reducers/connections.js",
@@ -2602,7 +2753,7 @@
     "importPath": "cozify-sdk/src/reducers/connections.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 46,
+    "lineNumber": 47,
     "undocument": true,
     "type": {
       "types": [
@@ -2612,7 +2763,7 @@
     "ignore": true
   },
   {
-    "__docId__": 125,
+    "__docId__": 130,
     "kind": "variable",
     "name": "setCloudConnectionState",
     "memberof": "src/reducers/connections.js",
@@ -2623,7 +2774,7 @@
     "importPath": "cozify-sdk/src/reducers/connections.js",
     "importStyle": "{setCloudConnectionState}",
     "description": null,
-    "lineNumber": 54,
+    "lineNumber": 55,
     "undocument": true,
     "type": {
       "types": [
@@ -2632,18 +2783,18 @@
     }
   },
   {
-    "__docId__": 126,
+    "__docId__": 131,
     "kind": "file",
     "name": "src/reducers/devices.js",
-    "content": "// \n\n// This actionreducer uses internally https://github.com/mweststrate/immer, so it's safe to modify given state directly\nimport { createSlice } from 'redux-starter-kit'\n\n/**\n * Devices action creators object\n * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md\n * @return { {\n *   slice : string,\n *   reducer : ReducerFunction,\n *   actions : Object<string, ActionCreator},\n *   selectors : Object<string, Selector>\n *   }}\n */\nexport const devicesState = createSlice({\n  slice: 'devices',\n  initialState: {},\n  reducers: {\n    /*\n     * Reducer action of setting devices state - sets all given devices of given hub, keeps existing states\n     * @param {Object} state\n     * @param {Object} action\n     */\n    setDevices(state, action) {\n      const hubId = action.payload.hubId;\n      const devices = action.payload.devices;\n      const hubDevices = {}\n      for (const [id, device] of Object.entries(devices)) {\n        hubDevices[id] = {...device};\n      }\n      state[hubId] = {...hubDevices};\n    },\n\n    /*\n     * Reducer action of setting device state - sets all given devices of given hub, keeps existing states\n     * @param {Object} state\n     * @param {payload:{Object{hubId:string, device:Object}}} action\n     */\n    setDevice(state, action) {\n      const hubId = action.payload.hubId;\n      const device = action.payload.device;\n      if(state[hubId]) {\n        state[hubId][device.id] = {...device}\n      }\n    },\n\n    /*\n     * Reducer action to remove device from state - sets all given devices of given hub, keeps existing states\n     * @param {Object} state\n     * @param {payload:{Object{hubId:string, device:Object}}} action\n     */\n    deleteDevice(state, action) {\n      const hubId = action.payload.hubId;\n      const device = action.payload.device;\n      if(state[hubId]) {\n        delete state[hubId][device.id]\n      }\n    }\n  }\n})\n\nconst { actions, reducer } = devicesState\n\n/**\n * Devices reducer\n * @type {function} reducer\n */\nexport {reducer as devicesReducer}\n\n\n\n// Extract and export each action creator by name\n/*\nconsole.log(addDevice({ id: 123, name: 'Unnamed device' }))\n{type : \"devices/addDevice\", payload : {id : 123, name: 'Unnamed device' }}\n*/\nexport const { setDevices, deleteDevice } = actions\n\n\n",
+    "content": "// \n\n// This actionreducer uses internally https://github.com/mweststrate/immer, so it's safe to modify given state directly\nimport { createSlice } from 'redux-starter-kit';\n\n/**\n * Devices action creators object\n * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md\n * @return { {\n *   slice : string,\n *   reducer : ReducerFunction,\n *   actions : Object<string, ActionCreator},\n *   selectors : Object<string, Selector>\n *   }}\n */\nexport const devicesState = createSlice({\n  slice: 'devices',\n  initialState: {},\n  reducers: {\n    /*\n     * Reducer action of setting devices state - sets all given devices of given hub, keeps existing states\n     * @param {Object} state\n     * @param {Object} action\n     */\n    setDevices(state, action) {\n      const stateToSet = state;\n      const { hubId } = action.payload;\n      const { devices } = action.payload;\n      const hubDevices = {};\n\n\n      Object.entries(devices).forEach((entry) => {\n        const [id, device] = entry;\n        hubDevices[id] = { ...device };\n      });\n      stateToSet[hubId] = { ...hubDevices };\n    },\n\n    /*\n     * Reducer action of setting device state - sets all given devices of given hub, keeps existing states\n     * @param {Object} state\n     * @param {payload:{Object{hubId:string, device:Object}}} action\n     */\n    setDevice(state, action) {\n      const stateToSet = state;\n      const { hubId } = action.payload;\n      const { device } = action.payload;\n      if (stateToSet[hubId]) {\n        stateToSet[hubId][device.id] = { ...device };\n      }\n    },\n\n    /*\n     * Reducer action to remove device from state - sets all given devices of given hub, keeps existing states\n     * @param {Object} state\n     * @param {payload:{Object{hubId:string, device:Object}}} action\n     */\n    deleteDevice(state, action) {\n      const stateToSet = state;\n      const { hubId } = action.payload;\n      const { device } = action.payload;\n      if (stateToSet[hubId]) {\n        delete stateToSet[hubId][device.id];\n      }\n    },\n  },\n});\n\nconst { actions, reducer } = devicesState;\nconst devicesReducer = reducer;\n/**\n * Devices reducer\n * @type {function} reducer\n */\nexport { reducer as devicesReducer };\n\n\n// Extract and export each action creator by name\n/*\nconsole.log(addDevice({ id: 123, name: 'Unnamed device' }))\n{type : \"devices/addDevice\", payload : {id : 123, name: 'Unnamed device' }}\n*/\nexport const { setDevices, deleteDevice } = actions;\n",
     "static": true,
-    "longname": "/Users/vesalindfors/Code/JS-SDK/docs/src/reducers/devices.js",
+    "longname": "/Users/vesa/code/JS-SDK/docs/src/reducers/devices.js",
     "access": "public",
     "description": null,
     "lineNumber": 1
   },
   {
-    "__docId__": 127,
+    "__docId__": 132,
     "kind": "variable",
     "name": "devicesState",
     "memberof": "src/reducers/devices.js",
@@ -2673,7 +2824,7 @@
     }
   },
   {
-    "__docId__": 128,
+    "__docId__": 133,
     "kind": "variable",
     "name": "actions",
     "memberof": "src/reducers/devices.js",
@@ -2684,7 +2835,7 @@
     "importPath": "cozify-sdk/src/reducers/devices.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 63,
+    "lineNumber": 69,
     "undocument": true,
     "type": {
       "types": [
@@ -2694,7 +2845,7 @@
     "ignore": true
   },
   {
-    "__docId__": 129,
+    "__docId__": 134,
     "kind": "variable",
     "name": "setDevices",
     "memberof": "src/reducers/devices.js",
@@ -2705,7 +2856,7 @@
     "importPath": "cozify-sdk/src/reducers/devices.js",
     "importStyle": "{setDevices}",
     "description": null,
-    "lineNumber": 78,
+    "lineNumber": 83,
     "undocument": true,
     "type": {
       "types": [
@@ -2714,18 +2865,38 @@
     }
   },
   {
-    "__docId__": 130,
+    "__docId__": 135,
+    "kind": "variable",
+    "name": "devicesReducer",
+    "memberof": "src/reducers/devices.js",
+    "static": true,
+    "longname": "src/reducers/devices.js~devicesReducer",
+    "access": "public",
+    "export": true,
+    "importPath": "cozify-sdk/src/reducers/devices.js",
+    "importStyle": "{devicesReducer}",
+    "description": null,
+    "lineNumber": 70,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 136,
     "kind": "file",
     "name": "src/reducers/hubs.js",
-    "content": "// \n\n// This actionreducer uses internally https://github.com/mweststrate/immer, so it's safe to modify given state directly\nimport { createSlice } from 'redux-starter-kit'\nimport { HUB_CONNECTION_STATES } from '../connection/constants';\n\n/**\n * Hubs action creators object\n * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md\n * @return { {\n *   slice : string,\n *   reducer : ReducerFunction,\n *   actions : Object<string, ActionCreator},\n *   selectors : Object<string, Selector>\n *   }}\n */\nexport const hubsState = createSlice({\n  slice: 'hubs',\n  initialState: {},\n  reducers: {\n    /*\n     * Reducer action of setting many hubs to state\n     * @param  {Object} state\n     * @param  {payload:{hubs:HUBS_MAP_TYPE}} action\n     */\n    updateHubs(state, action) {\n      for (const [id, hub] of Object.entries(action.payload)) {\n        state[id] = {...state[id], ...hub};\n      }\n    },\n\n\n    /*\n     * Reducer action of setting hub state to selected\n     * @param  {Object} state\n     * @param  {payload:{hubId:string}} action\n     */\n    selectHub(state, action) {\n      if (state[action.payload]) {\n        state[action.payload].selected = true;\n        //console.log(\"selectHub\", state[action.payload]);\n      }\n    },\n\n    /*\n     * Reducer action of setting hub state to unselected\n     * @param  {Object} state\n     * @param  {payload:{hubId:string}} action\n     */\n    unSelectHub(state, action) {\n      if (state[action.payload]) {\n        state[action.payload].selected = false;\n        //console.log(\"selectHub\", state[action.payload]);\n      }\n    },\n\n    /*\n     * Reducer action of setting hub connection state\n     * @param  {Object} state\n     * @param  {payload:{hubId:string, state:HUB_STATES_TYPE}} action\n     */\n    setHubConnectionState(state, action) {\n      const hubId = action.payload.hubId\n      const newState = action.payload.state\n      const oldState = state[hubId] ? state[hubId].connectionState : undefined\n      if (Object.values(HUB_CONNECTION_STATES).indexOf(newState) > -1) {\n        if (oldState && oldState !== newState) {\n          //console.log (`HUB ${hubId} connection state ${oldState} -> ${newState}`);\n          state[hubId].connectionState = newState;\n        }\n      }\n    }\n  }\n})\n\n\n//console.log('hubsState ', hubsState)\nconst { actions, reducer } = hubsState\nconst hubsReducer = reducer\n\n/**\n * Hubs reducer\n * @type {function} reducer\n */\nexport {reducer as hubsReducer}\n\n// Extract and export each action creator by name\n/*\nconsole.log(updateHubs({ id: 123, name: 'Unnamed device' }))\n{type : \"hubs/updateHubs, payload : {id : 123, name: 'Unnamed device' }}\n*/\nexport const { updateHubs, selectHub, unSelectHub, setHubConnectionState } = actions\n\n",
+    "content": "// \n\n// This actionreducer uses internally https://github.com/mweststrate/immer, so it's safe to modify given state directly\nimport { createSlice } from 'redux-starter-kit';\nimport { HUB_CONNECTION_STATES } from '../connection/constants';\n\n/**\n * Hubs action creators object\n * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md\n * @return { {\n *   slice : string,\n *   reducer : ReducerFunction,\n *   actions : Object<string, ActionCreator},\n *   selectors : Object<string, Selector>\n *   }}\n */\nexport const hubsState = createSlice({\n  slice: 'hubs',\n  initialState: {},\n  reducers: {\n    /*\n     * Reducer action of setting many hubs to state\n     * @param  {Object} state\n     * @param  {payload:{hubs:HUBS_MAP_TYPE}} action\n     */\n    updateHubs(state, action) {\n      const stateToSet = state;\n      const hubs = action.payload;\n      console.log('updateHubs', hubs);\n      Object.entries(hubs).forEach((entry) => {\n        const [id, hub] = entry;\n        stateToSet[id] = { ...state[id], ...hub };\n      });\n    },\n\n\n    /*\n     * Reducer action of setting hub state to selected\n     * @param  {Object} state\n     * @param  {payload:{hubId:string}} action\n     */\n    selectHub(state, action) {\n      const stateToSet = state;\n      const { hubId } = action.payload;\n      console.log('selectHub', hubId);\n      if (state[hubId]) {\n        stateToSet[hubId].selected = true;\n        console.log('selectHub', state[hubId]);\n      }\n    },\n\n    /*\n     * Reducer action of setting hub state to unselected\n     * @param  {Object} state\n     * @param  {payload:{hubId:string}} action\n     */\n    unSelectHub(state, action) {\n      const stateToSet = state;\n      const { hubId } = action.payload;\n      if (state[hubId]) {\n        stateToSet[hubId].selected = false;\n        // console.log(\"selectHub\", state[action.payload]);\n      }\n    },\n\n    /*\n     * Reducer action of setting hub connection state\n     * @param  {Object} state\n     * @param  {payload:{hubId:string, state:HUB_STATES_TYPE}} action\n     */\n    setHubConnectionState(state, action) {\n      const { hubId } = action.payload;\n      const stateToSet = state;\n      const newState = action.payload.state;\n      const oldState = state[hubId] ? state[hubId].connectionState : undefined;\n      if (Object.values(HUB_CONNECTION_STATES).indexOf(newState) > -1) {\n        if (oldState && oldState !== newState) {\n          // console.log (`HUB ${hubId} connection state ${oldState} -> ${newState}`);\n          stateToSet[hubId].connectionState = newState;\n        }\n      }\n    },\n  },\n});\n\n\n// console.log('hubsState ', hubsState)\nconst { actions, reducer } = hubsState;\nconst hubsReducer = reducer;\n\n/**\n * Hubs reducer\n * @type {function} reducer\n */\nexport { reducer as hubsReducer };\n\n// Extract and export each action creator by name\n/*\nconsole.log(updateHubs({ id: 123, name: 'Unnamed device' }))\n{type : \"hubs/updateHubs, payload : {id : 123, name: 'Unnamed device' }}\n*/\nexport const {\n  updateHubs, selectHub, unSelectHub, setHubConnectionState,\n} = actions;\n",
     "static": true,
-    "longname": "/Users/vesalindfors/Code/JS-SDK/docs/src/reducers/hubs.js",
+    "longname": "/Users/vesa/code/JS-SDK/docs/src/reducers/hubs.js",
     "access": "public",
     "description": null,
     "lineNumber": 1
   },
   {
-    "__docId__": 131,
+    "__docId__": 137,
     "kind": "variable",
     "name": "hubsState",
     "memberof": "src/reducers/hubs.js",
@@ -2755,7 +2926,7 @@
     }
   },
   {
-    "__docId__": 132,
+    "__docId__": 138,
     "kind": "variable",
     "name": "actions",
     "memberof": "src/reducers/hubs.js",
@@ -2766,7 +2937,7 @@
     "importPath": "cozify-sdk/src/reducers/hubs.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 78,
+    "lineNumber": 88,
     "undocument": true,
     "type": {
       "types": [
@@ -2776,7 +2947,7 @@
     "ignore": true
   },
   {
-    "__docId__": 133,
+    "__docId__": 139,
     "kind": "variable",
     "name": "updateHubs",
     "memberof": "src/reducers/hubs.js",
@@ -2787,7 +2958,7 @@
     "importPath": "cozify-sdk/src/reducers/hubs.js",
     "importStyle": "{updateHubs}",
     "description": null,
-    "lineNumber": 92,
+    "lineNumber": 102,
     "undocument": true,
     "type": {
       "types": [
@@ -2796,7 +2967,7 @@
     }
   },
   {
-    "__docId__": 134,
+    "__docId__": 140,
     "kind": "variable",
     "name": "hubsReducer",
     "memberof": "src/reducers/hubs.js",
@@ -2807,7 +2978,7 @@
     "importPath": "cozify-sdk/src/reducers/hubs.js",
     "importStyle": "{hubsReducer}",
     "description": null,
-    "lineNumber": 79,
+    "lineNumber": 89,
     "undocument": true,
     "type": {
       "types": [
@@ -2816,18 +2987,18 @@
     }
   },
   {
-    "__docId__": 135,
+    "__docId__": 141,
     "kind": "file",
     "name": "src/reducers/index.js",
-    "content": "import {connectionsReducer} from './connections';\nimport {devicesReducer} from './devices';\nimport {hubsReducer} from './hubs';\nimport {userReducer} from './user';\n\n/**\n * Root reducer\n * @type {Object}\n */\nconst rootReducer = {\n  connections: connectionsReducer,\n  devices: devicesReducer,\n  hubs: hubsReducer,\n  user: userReducer,\n};\n\nexport {rootReducer}\n\n\n",
+    "content": "import { connectionsReducer } from './connections';\nimport { devicesReducer } from './devices';\nimport { hubsReducer } from './hubs';\nimport { userReducer } from './user';\n\n/**\n * Root reducer\n * @type {Object}\n */\nconst rootReducer = {\n  connections: connectionsReducer,\n  devices: devicesReducer,\n  hubs: hubsReducer,\n  user: userReducer,\n};\n\nexport default rootReducer;\n",
     "static": true,
-    "longname": "/Users/vesalindfors/Code/JS-SDK/docs/src/reducers/index.js",
+    "longname": "/Users/vesa/code/JS-SDK/docs/src/reducers/index.js",
     "access": "public",
     "description": null,
     "lineNumber": 1
   },
   {
-    "__docId__": 136,
+    "__docId__": 142,
     "kind": "variable",
     "name": "rootReducer",
     "memberof": "src/reducers/index.js",
@@ -2836,7 +3007,7 @@
     "access": "public",
     "export": true,
     "importPath": "cozify-sdk/src/reducers/index.js",
-    "importStyle": "{rootReducer}",
+    "importStyle": "rootReducer",
     "description": "Root reducer",
     "lineNumber": 10,
     "type": {
@@ -2849,18 +3020,18 @@
     }
   },
   {
-    "__docId__": 137,
+    "__docId__": 143,
     "kind": "file",
     "name": "src/reducers/user.js",
-    "content": "// \n\n// This actionreducer uses internally https://github.com/mweststrate/immer, so it's safe to modify given state directly\nimport { createSlice } from 'redux-starter-kit'\nimport { LANGUAGES, USER_STATES, ROLES } from '../user/constants.js';\nimport isEmpty  from 'lodash/isEmpty';\n\n\n/**\n * User action creators object\n * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md\n * @return { {\n *   slice : string,\n *   reducer : ReducerFunction,\n *   actions : Object<string, ActionCreator},\n *   selectors : Object<string, Selector>\n *   }}\n */\nexport const userState = createSlice({\n  slice: 'user',\n  initialState: {\n    firstName: '',\n    lastName: '',\n    email: '',\n    language: LANGUAGES.NONE,\n    authKey: '',\n    role: ROLES.ANONYMOUS,\n    eulaAccepted: false,\n    state: USER_STATES.WAITING_LANGUAGE\n  },\n  reducers: {\n    /*\n     * Reducer action of setting user's state\n     * @param  {Object} state\n     * @param  {payload:{state:USER_STATE_TYPE}} action\n     */\n    changeState(state, action) {\n      const newState = action.payload\n      const oldState = state.state\n      console.log (\"User state \" + oldState + \" -> \" + newState)\n      switch (oldState) {\n        case USER_STATES.WAITING_LANGUAGE: {\n          if (newState === USER_STATES.LANGUAGE_SET) {\n            if (!isEmpty(state.language)) {\n              state.state = USER_STATES.WAITING_LOGIN;\n            }\n          }\n          break;\n        }\n        case USER_STATES.WAITING_LOGIN: {\n          if (newState === USER_STATES.LOGIN_DONE) {\n            if (!isEmpty(state.authKey)) {\n              if (isEmpty(state.eulaAcceted)) {\n                state.state = USER_STATES.WAITING_EULA;\n              } else {\n                state.state = USER_STATES.AUTHENTICATED;\n              }\n            }\n          }\n          break;\n        }\n        case USER_STATES.WAITING_EULA: {\n          if (newState === USER_STATES.EULA_ACCEPTED) {\n            state.state = USER_STATES.AUTHENTICATED;\n          }\n          break;\n        }\n        case USER_STATES.AUTHENTICATED: {\n          if (newState === USER_STATES.LOGGED_OUT) {\n            state.state = USER_STATES.WAITING_LOGIN;\n          }\n          break;\n        }\n        default: {\n          // statements;\n          break;\n        }\n      }\n    },\n\n    /*\n     * Reducer action of setting user's eula to accepted\n     * @param  {Object} state\n     * @param  {payload:boolean} action\n     */\n    setEula(state, action) {\n      state.eulaAccepted = action.payload\n    },\n\n    /*\n     * Reducer action of setting user's language\n     * @param  {Object} state\n     * @param  {payload:LANGUAGES_TYPE} action\n     */\n    setLanguage(state, action) {\n      state.language = action.payload\n    },\n\n    /*\n     * Reducer action of setting user's authKey\n     * @param  {Object} state\n     * @param  {payload:string} action\n     */\n    setAuthKey(state, action) {\n      state.authKey = action.payload\n    }\n\n  }\n})\n\n/*\nconsole.log(user)\n{\n    actions : {\n        setState\n    },\n    reducer\n}\n*/\n\n\nconst { actions, reducer } = userState\nconst userReducer = reducer\n\n/**\n * Hubs reducer\n * @type {function} reducer\n */\nexport {reducer as userReducer}\n\n\n// Extract and export each action creator by name\nexport const { changeState, setEula, setLanguage, setAuthKey } = actions\n\n\n",
+    "content": "// \n\n// This actionreducer uses internally https://github.com/mweststrate/immer, so it's safe to modify given state directly\nimport { createSlice } from 'redux-starter-kit';\nimport isEmpty from 'lodash/isEmpty';\nimport { LANGUAGES, USER_STATES, ROLES } from '../user/constants';\n\n\n/**\n * User action creators object\n * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md\n * @return { {\n *   slice : string,\n *   reducer : ReducerFunction,\n *   actions : Object<string, ActionCreator},\n *   selectors : Object<string, Selector>\n *   }}\n */\nexport const userState = createSlice({\n  slice: 'user',\n  initialState: {\n    firstName: '',\n    lastName: '',\n    email: '',\n    language: LANGUAGES.NONE,\n    authKey: '',\n    role: ROLES.ANONYMOUS,\n    eulaAccepted: false,\n    state: USER_STATES.WAITING_LANGUAGE,\n  },\n  reducers: {\n    /*\n     * Reducer action of setting user's state\n     * @param  {Object} state\n     * @param  {payload:{state:USER_STATE_TYPE}} action\n     */\n    changeState(state, action) {\n      const stateToSet = state;\n      const newState = action.payload;\n      const oldState = state.state;\n      console.log(`User state ${oldState} -> ${newState}`);\n      switch (oldState) {\n        case USER_STATES.WAITING_LANGUAGE: {\n          if (newState === USER_STATES.LANGUAGE_SET) {\n            if (!isEmpty(state.language)) {\n              stateToSet.state = USER_STATES.WAITING_LOGIN;\n            }\n          }\n          break;\n        }\n        case USER_STATES.WAITING_LOGIN: {\n          if (newState === USER_STATES.LOGIN_DONE) {\n            if (!isEmpty(state.authKey)) {\n              if (isEmpty(state.eulaAcceted)) {\n                stateToSet.state = USER_STATES.WAITING_EULA;\n              } else {\n                stateToSet.state = USER_STATES.AUTHENTICATED;\n              }\n            }\n          }\n          break;\n        }\n        case USER_STATES.WAITING_EULA: {\n          if (newState === USER_STATES.EULA_ACCEPTED) {\n            stateToSet.state = USER_STATES.AUTHENTICATED;\n          }\n          break;\n        }\n        case USER_STATES.AUTHENTICATED: {\n          if (newState === USER_STATES.LOGGED_OUT) {\n            stateToSet.state = USER_STATES.WAITING_LOGIN;\n          }\n          break;\n        }\n        default: {\n          // statements;\n          break;\n        }\n      }\n    },\n\n    /*\n     * Reducer action of setting user's eula to accepted\n     * @param  {Object} state\n     * @param  {payload:boolean} action\n     */\n    setEula(state, action) {\n      const stateToSet = state;\n      stateToSet.eulaAccepted = action.payload;\n    },\n\n    /*\n     * Reducer action of setting user's language\n     * @param  {Object} state\n     * @param  {payload:LANGUAGES_TYPE} action\n     */\n    setLanguage(state, action) {\n      const stateToSet = state;\n      stateToSet.language = action.payload;\n    },\n\n    /*\n     * Reducer action of setting user's authKey\n     * @param  {Object} state\n     * @param  {payload:string} action\n     */\n    setAuthKey(state, action) {\n      const stateToSet = state;\n      stateToSet.authKey = action.payload;\n    },\n\n  },\n});\n\n/*\nconsole.log(user)\n{\n    actions : {\n        setState\n    },\n    reducer\n}\n*/\n\n\nconst { actions, reducer } = userState;\nconst userReducer = reducer;\n\n/**\n * Hubs reducer\n * @type {function} reducer\n */\nexport { reducer as userReducer };\n\n\n// Extract and export each action creator by name\nexport const {\n  changeState, setEula, setLanguage, setAuthKey,\n} = actions;\n",
     "static": true,
-    "longname": "/Users/vesalindfors/Code/JS-SDK/docs/src/reducers/user.js",
+    "longname": "/Users/vesa/code/JS-SDK/docs/src/reducers/user.js",
     "access": "public",
     "description": null,
     "lineNumber": 1
   },
   {
-    "__docId__": 138,
+    "__docId__": 144,
     "kind": "variable",
     "name": "userState",
     "memberof": "src/reducers/user.js",
@@ -2890,7 +3061,7 @@
     }
   },
   {
-    "__docId__": 139,
+    "__docId__": 145,
     "kind": "variable",
     "name": "actions",
     "memberof": "src/reducers/user.js",
@@ -2901,7 +3072,7 @@
     "importPath": "cozify-sdk/src/reducers/user.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 122,
+    "lineNumber": 126,
     "undocument": true,
     "type": {
       "types": [
@@ -2911,7 +3082,7 @@
     "ignore": true
   },
   {
-    "__docId__": 140,
+    "__docId__": 146,
     "kind": "variable",
     "name": "changeState",
     "memberof": "src/reducers/user.js",
@@ -2922,7 +3093,7 @@
     "importPath": "cozify-sdk/src/reducers/user.js",
     "importStyle": "{changeState}",
     "description": null,
-    "lineNumber": 133,
+    "lineNumber": 137,
     "undocument": true,
     "type": {
       "types": [
@@ -2931,7 +3102,7 @@
     }
   },
   {
-    "__docId__": 141,
+    "__docId__": 147,
     "kind": "variable",
     "name": "userReducer",
     "memberof": "src/reducers/user.js",
@@ -2942,7 +3113,7 @@
     "importPath": "cozify-sdk/src/reducers/user.js",
     "importStyle": "{userReducer}",
     "description": null,
-    "lineNumber": 123,
+    "lineNumber": 127,
     "undocument": true,
     "type": {
       "types": [
@@ -2951,18 +3122,18 @@
     }
   },
   {
-    "__docId__": 142,
+    "__docId__": 148,
     "kind": "file",
     "name": "src/store.js",
-    "content": "\nimport { configureStore, getDefaultMiddleware } from 'redux-starter-kit';\nimport {rootReducer} from './reducers';\n\nimport get from 'get-value'\n\n/**\n * store as a redux state store\n * @type {Object}\n */\nexport const store = configureStore({\n  reducer: rootReducer\n  //middleware: [...getDefaultMiddleware(), logger]\n  // default true like: devTools: process.env.NODE_ENV !== 'production'\n  //preloadedState\n  //enhancers: [reduxBatch]\n});\nconsole.log(\"Store Initial State: \", store.getState())\n\nfunction watchState (getState, objectPath) {\n  var currentValue = get(getState(), objectPath)\n  return function w (fn) {\n    return function () {\n      var newValue = get(getState(), objectPath)\n      if (currentValue !== newValue) {\n        var oldValue = currentValue\n        currentValue = newValue\n        fn(newValue, oldValue)\n      }\n    }\n  }\n}\n\n/**\n * Helper to subscribe to store changes\n * @param  {string} path - attribute path to watch changes, e.g. 'user.state'\n * @param  {function} changed - function to handle changes\n * @param  {Object} optionalStore - optional store for unit tests etc.\n */\nexport function watchChanges(path, changed, optionalStore) {\n    let selectedStore = optionalStore ? optionalStore : store\n    let watchFn = watchState(selectedStore.getState, path);\n    selectedStore.subscribe(watchFn(changed));\n}\n\n",
+    "content": "\nimport { configureStore } from 'redux-starter-kit';\nimport get from 'get-value';\nimport rootReducer from './reducers';\n\n\n/**\n * store as a redux state store\n * @type {Object}\n */\nexport const store = configureStore({\n  reducer: rootReducer,\n  // middleware: [...getDefaultMiddleware(), logger]\n  // default true like: devTools: process.env.NODE_ENV !== 'production'\n  // preloadedState\n  // enhancers: [reduxBatch]\n});\nconsole.log('Store Initial State: ', store.getState());\n\nfunction watchState (getState, objectPath) {\n  let currentValue = get(getState(), objectPath);\n  return function w (fn) {\n    return () => {\n      const newValue = get(getState(), objectPath);\n      if (currentValue !== newValue) {\n        const oldValue = currentValue;\n        currentValue = newValue;\n        fn(newValue, oldValue);\n      }\n    };\n  };\n}\n\n/**\n * Helper to subscribe to store changes\n * @param  {string} path - attribute path to watch changes, e.g. 'user.state'\n * @param  {function} changed - function to handle changes\n * @param  {Object} optionalStore - optional store for unit tests etc.\n */\nexport function watchChanges(path, changed, optionalStore) {\n  const selectedStore = optionalStore || store;\n  const watchFn = watchState(selectedStore.getState, path);\n  selectedStore.subscribe(watchFn(changed));\n}\n",
     "static": true,
-    "longname": "/Users/vesalindfors/Code/JS-SDK/docs/src/store.js",
+    "longname": "/Users/vesa/code/JS-SDK/docs/src/store.js",
     "access": "public",
     "description": null,
     "lineNumber": 1
   },
   {
-    "__docId__": 143,
+    "__docId__": 149,
     "kind": "variable",
     "name": "store",
     "memberof": "src/store.js",
@@ -2984,7 +3155,7 @@
     }
   },
   {
-    "__docId__": 144,
+    "__docId__": 150,
     "kind": "function",
     "name": "watchState",
     "memberof": "src/store.js",
@@ -3028,7 +3199,7 @@
     "ignore": true
   },
   {
-    "__docId__": 145,
+    "__docId__": 151,
     "kind": "function",
     "name": "watchChanges",
     "memberof": "src/store.js",
@@ -3077,18 +3248,18 @@
     "return": null
   },
   {
-    "__docId__": 146,
+    "__docId__": 152,
     "kind": "file",
     "name": "src/user/constants.js",
-    "content": "// \n\n\n/**\n  * Enumeration of language, that could be\n  * NONE, EN_UK or FI_FI\n  * @readonly\n  * @enum {string}\n  */\nexport const LANGUAGES = Object.freeze({\n  NONE: 'none',\n  EN_UK: 'en-uk',\n  FI_FI: 'fi-fi',\n});\n\n\n/**\n  * Enumeration of user state, that could be\n  * WAITING_LANGUAGE, LANGUAGE_SET, WAITING_LOGIN, LOGIN_DONE, WAITING_EULA, EULA_ACCEPTED, AUTHENTICATED or LOGGED_OUT\n  * @readonly\n  * @enum {string}\n  */\nexport const USER_STATES = Object.freeze({\n  WAITING_LANGUAGE: 'wait language',\n  LANGUAGE_SET: 'language set',\n  WAITING_LOGIN: 'wait login',\n  LOGIN_DONE: 'login done',\n  WAITING_EULA: 'wait eula',\n  EULA_ACCEPTED: 'eula accepted',\n  AUTHENTICATED: 'logged in',\n  LOGGED_OUT: 'loged out',\n});\n\n\n/**\n  * Enumeration of ROLES, that could be\n  * ADMIN, USER, GUEST or ANONYMOUS\n  * @readonly\n  * @enum {string}\n  */\nexport const ROLES = Object.freeze({\n  ADMIN: 32,\n  USER: 8,\n  GUEST: 2,\n  ANONYMOUS: 1,\n});\n\n\n",
+    "content": "// \n\n\n/**\n  * Enumeration of language, that could be\n  * NONE, EN_UK or FI_FI\n  * @readonly\n  * @enum {string}\n  */\nexport const LANGUAGES = Object.freeze({\n  NONE: 'none',\n  EN_UK: 'en-uk',\n  FI_FI: 'fi-fi',\n});\n\n\n/**\n  * Enumeration of user state, that could be\n  * WAITING_LANGUAGE, LANGUAGE_SET, WAITING_LOGIN, LOGIN_DONE, WAITING_EULA, EULA_ACCEPTED, AUTHENTICATED or LOGGED_OUT\n  * @readonly\n  * @enum {string}\n  */\nexport const USER_STATES = Object.freeze({\n  WAITING_LANGUAGE: 'wait language',\n  LANGUAGE_SET: 'language set',\n  WAITING_LOGIN: 'wait login',\n  LOGIN_DONE: 'login done',\n  WAITING_EULA: 'wait eula',\n  EULA_ACCEPTED: 'eula accepted',\n  AUTHENTICATED: 'logged in',\n  LOGGED_OUT: 'loged out',\n});\n\n\n/**\n  * Enumeration of ROLES, that could be\n  * ADMIN, USER, GUEST or ANONYMOUS\n  * @readonly\n  * @enum {string}\n  */\nexport const ROLES = Object.freeze({\n  ADMIN: 32,\n  USER: 8,\n  GUEST: 2,\n  ANONYMOUS: 1,\n});\n",
     "static": true,
-    "longname": "/Users/vesalindfors/Code/JS-SDK/docs/src/user/constants.js",
+    "longname": "/Users/vesa/code/JS-SDK/docs/src/user/constants.js",
     "access": "public",
     "description": null,
     "lineNumber": 1
   },
   {
-    "__docId__": 147,
+    "__docId__": 153,
     "kind": "variable",
     "name": "LANGUAGES",
     "memberof": "src/user/constants.js",
@@ -3117,7 +3288,7 @@
     }
   },
   {
-    "__docId__": 148,
+    "__docId__": 154,
     "kind": "variable",
     "name": "USER_STATES",
     "memberof": "src/user/constants.js",
@@ -3146,7 +3317,7 @@
     }
   },
   {
-    "__docId__": 149,
+    "__docId__": 155,
     "kind": "variable",
     "name": "ROLES",
     "memberof": "src/user/constants.js",
@@ -3175,18 +3346,18 @@
     }
   },
   {
-    "__docId__": 150,
+    "__docId__": 156,
     "kind": "file",
     "name": "src/user/user.js",
-    "content": "// \nimport isEmpty  from 'lodash/isEmpty';\nimport isString  from 'lodash/isString';\n\n\nimport { send, COMMANDS } from '../connection/send.js'\nimport { store } from \"../store.js\"\nimport { userState, userReducer } from \"../reducers/user\";\n\nimport { USER_STATES, ROLES, LANGUAGES } from './constants.js';\n\n/*\n * Helper to get user\n * @return {Object} user\n */\nfunction storedUser() {\n  return userState.selectors.getUser(store.getState());\n}\n\n\n/**\n * User action to change current language\n * @type {LANGUAGES_TYPE}\n */\nexport function changeLanguage(newLanguage) {\n  let retVel = false\n  if (Object.values(LANGUAGES).indexOf(newLanguage) > -1) {\n    store.dispatch(userState.actions.setLanguage(newLanguage));\n    if (storedUser().state === USER_STATES.WAITING_LANGUAGE) {\n      store.dispatch(userState.actions.changeState(USER_STATES.LANGUAGE_SET));\n    }\n    retVel = true;\n  }\n  return retVel;\n}\n\n/**\n * User action to accept EULA\n */\nexport function acceptEula() {\n  let retVel = false\n  store.dispatch(userState.actions.setEula(true));\n  if (storedUser().state === USER_STATES.WAITING_EULA) {\n    store.dispatch(userState.actions.changeState(USER_STATES.EULA_ACCEPTED));\n  }\n  retVel = true;\n\n  return retVel;\n}\n\n/**\n * User action to log in\n * @param {string} email - email address\n * @param {password} password  - fixed password\n */\nexport function doPwLogin(email, password) {\n  return new Promise( (resolve, reject) => {\n    send( {command: COMMANDS.USER_LOGIN,  data:{email:email, password:password} })\n      .then((response) => {\n        if (response && isString(response)) {\n          store.dispatch(userState.actions.setAuthKey(response));\n          if (storedUser().state === USER_STATES.WAITING_LOGIN) {\n            store.dispatch(userState.actions.changeState(USER_STATES.LOGIN_DONE));\n          }\n        }\n        resolve(response);\n      })\n      .catch((error) => {\n        //console.error(error);\n        reject(false)\n      });\n  });\n}\n\n\n/**\n * Get state of user state-machine\n */\nexport function getUserState() {\n  return storedUser().state\n}\n\n\n",
+    "content": "// \nimport isString from 'lodash/isString';\n\n\nimport { send, COMMANDS } from '../connection/send';\nimport { store } from '../store';\nimport { userState } from '../reducers/user';\n\nimport { USER_STATES, LANGUAGES } from './constants';\n\n\n/*\n * Helper to get user\n * @return {Object} user\n */\nfunction storedUser() {\n  return userState.selectors.getUser(store.getState());\n}\n\n\n/**\n * User action to change current language\n * @type {LANGUAGES_TYPE}\n */\nexport function changeLanguage(newLanguage) {\n  let retVel = false;\n  if (Object.values(LANGUAGES).indexOf(newLanguage) > -1) {\n    store.dispatch(userState.actions.setLanguage(newLanguage));\n    if (storedUser().state === USER_STATES.WAITING_LANGUAGE) {\n      store.dispatch(userState.actions.changeState(USER_STATES.LANGUAGE_SET));\n    }\n    retVel = true;\n  }\n  return retVel;\n}\n\n/**\n * User action to accept EULA\n */\nexport function acceptEula() {\n  let retVel = false;\n  store.dispatch(userState.actions.setEula(true));\n  if (storedUser().state === USER_STATES.WAITING_EULA) {\n    store.dispatch(userState.actions.changeState(USER_STATES.EULA_ACCEPTED));\n  }\n  retVel = true;\n\n  return retVel;\n}\n\n/**\n * User action to log in\n * @param {string} email - email address\n * @param {password} password  - fixed password\n */\nexport function doPwLogin(email, password) {\n  return new Promise((resolve, reject) => {\n    send({ command: COMMANDS.USER_LOGIN, data: { email, password } })\n      .then((response) => {\n        if (response && isString(response)) {\n          store.dispatch(userState.actions.setAuthKey(response));\n          if (storedUser().state === USER_STATES.WAITING_LOGIN) {\n            store.dispatch(userState.actions.changeState(USER_STATES.LOGIN_DONE));\n          }\n        }\n        resolve(response);\n      })\n      .catch((error) => {\n        console.debug('doPwLogin error', error);\n        reject(new Error('Login failure'));\n      });\n  });\n}\n\n\n/**\n * Get state of user state-machine\n */\nexport function getUserState() {\n  return storedUser().state;\n}\n",
     "static": true,
-    "longname": "/Users/vesalindfors/Code/JS-SDK/docs/src/user/user.js",
+    "longname": "/Users/vesa/code/JS-SDK/docs/src/user/user.js",
     "access": "public",
     "description": null,
     "lineNumber": 1
   },
   {
-    "__docId__": 151,
+    "__docId__": 157,
     "kind": "function",
     "name": "storedUser",
     "memberof": "src/user/user.js",
@@ -3209,7 +3380,7 @@
     "ignore": true
   },
   {
-    "__docId__": 152,
+    "__docId__": 158,
     "kind": "function",
     "name": "changeLanguage",
     "memberof": "src/user/user.js",
@@ -3246,7 +3417,7 @@
     }
   },
   {
-    "__docId__": 153,
+    "__docId__": 159,
     "kind": "function",
     "name": "acceptEula",
     "memberof": "src/user/user.js",
@@ -3268,7 +3439,7 @@
     }
   },
   {
-    "__docId__": 154,
+    "__docId__": 160,
     "kind": "function",
     "name": "doPwLogin",
     "memberof": "src/user/user.js",
@@ -3311,7 +3482,7 @@
     }
   },
   {
-    "__docId__": 155,
+    "__docId__": 161,
     "kind": "function",
     "name": "getUserState",
     "memberof": "src/user/user.js",
@@ -3333,18 +3504,61 @@
     }
   },
   {
-    "__docId__": 156,
+    "__docId__": 162,
     "kind": "file",
     "name": "src/utils.js",
-    "content": "// \n\n/**\n * Helper method to Base64 decode\n * @param  {string} encoded - string to be decoded\n * @return {string}  - decoded string\n */\nexport function urlBase64Decode(encoded) {\n  let str = encoded.replace(/-/g, \"+\").replace(/_/g, \"/\");\n  let output = str;\n  switch (output.length % 4) {\n      case 0:\n      case 2:\n          output += \"==\";\n          break;\n      case 3:\n          output += \"=\";\n          break;\n      default:\n          throw \"Illegal base64url string!\"\n  }\n  var retVal = \"\";\n\n  let atob = function(a) {};\n  if(!isNode){\n    atob  = window.atob;\n  } else {\n    atob = function(a) {\n      return new Buffer(a, 'base64').toString('binary');\n    };\n  }\n\n  try {\n        retVal = atob(str);\n  } catch(error){\n      try {\n        retVal = atob(output);\n      } catch(error){\n        console.error( \"urlBase64Decode: trying atob failed\");\n      }\n  }\n  return retVal\n\n}\n\n/**\n * Helper to check if run environment is Node\n * @type {Boolean}\n */\nexport let isNode = false;\nif (typeof process === 'object') {\n  if (typeof process.versions === 'object') {\n    if (typeof process.versions.node !== 'undefined') {\n      isNode = true;\n      console.log(\"Running in node.js\");\n    } else {\n      console.log(\"Running in browser\");\n    }\n  }\n}\n",
+    "content": "// \n\n/**\n * Helper to check if run environment is Node\n * @type {Boolean}\n */\nlet isNodeInUse = false;\n\nif (typeof process === 'object') {\n  if (typeof process.versions === 'object') {\n    if (typeof process.versions.node !== 'undefined') {\n      isNodeInUse = true;\n      console.log('Running in node.js');\n    } else {\n      console.log('Running in browser');\n    }\n  }\n}\n\nexport const isNode = isNodeInUse;\n\n/**\n * Helper method to Base64 decode\n * @param  {string} encoded - string to be decoded\n * @return {string}  - decoded string\n */\nexport function urlBase64Decode(encoded) {\n  const str = encoded.replace(/-/g, '+').replace(/_/g, '/');\n  let output = str;\n  switch (output.length % 4) {\n    case 0:\n    case 2:\n      output += '==';\n      break;\n    case 3:\n      output += '=';\n      break;\n    default:\n      throw new Error('Illegal base64url string!');\n  }\n  let retVal = '';\n\n  let atob = (a) => { console.error('Invalid atob for string ', a); return 'invalid atob'; };\n  if (!isNodeInUse) {\n    atob = window.atob;\n  } else {\n    const nodeAtob = (a) => {\n      const binVal = Buffer.from(a, 'base64').toString('binary');\n      return binVal;\n    };\n    atob = nodeAtob;\n  }\n\n  try {\n    retVal = atob(str);\n  } catch (error) {\n    try {\n      retVal = atob(output);\n    } catch (error2) {\n      console.error('urlBase64Decode: trying atob failed');\n    }\n  }\n  return retVal;\n}\n",
     "static": true,
-    "longname": "/Users/vesalindfors/Code/JS-SDK/docs/src/utils.js",
+    "longname": "/Users/vesa/code/JS-SDK/docs/src/utils.js",
     "access": "public",
     "description": null,
     "lineNumber": 1
   },
   {
-    "__docId__": 157,
+    "__docId__": 163,
+    "kind": "variable",
+    "name": "isNodeInUse",
+    "memberof": "src/utils.js",
+    "static": true,
+    "longname": "src/utils.js~isNodeInUse",
+    "access": "public",
+    "export": false,
+    "importPath": "cozify-sdk/src/utils.js",
+    "importStyle": null,
+    "description": "Helper to check if run environment is Node",
+    "lineNumber": 7,
+    "type": {
+      "nullable": null,
+      "types": [
+        "Boolean"
+      ],
+      "spread": false,
+      "description": null
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 164,
+    "kind": "variable",
+    "name": "isNode",
+    "memberof": "src/utils.js",
+    "static": true,
+    "longname": "src/utils.js~isNode",
+    "access": "public",
+    "export": true,
+    "importPath": "cozify-sdk/src/utils.js",
+    "importStyle": "{isNode}",
+    "description": null,
+    "lineNumber": 20,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 165,
     "kind": "function",
     "name": "urlBase64Decode",
     "memberof": "src/utils.js",
@@ -3357,7 +3571,7 @@
     "importPath": "cozify-sdk/src/utils.js",
     "importStyle": "{urlBase64Decode}",
     "description": "Helper method to Base64 decode",
-    "lineNumber": 8,
+    "lineNumber": 27,
     "params": [
       {
         "nullable": null,
@@ -3380,39 +3594,17 @@
     }
   },
   {
-    "__docId__": 158,
-    "kind": "variable",
-    "name": "isNode",
-    "memberof": "src/utils.js",
-    "static": true,
-    "longname": "src/utils.js~isNode",
-    "access": "public",
-    "export": true,
-    "importPath": "cozify-sdk/src/utils.js",
-    "importStyle": "{isNode}",
-    "description": "Helper to check if run environment is Node",
-    "lineNumber": 50,
-    "type": {
-      "nullable": null,
-      "types": [
-        "Boolean"
-      ],
-      "spread": false,
-      "description": null
-    }
-  },
-  {
     "kind": "index",
-    "content": "# cozify-sdk\n\n> JavaScript SDK for Cozify REST API\n\n\n### Usage\n\n#### Browsers (should use iife-version)\n```\n<script src=\"https://unpkg.com/axios/dist/axios.min.js\"></script>\n<script type=\"text/javascript\" src=\"../dist/sdk-browser.js\"></script>\n<script type=\"text/javascript\">\n      let LANGUAGES = CozifySDK.LANGUAGES;\n      let USER_STATES = CozifySDK.USER_STATES;\n      console.info(`Initial user state ${CozifySDK.getUserState()}`);\n      CozifySDK.changeLanguage(LANGUAGES.FI_FI);\n      ... more in /browser-example\n\n```\n\n#### React-projects (should use es-version)\n```\nimport { state } from 'cozify-sdk'\nconsole.log(`Initial connection state now ${state.connectionState}`);\n\n... more in /example\n\n```\n\n#### Node-projects (should use cjs-version)\n```\nimport { state } from 'cozify-sdk'\nconsole.log(`Initial connection state now ${state.connectionState}`);\n\n... more in /node-example\n\n```\n\n## License\n\nMIT © [cozify/JS-SDK]\n",
-    "longname": "/Users/vesalindfors/Code/JS-SDK/README.md",
+    "content": "# cozify-sdk\n\n> JavaScript SDK for Cozify REST API\n\n\n### Usage\n\n#### Browsers (should use iife-version)\n```\n<script src=\"https://unpkg.com/axios/dist/axios.min.js\"></script>\n<script type=\"text/javascript\" src=\"../dist/sdk-browser.js\"></script>\n<script type=\"text/javascript\">\n      let LANGUAGES = CozifySDK.LANGUAGES;\n      let USER_STATES = CozifySDK.USER_STATES;\n      console.info(`Initial user state ${CozifySDK.getUserState()}`);\n      CozifySDK.changeLanguage(LANGUAGES.FI_FI);\n      ... more in /browser-example\n\n```\n\n#### React-projects (should use es-version)\n```\nimport { LANGUAGES, USER_STATES, getUserState } from 'cozify-sdk'\nconsole.info(`Initial user state ${getUserState()}`);\nCozifySDK.changeLanguage(LANGUAGES.FI_FI);\n\n... more in /example\n\n```\n\n#### Node-projects (should use cjs-version)\n```\nconst CozifySDK = require('../dist/sdk-node.js');\nlet LANGUAGES = CozifySDK.LANGUAGES;\nlet USER_STATES = CozifySDK.USER_STATES;\nconsole.info(`Initial user state ${CozifySDK.getUserState()}`);\nCozifySDK.changeLanguage(LANGUAGES.FI_FI);\n\n... more in /node-example\n\n```\n\n## License\n\nMIT © [cozify/JS-SDK]\n",
+    "longname": "/Users/vesa/code/JS-SDK/README.md",
     "name": "./README.md",
     "static": true,
     "access": "public"
   },
   {
     "kind": "packageJSON",
-    "content": "{\n  \"name\": \"cozify-sdk\",\n  \"version\": \"1.0.0\",\n  \"description\": \"JavaScript SDK for Cozify REST API\",\n  \"author\": \"tech-admin\",\n  \"license\": \"MIT\",\n  \"repository\": \"tech-admin/cozify-sdk\",\n  \"module\": \"dist/index.es.js\",\n  \"node\": \"dist/sdk-node.js\",\n  \"browser\": \"dist/sdk-browser.js\",\n  \"jsnext:main\": \"dist/index.es.js\",\n  \"engines\": {\n    \"node\": \">=8\",\n    \"npm\": \">=5\"\n  },\n  \"scripts\": {\n    \"build\": \"rollup -c\",\n    \"start\": \"rollup -c -w\",\n    \"test\": \"jest src\",\n    \"test:watch\": \"jest src --watch --notify\",\n    \"cover\": \"jest src --coverage\",\n    \"flow\": \"flow\",\n    \"flow:check\": \"flow check ./src/\",\n    \"flow:status\": \"flow status\",\n    \"flow:coverage\": \"flow-coverage-report --config .flowcoverage.json\",\n    \"flow:deps\": \"flow-typed install\",\n    \"docs\": \"./node_modules/.bin/flow-remove-types src/ -d docs/src/ -p | ./node_modules/.bin/esdoc | rm -rf docs/src/\",\n    \"deploy\": \"gh-pages -d example/build\",\n    \"lint\": \"eslint src\",\n    \"lint:fix\": \"eslint src --fix\",\n    \"prepare\": \"npm run build\",\n    \"predeploy\": \"cd example && npm install && npm run build\",\n    \"precommit\": \"flow src && npm lint && npm test\",\n    \"prepublishOnly\": \"npm clean && npm lint && npm test && npm build\"\n  },\n  \"peerDependencies\": {},\n  \"devDependencies\": {\n    \"@babel/cli\": \"^7.2.3\",\n    \"@babel/core\": \"^7.4.0\",\n    \"@babel/node\": \"^7.2.2\",\n    \"@babel/plugin-external-helpers\": \"^7.2.0\",\n    \"@babel/plugin-proposal-object-rest-spread\": \"^7.4.0\",\n    \"@babel/plugin-transform-flow-strip-types\": \"^7.4.0\",\n    \"@babel/plugin-transform-runtime\": \"^7.4.0\",\n    \"@babel/preset-env\": \"^7.4.2\",\n    \"@babel/preset-flow\": \"^7.0.0\",\n    \"@babel/runtime\": \"^7.4.2\",\n    \"acorn\": \"^6.1.1\",\n    \"babel-eslint\": \"^10.0.1\",\n    \"babel-plugin-lodash\": \"^3.3.4\",\n    \"deep-freeze\": \"0.0.1\",\n    \"esdoc\": \"^1.1.0\",\n    \"esdoc-flow-type-plugin\": \"^1.1.0\",\n    \"esdoc-standard-plugin\": \"^1.0.0\",\n    \"eslint\": \"^5.15.3\",\n    \"eslint-config-airbnb-base\": \"^13.1.0\",\n    \"eslint-config-standard\": \"^12.0.0\",\n    \"eslint-plugin-flowtype\": \"^3.4.2\",\n    \"eslint-plugin-import\": \"^2.16.0\",\n    \"eslint-plugin-jest\": \"^22.4.1\",\n    \"eslint-plugin-node\": \"^8.0.1\",\n    \"eslint-plugin-promise\": \"^4.0.1\",\n    \"eslint-plugin-standard\": \"^4.0.0\",\n    \"flow-bin\": \"^0.95.1\",\n    \"flow-typed\": \"^2.5.1\",\n    \"jest\": \"^24.5.0\",\n    \"rollup\": \"^1.8.0\",\n    \"rollup-all\": \"^1.5.2\",\n    \"rollup-jest\": \"0.0.2\",\n    \"rollup-plugin-babel\": \"^4.3.2\",\n    \"rollup-plugin-commonjs\": \"^9.2.2\",\n    \"rollup-plugin-cpy\": \"^1.1.0\",\n    \"rollup-plugin-flow\": \"^1.1.1\",\n    \"rollup-plugin-flow-entry\": \"^0.3.1\",\n    \"rollup-plugin-json\": \"^4.0.0\",\n    \"rollup-plugin-node-builtins\": \"^2.1.2\",\n    \"rollup-plugin-node-resolve\": \"^4.0.1\",\n    \"rollup-plugin-npm\": \"^2.0.0\",\n    \"rollup-plugin-replace\": \"^2.1.1\",\n    \"rollup-plugin-uglify\": \"^6.0.2\"\n  },\n  \"files\": [\n    \"dist\"\n  ],\n  \"dependencies\": {\n    \"axios\": \"^0.18.0\",\n    \"axios-retry\": \"^3.1.2\",\n    \"esdoc-ecmascript-proposal-plugin\": \"^1.0.0\",\n    \"get-value\": \"^3.0.1\",\n    \"lodash\": \"^4.17.11\",\n    \"redux\": \"^4.0.1\",\n    \"redux-devtools-extension\": \"^2.13.8\",\n    \"redux-starter-kit\": \"^0.4.3\"\n  }\n}\n",
-    "longname": "/Users/vesalindfors/Code/JS-SDK/package.json",
+    "content": "{\n  \"name\": \"cozify-sdk\",\n  \"version\": \"1.0.0\",\n  \"description\": \"JavaScript SDK for Cozify REST API\",\n  \"author\": \"tech-admin\",\n  \"license\": \"MIT\",\n  \"repository\": \"tech-admin/cozify-sdk\",\n  \"module\": \"dist/index.es.js\",\n  \"node\": \"dist/sdk-node.js\",\n  \"browser\": \"dist/sdk-browser.js\",\n  \"jsnext:main\": \"dist/index.es.js\",\n  \"engines\": {\n    \"node\": \">=8\",\n    \"npm\": \">=5\"\n  },\n  \"scripts\": {\n    \"build\": \"rollup -c\",\n    \"start\": \"rollup -c -w\",\n    \"test\": \"jest src\",\n    \"test:watch\": \"jest src --watch --notify\",\n    \"cover\": \"jest src --coverage\",\n    \"flow\": \"flow\",\n    \"flow:check\": \"flow check ./src/\",\n    \"flow:status\": \"flow status\",\n    \"flow:coverage\": \"flow-coverage-report --config .flowcoverage.json\",\n    \"flow:deps\": \"flow-typed install\",\n    \"docs\": \"./node_modules/.bin/flow-remove-types src/ -d docs/src/ -p | ./node_modules/.bin/esdoc | rm -rf docs/src/\",\n    \"deploy\": \"gh-pages -d example/build\",\n    \"lint\": \"eslint src\",\n    \"lint:fix\": \"eslint src --fix\",\n    \"prepare\": \"npm run build\",\n    \"predeploy\": \"cd example && npm install && npm run build\",\n    \"precommit\": \"flow src && npm lint && npm test\",\n    \"prepublishOnly\": \"npm clean && npm lint && npm test && npm build\"\n  },\n  \"peerDependencies\": {},\n  \"devDependencies\": {\n    \"@babel/cli\": \"^7.2.3\",\n    \"@babel/core\": \"^7.4.0\",\n    \"@babel/node\": \"^7.2.2\",\n    \"@babel/plugin-external-helpers\": \"^7.2.0\",\n    \"@babel/plugin-proposal-object-rest-spread\": \"^7.4.0\",\n    \"@babel/plugin-transform-flow-strip-types\": \"^7.4.0\",\n    \"@babel/plugin-transform-runtime\": \"^7.4.0\",\n    \"@babel/preset-env\": \"^7.4.2\",\n    \"@babel/preset-flow\": \"^7.0.0\",\n    \"@babel/runtime\": \"^7.4.2\",\n    \"acorn\": \"^6.1.1\",\n    \"babel-eslint\": \"^10.0.3\",\n    \"babel-plugin-lodash\": \"^3.3.4\",\n    \"deep-freeze\": \"0.0.1\",\n    \"esdoc\": \"^1.1.0\",\n    \"esdoc-flow-type-plugin\": \"^1.1.0\",\n    \"esdoc-standard-plugin\": \"^1.0.0\",\n    \"eslint\": \"^6.1.0\",\n    \"eslint-config-airbnb-base\": \"^14.0.0\",\n    \"eslint-config-standard\": \"^12.0.0\",\n    \"eslint-plugin-flowtype\": \"^3.4.2\",\n    \"eslint-plugin-import\": \"^2.18.2\",\n    \"eslint-plugin-jest\": \"^22.4.1\",\n    \"eslint-plugin-json\": \"^1.4.0\",\n    \"eslint-plugin-node\": \"^8.0.1\",\n    \"eslint-plugin-promise\": \"^4.0.1\",\n    \"eslint-plugin-react\": \"^7.14.3\",\n    \"eslint-plugin-standard\": \"^4.0.0\",\n    \"flow-bin\": \"^0.95.1\",\n    \"flow-typed\": \"^2.5.1\",\n    \"jest\": \"^24.5.0\",\n    \"rollup\": \"^1.8.0\",\n    \"rollup-all\": \"^1.5.2\",\n    \"rollup-jest\": \"0.0.2\",\n    \"rollup-plugin-babel\": \"^4.3.2\",\n    \"rollup-plugin-commonjs\": \"^9.2.2\",\n    \"rollup-plugin-cpy\": \"^1.1.0\",\n    \"rollup-plugin-flow\": \"^1.1.1\",\n    \"rollup-plugin-flow-entry\": \"^0.3.1\",\n    \"rollup-plugin-json\": \"^4.0.0\",\n    \"rollup-plugin-node-builtins\": \"^2.1.2\",\n    \"rollup-plugin-node-resolve\": \"^4.0.1\",\n    \"rollup-plugin-npm\": \"^2.0.0\",\n    \"rollup-plugin-replace\": \"^2.1.1\",\n    \"rollup-plugin-uglify\": \"^6.0.2\"\n  },\n  \"files\": [\n    \"dist\"\n  ],\n  \"dependencies\": {\n    \"axios\": \"^0.18.0\",\n    \"axios-retry\": \"^3.1.2\",\n    \"esdoc-ecmascript-proposal-plugin\": \"^1.0.0\",\n    \"get-value\": \"^3.0.1\",\n    \"is-retry-allowed\": \"^1.1.0\",\n    \"lodash\": \"^4.17.14\",\n    \"redux\": \"^4.0.1\",\n    \"redux-devtools-extension\": \"^2.13.8\",\n    \"redux-starter-kit\": \"^0.4.3\"\n  }\n}\n",
+    "longname": "/Users/vesa/code/JS-SDK/package.json",
     "name": "package.json",
     "static": true,
     "access": "public"

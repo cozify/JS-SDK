@@ -54,6 +54,12 @@ window.esdocSearchIndex = [
     "variable"
   ],
   [
+    "cozify-sdk/src/connection/constants.js~max_api_version",
+    "variable/index.html#static-variable-MAX_API_VERSION",
+    "<span>MAX_API_VERSION</span> <span class=\"search-result-import-path\">cozify-sdk/src/connection/constants.js</span>",
+    "variable"
+  ],
+  [
     "cozify-sdk/src/hubs/constants.js~poll_interval_ms",
     "variable/index.html#static-variable-POLL_INTERVAL_MS",
     "<span>POLL_INTERVAL_MS</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/constants.js</span>",
@@ -108,6 +114,12 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
+    "cozify-sdk/src/reducers/devices.js~devicesreducer",
+    "variable/index.html#static-variable-devicesReducer",
+    "<span>devicesReducer</span> <span class=\"search-result-import-path\">cozify-sdk/src/reducers/devices.js</span>",
+    "variable"
+  ],
+  [
     "cozify-sdk/src/reducers/devices.js~devicesstate",
     "variable/index.html#static-variable-devicesState",
     "<span>devicesState</span> <span class=\"search-result-import-path\">cozify-sdk/src/reducers/devices.js</span>",
@@ -117,6 +129,12 @@ window.esdocSearchIndex = [
     "cozify-sdk/src/user/user.js~dopwlogin",
     "function/index.html#static-function-doPwLogin",
     "<span>doPwLogin</span> <span class=\"search-result-import-path\">cozify-sdk/src/user/user.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/connection/send-utilities.js~getapiversion",
+    "function/index.html#static-function-getAPIversion",
+    "<span>getAPIversion</span> <span class=\"search-result-import-path\">cozify-sdk/src/connection/send-utilities.js</span>",
     "function"
   ],
   [
@@ -178,6 +196,12 @@ window.esdocSearchIndex = [
     "variable/index.html#static-variable-isNode",
     "<span>isNode</span> <span class=\"search-result-import-path\">cozify-sdk/src/utils.js</span>",
     "variable"
+  ],
+  [
+    "cozify-sdk/src/connection/send-retry.js~resetretry",
+    "function/index.html#static-function-resetRetry",
+    "<span>resetRetry</span> <span class=\"search-result-import-path\">cozify-sdk/src/connection/send-retry.js</span>",
+    "function"
   ],
   [
     "cozify-sdk/src/connection/send-retry.js~retrycondition",

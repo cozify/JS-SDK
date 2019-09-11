@@ -33,8 +33,10 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-urlBase64Decode">urlBase64Decode</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-store">store</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-isNode">isNode</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#connection">connection</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-retryCondition">retryCondition</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#connection">connection</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-resetRetry">resetRetry</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-retryCondition">retryCondition</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-cloudErrorState">cloudErrorState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getAPIversion">getAPIversion</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hubErrorState">hubErrorState</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-testSSLCertificate">testSSLCertificate</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-send">send</a></span></span></li>
@@ -47,6 +49,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_FINGERPRINTS_SHA1">CLOUD_FINGERPRINTS_SHA1</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_HOST">CLOUD_HOST</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_URL">CLOUD_URL</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-MAX_API_VERSION">MAX_API_VERSION</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-CLOUD_CONNECTION_STATE_TYPE">CLOUD_CONNECTION_STATE_TYPE</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-COMMANDS_TYPE">COMMANDS_TYPE</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-COMMANDS_TYPE">COMMANDS_TYPE</a></span></span></li>
@@ -67,6 +70,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-POLL_INTERVAL_MS">POLL_INTERVAL_MS</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#reducers">reducers</a><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-connectionsState">connectionsState</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setCloudConnectionState">setCloudConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-devicesReducer">devicesReducer</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-devicesState">devicesState</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setDevices">setDevices</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-hubsReducer">hubsReducer</a></span></span></li>
@@ -91,7 +95,7 @@
 <pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">// 
 
 // This actionreducer uses internally https://github.com/mweststrate/immer, so it&apos;s safe to modify given state directly
-import { createSlice } from &apos;redux-starter-kit&apos;
+import { createSlice } from &apos;redux-starter-kit&apos;;
 import { HUB_CONNECTION_STATES } from &apos;../connection/constants&apos;;
 
 /**
@@ -114,9 +118,13 @@ export const hubsState = createSlice({
      * @param  {payload:{hubs:HUBS_MAP_TYPE}} action
      */
     updateHubs(state, action) {
-      for (const [id, hub] of Object.entries(action.payload)) {
-        state[id] = {...state[id], ...hub};
-      }
+      const stateToSet = state;
+      const hubs = action.payload;
+      console.log(&apos;updateHubs&apos;, hubs);
+      Object.entries(hubs).forEach((entry) =&gt; {
+        const [id, hub] = entry;
+        stateToSet[id] = { ...state[id], ...hub };
+      });
     },
 
 
@@ -126,9 +134,12 @@ export const hubsState = createSlice({
      * @param  {payload:{hubId:string}} action
      */
     selectHub(state, action) {
-      if (state[action.payload]) {
-        state[action.payload].selected = true;
-        //console.log(&quot;selectHub&quot;, state[action.payload]);
+      const stateToSet = state;
+      const { hubId } = action.payload;
+      console.log(&apos;selectHub&apos;, hubId);
+      if (state[hubId]) {
+        stateToSet[hubId].selected = true;
+        console.log(&apos;selectHub&apos;, state[hubId]);
       }
     },
 
@@ -138,9 +149,11 @@ export const hubsState = createSlice({
      * @param  {payload:{hubId:string}} action
      */
     unSelectHub(state, action) {
-      if (state[action.payload]) {
-        state[action.payload].selected = false;
-        //console.log(&quot;selectHub&quot;, state[action.payload]);
+      const stateToSet = state;
+      const { hubId } = action.payload;
+      if (state[hubId]) {
+        stateToSet[hubId].selected = false;
+        // console.log(&quot;selectHub&quot;, state[action.payload]);
       }
     },
 
@@ -150,37 +163,39 @@ export const hubsState = createSlice({
      * @param  {payload:{hubId:string, state:HUB_STATES_TYPE}} action
      */
     setHubConnectionState(state, action) {
-      const hubId = action.payload.hubId
-      const newState = action.payload.state
-      const oldState = state[hubId] ? state[hubId].connectionState : undefined
+      const { hubId } = action.payload;
+      const stateToSet = state;
+      const newState = action.payload.state;
+      const oldState = state[hubId] ? state[hubId].connectionState : undefined;
       if (Object.values(HUB_CONNECTION_STATES).indexOf(newState) &gt; -1) {
         if (oldState &amp;&amp; oldState !== newState) {
-          //console.log (`HUB ${hubId} connection state ${oldState} -&gt; ${newState}`);
-          state[hubId].connectionState = newState;
+          // console.log (`HUB ${hubId} connection state ${oldState} -&gt; ${newState}`);
+          stateToSet[hubId].connectionState = newState;
         }
       }
-    }
-  }
-})
+    },
+  },
+});
 
 
-//console.log(&apos;hubsState &apos;, hubsState)
-const { actions, reducer } = hubsState
-const hubsReducer = reducer
+// console.log(&apos;hubsState &apos;, hubsState)
+const { actions, reducer } = hubsState;
+const hubsReducer = reducer;
 
 /**
  * Hubs reducer
  * @type {function} reducer
  */
-export {reducer as hubsReducer}
+export { reducer as hubsReducer };
 
 // Extract and export each action creator by name
 /*
 console.log(updateHubs({ id: 123, name: &apos;Unnamed device&apos; }))
 {type : &quot;hubs/updateHubs, payload : {id : 123, name: &apos;Unnamed device&apos; }}
 */
-export const { updateHubs, selectHub, unSelectHub, setHubConnectionState } = actions
-
+export const {
+  updateHubs, selectHub, unSelectHub, setHubConnectionState,
+} = actions;
 </code></pre>
 
 </div>

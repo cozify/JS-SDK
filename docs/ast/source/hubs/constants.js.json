@@ -1,28 +1,28 @@
 {
   "type": "File",
   "start": 0,
-  "end": 719,
+  "end": 722,
   "loc": {
     "start": {
       "line": 1,
       "column": 0
     },
     "end": {
-      "line": 33,
+      "line": 32,
       "column": 0
     }
   },
   "program": {
     "type": "Program",
     "start": 0,
-    "end": 719,
+    "end": 722,
     "loc": {
       "start": {
         "line": 1,
         "column": 0
       },
       "end": {
-        "line": 33,
+        "line": 32,
         "column": 0
       }
     },
@@ -596,7 +596,7 @@
       {
         "type": "ExportNamedDeclaration",
         "start": 413,
-        "end": 459,
+        "end": 460,
         "loc": {
           "start": {
             "line": 22,
@@ -604,7 +604,7 @@
           },
           "end": {
             "line": 22,
-            "column": 46
+            "column": 47
           }
         },
         "specifiers": [],
@@ -612,7 +612,7 @@
         "declaration": {
           "type": "VariableDeclaration",
           "start": 420,
-          "end": 459,
+          "end": 460,
           "loc": {
             "start": {
               "line": 22,
@@ -620,7 +620,7 @@
             },
             "end": {
               "line": 22,
-              "column": 46
+              "column": 47
             }
           },
           "declarations": [
@@ -709,14 +709,10 @@
                     "rawValue": 1000,
                     "raw": "1000"
                   },
-                  "value": 1000,
-                  "leadingComments": null,
-                  "trailingComments": null
-                },
-                "trailingComments": null
+                  "value": 1000
+                }
               },
-              "leadingComments": null,
-              "trailingComments": null
+              "leadingComments": null
             }
           ],
           "kind": "const",
@@ -742,8 +738,8 @@
             {
               "type": "CommentBlock",
               "value": "\n * Interval defining how often hubs are polled at max\n * This value is used as is in local connection, and multiplied in remote connection\n ",
-              "start": 461,
-              "end": 606,
+              "start": 462,
+              "end": 607,
               "loc": {
                 "start": {
                   "line": 24,
@@ -779,8 +775,8 @@
           {
             "type": "CommentBlock",
             "value": "\n * Interval defining how often hubs are polled at max\n * This value is used as is in local connection, and multiplied in remote connection\n ",
-            "start": 461,
-            "end": 606,
+            "start": 462,
+            "end": 607,
             "loc": {
               "start": {
                 "line": 24,
@@ -797,8 +793,8 @@
       },
       {
         "type": "ExportNamedDeclaration",
-        "start": 607,
-        "end": 647,
+        "start": 608,
+        "end": 649,
         "loc": {
           "start": {
             "line": 28,
@@ -806,15 +802,15 @@
           },
           "end": {
             "line": 28,
-            "column": 40
+            "column": 41
           }
         },
         "specifiers": [],
         "source": null,
         "declaration": {
           "type": "VariableDeclaration",
-          "start": 614,
-          "end": 647,
+          "start": 615,
+          "end": 649,
           "loc": {
             "start": {
               "line": 28,
@@ -822,14 +818,14 @@
             },
             "end": {
               "line": 28,
-              "column": 40
+              "column": 41
             }
           },
           "declarations": [
             {
               "type": "VariableDeclarator",
-              "start": 620,
-              "end": 647,
+              "start": 621,
+              "end": 648,
               "loc": {
                 "start": {
                   "line": 28,
@@ -842,8 +838,8 @@
               },
               "id": {
                 "type": "Identifier",
-                "start": 620,
-                "end": 636,
+                "start": 621,
+                "end": 637,
                 "loc": {
                   "start": {
                     "line": 28,
@@ -860,8 +856,8 @@
               },
               "init": {
                 "type": "BinaryExpression",
-                "start": 639,
-                "end": 647,
+                "start": 640,
+                "end": 648,
                 "loc": {
                   "start": {
                     "line": 28,
@@ -874,8 +870,8 @@
                 },
                 "left": {
                   "type": "NumericLiteral",
-                  "start": 639,
-                  "end": 640,
+                  "start": 640,
+                  "end": 641,
                   "loc": {
                     "start": {
                       "line": 28,
@@ -895,8 +891,8 @@
                 "operator": "*",
                 "right": {
                   "type": "NumericLiteral",
-                  "start": 643,
-                  "end": 647,
+                  "start": 644,
+                  "end": 648,
                   "loc": {
                     "start": {
                       "line": 28,
@@ -922,8 +918,8 @@
             {
               "type": "CommentBlock",
               "value": "\n * Interval defining how often hubs are polled at max\n * This value is used as is in local connection, and multiplied in remote connection\n ",
-              "start": 461,
-              "end": 606,
+              "start": 462,
+              "end": 607,
               "loc": {
                 "start": {
                   "line": 24,
@@ -942,8 +938,8 @@
           {
             "type": "CommentBlock",
             "value": "\n * Interval defining how often hubs are polled at max\n * This value is used as is in local connection, and multiplied in remote connection\n ",
-            "start": 461,
-            "end": 606,
+            "start": 462,
+            "end": 607,
             "loc": {
               "start": {
                 "line": 24,
@@ -960,8 +956,8 @@
       },
       {
         "type": "ExportNamedDeclaration",
-        "start": 649,
-        "end": 686,
+        "start": 651,
+        "end": 689,
         "loc": {
           "start": {
             "line": 30,
@@ -969,15 +965,15 @@
           },
           "end": {
             "line": 30,
-            "column": 37
+            "column": 38
           }
         },
         "specifiers": [],
         "source": null,
         "declaration": {
           "type": "VariableDeclaration",
-          "start": 656,
-          "end": 686,
+          "start": 658,
+          "end": 689,
           "loc": {
             "start": {
               "line": 30,
@@ -985,14 +981,14 @@
             },
             "end": {
               "line": 30,
-              "column": 37
+              "column": 38
             }
           },
           "declarations": [
             {
               "type": "VariableDeclarator",
-              "start": 662,
-              "end": 686,
+              "start": 664,
+              "end": 688,
               "loc": {
                 "start": {
                   "line": 30,
@@ -1005,8 +1001,8 @@
               },
               "id": {
                 "type": "Identifier",
-                "start": 662,
-                "end": 674,
+                "start": 664,
+                "end": 676,
                 "loc": {
                   "start": {
                     "line": 30,
@@ -1022,8 +1018,8 @@
               },
               "init": {
                 "type": "StringLiteral",
-                "start": 677,
-                "end": 686,
+                "start": 679,
+                "end": 688,
                 "loc": {
                   "start": {
                     "line": 30,
@@ -1050,8 +1046,8 @@
       },
       {
         "type": "ExportNamedDeclaration",
-        "start": 687,
-        "end": 717,
+        "start": 690,
+        "end": 721,
         "loc": {
           "start": {
             "line": 31,
@@ -1059,15 +1055,15 @@
           },
           "end": {
             "line": 31,
-            "column": 30
+            "column": 31
           }
         },
         "specifiers": [],
         "source": null,
         "declaration": {
           "type": "VariableDeclaration",
-          "start": 694,
-          "end": 717,
+          "start": 697,
+          "end": 721,
           "loc": {
             "start": {
               "line": 31,
@@ -1075,14 +1071,14 @@
             },
             "end": {
               "line": 31,
-              "column": 30
+              "column": 31
             }
           },
           "declarations": [
             {
               "type": "VariableDeclarator",
-              "start": 700,
-              "end": 717,
+              "start": 703,
+              "end": 720,
               "loc": {
                 "start": {
                   "line": 31,
@@ -1095,8 +1091,8 @@
               },
               "id": {
                 "type": "Identifier",
-                "start": 700,
-                "end": 708,
+                "start": 703,
+                "end": 711,
                 "loc": {
                   "start": {
                     "line": 31,
@@ -1112,8 +1108,8 @@
               },
               "init": {
                 "type": "StringLiteral",
-                "start": 711,
-                "end": 717,
+                "start": 714,
+                "end": 720,
                 "loc": {
                   "start": {
                     "line": 31,
@@ -1209,8 +1205,8 @@
     {
       "type": "CommentBlock",
       "value": "\n * Interval defining how often hubs are polled at max\n * This value is used as is in local connection, and multiplied in remote connection\n ",
-      "start": 461,
-      "end": 606,
+      "start": 462,
+      "end": 607,
       "loc": {
         "start": {
           "line": 24,
@@ -2317,10 +2313,36 @@
       }
     },
     {
+      "type": {
+        "label": ";",
+        "beforeExpr": true,
+        "startsExpr": false,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null,
+        "updateContext": null
+      },
+      "start": 459,
+      "end": 460,
+      "loc": {
+        "start": {
+          "line": 22,
+          "column": 46
+        },
+        "end": {
+          "line": 22,
+          "column": 47
+        }
+      }
+    },
+    {
       "type": "CommentBlock",
       "value": "\n * Interval defining how often hubs are polled at max\n * This value is used as is in local connection, and multiplied in remote connection\n ",
-      "start": 461,
-      "end": 606,
+      "start": 462,
+      "end": 607,
       "loc": {
         "start": {
           "line": 24,
@@ -2347,8 +2369,8 @@
         "updateContext": null
       },
       "value": "export",
-      "start": 607,
-      "end": 613,
+      "start": 608,
+      "end": 614,
       "loc": {
         "start": {
           "line": 28,
@@ -2375,8 +2397,8 @@
         "updateContext": null
       },
       "value": "const",
-      "start": 614,
-      "end": 619,
+      "start": 615,
+      "end": 620,
       "loc": {
         "start": {
           "line": 28,
@@ -2401,8 +2423,8 @@
         "binop": null
       },
       "value": "POLL_INTERVAL_MS",
-      "start": 620,
-      "end": 636,
+      "start": 621,
+      "end": 637,
       "loc": {
         "start": {
           "line": 28,
@@ -2428,8 +2450,8 @@
         "updateContext": null
       },
       "value": "=",
-      "start": 637,
-      "end": 638,
+      "start": 638,
+      "end": 639,
       "loc": {
         "start": {
           "line": 28,
@@ -2455,8 +2477,8 @@
         "updateContext": null
       },
       "value": 1,
-      "start": 639,
-      "end": 640,
+      "start": 640,
+      "end": 641,
       "loc": {
         "start": {
           "line": 28,
@@ -2482,8 +2504,8 @@
         "updateContext": null
       },
       "value": "*",
-      "start": 641,
-      "end": 642,
+      "start": 642,
+      "end": 643,
       "loc": {
         "start": {
           "line": 28,
@@ -2509,8 +2531,8 @@
         "updateContext": null
       },
       "value": 1000,
-      "start": 643,
-      "end": 647,
+      "start": 644,
+      "end": 648,
       "loc": {
         "start": {
           "line": 28,
@@ -2519,6 +2541,32 @@
         "end": {
           "line": 28,
           "column": 40
+        }
+      }
+    },
+    {
+      "type": {
+        "label": ";",
+        "beforeExpr": true,
+        "startsExpr": false,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null,
+        "updateContext": null
+      },
+      "start": 648,
+      "end": 649,
+      "loc": {
+        "start": {
+          "line": 28,
+          "column": 40
+        },
+        "end": {
+          "line": 28,
+          "column": 41
         }
       }
     },
@@ -2537,8 +2585,8 @@
         "updateContext": null
       },
       "value": "export",
-      "start": 649,
-      "end": 655,
+      "start": 651,
+      "end": 657,
       "loc": {
         "start": {
           "line": 30,
@@ -2565,8 +2613,8 @@
         "updateContext": null
       },
       "value": "const",
-      "start": 656,
-      "end": 661,
+      "start": 658,
+      "end": 663,
       "loc": {
         "start": {
           "line": 30,
@@ -2591,8 +2639,8 @@
         "binop": null
       },
       "value": "HUB_PROTOCOL",
-      "start": 662,
-      "end": 674,
+      "start": 664,
+      "end": 676,
       "loc": {
         "start": {
           "line": 30,
@@ -2618,8 +2666,8 @@
         "updateContext": null
       },
       "value": "=",
-      "start": 675,
-      "end": 676,
+      "start": 677,
+      "end": 678,
       "loc": {
         "start": {
           "line": 30,
@@ -2645,8 +2693,8 @@
         "updateContext": null
       },
       "value": "http://",
-      "start": 677,
-      "end": 686,
+      "start": 679,
+      "end": 688,
       "loc": {
         "start": {
           "line": 30,
@@ -2655,6 +2703,32 @@
         "end": {
           "line": 30,
           "column": 37
+        }
+      }
+    },
+    {
+      "type": {
+        "label": ";",
+        "beforeExpr": true,
+        "startsExpr": false,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null,
+        "updateContext": null
+      },
+      "start": 688,
+      "end": 689,
+      "loc": {
+        "start": {
+          "line": 30,
+          "column": 37
+        },
+        "end": {
+          "line": 30,
+          "column": 38
         }
       }
     },
@@ -2673,8 +2747,8 @@
         "updateContext": null
       },
       "value": "export",
-      "start": 687,
-      "end": 693,
+      "start": 690,
+      "end": 696,
       "loc": {
         "start": {
           "line": 31,
@@ -2701,8 +2775,8 @@
         "updateContext": null
       },
       "value": "const",
-      "start": 694,
-      "end": 699,
+      "start": 697,
+      "end": 702,
       "loc": {
         "start": {
           "line": 31,
@@ -2727,8 +2801,8 @@
         "binop": null
       },
       "value": "HUB_PORT",
-      "start": 700,
-      "end": 708,
+      "start": 703,
+      "end": 711,
       "loc": {
         "start": {
           "line": 31,
@@ -2754,8 +2828,8 @@
         "updateContext": null
       },
       "value": "=",
-      "start": 709,
-      "end": 710,
+      "start": 712,
+      "end": 713,
       "loc": {
         "start": {
           "line": 31,
@@ -2781,8 +2855,8 @@
         "updateContext": null
       },
       "value": "8893",
-      "start": 711,
-      "end": 717,
+      "start": 714,
+      "end": 720,
       "loc": {
         "start": {
           "line": 31,
@@ -2791,6 +2865,32 @@
         "end": {
           "line": 31,
           "column": 30
+        }
+      }
+    },
+    {
+      "type": {
+        "label": ";",
+        "beforeExpr": true,
+        "startsExpr": false,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null,
+        "updateContext": null
+      },
+      "start": 720,
+      "end": 721,
+      "loc": {
+        "start": {
+          "line": 31,
+          "column": 30
+        },
+        "end": {
+          "line": 31,
+          "column": 31
         }
       }
     },
@@ -2807,15 +2907,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 719,
-      "end": 719,
+      "start": 722,
+      "end": 722,
       "loc": {
         "start": {
-          "line": 33,
+          "line": 32,
           "column": 0
         },
         "end": {
-          "line": 33,
+          "line": 32,
           "column": 0
         }
       }

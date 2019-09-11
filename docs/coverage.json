@@ -1,41 +1,45 @@
 {
-  "coverage": "64.36%",
-  "expectCount": 87,
-  "actualCount": 56,
+  "coverage": "60.63%",
+  "expectCount": 94,
+  "actualCount": 57,
   "files": {
     "src/connection/constants.js": {
-      "expectCount": 4,
+      "expectCount": 5,
       "actualCount": 0,
       "undocumentLines": [
         12,
-        14,
-        16,
-        18
+        17,
+        19,
+        21,
+        23
       ]
     },
     "src/connection/send-retry.js": {
-      "expectCount": 7,
-      "actualCount": 5,
+      "expectCount": 9,
+      "actualCount": 4,
       "undocumentLines": [
-        1,
-        2
+        3,
+        4,
+        5,
+        48,
+        49
       ]
     },
     "src/connection/send-utilities.js": {
-      "expectCount": 6,
-      "actualCount": 3,
+      "expectCount": 8,
+      "actualCount": 5,
       "undocumentLines": [
-        7,
-        65,
-        66
+        9,
+        103,
+        104
       ]
     },
     "src/connection/send.js": {
       "expectCount": 6,
       "actualCount": 4,
       "undocumentLines": [
-        19,
-        98
+        25,
+        112
       ]
     },
     "src/connection/state.js": {
@@ -67,37 +71,38 @@
       "expectCount": 23,
       "actualCount": 17,
       "undocumentLines": [
-        20,
-        216,
-        272,
-        273,
-        274,
-        275
+        18,
+        242,
+        269,
+        270,
+        271,
+        272
       ]
     },
     "src/reducers/connections.js": {
       "expectCount": 3,
       "actualCount": 1,
       "undocumentLines": [
-        46,
-        54
+        47,
+        55
       ]
     },
     "src/reducers/devices.js": {
-      "expectCount": 3,
+      "expectCount": 4,
       "actualCount": 1,
       "undocumentLines": [
-        63,
-        78
+        69,
+        83,
+        70
       ]
     },
     "src/reducers/hubs.js": {
       "expectCount": 4,
       "actualCount": 1,
       "undocumentLines": [
-        78,
-        92,
-        79
+        88,
+        102,
+        89
       ]
     },
     "src/reducers/index.js": {
@@ -109,9 +114,9 @@
       "expectCount": 4,
       "actualCount": 1,
       "undocumentLines": [
-        122,
-        133,
-        123
+        126,
+        137,
+        127
       ]
     },
     "src/store.js": {
@@ -130,9 +135,11 @@
       "undocumentLines": []
     },
     "src/utils.js": {
-      "expectCount": 2,
+      "expectCount": 3,
       "actualCount": 2,
-      "undocumentLines": []
+      "undocumentLines": [
+        20
+      ]
     }
   }
 }

@@ -33,8 +33,10 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-urlBase64Decode">urlBase64Decode</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-store">store</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-isNode">isNode</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#connection">connection</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-retryCondition">retryCondition</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#connection">connection</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-resetRetry">resetRetry</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-retryCondition">retryCondition</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-cloudErrorState">cloudErrorState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getAPIversion">getAPIversion</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hubErrorState">hubErrorState</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-testSSLCertificate">testSSLCertificate</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-send">send</a></span></span></li>
@@ -47,6 +49,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_FINGERPRINTS_SHA1">CLOUD_FINGERPRINTS_SHA1</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_HOST">CLOUD_HOST</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_URL">CLOUD_URL</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-MAX_API_VERSION">MAX_API_VERSION</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-CLOUD_CONNECTION_STATE_TYPE">CLOUD_CONNECTION_STATE_TYPE</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-COMMANDS_TYPE">COMMANDS_TYPE</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-COMMANDS_TYPE">COMMANDS_TYPE</a></span></span></li>
@@ -67,6 +70,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-POLL_INTERVAL_MS">POLL_INTERVAL_MS</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#reducers">reducers</a><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-connectionsState">connectionsState</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setCloudConnectionState">setCloudConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-devicesReducer">devicesReducer</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-devicesState">devicesState</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setDevices">setDevices</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-hubsReducer">hubsReducer</a></span></span></li>
@@ -89,50 +93,49 @@
 
 <div class="content" data-ice="content"><h1 data-ice="title">src/hubs/hubs.js</h1>
 <pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">// 
-import isEmpty from &apos;lodash/isEmpty&apos;
-import { HUB_STATES, POLL_INTERVAL_MS, HUB_PROTOCOL, HUB_PORT, DISCOVERY_INTERVAL_MS } from &apos;./constants&apos;
-import { USER_STATES } from &apos;../user/constants&apos;;
-import { HUB_CONNECTION_STATES } from &apos;../connection/constants&apos;
-import { COMMANDS, send, sendAll } from &apos;../connection/send&apos;
-import { getHubConnectionState } from &apos;../connection/state&apos;
-import { ROLES } from &apos;../user/constants&apos;
-import { deviceDeltaHandler } from &apos;../devices/devices&apos;
-import { isNode, urlBase64Decode } from &apos;../utils&apos;
-import { store, watchChanges } from &quot;../store&quot;
-import { hubsState, hubsReducer } from &quot;../reducers/hubs&quot;
-import { userState, userReducer } from &quot;../reducers/user&quot;
+import isEmpty from &apos;lodash/isEmpty&apos;;
+import {
+  POLL_INTERVAL_MS, HUB_PROTOCOL, HUB_PORT,
+} from &apos;./constants&apos;;
+import { USER_STATES, ROLES } from &apos;../user/constants&apos;;
+import { HUB_CONNECTION_STATES } from &apos;../connection/constants&apos;;
+import { COMMANDS, send, sendAll } from &apos;../connection/send&apos;;
+
+import { deviceDeltaHandler } from &apos;../devices/devices&apos;;
+import { urlBase64Decode } from &apos;../utils&apos;;
+import { store, watchChanges } from &apos;../store&apos;;
+import { hubsState } from &apos;../reducers/hubs&apos;;
+import { userState } from &apos;../reducers/user&apos;;
 
 
 
-
-
-
-let _hubs = {}
+let hubsMap = {};
 
 
 /*
  * Helper method to extract hub info from JWT based hub keys
  */
 function extractHubInfo(HUBKeys) {
-  let hubs = {};
-  for (let key in HUBKeys) {
-      let coded = HUBKeys[key].split(&apos;.&apos;)[1];
-      let decoded = urlBase64Decode(coded);
-      let payload = JSON.parse(decoded);
-      let info = {};
+  const hubs = {};
+  if (HUBKeys) {
+    Object.keys(HUBKeys).forEach((hubKey) =&gt; {
+      const coded = HUBKeys[hubKey].split(&apos;.&apos;)[1];
+      const decoded = urlBase64Decode(coded);
+      const payload = JSON.parse(decoded);
+      const info = {};
       info.id = payload.hubId || payload.hub_id;
       info.name = payload.hubName || payload.hub_name;
-      info.hubKey = HUBKeys[key];
+      info.hubKey = HUBKeys[hubKey];
       info.connectionState = HUB_CONNECTION_STATES.UNCONNECTED;
-      if (payload.role){
-          info.role = payload.role;
-          info.roleString = &apos;&apos;
-          Object.keys(ROLES).forEach( (key)=&gt; {
-            if (ROLES[key] === info.role)
-              info.roleString = key
-          });
+      if (payload.role) {
+        info.role = payload.role;
+        info.roleString = &apos;&apos;;
+        Object.keys(ROLES).forEach((roleKey) =&gt; {
+          if (ROLES[hubKey] === info.role) info.roleString = roleKey;
+        });
       }
-      hubs[ info.id ] = info;
+      hubs[info.id] = info;
+    });
   }
   return hubs;
 }
@@ -141,41 +144,52 @@ function extractHubInfo(HUBKeys) {
 /*
  * Hub metadata is received and will be stored
  */
-function updateFoundHub(hubURL, foundHub) {
+function updateFoundHub(hubURL, hub) {
+  const foundHub = hub;
   // Hub keys returns ids, idQuerys return hubId
-  if(foundHub.hubId){
+  if (foundHub.hubId) {
     foundHub.id = foundHub.hubId;
     delete foundHub.hubId;
   }
-  _hubs[foundHub.id].connected = foundHub.connected;
-  _hubs[foundHub.id].features = foundHub.features;
-  _hubs[foundHub.id].state = foundHub.state;
-  _hubs[foundHub.id].version = foundHub.version;
-  _hubs[foundHub.id].connectionState = foundHub.connected ? HUB_CONNECTION_STATES.REMOTE : HUB_CONNECTION_STATES.UNCONNECTED;
-  if (hubURL) {
-    _hubs[foundHub.id].connectionState = HUB_CONNECTION_STATES.LOCAL;
-    _hubs[foundHub.id].url =  hubURL
-  } else {
-    _hubs[foundHub.id].url =  undefined
+  if (!foundHub.id) {
+    return;
   }
 
-
+  if (!hubsMap[foundHub.id]) {
+    hubsMap[foundHub.id] = {
+      id: foundHub.id,
+      name: foundHub.name || &apos;&apos;,
+    };
+  }
+  hubsMap[foundHub.id].connected = foundHub.connected;
+  hubsMap[foundHub.id].features = foundHub.features;
+  hubsMap[foundHub.id].state = foundHub.state;
+  hubsMap[foundHub.id].version = foundHub.version;
+  hubsMap[foundHub.id].connectionState = foundHub.connected ? HUB_CONNECTION_STATES.REMOTE : HUB_CONNECTION_STATES.UNCONNECTED;
+  if (hubURL) {
+    hubsMap[foundHub.id].connectionState = HUB_CONNECTION_STATES.LOCAL;
+    hubsMap[foundHub.id].url = hubURL;
+  } else {
+    hubsMap[foundHub.id].url = undefined;
+  }
 }
 
 /*
  * Remote hub metamata request for version etc information
  */
 function doRemoteIdQuery(hubId, authKey, hubKey) {
-  return new Promise( (resolve, reject) =&gt; {
-    send( {command: COMMANDS.CLOUD_META, authKey: authKey, hubKey: hubKey, hubId: hubId })
-    .then((hubData) =&gt; {
-      updateFoundHub(undefined, hubData);
-      resolve(hubId);
+  return new Promise((resolve, reject) =&gt; {
+    send({
+      command: COMMANDS.CLOUD_META, authKey, hubKey, hubId,
     })
-    .catch((error) =&gt; {
-      console.log(`doRemoteIdQuery ${hubId} error `, error.message);
-      reject(hubId);
-    });
+      .then((hubData) =&gt; {
+        updateFoundHub(undefined, hubData);
+        resolve(hubId);
+      })
+      .catch((error) =&gt; {
+        console.log(`doRemoteIdQuery ${hubId} error `, error.message);
+        reject(hubId);
+      });
   });
 }
 
@@ -183,290 +197,23 @@ function doRemoteIdQuery(hubId, authKey, hubKey) {
  * Local hub metadata request for version etc information
  */
 function doLocalIdQuery(ip) {
-  return new Promise( (resolve, reject) =&gt; {
+  return new Promise((resolve) =&gt; {
     if (ip) {
-      const hubURL = HUB_PROTOCOL + ip + &quot;:&quot; + HUB_PORT
-      const url = hubURL + &quot;/hub&quot;;
-      send( {url: url} )
-      .then((hubData) =&gt; {
-        updateFoundHub(hubURL, hubData)
-        resolve(ip)
-      })
-      .catch((error) =&gt; {
-        console.log(`doLocalIdQuery ${ip} error `, error.message);
-        resolve(ip);
-      });
-    } else {
-      resolve()
-    }
-  });
-}
-
-/*
- * Fetch HUB IP addresses in the same network
- */
-function doCloudDiscovery() {
-  return new Promise( (resolve, reject) =&gt; {
-    send( {command: COMMANDS.CLOUD_IP })
-    .then((ips) =&gt; {
-      let queries = []
-      if (ips &amp;&amp; !isEmpty(ips)) {
-        for(var ip of ips){
-          queries.push(doLocalIdQuery(ip));
-        }
-      }
-      sendAll(queries)
-      .finally(() =&gt; {
-        // mark selected hubs to be selected after
-        setSelectedHubs(_hubs);
-        store.dispatch(hubsState.actions.updateHubs(_hubs));
-        resolve(&apos;ok&apos;);
-      });
-    })
-    .catch((error) =&gt; {
-      console.error(&quot;doCloudDiscovery error: &quot;, error.message);
-      store.dispatch(hubsState.actions.updateHubs(_hubs));
-      resolve(&apos;error&apos;);
-    });
-  });
-}
-
-/*
- * Fetch hub metadatas
- */
-function fetchMetaData(hubs, authKey) {
-  return new Promise( (resolve, reject) =&gt; {
-    let queries = []
-    for (var hub of (Object.values(hubs)) ) {
-      if (hub.hubKey){
-        queries.push(doRemoteIdQuery(hub.id, authKey, hub.hubKey));
-      }
-    }
-    sendAll(queries)
-    .then( values =&gt; {
-      //console.log(values);
-    })
-    .catch(error =&gt; {
-      //console.log(error);
-    })
-    .finally(() =&gt; {
-        resolve();
-    });
-  });
-}
-
-/*
- * Check hubs that are currently selected and mark them selected also in map of given hubs
- */
-function setSelectedHubs(newHubs) {
-  const hubs = getHubs();
-  for (var hub of (Object.values(hubs)) ) {
-    if (hub.selected) {
-      const selectedNewHub = newHubs[hub.id]
-      if (selectedNewHub) {
-        selectedNewHub.selected = true
-      }
-    }
-  }
-}
-
-
-/*
- * Fetch Hub keys by user authKey and start fetching hub meta datas
- */
-function fetchHubs() {
-  const authKey = storedUser().authKey;
-  return new Promise( (resolve, reject) =&gt; {
-
-    if (!authKey) {
-      reject(&apos;No userKey!&apos;);
-      return;
-    }
-    send({ command: COMMANDS.HUB_KEYS,  authKey: authKey })
-    .then((tokens) =&gt; {
-      if (tokens) {
-        _hubs = extractHubInfo(tokens);
-        fetchMetaData(_hubs, authKey)
-        .finally(() =&gt; {
-          doCloudDiscovery();
-          resolve(getHubs());
+      const hubURL = `${HUB_PROTOCOL + ip}:${HUB_PORT}`;
+      const url = `${hubURL}/hub`;
+      send({ url, timeout: 500 })
+        .then((hubData) =&gt; {
+          updateFoundHub(hubURL, hubData);
+          resolve(ip);
+        })
+        .catch((error) =&gt; {
+          console.log(`doLocalIdQuery ${ip} error `, error.message);
+          resolve(ip);
         });
-      } else {
-        resolve(getHubs());
-      }
-    })
-    .catch((error) =&gt; {
-      console.error(&quot;fetchHubTokens error: &quot;, error.message);
-      reject(error)
-    });
+    } else {
+      resolve();
+    }
   });
-}
-
-
-let _discoveryInterval = undefined;
-
-/**
- * Start discovering hubs every DISCOVERY_INTERVAL_MS
- * Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local meta-infos
- */
-export function startDiscoveringHubs() {
-  if (!_discoveryInterval) {
-    fetchHubs(); // call immediately and then every 30s
-    //_discoveryInterval = setInterval(fetchHubs, DISCOVERY_INTERVAL_MS);
-  }
-}
-
-/**
- * Stop discovering hubs
- */
-export function stopDiscoveringHubs() {
-  clearInterval(_discoveryInterval);
-}
-
-
-/**
- * Unselect hub by id, stops hub polling
- * @param  {string} selectedId   - hub id to be selected
- */
-export function unSelectHubById( selectedId ) {
-  const hubs = getHubs();
-  for (var hub of (Object.values(hubs)) ) {
-    if (selectedId === hub.id) {
-      store.dispatch(hubsState.actions.unSelectHub(hub.id));
-      stopPolling(hub.id);
-    }
-  }
-}
-
-
-/**
- * Select hub by id, starts hub polling
- * @param  {string} selectedId   - hub id to be selected
- */
-export function selectHubById( selectedId ) {
-  const hubs = getHubs();
-  for (var hub of (Object.values(hubs)) ) {
-    if (selectedId === hub.id) {
-      store.dispatch(hubsState.actions.selectHub(hub.id));
-      startPolling(hub.id);
-    }
-  }
-}
-
-
-
-/*
-** Polling
-*/
-
-let _pollIntervals= {};
-let _pollTimeStamp = 0;
-let _pollInAction = false;
-let _secondPoll = false;
-
-/*
- * Do poll if hub connection is ok
- * Remote poll is executed only every second call
- */
-function doPoll(hubId){
-
-  const hub = getHubs()[hubId];
-  if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL &amp;&amp; hub.connectionState !== HUB_CONNECTION_STATES.REMOTE){
-    return;
-  }
-
-  //just return every second -&gt; not doing so often as in local connection
-  if (hub.connectionState === HUB_CONNECTION_STATES.REMOTE){
-    if (_secondPoll) {
-      _secondPoll = false;
-      return
-    }
-    _secondPoll = true;
-  }
-
-  const authKey = storedUser().authKey;
-  const hubKey = hub.hubKey;
-
-  if (_pollInAction) {
-    return;
-  }
-  _pollInAction = true
-
-  let reset = _pollTimeStamp === 0 ? true : false
-  send( {command: COMMANDS.POLL, hubId:hubId, authKey: authKey, hubKey: hubKey, localUrl: hub.url, data: {ts:_pollTimeStamp} })
-  .then((deltas) =&gt; {
-    if (deltas) {
-      //console.log(JSON.stringify(deltas));
-      // Return can be null poll, even if not asked that
-      if (_pollTimeStamp === 0 || deltas.full) {
-        reset = true
-      }
-
-      _pollTimeStamp = deltas.timestamp
-
-      for (let delta of deltas.polls) {
-        switch(delta.type) {
-          case &quot;DEVICE_DELTA&quot;: {
-            deviceDeltaHandler(hubId, reset, delta.devices)
-            break;
-          }
-          case &quot;GROUP_DELTA&quot;: {
-            break;
-          }
-          case &quot;SCENE_DELTA&quot;: {
-            break;
-          }
-          case &quot;RULE_DELTA&quot;: {
-            break;
-          }
-          case &quot;USERS_DELTA&quot;: {
-            break;
-          }
-          case &quot;ROOM_DELTA&quot;: {
-            break;
-          }
-          case &quot;ZONE_DELTA&quot;: {
-            break;
-          }
-          case &quot;ALARM_DELTA&quot;: {
-            break;
-          }
-          default: {
-            break;
-          }
-        }
-      }
-    }
-    _pollInAction = false;
-  })
-  .catch((error) =&gt; {
-    //store.dispatch(hubsState.actions.hubPollFailed())
-    console.error(&quot;doPoll error: &quot;, error.message);
-    _pollInAction = false;
-  });
-}
-
-/*
- * Start polling of given hub
- */
-function startPolling(hubId) {
-  const intervalTime = POLL_INTERVAL_MS;
-  _pollIntervals[hubId] = setInterval(doPoll, intervalTime, hubId);
-}
-
-/*
- * Stop polling of given hub
- */
-function stopPolling(hubId) {
-  clearInterval(_pollIntervals[hubId]);
-}
-
-
-/**
- * Helper to get current user from state
- */
-function storedUser() {
-  return userState.selectors.getUser(store.getState());
 }
 
 /**
@@ -477,12 +224,281 @@ export function getHubs() {
   return hubsState.selectors.getHubs(store.getState());
 }
 
+/*
+ * Check hubs that are currently selected and mark them selected also in map of given hubs
+ */
+function setSelectedHubs(newHubs) {
+  const hubs = getHubs();
+  (Object.values(hubs)).forEach((hub) =&gt; {
+    if (hub.selected) {
+      const selectedNewHub = newHubs[hub.id];
+      if (selectedNewHub) {
+        selectedNewHub.selected = true;
+      }
+    }
+  });
+}
+
+/*
+ * Fetch HUB IP addresses in the same network
+ */
+function doCloudDiscovery() {
+  return new Promise((resolve) =&gt; {
+    send({ command: COMMANDS.CLOUD_IP })
+      .then((ips) =&gt; {
+        const queries = [];
+        if (ips &amp;&amp; !isEmpty(ips)) {
+          ips.forEach((ip) =&gt; {
+            queries.push(doLocalIdQuery(ip));
+          });
+        }
+        sendAll(queries)
+          .finally(() =&gt; {
+            // mark selected hubs to be selected after
+            setSelectedHubs(hubsMap);
+            store.dispatch(hubsState.actions.updateHubs(hubsMap));
+            resolve(&apos;ok&apos;);
+          });
+      })
+      .catch((error) =&gt; {
+        console.error(&apos;doCloudDiscovery error: &apos;, error.message);
+        store.dispatch(hubsState.actions.updateHubs(hubsMap));
+        resolve(&apos;error&apos;);
+      });
+  });
+}
+
+/*
+ * Fetch hub metadatas
+ */
+function fetchMetaData(hubs, authKey) {
+  return new Promise((resolve) =&gt; {
+    const queries = [];
+    (Object.values(hubs)).forEach((hub) =&gt; {
+      if (hub.hubKey) {
+        queries.push(doRemoteIdQuery(hub.id, authKey, hub.hubKey));
+      }
+    });
+    sendAll(queries)
+      .then((values) =&gt; {
+        console.debug(&apos;fetchMetaData values&apos;, values);
+      })
+      .catch((error) =&gt; {
+        console.debug(&apos;fetchMetaData error&apos;, error);
+      })
+      .finally(() =&gt; {
+        resolve();
+      });
+  });
+}
+
+
+/**
+ * Helper to get current user from state
+ */
+function storedUser() {
+  return userState.selectors.getUser(store.getState());
+}
+
+
+/*
+ * Fetch Hub keys by user authKey and start fetching hub meta datas
+ */
+function fetchHubs() {
+  const { authKey } = storedUser();
+  return new Promise((resolve, reject) =&gt; {
+    if (!authKey) {
+      reject(new Error(&apos;No userKey!&apos;));
+      return;
+    }
+    send({ command: COMMANDS.HUB_KEYS, authKey })
+      .then((tokens) =&gt; {
+        if (tokens) {
+          hubsMap = extractHubInfo(tokens);
+          store.dispatch(hubsState.actions.updateHubs(hubsMap));
+          fetchMetaData(hubsMap, authKey)
+            .finally(() =&gt; {
+              doCloudDiscovery();
+              resolve(getHubs());
+            });
+        } else {
+          resolve(getHubs());
+        }
+      })
+      .catch((error) =&gt; {
+        console.error(&apos;fetchHubTokens error: &apos;, error.message);
+        reject(error);
+      });
+  });
+}
+
+
+const discoveryInterval = undefined;
+
+/**
+ * Start discovering hubs every DISCOVERY_INTERVAL_MS
+ * Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local meta-infos
+ */
+export function startDiscoveringHubs() {
+  if (!discoveryInterval) {
+    // call immediately...
+    fetchHubs();
+    // and then every DISCOVERY_INTERVAL_MS (30s?)
+    // discoveryInterval = setInterval(fetchHubs, DISCOVERY_INTERVAL_MS);
+  }
+}
+
+/**
+ * Stop discovering hubs
+ */
+export function stopDiscoveringHubs() {
+  clearInterval(discoveryInterval);
+}
+
+
+/*
+** Polling
+*/
+
+const pollIntervals = {};
+let pollTimeStamp = 0;
+let pollInAction = false;
+let secondPoll = false;
+
+/*
+ * Do poll if hub connection is ok
+ * Remote poll is executed only every second call
+ */
+function doPoll(hubId) {
+  const hub = getHubs()[hubId];
+  console.error(&apos;doPoll connection state: &apos;, hub.connectionState);
+  if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL &amp;&amp; hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
+    return;
+  }
+
+  // just return every second -&gt; not doing so often as in local connection
+  if (hub.connectionState === HUB_CONNECTION_STATES.REMOTE) {
+    if (secondPoll) {
+      secondPoll = false;
+      return;
+    }
+    secondPoll = true;
+  }
+
+  const { authKey } = storedUser();
+  const { hubKey } = hub;
+
+  if (pollInAction) {
+    return;
+  }
+  pollInAction = true;
+
+  let reset = pollTimeStamp === 0;
+  send({
+    command: COMMANDS.POLL, hubId, authKey, hubKey, localUrl: hub.url, data: { ts: pollTimeStamp },
+  })
+    .then((deltas) =&gt; {
+      if (deltas) {
+      // console.log(JSON.stringify(deltas));
+      // Return can be null poll, even if not asked that
+        if (pollTimeStamp === 0 || deltas.full) {
+          reset = true;
+        }
+
+        pollTimeStamp = deltas.timestamp;
+
+        deltas.polls.forEach((delta) =&gt; {
+          switch (delta.type) {
+            case &apos;DEVICE_DELTA&apos;: {
+              deviceDeltaHandler(hubId, reset, delta.devices);
+              break;
+            }
+            case &apos;GROUP_DELTA&apos;: {
+              break;
+            }
+            case &apos;SCENE_DELTA&apos;: {
+              break;
+            }
+            case &apos;RULE_DELTA&apos;: {
+              break;
+            }
+            case &apos;USERS_DELTA&apos;: {
+              break;
+            }
+            case &apos;ROOM_DELTA&apos;: {
+              break;
+            }
+            case &apos;ZONE_DELTA&apos;: {
+              break;
+            }
+            case &apos;ALARM_DELTA&apos;: {
+              break;
+            }
+            default: {
+              break;
+            }
+          }
+        });
+      }
+      pollInAction = false;
+    })
+    .catch((error) =&gt; {
+    // store.dispatch(hubsState.actions.hubPollFailed())
+      console.error(&apos;doPoll error: &apos;, error.message);
+      pollInAction = false;
+    });
+}
+
+/*
+ * Start polling of given hub
+ */
+function startPolling(hubId) {
+  const intervalTime = POLL_INTERVAL_MS;
+  pollIntervals[hubId] = setInterval(doPoll, intervalTime, hubId);
+}
+
+/*
+ * Stop polling of given hub
+ */
+function stopPolling(hubId) {
+  clearInterval(pollIntervals[hubId]);
+}
+
+/**
+ * Unselect hub by id, stops hub polling
+ * @param  {string} selectedId   - hub id to be selected
+ */
+export function unSelectHubById(selectedId) {
+  const hubs = getHubs();
+  (Object.values(hubs)).forEach((hub) =&gt; {
+    if (selectedId === hub.id) {
+      store.dispatch(hubsState.actions.unSelectHub({ hubId: hub.id }));
+      stopPolling(hub.id);
+    }
+  });
+}
+
+
+/**
+ * Select hub by id, starts hub polling
+ * @param  {string} selectedId   - hub id to be selected
+ */
+export function selectHubById(selectedId) {
+  const hubs = getHubs();
+  (Object.values(hubs)).forEach((hub) =&gt; {
+    if (selectedId === hub.id) {
+      store.dispatch(hubsState.actions.selectHub({ hubId: hub.id }));
+      startPolling(hub.id);
+    }
+  });
+}
+
 
 /*
  * Listener of User state changes
  * Hub discovery is started when user&apos;s new state is AUTHENTICATED
  */
-watchChanges(&apos;user.state&apos;, (newState, oldState) =&gt; {
+watchChanges(&apos;user.state&apos;, (newState) =&gt; {
   // Start discovery when user is authenticated
   if (newState === USER_STATES.AUTHENTICATED) {
     startDiscoveringHubs();

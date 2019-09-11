@@ -33,8 +33,10 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-urlBase64Decode">urlBase64Decode</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-store">store</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-isNode">isNode</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#connection">connection</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-retryCondition">retryCondition</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#connection">connection</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-resetRetry">resetRetry</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-retryCondition">retryCondition</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-cloudErrorState">cloudErrorState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getAPIversion">getAPIversion</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hubErrorState">hubErrorState</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-testSSLCertificate">testSSLCertificate</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-send">send</a></span></span></li>
@@ -47,6 +49,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_FINGERPRINTS_SHA1">CLOUD_FINGERPRINTS_SHA1</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_HOST">CLOUD_HOST</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_URL">CLOUD_URL</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-MAX_API_VERSION">MAX_API_VERSION</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-CLOUD_CONNECTION_STATE_TYPE">CLOUD_CONNECTION_STATE_TYPE</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-COMMANDS_TYPE">COMMANDS_TYPE</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-COMMANDS_TYPE">COMMANDS_TYPE</a></span></span></li>
@@ -67,6 +70,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-POLL_INTERVAL_MS">POLL_INTERVAL_MS</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#reducers">reducers</a><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-connectionsState">connectionsState</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setCloudConnectionState">setCloudConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-devicesReducer">devicesReducer</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-devicesState">devicesState</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setDevices">setDevices</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-hubsReducer">hubsReducer</a></span></span></li>
@@ -89,41 +93,48 @@
 
 <div class="content" data-ice="content"><h1 data-ice="title">src/connection/send.js</h1>
 <pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">// 
-import isEmpty from &apos;lodash/isEmpty&apos;
-import isArray from &apos;lodash/isArray&apos;
-import axios from &apos;axios&apos;
-import axiosRetry from &apos;axios-retry&apos;
-import { urlBase64Decode } from &apos;../utils.js&apos;
-import { COMMANDS, CLOUD_CONNECTION_STATES, CLOUD_HOST, CLOUD_URL, CLOUD_API_VERSION, CLOUD_FINGERPRINTS_SHA1, HUB_CONNECTION_STATES } from &apos;./constants&apos;
-import { cloudErrorState, hubErrorState, testSSLCertificate } from &apos;./send-utilities&apos;
-import { setCloudConnectionState, setHubConnectionState } from &apos;./state&apos;
-import { userState } from &quot;../reducers/user&quot;;
-import { store } from &quot;../store&quot;
+import isEmpty from &apos;lodash/isEmpty&apos;;
+import isArray from &apos;lodash/isArray&apos;;
+import axios from &apos;axios&apos;;
+import axiosRetry from &apos;axios-retry&apos;;
+// import rax from &apos;retry-axios&apos;;
+import { urlBase64Decode } from &apos;../utils&apos;;
+import {
+  COMMANDS, CLOUD_CONNECTION_STATES, CLOUD_URL, HUB_CONNECTION_STATES, MAX_API_VERSION,
+} from &apos;./constants&apos;;
+import {
+  cloudErrorState, hubErrorState, testSSLCertificate, getAPIversion,
+} from &apos;./send-utilities&apos;;
+import { setCloudConnectionState, setHubConnectionState } from &apos;./state&apos;;
+import { userState } from &apos;../reducers/user&apos;;
+import { hubsState } from &apos;../reducers/hubs&apos;;
+import { store } from &apos;../store&apos;;
 
-import {retryCondition} from &apos;./send-retry&apos;
+import { retryCondition, resetRetry } from &apos;./send-retry&apos;;
 
 
 
-export {COMMANDS}
+export { COMMANDS };
 
-let _refreshingToken = false;
+let refreshingToken = false;
 
+/* eslint no-use-before-define: [&quot;error&quot;, { &quot;functions&quot;: false }] */
 /*
  * Refresh Auth key call
  */
 function refreshAuthKey(authKey) {
-  if (!_refreshingToken) {
-    _refreshingToken = true
-    send( {command: COMMANDS.REFRESH_AUTHKEY, authKey: authKey} )
-    .then((response) =&gt; {
-      setTimeout(function() { _refreshingToken = false; }, 1000 * 60  * 10); //10min
-      if (response.length &gt; 10) {
+  if (!refreshingToken) {
+    refreshingToken = true;
+    send({ command: COMMANDS.REFRESH_AUTHKEY, authKey })
+      .then((response) =&gt; {
+        setTimeout(() =&gt; { refreshingToken = false; }, 1000 * 60 * 10); // 10min
+        if (response.length &gt; 10) {
           store.dispatch(userState.actions.setAuthKey(response));
-      }
-    })
-    .catch((error) =&gt; {
-      _refreshingToken = false
-    });
+        }
+      })
+      .catch(() =&gt; {
+        refreshingToken = false;
+      });
   }
 }
 
@@ -131,33 +142,32 @@ function refreshAuthKey(authKey) {
  * Token refresh
  */
 function testAndRefreshToken(key) {
-    let exp = null;
-    let header = {};
-    let payload = {};
-    let diff = null;
+  let exp = null;
+  let header = {};
+  let payload = {};
+  let diff = null;
 
-    if (key) {
-        const tokenParts = key.split(&apos;.&apos;);
-        header = JSON.parse(urlBase64Decode(tokenParts[0]));
-        payload = JSON.parse(urlBase64Decode(tokenParts[1]));
-    }
+  if (key) {
+    const tokenParts = key.split(&apos;.&apos;);
+    header = JSON.parse(urlBase64Decode(tokenParts[0]));
+    payload = JSON.parse(urlBase64Decode(tokenParts[1]));
+  }
 
-    if ((header &amp;&amp; header.exp) || (payload != null &amp;&amp; payload.exp)) {
-        exp = header.exp ? header.exp : payload.exp
-    }
+  if ((header &amp;&amp; header.exp) || (payload != null &amp;&amp; payload.exp)) {
+    exp = header.exp ? header.exp : payload.exp;
+  }
 
-    if (exp) {
-        diff = exp - Math.round(new Date().getTime() / 1000)
-    }
+  if (exp) {
+    diff = exp - Math.round(new Date().getTime() / 1000);
+  }
 
-    if (!diff || diff &lt; 0) {
-      // User is unauthenticated
-      setCloudConnectionState(CLOUD_CONNECTION_STATES.UNAUTHENTICATED);
-    } else if (diff &amp;&amp; diff &lt;  5 * 24 * 60 * 60) {
-      // refresh if &lt; 5 days to exp date
-      refreshAuthKey(key);
-    }
-
+  if (!diff || diff &lt; 0) {
+    // User is unauthenticated
+    setCloudConnectionState(CLOUD_CONNECTION_STATES.UNAUTHENTICATED);
+  } else if (diff &amp;&amp; diff &lt; 5 * 24 * 60 * 60) {
+    // refresh if &lt; 5 days to exp date
+    refreshAuthKey(key);
+  }
 }
 
 /**
@@ -166,26 +176,34 @@ function testAndRefreshToken(key) {
  * @return {Promise}
  */
 export function sendAll(requests) {
-  return new Promise( (resolve, reject) =&gt; {
-
+  return new Promise((resolve) =&gt; {
     Promise.all(requests)
-    .then(results =&gt; {
+      .then(() =&gt; {
         // Use the data from the results like so:
         // results[0].data
         // results[1].data
-      resolve()
-    })
-    .catch(error =&gt; {
+        resolve();
+      })
+      .catch(() =&gt; {
         // do whatever
-      resolve()
-    });
-
+        resolve();
+      });
   });
-
 }
 
+axiosRetry(axios, {
+  // retries: 1, DOESN&apos;T WORK, see send_retry.js
+  retryCondition,
+  shouldResetTimeout: true,
+  retryDelay: (retryCount, error) =&gt; {
+    // console.error(&apos;axiosRetry &apos;, retryCount); DOESN&apos;T WORK , see send_retry.js
+    console.error(&apos;axiosRetry &apos;, error);
+    return 1000; // retryCount * 1000;
+  },
+});
+
 /* Flag to indicate SSL failures */
-let _permanentSSLFailure = false;
+let permanentSSLFailure = false;
 
 /**
  * Send method for REST API
@@ -206,56 +224,87 @@ let _permanentSSLFailure = false;
  *   .then((hubData) =&gt; {...});
  *
  */
-export function send({command, localUrl, hubId, url, method, authKey, hubKey, type, config, data}) {
-  if (method == null) {
-    method = &apos;GET&apos;;
-  }
+export function send({
+  command, localUrl, url, timeout, method, authKey, hubKey, type, config, data, hubId,
+}) {
+  let sendMethod = method;
+  let sendUrl = url;
+  let sendAuthKey = authKey;
+  let sendHubKey = hubKey;
+  let sendConfig = config;
+  let sendType = type;
 
-  let body = data;
+  if (sendMethod == null) {
+    sendMethod = &apos;GET&apos;;
+  }
+  if (sendType == null) {
+    sendType = &apos;application/json;charset=UTF-8&apos;;
+  }
+  const body = data;
   /*
   if (isArray(data)) {
     body = [];
     body.push({});
   }
   */
-  //console.log(&quot;send: command &quot;, command);
+  // console.log(&quot;send: command &quot;, command);
   // Flag to indicate are we using remote (vrs.local) connection
   let remoteConnection = false;
 
   // Flag to indicate are we sending hub command meaning using commandAPI (vrs. some cloud/videocloud command like login, log etc)
-  const hubCommand = isEmpty(hubId) ? false : true;
+  const hubCommand = !isEmpty(hubId);
 
-  if (typeof command != &quot;undefined&quot; &amp;&amp; command){
+
+  if (typeof command !== &apos;undefined&apos; &amp;&amp; command) {
     if (command.method) {
-      method = command.method;
+      sendMethod = command.method;
     }
-    if (isEmpty(url) &amp;&amp; command.url) {
-      url = command.url;
-    }
-
-    if (url){
-      var parts = url.split(&apos;hub/remote&apos;)
-      if (parts &amp;&amp; parts[1]){
-        if (localUrl) {
-            url = localUrl + parts[1]
-            if (hubKey) {
-              authKey = hubKey;
-              hubKey = null;
-            }
-          }
+    if (isEmpty(sendUrl) &amp;&amp; command.url) {
+      // command with Hub API version
+      if (command.url.indexOf(&apos;$API_VER&apos;) !== -1) {
+        const stateNow = store.getState();
+        const hubs = hubsState.selectors.getHubs(stateNow);
+        if (!hubs[hubId] || !hubs[hubId].hubKey) {
+          return new Promise((resolve, reject) =&gt; {
+            reject(new Error(&apos;SDK Error: Send - No Hub id error&apos;));
+          });
+        }
+        const hub = hubs[hubId];
+        if (!hub.version || (hub.connectionState === HUB_CONNECTION_STATES.UNCONNECTED &amp;&amp; command.url.indexOf(&apos;hub/remote/hub&apos;) === -1)) {
+          return new Promise((resolve, reject) =&gt; {
+            reject(new Error(&apos;SDK Error: Send - No Hub connection error&apos;));
+          });
+        }
+        const hubVersion = getAPIversion(hub.version, MAX_API_VERSION);
+        sendUrl = command.url.replace(&apos;$API_VER&apos;, hubVersion);
+      } else {
+        sendUrl = command.url;
       }
     }
 
-    if (url &amp;&amp; url.indexOf(CLOUD_URL) &gt; -1) {
+    if (sendUrl) {
+      const parts = sendUrl.split(&apos;hub/remote&apos;);
+      if (parts &amp;&amp; parts[1]) {
+        if (localUrl) {
+          sendUrl = localUrl + parts[1];
+          if (sendHubKey) {
+            sendAuthKey = sendHubKey;
+            sendHubKey = null;
+          }
+        }
+      }
+    }
+
+    if (sendUrl &amp;&amp; sendUrl.indexOf(CLOUD_URL) &gt; -1) {
       remoteConnection = true;
     }
 
     if (command.type &amp;&amp; body) {
-        if (isArray(body)) {
-          body[0][&apos;type&apos;] = command.type;
-        } else {
-          body[&apos;type&apos;] = command.type;
-        }
+      if (isArray(body)) {
+        body[0].type = command.type;
+      } else {
+        body.type = command.type;
+      }
     }
 
     /*
@@ -270,150 +319,147 @@ export function send({command, localUrl, hubId, url, method, authKey, hubKey, ty
     } */
 
     if (command.urlParams) {
-      let params = [];
-      command.urlParams.forEach(param =&gt; {
-          if (data &amp;&amp; data[param] !== undefined){
-            params.push(encodeURIComponent(param) + &apos;=&apos; + encodeURIComponent(data[param]));
-          }
+      const params = [];
+      command.urlParams.forEach((param) =&gt; {
+        if (data &amp;&amp; data[param] !== undefined) {
+          params.push(`${encodeURIComponent(param)}=${encodeURIComponent(data[param])}`);
+        }
       });
-      if (url &amp;&amp; params.length &gt; 0) {
-        url = url + &quot;?&quot; + params.join(&apos;&amp;&apos;);
+      if (sendUrl &amp;&amp; params.length &gt; 0) {
+        sendUrl = `${sendUrl}?${params.join(&apos;&amp;&apos;)}`;
       }
     }
 
     if (command.config) {
-      config = command.config;
+      sendConfig = command.config;
     }
-
   }
 
   const bodyString = JSON.stringify(body);
 
-  const reqConf ={
-    timeout: 1000,
-    method: method,
-    //withCredentials: false,
+  const reqConf = {
+    timeout: timeout || 1000,
+    method: sendMethod,
+    // withCredentials: false,
     headers: {
-      &apos;Accept&apos;: &apos;application/json, application/binary, text/plain, */*&apos;,
-      &apos;Content-Type&apos;: &apos;application/json;charset=UTF-8&apos;,
-      &apos;Authorization&apos;: authKey ? authKey : null,
-      &apos;X-Hub-Key&apos;: hubKey ? hubKey : null
+      Accept: &apos;application/json, application/binary, text/plain, */*&apos;,
+      &apos;Content-Type&apos;: sendType,
+      Authorization: sendAuthKey || null,
+      &apos;X-Hub-Key&apos;: sendHubKey || null,
     },
     crossDomain: true,
     responseType: &apos;application/json&apos;,
-    url: url,
-    data: isEmpty(bodyString) ? null : bodyString
-  }
+    url: sendUrl,
+    data: isEmpty(bodyString) ? null : bodyString,
+  };
 
-  Object.assign(reqConf, config);
+  Object.assign(reqConf, sendConfig);
 
-  return new Promise( (resolve, reject) =&gt; {
-    if (command || url) {
-
-      axios.interceptors.response.use(response =&gt; {
-        if(response.headers[&apos;content-type&apos;] === &apos;application/json&apos; || response.headers[&apos;content-type&apos;] === &apos;application/binary&apos;) {
-          return response
+  return new Promise((resolve, reject) =&gt; {
+    if (command || sendUrl) {
+      axios.interceptors.response.use((response) =&gt; {
+        if (response.headers[&apos;content-type&apos;] === &apos;application/json&apos; || response.headers[&apos;content-type&apos;] === &apos;application/binary&apos;) {
+          resetRetry(sendUrl);
+          return response;
         }
-        else {
-         console.error(&quot;send: unknown response type&quot;);
-         debugger;
-         return Promise.reject(response);
+        console.error(&apos;send: unknown response type&apos;);
+        return Promise.reject(response);
+      }, (error) =&gt; Promise.reject(error));
+      /*
+      axios.interceptors.request.use((reqConfig) =&gt; {
+        //if (reqConfig.url.indexOf(&apos;192.168.1.119&apos;) !== -1) debugger;
+        const rConfig = reqConfig;
+        const retryState = rConfig[&apos;axios-retry&apos;] || {};
+        if (retryState.retryCount &gt; 0) {
+          rConfig.headers[&apos;x-retry-count&apos;] = retryState.retryCount;
         }
-      }, error =&gt; Promise.reject(error));
-
-      //retries if it is a network error or a 5xx error on an idempotent request (GET, HEAD, OPTIONS, PUT or DELETE).
-      axiosRetry(axios, { retries: 3, shouldResetTimeout: true, retryCondition: retryCondition });
+        return rConfig;
+      });
+      */
+      // retries if it is a network error or a 5xx error on an idempotent request (GET, HEAD, OPTIONS, PUT or DELETE).
+      // axiosRetry(axios, {
+      //  retries: 3, shouldResetTimeout: false, retryDelay: axiosRetry.exponentialDelay, retryCondition,
+      // });
+      //
 
       testSSLCertificate(remoteConnection)
-      .then(function (status) {
+        .then((status) =&gt; {
         // Cancel request if SSL Certificate status is invalid
-        if (!status || _permanentSSLFailure) {
-
-          _permanentSSLFailure = true;
-          reject(new Error(&apos;SDK Error: SSL failure.&apos;));
-
-        } else {
-
+          if (!status || permanentSSLFailure) {
+            permanentSSLFailure = true;
+            reject(new Error(&apos;SDK Error: SSL failure.&apos;));
+          } else {
           // SSL is ok,
-          // check if auth Key needs to be refreshed
-          if (authKey) {
-            testAndRefreshToken(authKey);
-          }
-
-          // Send command
-          // See options: https://github.com/axios/axios#request-config
-          axios(reqConf)
-          .then(function (response) {
-            // console.error(&quot;send: response &quot;, response);
-            if (remoteConnection){
-              setCloudConnectionState(CLOUD_CONNECTION_STATES.CONNECTED)
-            } else if (hubId) {
-              setHubConnectionState({hubId: hubId, state:HUB_CONNECTION_STATES.LOCAL})
+            // check if auth Key needs to be refreshed
+            if (sendAuthKey) {
+              testAndRefreshToken(sendAuthKey);
             }
-            resolve(response.data);
 
-          })
-          .catch(function (error) {
-            if (error &amp;&amp; error.response){
-              // The request was made and the server responded with a status code
-              // that falls out of the range of 2xx
-              if (remoteConnection) {
-                  if (command !== COMMANDS.CLOUD_META){
-                    setCloudConnectionState(cloudErrorState(error))
+            // Send command
+            // See options: https://github.com/axios/axios#request-config
+            axios(reqConf)
+              .then((response) =&gt; {
+                // console.error(&quot;send: response &quot;, response);
+                if (remoteConnection) {
+                  setCloudConnectionState(CLOUD_CONNECTION_STATES.CONNECTED);
+                } else if (hubId) {
+                  setHubConnectionState({ hubId, state: HUB_CONNECTION_STATES.LOCAL });
+                }
+                resolve(response.data);
+              })
+              .catch((error) =&gt; {
+                if (error &amp;&amp; error.response) {
+                  // The request was made and the server responded with a status code
+                  // that falls out of the range of 2xx
+                  if (remoteConnection) {
+                    if (command !== COMMANDS.CLOUD_META) {
+                      setCloudConnectionState(cloudErrorState(error));
+                    }
+                    if (hubCommand &amp;&amp; hubId) {
+                      setHubConnectionState({ hubId, state: hubErrorState(error) });
+                    }
+                  } else {
+                    // Local connection
+                    // 401 means also cloud auth refresh is required
+                    if (error &amp;&amp; error.response &amp;&amp; error.response.status === 401) {
+                      setCloudConnectionState(cloudErrorState(error));
+                    }
+                    if (hubCommand &amp;&amp; hubId) {
+                      setHubConnectionState({ hubId, state: hubErrorState(error) });
+                    }
                   }
+                } else if (error.request) {
+                  // The request was made but no response was received
+                  // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                  // http.ClientRequest in node.js
+                  if (remoteConnection) {
+                    setCloudConnectionState(CLOUD_CONNECTION_STATES.UNCONNECTED);
+                    if (hubCommand &amp;&amp; hubId) {
+                      setHubConnectionState({ hubId, state: HUB_CONNECTION_STATES.UNCONNECTED });
+                    }
+                  } else if (hubCommand &amp;&amp; hubId) {
+                    // Local connection
+                    setHubConnectionState({ hubId, state: HUB_CONNECTION_STATES.UNCONNECTED });
+                  }
+                } else if (remoteConnection) {
+                  // Something happened in setting up the request that triggered an Error
+                  setCloudConnectionState(CLOUD_CONNECTION_STATES.UNCONNECTED);
                   if (hubCommand &amp;&amp; hubId) {
-                    setHubConnectionState({hubId: hubId, state: hubErrorState(error)})
+                    setHubConnectionState({ hubId, state: HUB_CONNECTION_STATES.UNCONNECTED });
                   }
-              } else {
-                // Local connection
-                // 401 means also cloud auth refresh is required
-                if (error &amp;&amp; error.response &amp;&amp; error.response.status === 401) {
-                  setCloudConnectionState(cloudErrorState(error))
+                } else if (hubCommand &amp;&amp; hubId) {
+                  // Local connection
+                  setHubConnectionState({ hubId, state: HUB_CONNECTION_STATES.UNCONNECTED });
                 }
-                if (hubCommand &amp;&amp; hubId) {
-                  setHubConnectionState({hubId: hubId, state: hubErrorState(error)})
-                }
-              }
-            } else if (error.request) {
-              // The request was made but no response was received
-              // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-              // http.ClientRequest in node.js
-              if (remoteConnection) {
-                setCloudConnectionState(CLOUD_CONNECTION_STATES.UNCONNECTED)
-                if (hubCommand &amp;&amp; hubId) {
-                    setHubConnectionState({hubId: hubId, state: HUB_CONNECTION_STATES.UNCONNECTED})
-                }
-              } else {
-                // Local connection
-                if (hubCommand &amp;&amp; hubId) {
-                  setHubConnectionState({hubId: hubId, state: HUB_CONNECTION_STATES.UNCONNECTED})
-                }
-              }
-            } else {
-              // Something happened in setting up the request that triggered an Error
-              if (remoteConnection) {
-                setCloudConnectionState(CLOUD_CONNECTION_STATES.UNCONNECTED)
-                if (hubCommand &amp;&amp; hubId) {
-                    setHubConnectionState({hubId: hubId, state: HUB_CONNECTION_STATES.UNCONNECTED})
-                }
-              } else {
-                // Local connection
-                if (hubCommand &amp;&amp; hubId) {
-                  setHubConnectionState({hubId: hubId, state: HUB_CONNECTION_STATES.UNCONNECTED})
-                }
-              }
-            }
-            console.error(&apos;SDK send: error &apos;, error);
-            reject(new Error(&apos;SDK Error: Send error&apos;));
-          });
-        }
-      });
+                console.error(&apos;SDK send: error &apos;, error);
+                reject(new Error(&apos;SDK Error: Send error&apos;));
+              });
+          }
+        });
     } else {
       reject(new Error(&apos;SDK Error: Command or Command API URL not found.&apos;));
     }
   });
-
-
 }
 </code></pre>
 

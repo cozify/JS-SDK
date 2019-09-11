@@ -8,9 +8,9 @@ import { store, LANGUAGES, USER_STATES, getUserState, changeLanguage, doPwLogin,
 
 
 // Fill them as should
-let fixedUsername = '...@cozify.fi'
-let fixedPassword = 'xxx'
-let fixedHubId = 'xxxx-xxxx'
+let fixedUsername = 'vesa@cozify.fi'
+let fixedPassword = 'Duun1alko!'
+let fixedHubId = 'cd3bd9e4-7943-11e5-a567-544a168673f2'
 let fixedDeviceId = 'abcd-efgh'
 
 

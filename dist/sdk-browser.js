@@ -4350,6 +4350,597 @@ var CozifySDK = (function (exports, axios) {
 	  };
 	}
 
+	/*!
+	 * isobject <https://github.com/jonschlinkert/isobject>
+	 *
+	 * Copyright (c) 2014-2017, Jon Schlinkert.
+	 * Released under the MIT License.
+	 */
+
+	var isobject = function isObject(val) {
+	  return val != null && typeof val === 'object' && Array.isArray(val) === false;
+	};
+
+	/*!
+	 * get-value <https://github.com/jonschlinkert/get-value>
+	 *
+	 * Copyright (c) 2014-2018, Jon Schlinkert.
+	 * Released under the MIT License.
+	 */
+
+
+
+	var getValue = function(target, path, options) {
+	  if (!isobject(options)) {
+	    options = { default: options };
+	  }
+
+	  if (!isValidObject(target)) {
+	    return typeof options.default !== 'undefined' ? options.default : target;
+	  }
+
+	  if (typeof path === 'number') {
+	    path = String(path);
+	  }
+
+	  const isArray = Array.isArray(path);
+	  const isString = typeof path === 'string';
+	  const splitChar = options.separator || '.';
+	  const joinChar = options.joinChar || (typeof splitChar === 'string' ? splitChar : '.');
+
+	  if (!isString && !isArray) {
+	    return target;
+	  }
+
+	  if (isString && path in target) {
+	    return isValid(path, target, options) ? target[path] : options.default;
+	  }
+
+	  let segs = isArray ? path : split(path, splitChar, options);
+	  let len = segs.length;
+	  let idx = 0;
+
+	  do {
+	    let prop = segs[idx];
+	    if (typeof prop === 'number') {
+	      prop = String(prop);
+	    }
+
+	    while (prop && prop.slice(-1) === '\\') {
+	      prop = join([prop.slice(0, -1), segs[++idx] || ''], joinChar, options);
+	    }
+
+	    if (prop in target) {
+	      if (!isValid(prop, target, options)) {
+	        return options.default;
+	      }
+
+	      target = target[prop];
+	    } else {
+	      let hasProp = false;
+	      let n = idx + 1;
+
+	      while (n < len) {
+	        prop = join([prop, segs[n++]], joinChar, options);
+
+	        if ((hasProp = prop in target)) {
+	          if (!isValid(prop, target, options)) {
+	            return options.default;
+	          }
+
+	          target = target[prop];
+	          idx = n - 1;
+	          break;
+	        }
+	      }
+
+	      if (!hasProp) {
+	        return options.default;
+	      }
+	    }
+	  } while (++idx < len && isValidObject(target));
+
+	  if (idx === len) {
+	    return target;
+	  }
+
+	  return options.default;
+	};
+
+	function join(segs, joinChar, options) {
+	  if (typeof options.join === 'function') {
+	    return options.join(segs);
+	  }
+	  return segs[0] + joinChar + segs[1];
+	}
+
+	function split(path, splitChar, options) {
+	  if (typeof options.split === 'function') {
+	    return options.split(path);
+	  }
+	  return path.split(splitChar);
+	}
+
+	function isValid(key, target, options) {
+	  if (typeof options.isValid === 'function') {
+	    return options.isValid(key, target);
+	  }
+	  return true;
+	}
+
+	function isValidObject(val) {
+	  return isobject(val) || Array.isArray(val) || typeof val === 'function';
+	}
+
+	//      
+
+	/**
+	 * Helper to check if run environment is Node
+	 * @type {Boolean}
+	 */
+	let isNodeInUse = false;
+
+	if (typeof process === 'object') {
+	  if (typeof process.versions === 'object') {
+	    if (typeof process.versions.node !== 'undefined') {
+	      isNodeInUse = true;
+	      console.log('Running in node.js');
+	    } else {
+	      console.log('Running in browser');
+	    }
+	  }
+	}
+
+	const isNode = isNodeInUse;
+	/**
+	 * Helper method to Base64 decode
+	 * @param  {string} encoded - string to be decoded
+	 * @return {string}  - decoded string
+	 */
+
+	function urlBase64Decode(encoded) {
+	  const str = encoded.replace(/-/g, '+').replace(/_/g, '/');
+	  let output = str;
+
+	  switch (output.length % 4) {
+	    case 0:
+	    case 2:
+	      output += '==';
+	      break;
+
+	    case 3:
+	      output += '=';
+	      break;
+
+	    default:
+	      throw new Error('Illegal base64url string!');
+	  }
+
+	  let retVal = '';
+
+	  let atob = a => {
+	    console.error('Invalid atob for string ', a);
+	    return 'invalid atob';
+	  };
+
+	  if (!isNodeInUse) {
+	    atob = window.atob;
+	  } else {
+	    const nodeAtob = a => {
+	      const binVal = Buffer.from(a, 'base64').toString('binary');
+	      return binVal;
+	    };
+
+	    atob = nodeAtob;
+	  }
+
+	  try {
+	    retVal = atob(str);
+	  } catch (error) {
+	    try {
+	      retVal = atob(output);
+	    } catch (error2) {
+	      console.error('urlBase64Decode: trying atob failed');
+	    }
+	  }
+
+	  return retVal;
+	}
+
+	//      
+	/*
+	* Cloud servers SSL cretification fingerprints to be checked if possible
+	* Fingerprint could be found by opening the server URL like https://testapi.cozify.fi/ui/0.2/hub/lan_ip in Chrome.
+	* Then click the green certificate in front of the URL, click 'Connection', 'Certificate details', expand the details
+	* and scroll down to the SHA1 fingerprint.
+	* testapi 91 30 CF 20 17 F7 D7 EC F7 BA 43 30 8E 19 83 B4 CF DE 5A CC
+	* cloud & cloud2 26 B0 20 FA AB E8 A3 81 63 37 C6 B7 EF 94 4D 40 3D 1B 85 10
+	*/
+
+	const CLOUD_FINGERPRINTS_SHA1 = ['91 30 CF 20 17 F7 D7 EC F7 BA 43 30 8E 19 83 B4 CF DE 5A CC', '26 B0 20 FA AB E8 A3 81 63 37 C6 B7 EF 94 4D 40 3D 1B 85 10'];
+	/* Cloud HTTPS host name */
+
+	const CLOUD_HOST = 'https://testapi.cozify.fi';
+	/* Cloud API VERSION */
+
+	const CLOUD_API_VERSION = 'ui/0.2/';
+	/* Cloud URL */
+
+	const CLOUD_URL = `${CLOUD_HOST}/${CLOUD_API_VERSION}`;
+	const MAX_API_VERSION = '1.12';
+	/**
+	 *  Enumeration of supported API commands, that could be
+	 *  USER_LOGIN, HUB_KEYS, REFRESH_AUTHKEY, CLOUD_IP, CLOUD_META, POLL, CMD_DEVICE
+	 *  @typedef {Object} COMMANDS_TYPE
+	 *  @readonly
+	 *
+	  */
+
+	const COMMANDS = Object.freeze({
+	  USER_LOGIN: {
+	    method: 'POST',
+	    url: `${CLOUD_URL}user/login`,
+	    params: ['password', 'email'],
+	    config: {
+	      responseType: isNode ? 'blob' : 'stream',
+	      timeout: 5000
+	    }
+	  },
+	  HUB_KEYS: {
+	    method: 'GET',
+	    url: `${CLOUD_URL}user/hubkeys`
+	  },
+	  REFRESH_AUTHKEY: {
+	    method: 'GET',
+	    url: `${CLOUD_URL}user/refreshsession`
+	  },
+	  CLOUD_IP: {
+	    method: 'GET',
+	    url: `${CLOUD_URL}hub/lan_ip`
+	  },
+	  CLOUD_META: {
+	    method: 'GET',
+	    url: `${CLOUD_URL}hub/remote/hub`
+	  },
+	  POLL: {
+	    method: 'GET',
+	    url: `${CLOUD_URL}hub/remote/cc/$API_VER/hub/poll`,
+	    urlParams: ['ts']
+	  },
+	  CMD_DEVICE: {
+	    method: 'PUT',
+	    url: `${CLOUD_URL}hub/remote/cc/$API_VER/devices/command`,
+	    type: 'CMD_DEVICE',
+	    params: ['id', 'state']
+	  }
+	});
+	/**
+	 * COMMAND_TYPE
+	 *  @typedef {Object} COMMANDS_TYPE
+	 *  @property {COMMANDS_TYPE} [command]   - Optional command like USER_LOGIN,
+	 *  @property {string} [localUrl]         - Optional localUrl for direct hub access
+	 *  @property {string} [url]              - Optional url
+	 *  @property {number} [timeout]          - Optional timeout
+	 *  @property {string} [method]           - Optional method
+	 *  @property {string} [authKey]          - Optional authKey
+	 *  @property {string} [hubKey]           - Optional hubKey
+	 *  @property {Object} [config]           - Optional config that might have 'timeout' or 'responseType' configs to be used over defaults,
+	 *  @property {Object} [data]             - Optional data to be sent over url or body parameters (depending command)
+	 *  @property {string} [type]             - Optional type that defaults to 'application/json',
+	 *  @property {string} [hubId]            - Optional hub Id when messaging to hub
+	 */
+
+	/**
+	  * Enumeration of cloud connection state, that could be
+	  * UNCONNECTED, UNAUTHENTICATED, UNAUTHORIZED, OBSOLETE_API_VERSION, LATE_PAYMENT or CONNECTED
+	  * @readonly
+	  * @enum {string}
+	  * @typedef {string} CLOUD_CONNECTION_STATE_TYPE
+	  */
+
+	const CLOUD_CONNECTION_STATES = Object.freeze({
+	  UNCONNECTED: 'no connection',
+	  UNAUTHENTICATED: 'unauthenticated',
+	  UNAUTHORIZED: 'unauthorized',
+	  OBSOLETE_API_VERSION: 'obsolete api version',
+	  LATE_PAYMENT: 'late payment',
+	  CONNECTED: 'connected'
+	});
+	/**
+	  * Enumeration of HUB connection state, that could be
+	  * UNCONNECTED, UNAUTHENTICATED, UNAUTHORIZED, OBSOLETE_API_VERSION, REMOTE or LOCAL
+	  * @readonly
+	  * @enum {string}
+	  * @typedef {string} HUB_CONNECTION_STATE_TYPE
+	  */
+
+	const HUB_CONNECTION_STATES = Object.freeze({
+	  UNCONNECTED: 'no connection',
+	  UNAUTHENTICATED: 'unauthenticated',
+	  UNAUTHORIZED: 'unauthorized',
+	  OBSOLETE_API_VERSION: 'obsolete api version',
+	  REMOTE: 'remote',
+	  LOCAL: 'local'
+	});
+
+	//      
+
+	/**
+	 * Connections action creators object
+	 * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
+	 * @return { {
+	 *   slice : string,
+	 *   reducer : ReducerFunction,
+	 *   actions : Object<string, ActionCreator},
+	 *   selectors : Object<string, Selector>
+	 *   }}
+	 */
+
+	const connectionsState = createSlice({
+	  slice: 'connections',
+	  initialState: {
+	    cloudState: CLOUD_CONNECTION_STATES.UNCONNECTED
+	  },
+	  reducers: {
+	    /*
+	     * Reducer action of cloud connection state
+	     * @param {Object} state
+	     * @param {CLOUD_CONNECTION_STATES} action
+	     */
+	    setCloudConnectionState(state, action) {
+	      const stateToSet = state;
+	      const newState = action.payload;
+	      const oldState = state.cloudState;
+
+	      if (Object.values(CLOUD_CONNECTION_STATES).indexOf(newState) > -1) {
+	        if (oldState !== newState) {
+	          console.log(`CLOUD connection state ${oldState} -> ${newState}`);
+	          stateToSet.cloudState = newState;
+	        }
+	      }
+	    }
+
+	  }
+	});
+	const {
+	  actions,
+	  reducer
+	} = connectionsState;
+
+	function _defineProperty$3(obj, key, value) {
+	  if (key in obj) {
+	    Object.defineProperty(obj, key, {
+	      value: value,
+	      enumerable: true,
+	      configurable: true,
+	      writable: true
+	    });
+	  } else {
+	    obj[key] = value;
+	  }
+
+	  return obj;
+	}
+
+	var defineProperty$1 = _defineProperty$3;
+
+	function _objectSpread$2(target) {
+	  for (var i = 1; i < arguments.length; i++) {
+	    var source = arguments[i] != null ? arguments[i] : {};
+	    var ownKeys = Object.keys(source);
+
+	    if (typeof Object.getOwnPropertySymbols === 'function') {
+	      ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {
+	        return Object.getOwnPropertyDescriptor(source, sym).enumerable;
+	      }));
+	    }
+
+	    ownKeys.forEach(function (key) {
+	      defineProperty$1(target, key, source[key]);
+	    });
+	  }
+
+	  return target;
+	}
+
+	var objectSpread = _objectSpread$2;
+
+	/**
+	 * Devices action creators object
+	 * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
+	 * @return { {
+	 *   slice : string,
+	 *   reducer : ReducerFunction,
+	 *   actions : Object<string, ActionCreator},
+	 *   selectors : Object<string, Selector>
+	 *   }}
+	 */
+
+	const devicesState = createSlice({
+	  slice: 'devices',
+	  initialState: {},
+	  reducers: {
+	    /*
+	     * Reducer action of setting devices state - sets all given devices of given hub, keeps existing states
+	     * @param {Object} state
+	     * @param {Object} action
+	     */
+	    setDevices(state, action) {
+	      const stateToSet = state;
+	      const {
+	        hubId
+	      } = action.payload;
+	      const {
+	        devices
+	      } = action.payload;
+	      const hubDevices = {};
+	      Object.entries(devices).forEach(entry => {
+	        const [id, device] = entry;
+	        hubDevices[id] = objectSpread({}, device);
+	      });
+	      stateToSet[hubId] = objectSpread({}, hubDevices);
+	    },
+
+	    /*
+	     * Reducer action of setting device state - sets all given devices of given hub, keeps existing states
+	     * @param {Object} state
+	     * @param {payload:{Object{hubId:string, device:Object}}} action
+	     */
+	    setDevice(state, action) {
+	      const stateToSet = state;
+	      const {
+	        hubId
+	      } = action.payload;
+	      const {
+	        device
+	      } = action.payload;
+
+	      if (stateToSet[hubId]) {
+	        stateToSet[hubId][device.id] = objectSpread({}, device);
+	      }
+	    },
+
+	    /*
+	     * Reducer action to remove device from state - sets all given devices of given hub, keeps existing states
+	     * @param {Object} state
+	     * @param {payload:{Object{hubId:string, device:Object}}} action
+	     */
+	    deleteDevice(state, action) {
+	      const stateToSet = state;
+	      const {
+	        hubId
+	      } = action.payload;
+	      const {
+	        device
+	      } = action.payload;
+
+	      if (stateToSet[hubId]) {
+	        delete stateToSet[hubId][device.id];
+	      }
+	    }
+
+	  }
+	});
+	const {
+	  actions: actions$1,
+	  reducer: reducer$1
+	} = devicesState;
+
+	/*
+	console.log(addDevice({ id: 123, name: 'Unnamed device' }))
+	{type : "devices/addDevice", payload : {id : 123, name: 'Unnamed device' }}
+	*/
+
+	const {
+	  setDevices,
+	  deleteDevice
+	} = actions$1;
+
+	/**
+	 * Hubs action creators object
+	 * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
+	 * @return { {
+	 *   slice : string,
+	 *   reducer : ReducerFunction,
+	 *   actions : Object<string, ActionCreator},
+	 *   selectors : Object<string, Selector>
+	 *   }}
+	 */
+
+	const hubsState = createSlice({
+	  slice: 'hubs',
+	  initialState: {},
+	  reducers: {
+	    /*
+	     * Reducer action of setting many hubs to state
+	     * @param  {Object} state
+	     * @param  {payload:{hubs:HUBS_MAP_TYPE}} action
+	     */
+	    updateHubs(state, action) {
+	      const stateToSet = state;
+	      const hubs = action.payload;
+	      console.log('updateHubs', hubs);
+	      Object.entries(hubs).forEach(entry => {
+	        const [id, hub] = entry;
+	        stateToSet[id] = objectSpread({}, state[id], hub);
+	      });
+	    },
+
+	    /*
+	     * Reducer action of setting hub state to selected
+	     * @param  {Object} state
+	     * @param  {payload:{hubId:string}} action
+	     */
+	    selectHub(state, action) {
+	      const stateToSet = state;
+	      const {
+	        hubId
+	      } = action.payload;
+	      console.log('selectHub', hubId);
+
+	      if (state[hubId]) {
+	        stateToSet[hubId].selected = true;
+	        console.log('selectHub', state[hubId]);
+	      }
+	    },
+
+	    /*
+	     * Reducer action of setting hub state to unselected
+	     * @param  {Object} state
+	     * @param  {payload:{hubId:string}} action
+	     */
+	    unSelectHub(state, action) {
+	      const stateToSet = state;
+	      const {
+	        hubId
+	      } = action.payload;
+
+	      if (state[hubId]) {
+	        stateToSet[hubId].selected = false; // console.log("selectHub", state[action.payload]);
+	      }
+	    },
+
+	    /*
+	     * Reducer action of setting hub connection state
+	     * @param  {Object} state
+	     * @param  {payload:{hubId:string, state:HUB_STATES_TYPE}} action
+	     */
+	    setHubConnectionState(state, action) {
+	      const {
+	        hubId
+	      } = action.payload;
+	      const stateToSet = state;
+	      const newState = action.payload.state;
+	      const oldState = state[hubId] ? state[hubId].connectionState : undefined;
+
+	      if (Object.values(HUB_CONNECTION_STATES).indexOf(newState) > -1) {
+	        if (oldState && oldState !== newState) {
+	          // console.log (`HUB ${hubId} connection state ${oldState} -> ${newState}`);
+	          stateToSet[hubId].connectionState = newState;
+	        }
+	      }
+	    }
+
+	  }
+	}); // console.log('hubsState ', hubsState)
+
+	const {
+	  actions: actions$2,
+	  reducer: reducer$2
+	} = hubsState;
+
+	/*
+	console.log(updateHubs({ id: 123, name: 'Unnamed device' }))
+	{type : "hubs/updateHubs, payload : {id : 123, name: 'Unnamed device' }}
+	*/
+
+	const {
+	  updateHubs,
+	  selectHub,
+	  unSelectHub,
+	  setHubConnectionState
+	} = actions$2;
+
 	/** Used for built-in method references. */
 	var objectProto = Object.prototype;
 
@@ -4698,11 +5289,11 @@ var CozifySDK = (function (exports, axios) {
 	 * @param {string} key The key of the property to get.
 	 * @returns {*} Returns the property value.
 	 */
-	function getValue(object, key) {
+	function getValue$1(object, key) {
 	  return object == null ? undefined : object[key];
 	}
 
-	var _getValue = getValue;
+	var _getValue = getValue$1;
 
 	/**
 	 * Gets the native function at `key` of `object`.
@@ -5225,430 +5816,6 @@ var CozifySDK = (function (exports, axios) {
 	//      
 
 	/**
-	 * Helper method to Base64 decode
-	 * @param  {string} encoded - string to be decoded
-	 * @return {string}  - decoded string
-	 */
-	function urlBase64Decode(encoded) {
-	  let str = encoded.replace(/-/g, "+").replace(/_/g, "/");
-	  let output = str;
-
-	  switch (output.length % 4) {
-	    case 0:
-	    case 2:
-	      output += "==";
-	      break;
-
-	    case 3:
-	      output += "=";
-	      break;
-
-	    default:
-	      throw "Illegal base64url string!";
-	  }
-
-	  var retVal = "";
-
-	  let atob = function (a) {};
-
-	  if (!isNode) {
-	    atob = window.atob;
-	  } else {
-	    atob = function (a) {
-	      return new Buffer(a, 'base64').toString('binary');
-	    };
-	  }
-
-	  try {
-	    retVal = atob(str);
-	  } catch (error) {
-	    try {
-	      retVal = atob(output);
-	    } catch (error) {
-	      console.error("urlBase64Decode: trying atob failed");
-	    }
-	  }
-
-	  return retVal;
-	}
-	/**
-	 * Helper to check if run environment is Node
-	 * @type {Boolean}
-	 */
-
-	let isNode = false;
-
-	if (typeof process === 'object') {
-	  if (typeof process.versions === 'object') {
-	    if (typeof process.versions.node !== 'undefined') {
-	      isNode = true;
-	      console.log("Running in node.js");
-	    } else {
-	      console.log("Running in browser");
-	    }
-	  }
-	}
-
-	//      
-	/*
-	* Cloud servers SSL cretification fingerprints to be checked if possible
-	* Fingerprint could be found by opening the server URL like https://testapi.cozify.fi/ui/0.2/hub/lan_ip in Chrome.
-	* Then click the green certificate in front of the URL, click 'Connection', 'Certificate details', expand the details
-	* and scroll down to the SHA1 fingerprint.
-	* testapi 91 30 CF 20 17 F7 D7 EC F7 BA 43 30 8E 19 83 B4 CF DE 5A CC
-	* cloud & cloud2 26 B0 20 FA AB E8 A3 81 63 37 C6 B7 EF 94 4D 40 3D 1B 85 10
-	*/
-
-	const CLOUD_FINGERPRINTS_SHA1 = ["91 30 CF 20 17 F7 D7 EC F7 BA 43 30 8E 19 83 B4 CF DE 5A CC", "26 B0 20 FA AB E8 A3 81 63 37 C6 B7 EF 94 4D 40 3D 1B 85 10"];
-	/* Cloud HTTPS host name */
-
-	const CLOUD_HOST = 'https://testapi.cozify.fi';
-	/* Cloud API VERSION */
-
-	const CLOUD_API_VERSION = "ui/0.2/";
-	/* Cloud URL */
-
-	const CLOUD_URL = CLOUD_HOST + "/" + CLOUD_API_VERSION;
-	/**
-	 *  Enumeration of supported API commands, that could be
-	 *  USER_LOGIN, HUB_KEYS, REFRESH_AUTHKEY, CLOUD_IP, CLOUD_META, POLL, CMD_DEVICE
-	 *  @typedef {Object} COMMANDS_TYPE
-	 *  @readonly
-	 *
-	  */
-
-	const COMMANDS = Object.freeze({
-	  USER_LOGIN: {
-	    method: 'POST',
-	    url: CLOUD_URL + "user/login",
-	    params: ['password', 'email'],
-	    config: {
-	      responseType: isNode ? 'blob' : 'stream',
-	      timeout: 5000
-	    }
-	  },
-	  HUB_KEYS: {
-	    method: 'GET',
-	    url: CLOUD_URL + "user/hubkeys"
-	  },
-	  REFRESH_AUTHKEY: {
-	    method: 'GET',
-	    url: CLOUD_URL + "user/refreshsession"
-	  },
-	  CLOUD_IP: {
-	    method: 'GET',
-	    url: CLOUD_URL + "hub/lan_ip"
-	  },
-	  CLOUD_META: {
-	    method: 'GET',
-	    url: CLOUD_URL + "hub/remote/hub"
-	  },
-	  POLL: {
-	    method: 'GET',
-	    url: CLOUD_URL + "hub/remote/cc/1.11" + "/hub/poll",
-	    urlParams: ['ts']
-	  },
-	  CMD_DEVICE: {
-	    method: 'PUT',
-	    url: CLOUD_URL + "hub/remote/cc/1.11" + "/devices/command",
-	    type: 'CMD_DEVICE',
-	    params: ['id', 'state']
-	  }
-	});
-	/**
-	 * COMMAND_TYPE
-	 *  @typedef {Object} COMMANDS_TYPE
-	 *  @property {COMMANDS_TYPE} [command]      - Optional command like USER_LOGIN,
-	 *  @property {string} [localUrl]     - Optional localUrl for direct hub access
-	 *  @property {string} [hubId]        - Optional hub Id when messaging to hub
-	 *  @property {string} [url]          - Optional url
-	 *  @property {string} [method]       - Optional method
-	 *  @property {string} [authKey]      - Optional authKey
-	 *  @property {string} [hubKey]       - Optional hubKey
-	 *  @property {string} [type]         - Optional type that defaults to 'application/json',
-	 *  @property {Object} [config]       - Optional config that might have 'timeout' or 'responseType' configs to be used over defaults,
-	 *  @property {Object} [data]         - Optional data to be sent over url or body parameters (depending command)
-	 */
-
-	/**
-	  * Enumeration of cloud connection state, that could be
-	  * UNCONNECTED, UNAUTHENTICATED, UNAUTHORIZED, OBSOLETE_API_VERSION, LATE_PAYMENT or CONNECTED
-	  * @readonly
-	  * @enum {string}
-	  * @typedef {string} CLOUD_CONNECTION_STATE_TYPE
-	  */
-
-	const CLOUD_CONNECTION_STATES = Object.freeze({
-	  UNCONNECTED: 'no connection',
-	  UNAUTHENTICATED: 'unauthenticated',
-	  UNAUTHORIZED: 'unauthorized',
-	  OBSOLETE_API_VERSION: 'obsolete api version',
-	  LATE_PAYMENT: 'late payment',
-	  CONNECTED: 'connected'
-	});
-	/**
-	  * Enumeration of HUB connection state, that could be
-	  * UNCONNECTED, UNAUTHENTICATED, UNAUTHORIZED, OBSOLETE_API_VERSION, REMOTE or LOCAL
-	  * @readonly
-	  * @enum {string}
-	  * @typedef {string} HUB_CONNECTION_STATE_TYPE
-	  */
-
-	const HUB_CONNECTION_STATES = Object.freeze({
-	  UNCONNECTED: 'no connection',
-	  UNAUTHENTICATED: 'unauthenticated',
-	  UNAUTHORIZED: 'unauthorized',
-	  OBSOLETE_API_VERSION: 'obsolete api version',
-	  REMOTE: 'remote',
-	  LOCAL: 'local'
-	});
-
-	//      
-	/**
-	 * Connections action creators object
-	 * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
-	 * @return { {
-	 *   slice : string,
-	 *   reducer : ReducerFunction,
-	 *   actions : Object<string, ActionCreator},
-	 *   selectors : Object<string, Selector>
-	 *   }}
-	 */
-
-	const connectionsState = createSlice({
-	  slice: 'connections',
-	  initialState: {
-	    cloudState: CLOUD_CONNECTION_STATES.UNCONNECTED
-	  },
-	  reducers: {
-	    /*
-	     * Reducer action of cloud connection state
-	     * @param {Object} state
-	     * @param {CLOUD_CONNECTION_STATES} action
-	     */
-	    setCloudConnectionState(state, action) {
-	      const newState = action.payload;
-	      const oldState = state.cloudState;
-
-	      if (Object.values(CLOUD_CONNECTION_STATES).indexOf(newState) > -1) {
-	        if (oldState !== newState) {
-	          console.log("CLOUD connection state " + oldState + " -> " + newState);
-	          state.cloudState = newState;
-	        }
-	      }
-	    }
-
-	  }
-	});
-	const {
-	  actions,
-	  reducer
-	} = connectionsState;
-
-	function _defineProperty$3(obj, key, value) {
-	  if (key in obj) {
-	    Object.defineProperty(obj, key, {
-	      value: value,
-	      enumerable: true,
-	      configurable: true,
-	      writable: true
-	    });
-	  } else {
-	    obj[key] = value;
-	  }
-
-	  return obj;
-	}
-
-	var defineProperty$1 = _defineProperty$3;
-
-	function _objectSpread$2(target) {
-	  for (var i = 1; i < arguments.length; i++) {
-	    var source = arguments[i] != null ? arguments[i] : {};
-	    var ownKeys = Object.keys(source);
-
-	    if (typeof Object.getOwnPropertySymbols === 'function') {
-	      ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {
-	        return Object.getOwnPropertyDescriptor(source, sym).enumerable;
-	      }));
-	    }
-
-	    ownKeys.forEach(function (key) {
-	      defineProperty$1(target, key, source[key]);
-	    });
-	  }
-
-	  return target;
-	}
-
-	var objectSpread = _objectSpread$2;
-
-	/**
-	 * Devices action creators object
-	 * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
-	 * @return { {
-	 *   slice : string,
-	 *   reducer : ReducerFunction,
-	 *   actions : Object<string, ActionCreator},
-	 *   selectors : Object<string, Selector>
-	 *   }}
-	 */
-
-	const devicesState = createSlice({
-	  slice: 'devices',
-	  initialState: {},
-	  reducers: {
-	    /*
-	     * Reducer action of setting devices state - sets all given devices of given hub, keeps existing states
-	     * @param {Object} state
-	     * @param {Object} action
-	     */
-	    setDevices(state, action) {
-	      const hubId = action.payload.hubId;
-	      const devices = action.payload.devices;
-	      const hubDevices = {};
-
-	      for (const [id, device] of Object.entries(devices)) {
-	        hubDevices[id] = objectSpread({}, device);
-	      }
-
-	      state[hubId] = objectSpread({}, hubDevices);
-	    },
-
-	    /*
-	     * Reducer action of setting device state - sets all given devices of given hub, keeps existing states
-	     * @param {Object} state
-	     * @param {payload:{Object{hubId:string, device:Object}}} action
-	     */
-	    setDevice(state, action) {
-	      const hubId = action.payload.hubId;
-	      const device = action.payload.device;
-
-	      if (state[hubId]) {
-	        state[hubId][device.id] = objectSpread({}, device);
-	      }
-	    },
-
-	    /*
-	     * Reducer action to remove device from state - sets all given devices of given hub, keeps existing states
-	     * @param {Object} state
-	     * @param {payload:{Object{hubId:string, device:Object}}} action
-	     */
-	    deleteDevice(state, action) {
-	      const hubId = action.payload.hubId;
-	      const device = action.payload.device;
-
-	      if (state[hubId]) {
-	        delete state[hubId][device.id];
-	      }
-	    }
-
-	  }
-	});
-	const {
-	  actions: actions$1,
-	  reducer: reducer$1
-	} = devicesState;
-
-	/*
-	console.log(addDevice({ id: 123, name: 'Unnamed device' }))
-	{type : "devices/addDevice", payload : {id : 123, name: 'Unnamed device' }}
-	*/
-
-	const {
-	  setDevices,
-	  deleteDevice
-	} = actions$1;
-
-	/**
-	 * Hubs action creators object
-	 * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
-	 * @return { {
-	 *   slice : string,
-	 *   reducer : ReducerFunction,
-	 *   actions : Object<string, ActionCreator},
-	 *   selectors : Object<string, Selector>
-	 *   }}
-	 */
-
-	const hubsState = createSlice({
-	  slice: 'hubs',
-	  initialState: {},
-	  reducers: {
-	    /*
-	     * Reducer action of setting many hubs to state
-	     * @param  {Object} state
-	     * @param  {payload:{hubs:HUBS_MAP_TYPE}} action
-	     */
-	    updateHubs(state, action) {
-	      for (const [id, hub] of Object.entries(action.payload)) {
-	        state[id] = objectSpread({}, state[id], hub);
-	      }
-	    },
-
-	    /*
-	     * Reducer action of setting hub state to selected
-	     * @param  {Object} state
-	     * @param  {payload:{hubId:string}} action
-	     */
-	    selectHub(state, action) {
-	      if (state[action.payload]) {
-	        state[action.payload].selected = true; //console.log("selectHub", state[action.payload]);
-	      }
-	    },
-
-	    /*
-	     * Reducer action of setting hub state to unselected
-	     * @param  {Object} state
-	     * @param  {payload:{hubId:string}} action
-	     */
-	    unSelectHub(state, action) {
-	      if (state[action.payload]) {
-	        state[action.payload].selected = false; //console.log("selectHub", state[action.payload]);
-	      }
-	    },
-
-	    /*
-	     * Reducer action of setting hub connection state
-	     * @param  {Object} state
-	     * @param  {payload:{hubId:string, state:HUB_STATES_TYPE}} action
-	     */
-	    setHubConnectionState(state, action) {
-	      const hubId = action.payload.hubId;
-	      const newState = action.payload.state;
-	      const oldState = state[hubId] ? state[hubId].connectionState : undefined;
-
-	      if (Object.values(HUB_CONNECTION_STATES).indexOf(newState) > -1) {
-	        if (oldState && oldState !== newState) {
-	          //console.log (`HUB ${hubId} connection state ${oldState} -> ${newState}`);
-	          state[hubId].connectionState = newState;
-	        }
-	      }
-	    }
-
-	  }
-	}); //console.log('hubsState ', hubsState)
-
-	const {
-	  actions: actions$2,
-	  reducer: reducer$2
-	} = hubsState;
-
-	/*
-	console.log(updateHubs({ id: 123, name: 'Unnamed device' }))
-	{type : "hubs/updateHubs, payload : {id : 123, name: 'Unnamed device' }}
-	*/
-
-	const {
-	  updateHubs,
-	  selectHub,
-	  unSelectHub,
-	  setHubConnectionState
-	} = actions$2;
-
-	//      
-
-	/**
 	  * Enumeration of language, that could be
 	  * NONE, EN_UK or FI_FI
 	  * @readonly
@@ -5721,16 +5888,17 @@ var CozifySDK = (function (exports, axios) {
 	     * @param  {payload:{state:USER_STATE_TYPE}} action
 	     */
 	    changeState(state, action) {
+	      const stateToSet = state;
 	      const newState = action.payload;
 	      const oldState = state.state;
-	      console.log("User state " + oldState + " -> " + newState);
+	      console.log(`User state ${oldState} -> ${newState}`);
 
 	      switch (oldState) {
 	        case USER_STATES.WAITING_LANGUAGE:
 	          {
 	            if (newState === USER_STATES.LANGUAGE_SET) {
 	              if (!isEmpty_1(state.language)) {
-	                state.state = USER_STATES.WAITING_LOGIN;
+	                stateToSet.state = USER_STATES.WAITING_LOGIN;
 	              }
 	            }
 
@@ -5742,9 +5910,9 @@ var CozifySDK = (function (exports, axios) {
 	            if (newState === USER_STATES.LOGIN_DONE) {
 	              if (!isEmpty_1(state.authKey)) {
 	                if (isEmpty_1(state.eulaAcceted)) {
-	                  state.state = USER_STATES.WAITING_EULA;
+	                  stateToSet.state = USER_STATES.WAITING_EULA;
 	                } else {
-	                  state.state = USER_STATES.AUTHENTICATED;
+	                  stateToSet.state = USER_STATES.AUTHENTICATED;
 	                }
 	              }
 	            }
@@ -5755,7 +5923,7 @@ var CozifySDK = (function (exports, axios) {
 	        case USER_STATES.WAITING_EULA:
 	          {
 	            if (newState === USER_STATES.EULA_ACCEPTED) {
-	              state.state = USER_STATES.AUTHENTICATED;
+	              stateToSet.state = USER_STATES.AUTHENTICATED;
 	            }
 
 	            break;
@@ -5764,7 +5932,7 @@ var CozifySDK = (function (exports, axios) {
 	        case USER_STATES.AUTHENTICATED:
 	          {
 	            if (newState === USER_STATES.LOGGED_OUT) {
-	              state.state = USER_STATES.WAITING_LOGIN;
+	              stateToSet.state = USER_STATES.WAITING_LOGIN;
 	            }
 
 	            break;
@@ -5784,7 +5952,8 @@ var CozifySDK = (function (exports, axios) {
 	     * @param  {payload:boolean} action
 	     */
 	    setEula(state, action) {
-	      state.eulaAccepted = action.payload;
+	      const stateToSet = state;
+	      stateToSet.eulaAccepted = action.payload;
 	    },
 
 	    /*
@@ -5793,7 +5962,8 @@ var CozifySDK = (function (exports, axios) {
 	     * @param  {payload:LANGUAGES_TYPE} action
 	     */
 	    setLanguage(state, action) {
-	      state.language = action.payload;
+	      const stateToSet = state;
+	      stateToSet.language = action.payload;
 	    },
 
 	    /*
@@ -5802,7 +5972,8 @@ var CozifySDK = (function (exports, axios) {
 	     * @param  {payload:string} action
 	     */
 	    setAuthKey(state, action) {
-	      state.authKey = action.payload;
+	      const stateToSet = state;
+	      stateToSet.authKey = action.payload;
 	    }
 
 	  }
@@ -5834,150 +6005,28 @@ var CozifySDK = (function (exports, axios) {
 	  user: reducer$3
 	};
 
-	/*!
-	 * isobject <https://github.com/jonschlinkert/isobject>
-	 *
-	 * Copyright (c) 2014-2017, Jon Schlinkert.
-	 * Released under the MIT License.
-	 */
-
-	var isobject = function isObject(val) {
-	  return val != null && typeof val === 'object' && Array.isArray(val) === false;
-	};
-
-	/*!
-	 * get-value <https://github.com/jonschlinkert/get-value>
-	 *
-	 * Copyright (c) 2014-2018, Jon Schlinkert.
-	 * Released under the MIT License.
-	 */
-
-
-
-	var getValue$1 = function(target, path, options) {
-	  if (!isobject(options)) {
-	    options = { default: options };
-	  }
-
-	  if (!isValidObject(target)) {
-	    return typeof options.default !== 'undefined' ? options.default : target;
-	  }
-
-	  if (typeof path === 'number') {
-	    path = String(path);
-	  }
-
-	  const isArray = Array.isArray(path);
-	  const isString = typeof path === 'string';
-	  const splitChar = options.separator || '.';
-	  const joinChar = options.joinChar || (typeof splitChar === 'string' ? splitChar : '.');
-
-	  if (!isString && !isArray) {
-	    return target;
-	  }
-
-	  if (isString && path in target) {
-	    return isValid(path, target, options) ? target[path] : options.default;
-	  }
-
-	  let segs = isArray ? path : split(path, splitChar, options);
-	  let len = segs.length;
-	  let idx = 0;
-
-	  do {
-	    let prop = segs[idx];
-	    if (typeof prop === 'number') {
-	      prop = String(prop);
-	    }
-
-	    while (prop && prop.slice(-1) === '\\') {
-	      prop = join([prop.slice(0, -1), segs[++idx] || ''], joinChar, options);
-	    }
-
-	    if (prop in target) {
-	      if (!isValid(prop, target, options)) {
-	        return options.default;
-	      }
-
-	      target = target[prop];
-	    } else {
-	      let hasProp = false;
-	      let n = idx + 1;
-
-	      while (n < len) {
-	        prop = join([prop, segs[n++]], joinChar, options);
-
-	        if ((hasProp = prop in target)) {
-	          if (!isValid(prop, target, options)) {
-	            return options.default;
-	          }
-
-	          target = target[prop];
-	          idx = n - 1;
-	          break;
-	        }
-	      }
-
-	      if (!hasProp) {
-	        return options.default;
-	      }
-	    }
-	  } while (++idx < len && isValidObject(target));
-
-	  if (idx === len) {
-	    return target;
-	  }
-
-	  return options.default;
-	};
-
-	function join(segs, joinChar, options) {
-	  if (typeof options.join === 'function') {
-	    return options.join(segs);
-	  }
-	  return segs[0] + joinChar + segs[1];
-	}
-
-	function split(path, splitChar, options) {
-	  if (typeof options.split === 'function') {
-	    return options.split(path);
-	  }
-	  return path.split(splitChar);
-	}
-
-	function isValid(key, target, options) {
-	  if (typeof options.isValid === 'function') {
-	    return options.isValid(key, target);
-	  }
-	  return true;
-	}
-
-	function isValidObject(val) {
-	  return isobject(val) || Array.isArray(val) || typeof val === 'function';
-	}
-
 	/**
 	 * store as a redux state store
 	 * @type {Object}
 	 */
 
 	const store = configureStore({
-	  reducer: rootReducer //middleware: [...getDefaultMiddleware(), logger]
+	  reducer: rootReducer // middleware: [...getDefaultMiddleware(), logger]
 	  // default true like: devTools: 'production' !== 'production'
-	  //preloadedState
-	  //enhancers: [reduxBatch]
+	  // preloadedState
+	  // enhancers: [reduxBatch]
 
 	});
-	console.log("Store Initial State: ", store.getState());
+	console.log('Store Initial State: ', store.getState());
 
 	function watchState(getState, objectPath) {
-	  var currentValue = getValue$1(getState(), objectPath);
+	  let currentValue = getValue(getState(), objectPath);
 	  return function w(fn) {
-	    return function () {
-	      var newValue = getValue$1(getState(), objectPath);
+	    return () => {
+	      const newValue = getValue(getState(), objectPath);
 
 	      if (currentValue !== newValue) {
-	        var oldValue = currentValue;
+	        const oldValue = currentValue;
 	        currentValue = newValue;
 	        fn(newValue, oldValue);
 	      }
@@ -5993,8 +6042,8 @@ var CozifySDK = (function (exports, axios) {
 
 
 	function watchChanges(path, changed, optionalStore) {
-	  let selectedStore = optionalStore ? optionalStore : store;
-	  let watchFn = watchState(selectedStore.getState, path);
+	  const selectedStore = optionalStore || store;
+	  const watchFn = watchState(selectedStore.getState, path);
 	  selectedStore.subscribe(watchFn(changed));
 	}
 
@@ -6046,9 +6095,10 @@ var CozifySDK = (function (exports, axios) {
 	 * @param {{hubId: string, state: HUB_CONNECTION_STATE_TYPE}} hubAndState - hubId and new state
 	 */
 
-	function setHubConnectionState$1(hubAndState) {
+	function setHubConnectionState$1(paramHubAndState) {
 	  const stateNow = store.getState();
 	  const storedHubs = hubsState.selectors.getHubs(stateNow);
+	  const hubAndState = paramHubAndState;
 	  /* If hub is unconnected, lets try remote */
 
 	  if (hubAndState.state === HUB_CONNECTION_STATES.UNCONNECTED && storedHubs[hubAndState.hubId]) {
@@ -6425,11 +6475,57 @@ var CozifySDK = (function (exports, axios) {
 	var axiosRetry = lib.default;
 
 	//      
-	const SSL_CHECK_INTERVALL = 1000 * 60 * 60; //One hour
+	const SSL_CHECK_INTERVALL = 1000 * 60 * 60; // One hour
 
 	/*
-	* Return cloud connection state based on error
-	*/
+	 * Returns > 0 if v1 > v2 and < 0 if v1 < v2 and 0 if v1 == v2
+	 */
+
+	function compareVersions(v1, v2) {
+	  const v1Parts = v1.split('.');
+	  const v2Parts = v2.split('.');
+	  const minLength = Math.min(v1Parts.length, v2Parts.length);
+
+	  if (minLength > 0) {
+	    for (let idx = 0; idx < minLength - 1; idx += 1) {
+	      const diff = Number(v1Parts[idx]) - Number(v2Parts[idx]);
+
+	      if (diff !== 0) {
+	        return diff;
+	      }
+	    }
+	  }
+
+	  return v1Parts.length - v2Parts.length;
+	}
+	/*
+	 * Get API version, or given MAX version, from given hubVersion string
+	 * e.g. 1.12.0.5
+	 */
+
+
+	function getAPIversion(hubVersion, maxVersion) {
+	  let retVal = '0.0';
+	  const majorEnd = hubVersion.indexOf('.');
+	  let minorEnd = -1;
+
+	  if (majorEnd !== -1) {
+	    minorEnd = hubVersion.indexOf('.', majorEnd + 1);
+	  }
+
+	  if (minorEnd !== -1) {
+	    retVal = hubVersion.substring(0, minorEnd);
+	  }
+
+	  if (compareVersions(retVal, maxVersion) > 0) {
+	    retVal = maxVersion;
+	  }
+
+	  return retVal;
+	}
+	/*
+	 * Return cloud connection state based on error
+	 */
 
 	function cloudErrorState(error) {
 	  let retVal = CLOUD_CONNECTION_STATES.UNCONNECTED;
@@ -6437,19 +6533,19 @@ var CozifySDK = (function (exports, axios) {
 	  if (error && error.response && error.response.status === 401) {
 	    // 401 Authentication information missing or expired.
 	    retVal = CLOUD_CONNECTION_STATES.UNAUTHENTICATED;
-	    console.error("send: authentication error ", error);
+	    console.error('send: authentication error ', error);
 	  } else if (error && error.response && error.response.status === 403) {
 	    // 402 Late payment - > no remote access
 	    retVal = CLOUD_CONNECTION_STATES.LATE_PAYMENT;
-	    console.error("send: unauhorized error ", error);
+	    console.error('send: unauhorized error ', error);
 	  } else if (error && error.response && error.response.status === 403) {
 	    // 403 Unauthorized
 	    retVal = CLOUD_CONNECTION_STATES.UNAUTHORIZED;
-	    console.error("send: unauhorized error ", error);
+	    console.error('send: unauhorized error ', error);
 	  } else if (error && error.response && error.response.status === 410) {
 	    // 410 Version problem
 	    retVal = CLOUD_CONNECTION_STATES.OBSOLETE_API_VERSION;
-	    console.error("send: version error ", error);
+	    console.error('send: version error ', error);
 	  }
 
 	  return retVal;
@@ -6465,61 +6561,61 @@ var CozifySDK = (function (exports, axios) {
 
 	  if (error && error.response && error.response.status === 400) {
 	    // no connection to offline hub
-	    console.log("send: no-connection error ", error);
+	    console.log('send: no-connection error ', error);
 	  } else if (error && error.response && error.response.status === 401) {
 	    // 401 Authentication information missing or expired.
 	    retVal = HUB_CONNECTION_STATES.UNAUTHENTICATED;
-	    console.error("send: authentication error ", error);
+	    console.error('send: authentication error ', error);
 	  } else if (error && error.response && error.response.status === 403) {
 	    // 403 Unauthorized
 	    retVal = HUB_CONNECTION_STATES.UNAUTHORIZED;
-	    console.error("send: unauhorized error ", error);
+	    console.error('send: unauhorized error ', error);
 	  } else if (error && error.response && error.response.status === 410) {
 	    // 410 Version problem
 	    retVal = HUB_CONNECTION_STATES.OBSOLETE_API_VERSION;
-	    console.error("send: version error ", error);
+	    console.error('send: version error ', error);
 	  }
 
 	  return retVal;
 	}
-	let _ongoingSSLCertificateCheck = false;
-	let _lastSSLCertificateCheckTime = null;
+	let ongoingSSLCertificateCheck = false;
+	let lastSSLCertificateCheckTime = null;
 	/*
 	 * Palceholder function for certificate checker
 	 * @return {Promise}
 	 */
 
 	function testSSLCertificate(remoteConnection) {
-	  return new Promise((resolve, reject) => {
+	  return new Promise(resolve => {
 	    if (!remoteConnection) {
 	      // All requests are now complete
 	      resolve(true);
 	      return;
 	    }
 
-	    let now = new Date().getTime();
+	    const now = new Date().getTime();
 
-	    if (!_ongoingSSLCertificateCheck && (!_lastSSLCertificateCheckTime || now - _lastSSLCertificateCheckTime > SSL_CHECK_INTERVALL)) {
-	      _ongoingSSLCertificateCheck = true;
-	      _lastSSLCertificateCheckTime = now; // Cordova plugin?
+	    if (!ongoingSSLCertificateCheck && (!lastSSLCertificateCheckTime || now - lastSSLCertificateCheckTime > SSL_CHECK_INTERVALL)) {
+	      ongoingSSLCertificateCheck = true;
+	      lastSSLCertificateCheckTime = now; // Cordova plugin?
 
 	      if (!isNode && window && window.plugins && window.plugins.sslCertificateChecker) {
-	        window.plugins.sslCertificateChecker.check(successMsg => {
-	          _ongoingSSLCertificateCheck = false;
+	        window.plugins.sslCertificateChecker.check(() => {
+	          ongoingSSLCertificateCheck = false;
 	          resolve(true);
 	        }, errorMsg => {
-	          if (errorMsg === "CONNECTION_NOT_SECURE") {
-	            _ongoingSSLCertificateCheck = false;
+	          if (errorMsg === 'CONNECTION_NOT_SECURE') {
+	            ongoingSSLCertificateCheck = false;
 	            resolve(false);
 	          } else {
-	            _ongoingSSLCertificateCheck = false;
-	            _lastSSLCertificateCheckTime = undefined;
+	            ongoingSSLCertificateCheck = false;
+	            lastSSLCertificateCheckTime = undefined;
 	            resolve(true);
 	          }
 	        }, CLOUD_HOST, CLOUD_FINGERPRINTS_SHA1);
 	      } else {
-	        setTimeout(function () {
-	          _ongoingSSLCertificateCheck = false;
+	        setTimeout(() => {
+	          ongoingSSLCertificateCheck = false;
 	        }, SSL_CHECK_INTERVALL);
 	        resolve(true);
 	      }
@@ -6529,16 +6625,36 @@ var CozifySDK = (function (exports, axios) {
 	  });
 	}
 
+	// import isRetryAllowed from 'is-retry-allowed';
 	const SAFE_HTTP_METHODS = ['get', 'head', 'options'];
 	const IDEMPOTENT_HTTP_METHODS = SAFE_HTTP_METHODS.concat(['put', 'delete']);
+	const ALL_HTTP_METHODS = IDEMPOTENT_HTTP_METHODS.concat(['post']);
+	/*
+	 * @param  {Error}  error
+	 * @return {boolean}
+
+	function isNetworkError(error) {
+	  return (
+	    !error.response
+	    && isRetryAllowed(error) // Prevents retrying unsafe errors
+	    && !(Boolean(error.code) && error.code === 'ECONNABORTED') // Prevents retrying timed out requests
+	  );
+	}
+	*/
+
 	/*
 	 * @param  {Error}  error
 	 * @return {boolean}
 	 */
 
-
 	function isRetryableError(error) {
-	  return error.code !== 'ECONNABORTED' && (!error.response || error.response.status >= 500 && error.response.status <= 599);
+	  /*
+	  return (
+	    error.code !== 'ECONNABORTED'
+	    && (!error.response || (error.response.status >= 500 && error.response.status <= 599))
+	  );
+	  */
+	  return !error.response || error.response.status >= 500 && error.response.status <= 599;
 	}
 	/*
 	 * @param  {Error}  error
@@ -6546,37 +6662,88 @@ var CozifySDK = (function (exports, axios) {
 	 */
 
 
-	function retryCondition(error) {
+	function isSafeRequestError(error) {
 	  if (!error.config) {
 	    // Cannot determine if the request can be retried
 	    return false;
 	  }
 
-	  return isRetryableError(error) && IDEMPOTENT_HTTP_METHODS.indexOf(error.config.method) !== -1;
+	  return isRetryableError(error) && ALL_HTTP_METHODS.indexOf(error.config.method) !== -1;
 	}
 
+	const httpRetries = {};
+	const RETRY_COUNT = 1;
+	function resetRetry(url) {
+	  if (httpRetries[url]) {
+	    httpRetries[url] = 0;
+	    delete httpRetries[url];
+	  }
+	}
+	/*
+	 * @param  {Error}  error
+	 * @return {boolean}
+	 */
+
+	function retryCondition(error) {
+	  // if (error.config.url.indexOf('192.168.1.119') !== -1) debugger;
+	  if (error && error.config && error.config.url) {
+	    if (httpRetries[error.config.url]) {
+	      if (httpRetries[error.config.url] >= RETRY_COUNT) {
+	        httpRetries[error.config.url] = 0;
+	        return false;
+	      }
+
+	      httpRetries[error.config.url] += httpRetries[error.config.url];
+	    } else {
+	      httpRetries[error.config.url] = 1;
+	    }
+	  } else {
+	    console.error('retryCondition unknown', error); // Cannot determine if the request can be retried
+
+	    return false;
+	  }
+
+	  if (isSafeRequestError(error) && IDEMPOTENT_HTTP_METHODS.indexOf(error.config.method) !== -1) {
+	    console.error('retryCondition condition true', error.config);
+	  } else {
+	    console.error('retryCondition condition false', error.config);
+	    httpRetries[error.config.url] = 0;
+	  }
+
+	  return isSafeRequestError(error) && IDEMPOTENT_HTTP_METHODS.indexOf(error.config.method) !== -1;
+	}
+	/*
+	 * @param  {Error}  error
+	 * @return {boolean}
+	function isNetworkOrIdempotentRequestError(error) {
+	  return isNetworkError(error) || isIdempotentRequestError(error);
+	}
+	 */
+
 	//      
-	let _refreshingToken = false;
+	let refreshingToken = false;
+	/* eslint no-use-before-define: ["error", { "functions": false }] */
+
 	/*
 	 * Refresh Auth key call
 	 */
 
 	function refreshAuthKey(authKey) {
-	  if (!_refreshingToken) {
-	    _refreshingToken = true;
+	  if (!refreshingToken) {
+	    refreshingToken = true;
 	    send({
 	      command: COMMANDS.REFRESH_AUTHKEY,
-	      authKey: authKey
+	      authKey
 	    }).then(response => {
-	      setTimeout(function () {
-	        _refreshingToken = false;
-	      }, 1000 * 60 * 10); //10min
+	      setTimeout(() => {
+	        refreshingToken = false;
+	      }, 1000 * 60 * 10); // 10min
 
 	      if (response.length > 10) {
 	        store.dispatch(userState.actions.setAuthKey(response));
 	      }
-	    }).catch(error => {
-	      _refreshingToken = false;
+	    }).catch(() => {
+	      refreshingToken = false;
 	    });
 	  }
 	}
@@ -6621,21 +6788,31 @@ var CozifySDK = (function (exports, axios) {
 
 
 	function sendAll(requests) {
-	  return new Promise((resolve, reject) => {
-	    Promise.all(requests).then(results => {
+	  return new Promise(resolve => {
+	    Promise.all(requests).then(() => {
 	      // Use the data from the results like so:
 	      // results[0].data
 	      // results[1].data
 	      resolve();
-	    }).catch(error => {
+	    }).catch(() => {
 	      // do whatever
 	      resolve();
 	    });
 	  });
 	}
+	axiosRetry(axios, {
+	  // retries: 1, DOESN'T WORK, see send_retry.js
+	  retryCondition,
+	  shouldResetTimeout: true,
+	  retryDelay: (retryCount, error) => {
+	    // console.error('axiosRetry ', retryCount); DOESN'T WORK , see send_retry.js
+	    console.error('axiosRetry ', error);
+	    return 1000; // retryCount * 1000;
+	  }
+	});
 	/* Flag to indicate SSL failures */
 
-	let _permanentSSLFailure = false;
+	let permanentSSLFailure = false;
 	/**
 	 * Send method for REST API
 	 * @param {COMMAND_TYPE} params
@@ -6659,66 +6836,101 @@ var CozifySDK = (function (exports, axios) {
 	function send({
 	  command,
 	  localUrl,
-	  hubId,
 	  url,
+	  timeout,
 	  method,
 	  authKey,
 	  hubKey,
 	  type,
 	  config,
-	  data
+	  data,
+	  hubId
 	}) {
-	  if (method == null) {
-	    method = 'GET';
+	  let sendMethod = method;
+	  let sendUrl = url;
+	  let sendAuthKey = authKey;
+	  let sendHubKey = hubKey;
+	  let sendConfig = config;
+	  let sendType = type;
+
+	  if (sendMethod == null) {
+	    sendMethod = 'GET';
 	  }
 
-	  let body = data;
+	  if (sendType == null) {
+	    sendType = 'application/json;charset=UTF-8';
+	  }
+
+	  const body = data;
 	  /*
 	  if (isArray(data)) {
 	    body = [];
 	    body.push({});
 	  }
 	  */
-	  //console.log("send: command ", command);
+	  // console.log("send: command ", command);
 	  // Flag to indicate are we using remote (vrs.local) connection
 
 	  let remoteConnection = false; // Flag to indicate are we sending hub command meaning using commandAPI (vrs. some cloud/videocloud command like login, log etc)
 
-	  const hubCommand = isEmpty_1(hubId) ? false : true;
+	  const hubCommand = !isEmpty_1(hubId);
 
-	  if (typeof command != "undefined" && command) {
+	  if (typeof command !== 'undefined' && command) {
 	    if (command.method) {
-	      method = command.method;
+	      sendMethod = command.method;
 	    }
 
-	    if (isEmpty_1(url) && command.url) {
-	      url = command.url;
+	    if (isEmpty_1(sendUrl) && command.url) {
+	      // command with Hub API version
+	      if (command.url.indexOf('$API_VER') !== -1) {
+	        const stateNow = store.getState();
+	        const hubs = hubsState.selectors.getHubs(stateNow);
+
+	        if (!hubs[hubId] || !hubs[hubId].hubKey) {
+	          return new Promise((resolve, reject) => {
+	            reject(new Error('SDK Error: Send - No Hub id error'));
+	          });
+	        }
+
+	        const hub = hubs[hubId];
+
+	        if (!hub.version || hub.connectionState === HUB_CONNECTION_STATES.UNCONNECTED && command.url.indexOf('hub/remote/hub') === -1) {
+	          return new Promise((resolve, reject) => {
+	            reject(new Error('SDK Error: Send - No Hub connection error'));
+	          });
+	        }
+
+	        const hubVersion = getAPIversion(hub.version, MAX_API_VERSION);
+	        sendUrl = command.url.replace('$API_VER', hubVersion);
+	      } else {
+	        sendUrl = command.url;
+	      }
 	    }
 
-	    if (url) {
-	      var parts = url.split('hub/remote');
+	    if (sendUrl) {
+	      const parts = sendUrl.split('hub/remote');
 
 	      if (parts && parts[1]) {
 	        if (localUrl) {
-	          url = localUrl + parts[1];
+	          sendUrl = localUrl + parts[1];
 
-	          if (hubKey) {
-	            authKey = hubKey;
-	            hubKey = null;
+	          if (sendHubKey) {
+	            sendAuthKey = sendHubKey;
+	            sendHubKey = null;
 	          }
 	        }
 	      }
 	    }
 
-	    if (url && url.indexOf(CLOUD_URL) > -1) {
+	    if (sendUrl && sendUrl.indexOf(CLOUD_URL) > -1) {
 	      remoteConnection = true;
 	    }
 
 	    if (command.type && body) {
 	      if (isArray_1(body)) {
-	        body[0]['type'] = command.type;
+	        body[0].type = command.type;
 	      } else {
-	        body['type'] = command.type;
+	        body.type = command.type;
 	      }
 	    }
 	    /*
@@ -6734,84 +6946,95 @@ var CozifySDK = (function (exports, axios) {
 
 
 	    if (command.urlParams) {
-	      let params = [];
+	      const params = [];
 	      command.urlParams.forEach(param => {
 	        if (data && data[param] !== undefined) {
-	          params.push(encodeURIComponent(param) + '=' + encodeURIComponent(data[param]));
+	          params.push(`${encodeURIComponent(param)}=${encodeURIComponent(data[param])}`);
 	        }
 	      });
 
-	      if (url && params.length > 0) {
-	        url = url + "?" + params.join('&');
+	      if (sendUrl && params.length > 0) {
+	        sendUrl = `${sendUrl}?${params.join('&')}`;
 	      }
 	    }
 
 	    if (command.config) {
-	      config = command.config;
+	      sendConfig = command.config;
 	    }
 	  }
 
 	  const bodyString = JSON.stringify(body);
 	  const reqConf = {
-	    timeout: 1000,
-	    method: method,
-	    //withCredentials: false,
+	    timeout: timeout || 1000,
+	    method: sendMethod,
+	    // withCredentials: false,
 	    headers: {
-	      'Accept': 'application/json, application/binary, text/plain, */*',
-	      'Content-Type': 'application/json;charset=UTF-8',
-	      'Authorization': authKey ? authKey : null,
-	      'X-Hub-Key': hubKey ? hubKey : null
+	      Accept: 'application/json, application/binary, text/plain, */*',
+	      'Content-Type': sendType,
+	      Authorization: sendAuthKey || null,
+	      'X-Hub-Key': sendHubKey || null
 	    },
 	    crossDomain: true,
 	    responseType: 'application/json',
-	    url: url,
+	    url: sendUrl,
 	    data: isEmpty_1(bodyString) ? null : bodyString
 	  };
-	  Object.assign(reqConf, config);
+	  Object.assign(reqConf, sendConfig);
 	  return new Promise((resolve, reject) => {
-	    if (command || url) {
+	    if (command || sendUrl) {
 	      axios.interceptors.response.use(response => {
 	        if (response.headers['content-type'] === 'application/json' || response.headers['content-type'] === 'application/binary') {
+	          resetRetry(sendUrl);
 	          return response;
-	        } else {
-	          console.error("send: unknown response type");
-	          debugger;
-	          return Promise.reject(response);
 	        }
-	      }, error => Promise.reject(error)); //retries if it is a network error or a 5xx error on an idempotent request (GET, HEAD, OPTIONS, PUT or DELETE).
 
-	      axiosRetry(axios, {
-	        retries: 3,
-	        shouldResetTimeout: true,
-	        retryCondition: retryCondition
+	        console.error('send: unknown response type');
+	        return Promise.reject(response);
+	      }, error => Promise.reject(error));
+	      /*
+	      axios.interceptors.request.use((reqConfig) => {
+	        //if (reqConfig.url.indexOf('192.168.1.119') !== -1) debugger;
+	        const rConfig = reqConfig;
+	        const retryState = rConfig['axios-retry'] || {};
+	        if (retryState.retryCount > 0) {
+	          rConfig.headers['x-retry-count'] = retryState.retryCount;
+	        }
+	        return rConfig;
 	      });
-	      testSSLCertificate(remoteConnection).then(function (status) {
+	      */
+	      // retries if it is a network error or a 5xx error on an idempotent request (GET, HEAD, OPTIONS, PUT or DELETE).
+	      // axiosRetry(axios, {
+	      //  retries: 3, shouldResetTimeout: false, retryDelay: axiosRetry.exponentialDelay, retryCondition,
+	      // });
+	      //
+
+	      testSSLCertificate(remoteConnection).then(status => {
 	        // Cancel request if SSL Certificate status is invalid
-	        if (!status || _permanentSSLFailure) {
-	          _permanentSSLFailure = true;
+	        if (!status || permanentSSLFailure) {
+	          permanentSSLFailure = true;
 	          reject(new Error('SDK Error: SSL failure.'));
 	        } else {
 	          // SSL is ok,
 	          // check if auth Key needs to be refreshed
-	          if (authKey) {
-	            testAndRefreshToken(authKey);
+	          if (sendAuthKey) {
+	            testAndRefreshToken(sendAuthKey);
 	          } // Send command
 	          // See options: https://github.com/axios/axios#request-config
 
 
-	          axios(reqConf).then(function (response) {
+	          axios(reqConf).then(response => {
 	            // console.error("send: response ", response);
 	            if (remoteConnection) {
 	              setCloudConnectionState(CLOUD_CONNECTION_STATES.CONNECTED);
 	            } else if (hubId) {
 	              setHubConnectionState$1({
-	                hubId: hubId,
+	                hubId,
 	                state: HUB_CONNECTION_STATES.LOCAL
 	              });
 	            }
 
 	            resolve(response.data);
-	          }).catch(function (error) {
+	          }).catch(error => {
 	            if (error && error.response) {
 	              // The request was made and the server responded with a status code
 	              // that falls out of the range of 2xx
@@ -6822,7 +7045,7 @@ var CozifySDK = (function (exports, axios) {
 
 	                if (hubCommand && hubId) {
 	                  setHubConnectionState$1({
-	                    hubId: hubId,
+	                    hubId,
 	                    state: hubErrorState(error)
 	                  });
 	                }
@@ -6835,7 +7058,7 @@ var CozifySDK = (function (exports, axios) {
 
 	                if (hubCommand && hubId) {
 	                  setHubConnectionState$1({
-	                    hubId: hubId,
+	                    hubId,
 	                    state: hubErrorState(error)
 	                  });
 	                }
@@ -6849,39 +7072,33 @@ var CozifySDK = (function (exports, axios) {
 
 	                if (hubCommand && hubId) {
 	                  setHubConnectionState$1({
-	                    hubId: hubId,
+	                    hubId,
 	                    state: HUB_CONNECTION_STATES.UNCONNECTED
 	                  });
 	                }
-	              } else {
+	              } else if (hubCommand && hubId) {
 	                // Local connection
-	                if (hubCommand && hubId) {
-	                  setHubConnectionState$1({
-	                    hubId: hubId,
-	                    state: HUB_CONNECTION_STATES.UNCONNECTED
-	                  });
-	                }
+	                setHubConnectionState$1({
+	                  hubId,
+	                  state: HUB_CONNECTION_STATES.UNCONNECTED
+	                });
 	              }
-	            } else {
+	            } else if (remoteConnection) {
 	              // Something happened in setting up the request that triggered an Error
-	              if (remoteConnection) {
-	                setCloudConnectionState(CLOUD_CONNECTION_STATES.UNCONNECTED);
+	              setCloudConnectionState(CLOUD_CONNECTION_STATES.UNCONNECTED);
 
-	                if (hubCommand && hubId) {
-	                  setHubConnectionState$1({
-	                    hubId: hubId,
-	                    state: HUB_CONNECTION_STATES.UNCONNECTED
-	                  });
-	                }
-	              } else {
-	                // Local connection
-	                if (hubCommand && hubId) {
-	                  setHubConnectionState$1({
-	                    hubId: hubId,
-	                    state: HUB_CONNECTION_STATES.UNCONNECTED
-	                  });
-	                }
+	              if (hubCommand && hubId) {
+	                setHubConnectionState$1({
+	                  hubId,
+	                  state: HUB_CONNECTION_STATES.UNCONNECTED
+	                });
 	              }
+	            } else if (hubCommand && hubId) {
+	              // Local connection
+	              setHubConnectionState$1({
+	                hubId,
+	                state: HUB_CONNECTION_STATES.UNCONNECTED
+	              });
 	            }
 
 	            console.error('SDK send: error ', error);
@@ -6951,8 +7168,8 @@ var CozifySDK = (function (exports, axios) {
 	    send({
 	      command: COMMANDS.USER_LOGIN,
 	      data: {
-	        email: email,
-	        password: password
+	        email,
+	        password
 	      }
 	    }).then(response => {
 	      if (response && isString_1(response)) {
@@ -6965,8 +7182,8 @@ var CozifySDK = (function (exports, axios) {
 
 	      resolve(response);
 	    }).catch(error => {
-	      //console.error(error);
-	      reject(false);
+	      console.debug('doPwLogin error', error);
+	      reject(new Error('Login failure'));
 	    });
 	  });
 	}
@@ -6978,7 +7195,32 @@ var CozifySDK = (function (exports, axios) {
 	  return storedUser().state;
 	}
 
-	//     
+	//      
+	/**
+	 * Get devices of all selected hubs
+	 * @return {HUB_DEVICES_MAP_TYPE}
+	 */
+
+	function getDevices() {
+	  const stateNow = store.getState();
+	  return devicesState.selectors.getDevices(stateNow);
+	}
+	/**
+	 * Get devices of given hub
+	 * @param  {string} hubId
+	 * @return {DEVICES_MAP_TYPE}
+	 */
+
+	function getHubDevices(hubId) {
+	  let retVal;
+	  const devices = getDevices();
+
+	  if (devices && devices[hubId]) {
+	    retVal = devices[hubId];
+	  }
+
+	  return retVal;
+	}
 	/**
 	 * Device handler for poll delta results
 	 * @param  {string} hubId
@@ -6997,16 +7239,16 @@ var CozifySDK = (function (exports, axios) {
 	  if (reset) {
 	    // If reset then set  devices as they are received
 	    const stateDevices = {
-	      hubId: hubId,
-	      devices: devices
+	      hubId,
+	      devices
 	    };
 	    store.dispatch(devicesState.actions.setDevices(stateDevices));
 	  } else {
 	    // Loop devices to check could it be added or should be removed
 	    Object.entries(devices).forEach(([key, device]) => {
 	      const stateDevice = {
-	        hubId: hubId,
-	        device: device
+	        hubId,
+	        device
 	      };
 
 	      if (key && device) {
@@ -7017,60 +7259,37 @@ var CozifySDK = (function (exports, axios) {
 	    });
 	  }
 	}
-	/**
-	 * Get devices of given hub
-	 * @param  {string} hubId
-	 * @return {DEVICES_MAP_TYPE}
-	 */
-
-	function getHubDevices(hubId) {
-	  let retVal = undefined;
-	  const devices = getDevices();
-
-	  if (devices && devices[hubId]) {
-	    retVal = devices[hubId];
-	  }
-
-	  return retVal;
-	}
-	/**
-	 * Get devices of all selected hubs
-	 * @return {HUB_DEVICES_MAP_TYPE}
-	 */
-
-	function getDevices() {
-	  const stateNow = store.getState();
-	  return devicesState.selectors.getDevices(stateNow);
-	}
 
 	//      
-	let _hubs = {};
+	let hubsMap = {};
 	/*
 	 * Helper method to extract hub info from JWT based hub keys
 	 */
 
 	function extractHubInfo(HUBKeys) {
-	  let hubs = {};
+	  const hubs = {};
 
-	  for (let key in HUBKeys) {
-	    let coded = HUBKeys[key].split('.')[1];
-	    let decoded = urlBase64Decode(coded);
-	    let payload = JSON.parse(decoded);
-	    let info = {};
-	    info.id = payload.hubId || payload.hub_id;
-	    info.name = payload.hubName || payload.hub_name;
-	    info.hubKey = HUBKeys[key];
-	    info.connectionState = HUB_CONNECTION_STATES.UNCONNECTED;
+	  if (HUBKeys) {
+	    Object.keys(HUBKeys).forEach(hubKey => {
+	      const coded = HUBKeys[hubKey].split('.')[1];
+	      const decoded = urlBase64Decode(coded);
+	      const payload = JSON.parse(decoded);
+	      const info = {};
+	      info.id = payload.hubId || payload.hub_id;
+	      info.name = payload.hubName || payload.hub_name;
+	      info.hubKey = HUBKeys[hubKey];
+	      info.connectionState = HUB_CONNECTION_STATES.UNCONNECTED;
 
-	    if (payload.role) {
-	      info.role = payload.role;
-	      info.roleString = '';
-	      Object.keys(ROLES).forEach(key => {
-	        if (ROLES[key] === info.role) info.roleString = key;
-	      });
-	    }
+	      if (payload.role) {
+	        info.role = payload.role;
+	        info.roleString = '';
+	        Object.keys(ROLES).forEach(roleKey => {
+	          if (ROLES[hubKey] === info.role) info.roleString = roleKey;
+	        });
+	      }
 
-	    hubs[info.id] = info;
+	      hubs[info.id] = info;
+	    });
 	  }
 
 	  return hubs;
@@ -7080,24 +7299,36 @@ var CozifySDK = (function (exports, axios) {
 	 */
 
 
-	function updateFoundHub(hubURL, foundHub) {
-	  // Hub keys returns ids, idQuerys return hubId
+	function updateFoundHub(hubURL, hub) {
+	  const foundHub = hub; // Hub keys returns ids, idQuerys return hubId
+
 	  if (foundHub.hubId) {
 	    foundHub.id = foundHub.hubId;
 	    delete foundHub.hubId;
 	  }
 
-	  _hubs[foundHub.id].connected = foundHub.connected;
-	  _hubs[foundHub.id].features = foundHub.features;
-	  _hubs[foundHub.id].state = foundHub.state;
-	  _hubs[foundHub.id].version = foundHub.version;
-	  _hubs[foundHub.id].connectionState = foundHub.connected ? HUB_CONNECTION_STATES.REMOTE : HUB_CONNECTION_STATES.UNCONNECTED;
+	  if (!foundHub.id) {
+	    return;
+	  }
+
+	  if (!hubsMap[foundHub.id]) {
+	    hubsMap[foundHub.id] = {
+	      id: foundHub.id,
+	      name: foundHub.name || ''
+	    };
+	  }
+
+	  hubsMap[foundHub.id].connected = foundHub.connected;
+	  hubsMap[foundHub.id].features = foundHub.features;
+	  hubsMap[foundHub.id].state = foundHub.state;
+	  hubsMap[foundHub.id].version = foundHub.version;
+	  hubsMap[foundHub.id].connectionState = foundHub.connected ? HUB_CONNECTION_STATES.REMOTE : HUB_CONNECTION_STATES.UNCONNECTED;
 
 	  if (hubURL) {
-	    _hubs[foundHub.id].connectionState = HUB_CONNECTION_STATES.LOCAL;
-	    _hubs[foundHub.id].url = hubURL;
+	    hubsMap[foundHub.id].connectionState = HUB_CONNECTION_STATES.LOCAL;
+	    hubsMap[foundHub.id].url = hubURL;
 	  } else {
-	    _hubs[foundHub.id].url = undefined;
+	    hubsMap[foundHub.id].url = undefined;
 	  }
 	}
 	/*
@@ -7109,9 +7340,9 @@ var CozifySDK = (function (exports, axios) {
 	  return new Promise((resolve, reject) => {
 	    send({
 	      command: COMMANDS.CLOUD_META,
-	      authKey: authKey,
-	      hubKey: hubKey,
-	      hubId: hubId
+	      authKey,
+	      hubKey,
+	      hubId
 	    }).then(hubData => {
 	      updateFoundHub(undefined, hubData);
 	      resolve(hubId);
@@ -7127,12 +7358,13 @@ var CozifySDK = (function (exports, axios) {
 
 
 	function doLocalIdQuery(ip) {
-	  return new Promise((resolve, reject) => {
+	  return new Promise(resolve => {
 	    if (ip) {
-	      const hubURL = HUB_PROTOCOL + ip + ":" + HUB_PORT;
-	      const url = hubURL + "/hub";
+	      const hubURL = `${HUB_PROTOCOL + ip}:${HUB_PORT}`;
+	      const url = `${hubURL}/hub`;
 	      send({
-	        url: url
+	        url,
+	        timeout: 500
 	      }).then(hubData => {
 	        updateFoundHub(hubURL, hubData);
 	        resolve(ip);
@@ -7145,33 +7377,58 @@ var CozifySDK = (function (exports, axios) {
 	    }
 	  });
 	}
+	/**
+	 * Helper to get current hubs from state
+	 * @return {HUBS_MAP_TYPE} - hubs
+	 */
+
+
+	function getHubs() {
+	  return hubsState.selectors.getHubs(store.getState());
+	}
+	/*
+	 * Check hubs that are currently selected and mark them selected also in map of given hubs
+	 */
+
+	function setSelectedHubs(newHubs) {
+	  const hubs = getHubs();
+	  Object.values(hubs).forEach(hub => {
+	    if (hub.selected) {
+	      const selectedNewHub = newHubs[hub.id];
+
+	      if (selectedNewHub) {
+	        selectedNewHub.selected = true;
+	      }
+	    }
+	  });
+	}
 	/*
 	 * Fetch HUB IP addresses in the same network
 	 */
 
 
 	function doCloudDiscovery() {
-	  return new Promise((resolve, reject) => {
+	  return new Promise(resolve => {
 	    send({
 	      command: COMMANDS.CLOUD_IP
 	    }).then(ips => {
-	      let queries = [];
+	      const queries = [];
 
 	      if (ips && !isEmpty_1(ips)) {
-	        for (var ip of ips) {
+	        ips.forEach(ip => {
 	          queries.push(doLocalIdQuery(ip));
-	        }
+	        });
 	      }
 
 	      sendAll(queries).finally(() => {
 	        // mark selected hubs to be selected after
-	        setSelectedHubs(_hubs);
-	        store.dispatch(hubsState.actions.updateHubs(_hubs));
+	        setSelectedHubs(hubsMap);
+	        store.dispatch(hubsState.actions.updateHubs(hubsMap));
 	        resolve('ok');
 	      });
 	    }).catch(error => {
-	      console.error("doCloudDiscovery error: ", error.message);
-	      store.dispatch(hubsState.actions.updateHubs(_hubs));
+	      console.error('doCloudDiscovery error: ', error.message);
+	      store.dispatch(hubsState.actions.updateHubs(hubsMap));
 	      resolve('error');
 	    });
 	  });
@@ -7182,39 +7439,29 @@ var CozifySDK = (function (exports, axios) {
 
 
 	function fetchMetaData(hubs, authKey) {
-	  return new Promise((resolve, reject) => {
-	    let queries = [];
-
-	    for (var hub of Object.values(hubs)) {
+	  return new Promise(resolve => {
+	    const queries = [];
+	    Object.values(hubs).forEach(hub => {
 	      if (hub.hubKey) {
 	        queries.push(doRemoteIdQuery(hub.id, authKey, hub.hubKey));
 	      }
-	    }
-
-	    sendAll(queries).then(values => {//console.log(values);
-	    }).catch(error => {//console.log(error);
+	    });
+	    sendAll(queries).then(values => {
+	      console.debug('fetchMetaData values', values);
+	    }).catch(error => {
+	      console.debug('fetchMetaData error', error);
 	    }).finally(() => {
 	      resolve();
 	    });
 	  });
 	}
-	/*
-	 * Check hubs that are currently selected and mark them selected also in map of given hubs
+	/**
+	 * Helper to get current user from state
 	 */
 
 
-	function setSelectedHubs(newHubs) {
-	  const hubs = getHubs();
-
-	  for (var hub of Object.values(hubs)) {
-	    if (hub.selected) {
-	      const selectedNewHub = newHubs[hub.id];
-
-	      if (selectedNewHub) {
-	        selectedNewHub.selected = true;
-	      }
-	    }
-	  }
+	function storedUser$1() {
+	  return userState.selectors.getUser(store.getState());
 	}
 	/*
 	 * Fetch Hub keys by user authKey and start fetching hub meta datas
@@ -7222,20 +7469,23 @@ var CozifySDK = (function (exports, axios) {
 
 
 	function fetchHubs() {
-	  const authKey = storedUser$1().authKey;
+	  const {
+	    authKey
+	  } = storedUser$1();
 	  return new Promise((resolve, reject) => {
 	    if (!authKey) {
-	      reject('No userKey!');
+	      reject(new Error('No userKey!'));
 	      return;
 	    }
 
 	    send({
 	      command: COMMANDS.HUB_KEYS,
-	      authKey: authKey
+	      authKey
 	    }).then(tokens => {
 	      if (tokens) {
-	        _hubs = extractHubInfo(tokens);
-	        fetchMetaData(_hubs, authKey).finally(() => {
+	        hubsMap = extractHubInfo(tokens);
+	        store.dispatch(hubsState.actions.updateHubs(hubsMap));
+	        fetchMetaData(hubsMap, authKey).finally(() => {
 	          doCloudDiscovery();
 	          resolve(getHubs());
 	        });
@@ -7243,7 +7493,7 @@ var CozifySDK = (function (exports, axios) {
 	        resolve(getHubs());
 	      }
 	    }).catch(error => {
-	      console.error("fetchHubTokens error: ", error.message);
+	      console.error('fetchHubTokens error: ', error.message);
 	      reject(error);
 	    });
 	  });
@@ -7255,48 +7505,19 @@ var CozifySDK = (function (exports, axios) {
 
 	function startDiscoveringHubs() {
 	  {
-	    fetchHubs(); // call immediately and then every 30s
-	    //_discoveryInterval = setInterval(fetchHubs, DISCOVERY_INTERVAL_MS);
-	  }
-	}
-	/**
-	 * Unselect hub by id, stops hub polling
-	 * @param  {string} selectedId   - hub id to be selected
-	 */
-
-	function unSelectHubById(selectedId) {
-	  const hubs = getHubs();
-
-	  for (var hub of Object.values(hubs)) {
-	    if (selectedId === hub.id) {
-	      store.dispatch(hubsState.actions.unSelectHub(hub.id));
-	      stopPolling(hub.id);
-	    }
-	  }
-	}
-	/**
-	 * Select hub by id, starts hub polling
-	 * @param  {string} selectedId   - hub id to be selected
-	 */
-
-	function selectHubById(selectedId) {
-	  const hubs = getHubs();
-
-	  for (var hub of Object.values(hubs)) {
-	    if (selectedId === hub.id) {
-	      store.dispatch(hubsState.actions.selectHub(hub.id));
-	      startPolling(hub.id);
-	    }
+	    // call immediately...
+	    fetchHubs(); // and then every DISCOVERY_INTERVAL_MS (30s?)
+	    // discoveryInterval = setInterval(fetchHubs, DISCOVERY_INTERVAL_MS);
 	  }
 	}
 	/*
 	** Polling
 	*/
 
-	let _pollIntervals = {};
-	let _pollTimeStamp = 0;
-	let _pollInAction = false;
-	let _secondPoll = false;
+	const pollIntervals = {};
+	let pollTimeStamp = 0;
+	let pollInAction = false;
+	let secondPoll = false;
 	/*
 	 * Do poll if hub connection is ok
 	 * Remote poll is executed only every second call
@@ -7304,88 +7525,92 @@ var CozifySDK = (function (exports, axios) {
 
 	function doPoll(hubId) {
 	  const hub = getHubs()[hubId];
+	  console.error('doPoll connection state: ', hub.connectionState);
 
 	  if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
 	    return;
-	  } //just return every second -> not doing so often as in local connection
+	  } // just return every second -> not doing so often as in local connection
 
 
 	  if (hub.connectionState === HUB_CONNECTION_STATES.REMOTE) {
-	    if (_secondPoll) {
-	      _secondPoll = false;
+	    if (secondPoll) {
+	      secondPoll = false;
 	      return;
 	    }
 
-	    _secondPoll = true;
+	    secondPoll = true;
 	  }
 
-	  const authKey = storedUser$1().authKey;
-	  const hubKey = hub.hubKey;
+	  const {
+	    authKey
+	  } = storedUser$1();
+	  const {
+	    hubKey
+	  } = hub;
 
-	  if (_pollInAction) {
+	  if (pollInAction) {
 	    return;
 	  }
 
-	  _pollInAction = true;
-	  let reset = _pollTimeStamp === 0 ? true : false;
+	  pollInAction = true;
+	  let reset = pollTimeStamp === 0;
 	  send({
 	    command: COMMANDS.POLL,
-	    hubId: hubId,
-	    authKey: authKey,
-	    hubKey: hubKey,
+	    hubId,
+	    authKey,
+	    hubKey,
 	    localUrl: hub.url,
 	    data: {
-	      ts: _pollTimeStamp
+	      ts: pollTimeStamp
 	    }
 	  }).then(deltas => {
 	    if (deltas) {
-	      //console.log(JSON.stringify(deltas));
+	      // console.log(JSON.stringify(deltas));
 	      // Return can be null poll, even if not asked that
-	      if (_pollTimeStamp === 0 || deltas.full) {
+	      if (pollTimeStamp === 0 || deltas.full) {
 	        reset = true;
 	      }
 
-	      _pollTimeStamp = deltas.timestamp;
-
-	      for (let delta of deltas.polls) {
+	      pollTimeStamp = deltas.timestamp;
+	      deltas.polls.forEach(delta => {
 	        switch (delta.type) {
-	          case "DEVICE_DELTA":
+	          case 'DEVICE_DELTA':
 	            {
 	              deviceDeltaHandler(hubId, reset, delta.devices);
 	              break;
 	            }
 
-	          case "GROUP_DELTA":
+	          case 'GROUP_DELTA':
 	            {
 	              break;
 	            }
 
-	          case "SCENE_DELTA":
+	          case 'SCENE_DELTA':
 	            {
 	              break;
 	            }
 
-	          case "RULE_DELTA":
+	          case 'RULE_DELTA':
 	            {
 	              break;
 	            }
 
-	          case "USERS_DELTA":
+	          case 'USERS_DELTA':
 	            {
 	              break;
 	            }
 
-	          case "ROOM_DELTA":
+	          case 'ROOM_DELTA':
 	            {
 	              break;
 	            }
 
-	          case "ZONE_DELTA":
+	          case 'ZONE_DELTA':
 	            {
 	              break;
 	            }
 
-	          case "ALARM_DELTA":
+	          case 'ALARM_DELTA':
 	            {
 	              break;
 	            }
@@ -7395,14 +7620,14 @@ var CozifySDK = (function (exports, axios) {
 	              break;
 	            }
 	        }
-	      }
+	      });
 	    }
 
-	    _pollInAction = false;
+	    pollInAction = false;
 	  }).catch(error => {
-	    //store.dispatch(hubsState.actions.hubPollFailed())
-	    console.error("doPoll error: ", error.message);
-	    _pollInAction = false;
+	    // store.dispatch(hubsState.actions.hubPollFailed())
+	    console.error('doPoll error: ', error.message);
+	    pollInAction = false;
 	  });
 	}
 	/*
@@ -7412,7 +7637,7 @@ var CozifySDK = (function (exports, axios) {
 
 	function startPolling(hubId) {
 	  const intervalTime = POLL_INTERVAL_MS;
-	  _pollIntervals[hubId] = setInterval(doPoll, intervalTime, hubId);
+	  pollIntervals[hubId] = setInterval(doPoll, intervalTime, hubId);
 	}
 	/*
 	 * Stop polling of given hub
@@ -7420,78 +7645,1456 @@ var CozifySDK = (function (exports, axios) {
 
 
 	function stopPolling(hubId) {
-	  clearInterval(_pollIntervals[hubId]);
+	  clearInterval(pollIntervals[hubId]);
 	}
 	/**
-	 * Helper to get current user from state
+	 * Unselect hub by id, stops hub polling
+	 * @param  {string} selectedId   - hub id to be selected
 	 */
 
 
-	function storedUser$1() {
-	  return userState.selectors.getUser(store.getState());
+	function unSelectHubById(selectedId) {
+	  const hubs = getHubs();
+	  Object.values(hubs).forEach(hub => {
+	    if (selectedId === hub.id) {
+	      store.dispatch(hubsState.actions.unSelectHub({
+	        hubId: hub.id
+	      }));
+	      stopPolling(hub.id);
+	    }
+	  });
 	}
 	/**
-	 * Helper to get current hubs from state
-	 * @return {HUBS_MAP_TYPE} - hubs
+	 * Select hub by id, starts hub polling
+	 * @param  {string} selectedId   - hub id to be selected
 	 */
 
-
-	function getHubs() {
-	  return hubsState.selectors.getHubs(store.getState());
+	function selectHubById(selectedId) {
+	  const hubs = getHubs();
+	  Object.values(hubs).forEach(hub => {
+	    if (selectedId === hub.id) {
+	      store.dispatch(hubsState.actions.selectHub({
+	        hubId: hub.id
+	      }));
+	      startPolling(hub.id);
+	    }
+	  });
 	}
 	/*
 	 * Listener of User state changes
 	 * Hub discovery is started when user's new state is AUTHENTICATED
 	 */
 
-	watchChanges('user.state', (newState, oldState) => {
+	watchChanges('user.state', newState => {
 	  // Start discovery when user is authenticated
 	  if (newState === USER_STATES.AUTHENTICATED) {
 	    startDiscoveringHubs();
 	  }
 	});
 
-	//     
+	/** `Object#toString` result references. */
+	var symbolTag = '[object Symbol]';
+
+	/**
+	 * Checks if `value` is classified as a `Symbol` primitive or object.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 4.0.0
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is a symbol, else `false`.
+	 * @example
+	 *
+	 * _.isSymbol(Symbol.iterator);
+	 * // => true
+	 *
+	 * _.isSymbol('abc');
+	 * // => false
+	 */
+	function isSymbol(value) {
+	  return typeof value == 'symbol' ||
+	    (isObjectLike_1(value) && _baseGetTag(value) == symbolTag);
+	}
+
+	var isSymbol_1 = isSymbol;
+
+	/** Used to match property names within property paths. */
+	var reIsDeepProp = /\.|\[(?:[^[\]]*|(["'])(?:(?!\1)[^\\]|\\.)*?\1)\]/,
+	    reIsPlainProp = /^\w*$/;
+
+	/**
+	 * Checks if `value` is a property name and not a property path.
+	 *
+	 * @private
+	 * @param {*} value The value to check.
+	 * @param {Object} [object] The object to query keys on.
+	 * @returns {boolean} Returns `true` if `value` is a property name, else `false`.
+	 */
+	function isKey(value, object) {
+	  if (isArray_1(value)) {
+	    return false;
+	  }
+	  var type = typeof value;
+	  if (type == 'number' || type == 'symbol' || type == 'boolean' ||
+	      value == null || isSymbol_1(value)) {
+	    return true;
+	  }
+	  return reIsPlainProp.test(value) || !reIsDeepProp.test(value) ||
+	    (object != null && value in Object(object));
+	}
+
+	var _isKey = isKey;
+
+	/* Built-in method references that are verified to be native. */
+	var nativeCreate = _getNative(Object, 'create');
+
+	var _nativeCreate = nativeCreate;
+
+	/**
+	 * Removes all key-value entries from the hash.
+	 *
+	 * @private
+	 * @name clear
+	 * @memberOf Hash
+	 */
+	function hashClear() {
+	  this.__data__ = _nativeCreate ? _nativeCreate(null) : {};
+	  this.size = 0;
+	}
+
+	var _hashClear = hashClear;
+
+	/**
+	 * Removes `key` and its value from the hash.
+	 *
+	 * @private
+	 * @name delete
+	 * @memberOf Hash
+	 * @param {Object} hash The hash to modify.
+	 * @param {string} key The key of the value to remove.
+	 * @returns {boolean} Returns `true` if the entry was removed, else `false`.
+	 */
+	function hashDelete(key) {
+	  var result = this.has(key) && delete this.__data__[key];
+	  this.size -= result ? 1 : 0;
+	  return result;
+	}
+
+	var _hashDelete = hashDelete;
+
+	/** Used to stand-in for `undefined` hash values. */
+	var HASH_UNDEFINED = '__lodash_hash_undefined__';
+
+	/** Used for built-in method references. */
+	var objectProto$7 = Object.prototype;
+
+	/** Used to check objects for own properties. */
+	var hasOwnProperty$5 = objectProto$7.hasOwnProperty;
+
+	/**
+	 * Gets the hash value for `key`.
+	 *
+	 * @private
+	 * @name get
+	 * @memberOf Hash
+	 * @param {string} key The key of the value to get.
+	 * @returns {*} Returns the entry value.
+	 */
+	function hashGet(key) {
+	  var data = this.__data__;
+	  if (_nativeCreate) {
+	    var result = data[key];
+	    return result === HASH_UNDEFINED ? undefined : result;
+	  }
+	  return hasOwnProperty$5.call(data, key) ? data[key] : undefined;
+	}
+
+	var _hashGet = hashGet;
+
+	/** Used for built-in method references. */
+	var objectProto$8 = Object.prototype;
+
+	/** Used to check objects for own properties. */
+	var hasOwnProperty$6 = objectProto$8.hasOwnProperty;
+
+	/**
+	 * Checks if a hash value for `key` exists.
+	 *
+	 * @private
+	 * @name has
+	 * @memberOf Hash
+	 * @param {string} key The key of the entry to check.
+	 * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
+	 */
+	function hashHas(key) {
+	  var data = this.__data__;
+	  return _nativeCreate ? (data[key] !== undefined) : hasOwnProperty$6.call(data, key);
+	}
+
+	var _hashHas = hashHas;
+
+	/** Used to stand-in for `undefined` hash values. */
+	var HASH_UNDEFINED$1 = '__lodash_hash_undefined__';
+
+	/**
+	 * Sets the hash `key` to `value`.
+	 *
+	 * @private
+	 * @name set
+	 * @memberOf Hash
+	 * @param {string} key The key of the value to set.
+	 * @param {*} value The value to set.
+	 * @returns {Object} Returns the hash instance.
+	 */
+	function hashSet(key, value) {
+	  var data = this.__data__;
+	  this.size += this.has(key) ? 0 : 1;
+	  data[key] = (_nativeCreate && value === undefined) ? HASH_UNDEFINED$1 : value;
+	  return this;
+	}
+
+	var _hashSet = hashSet;
+
+	/**
+	 * Creates a hash object.
+	 *
+	 * @private
+	 * @constructor
+	 * @param {Array} [entries] The key-value pairs to cache.
+	 */
+	function Hash(entries) {
+	  var index = -1,
+	      length = entries == null ? 0 : entries.length;
+
+	  this.clear();
+	  while (++index < length) {
+	    var entry = entries[index];
+	    this.set(entry[0], entry[1]);
+	  }
+	}
+
+	// Add methods to `Hash`.
+	Hash.prototype.clear = _hashClear;
+	Hash.prototype['delete'] = _hashDelete;
+	Hash.prototype.get = _hashGet;
+	Hash.prototype.has = _hashHas;
+	Hash.prototype.set = _hashSet;
+
+	var _Hash = Hash;
+
+	/**
+	 * Removes all key-value entries from the list cache.
+	 *
+	 * @private
+	 * @name clear
+	 * @memberOf ListCache
+	 */
+	function listCacheClear() {
+	  this.__data__ = [];
+	  this.size = 0;
+	}
+
+	var _listCacheClear = listCacheClear;
+
+	/**
+	 * Performs a
+	 * [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
+	 * comparison between two values to determine if they are equivalent.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 4.0.0
+	 * @category Lang
+	 * @param {*} value The value to compare.
+	 * @param {*} other The other value to compare.
+	 * @returns {boolean} Returns `true` if the values are equivalent, else `false`.
+	 * @example
+	 *
+	 * var object = { 'a': 1 };
+	 * var other = { 'a': 1 };
+	 *
+	 * _.eq(object, object);
+	 * // => true
+	 *
+	 * _.eq(object, other);
+	 * // => false
+	 *
+	 * _.eq('a', 'a');
+	 * // => true
+	 *
+	 * _.eq('a', Object('a'));
+	 * // => false
+	 *
+	 * _.eq(NaN, NaN);
+	 * // => true
+	 */
+	function eq(value, other) {
+	  return value === other || (value !== value && other !== other);
+	}
+
+	var eq_1 = eq;
+
+	/**
+	 * Gets the index at which the `key` is found in `array` of key-value pairs.
+	 *
+	 * @private
+	 * @param {Array} array The array to inspect.
+	 * @param {*} key The key to search for.
+	 * @returns {number} Returns the index of the matched value, else `-1`.
+	 */
+	function assocIndexOf(array, key) {
+	  var length = array.length;
+	  while (length--) {
+	    if (eq_1(array[length][0], key)) {
+	      return length;
+	    }
+	  }
+	  return -1;
+	}
+
+	var _assocIndexOf = assocIndexOf;
+
+	/** Used for built-in method references. */
+	var arrayProto = Array.prototype;
+
+	/** Built-in value references. */
+	var splice = arrayProto.splice;
+
+	/**
+	 * Removes `key` and its value from the list cache.
+	 *
+	 * @private
+	 * @name delete
+	 * @memberOf ListCache
+	 * @param {string} key The key of the value to remove.
+	 * @returns {boolean} Returns `true` if the entry was removed, else `false`.
+	 */
+	function listCacheDelete(key) {
+	  var data = this.__data__,
+	      index = _assocIndexOf(data, key);
+
+	  if (index < 0) {
+	    return false;
+	  }
+	  var lastIndex = data.length - 1;
+	  if (index == lastIndex) {
+	    data.pop();
+	  } else {
+	    splice.call(data, index, 1);
+	  }
+	  --this.size;
+	  return true;
+	}
+
+	var _listCacheDelete = listCacheDelete;
+
+	/**
+	 * Gets the list cache value for `key`.
+	 *
+	 * @private
+	 * @name get
+	 * @memberOf ListCache
+	 * @param {string} key The key of the value to get.
+	 * @returns {*} Returns the entry value.
+	 */
+	function listCacheGet(key) {
+	  var data = this.__data__,
+	      index = _assocIndexOf(data, key);
+
+	  return index < 0 ? undefined : data[index][1];
+	}
+
+	var _listCacheGet = listCacheGet;
+
+	/**
+	 * Checks if a list cache value for `key` exists.
+	 *
+	 * @private
+	 * @name has
+	 * @memberOf ListCache
+	 * @param {string} key The key of the entry to check.
+	 * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
+	 */
+	function listCacheHas(key) {
+	  return _assocIndexOf(this.__data__, key) > -1;
+	}
+
+	var _listCacheHas = listCacheHas;
+
+	/**
+	 * Sets the list cache `key` to `value`.
+	 *
+	 * @private
+	 * @name set
+	 * @memberOf ListCache
+	 * @param {string} key The key of the value to set.
+	 * @param {*} value The value to set.
+	 * @returns {Object} Returns the list cache instance.
+	 */
+	function listCacheSet(key, value) {
+	  var data = this.__data__,
+	      index = _assocIndexOf(data, key);
+
+	  if (index < 0) {
+	    ++this.size;
+	    data.push([key, value]);
+	  } else {
+	    data[index][1] = value;
+	  }
+	  return this;
+	}
+
+	var _listCacheSet = listCacheSet;
+
+	/**
+	 * Creates an list cache object.
+	 *
+	 * @private
+	 * @constructor
+	 * @param {Array} [entries] The key-value pairs to cache.
+	 */
+	function ListCache(entries) {
+	  var index = -1,
+	      length = entries == null ? 0 : entries.length;
+
+	  this.clear();
+	  while (++index < length) {
+	    var entry = entries[index];
+	    this.set(entry[0], entry[1]);
+	  }
+	}
+
+	// Add methods to `ListCache`.
+	ListCache.prototype.clear = _listCacheClear;
+	ListCache.prototype['delete'] = _listCacheDelete;
+	ListCache.prototype.get = _listCacheGet;
+	ListCache.prototype.has = _listCacheHas;
+	ListCache.prototype.set = _listCacheSet;
+
+	var _ListCache = ListCache;
+
+	/**
+	 * Removes all key-value entries from the map.
+	 *
+	 * @private
+	 * @name clear
+	 * @memberOf MapCache
+	 */
+	function mapCacheClear() {
+	  this.size = 0;
+	  this.__data__ = {
+	    'hash': new _Hash,
+	    'map': new (_Map || _ListCache),
+	    'string': new _Hash
+	  };
+	}
+
+	var _mapCacheClear = mapCacheClear;
+
+	/**
+	 * Checks if `value` is suitable for use as unique object key.
+	 *
+	 * @private
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is suitable, else `false`.
+	 */
+	function isKeyable(value) {
+	  var type = typeof value;
+	  return (type == 'string' || type == 'number' || type == 'symbol' || type == 'boolean')
+	    ? (value !== '__proto__')
+	    : (value === null);
+	}
+
+	var _isKeyable = isKeyable;
+
+	/**
+	 * Gets the data for `map`.
+	 *
+	 * @private
+	 * @param {Object} map The map to query.
+	 * @param {string} key The reference key.
+	 * @returns {*} Returns the map data.
+	 */
+	function getMapData(map, key) {
+	  var data = map.__data__;
+	  return _isKeyable(key)
+	    ? data[typeof key == 'string' ? 'string' : 'hash']
+	    : data.map;
+	}
+
+	var _getMapData = getMapData;
+
+	/**
+	 * Removes `key` and its value from the map.
+	 *
+	 * @private
+	 * @name delete
+	 * @memberOf MapCache
+	 * @param {string} key The key of the value to remove.
+	 * @returns {boolean} Returns `true` if the entry was removed, else `false`.
+	 */
+	function mapCacheDelete(key) {
+	  var result = _getMapData(this, key)['delete'](key);
+	  this.size -= result ? 1 : 0;
+	  return result;
+	}
+
+	var _mapCacheDelete = mapCacheDelete;
+
+	/**
+	 * Gets the map value for `key`.
+	 *
+	 * @private
+	 * @name get
+	 * @memberOf MapCache
+	 * @param {string} key The key of the value to get.
+	 * @returns {*} Returns the entry value.
+	 */
+	function mapCacheGet(key) {
+	  return _getMapData(this, key).get(key);
+	}
+
+	var _mapCacheGet = mapCacheGet;
+
+	/**
+	 * Checks if a map value for `key` exists.
+	 *
+	 * @private
+	 * @name has
+	 * @memberOf MapCache
+	 * @param {string} key The key of the entry to check.
+	 * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
+	 */
+	function mapCacheHas(key) {
+	  return _getMapData(this, key).has(key);
+	}
+
+	var _mapCacheHas = mapCacheHas;
+
+	/**
+	 * Sets the map `key` to `value`.
+	 *
+	 * @private
+	 * @name set
+	 * @memberOf MapCache
+	 * @param {string} key The key of the value to set.
+	 * @param {*} value The value to set.
+	 * @returns {Object} Returns the map cache instance.
+	 */
+	function mapCacheSet(key, value) {
+	  var data = _getMapData(this, key),
+	      size = data.size;
+
+	  data.set(key, value);
+	  this.size += data.size == size ? 0 : 1;
+	  return this;
+	}
+
+	var _mapCacheSet = mapCacheSet;
+
+	/**
+	 * Creates a map cache object to store key-value pairs.
+	 *
+	 * @private
+	 * @constructor
+	 * @param {Array} [entries] The key-value pairs to cache.
+	 */
+	function MapCache(entries) {
+	  var index = -1,
+	      length = entries == null ? 0 : entries.length;
+
+	  this.clear();
+	  while (++index < length) {
+	    var entry = entries[index];
+	    this.set(entry[0], entry[1]);
+	  }
+	}
+
+	// Add methods to `MapCache`.
+	MapCache.prototype.clear = _mapCacheClear;
+	MapCache.prototype['delete'] = _mapCacheDelete;
+	MapCache.prototype.get = _mapCacheGet;
+	MapCache.prototype.has = _mapCacheHas;
+	MapCache.prototype.set = _mapCacheSet;
+
+	var _MapCache = MapCache;
+
+	/** Error message constants. */
+	var FUNC_ERROR_TEXT = 'Expected a function';
+
+	/**
+	 * Creates a function that memoizes the result of `func`. If `resolver` is
+	 * provided, it determines the cache key for storing the result based on the
+	 * arguments provided to the memoized function. By default, the first argument
+	 * provided to the memoized function is used as the map cache key. The `func`
+	 * is invoked with the `this` binding of the memoized function.
+	 *
+	 * **Note:** The cache is exposed as the `cache` property on the memoized
+	 * function. Its creation may be customized by replacing the `_.memoize.Cache`
+	 * constructor with one whose instances implement the
+	 * [`Map`](http://ecma-international.org/ecma-262/7.0/#sec-properties-of-the-map-prototype-object)
+	 * method interface of `clear`, `delete`, `get`, `has`, and `set`.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 0.1.0
+	 * @category Function
+	 * @param {Function} func The function to have its output memoized.
+	 * @param {Function} [resolver] The function to resolve the cache key.
+	 * @returns {Function} Returns the new memoized function.
+	 * @example
+	 *
+	 * var object = { 'a': 1, 'b': 2 };
+	 * var other = { 'c': 3, 'd': 4 };
+	 *
+	 * var values = _.memoize(_.values);
+	 * values(object);
+	 * // => [1, 2]
+	 *
+	 * values(other);
+	 * // => [3, 4]
+	 *
+	 * object.a = 2;
+	 * values(object);
+	 * // => [1, 2]
+	 *
+	 * // Modify the result cache.
+	 * values.cache.set(object, ['a', 'b']);
+	 * values(object);
+	 * // => ['a', 'b']
+	 *
+	 * // Replace `_.memoize.Cache`.
+	 * _.memoize.Cache = WeakMap;
+	 */
+	function memoize(func, resolver) {
+	  if (typeof func != 'function' || (resolver != null && typeof resolver != 'function')) {
+	    throw new TypeError(FUNC_ERROR_TEXT);
+	  }
+	  var memoized = function() {
+	    var args = arguments,
+	        key = resolver ? resolver.apply(this, args) : args[0],
+	        cache = memoized.cache;
+
+	    if (cache.has(key)) {
+	      return cache.get(key);
+	    }
+	    var result = func.apply(this, args);
+	    memoized.cache = cache.set(key, result) || cache;
+	    return result;
+	  };
+	  memoized.cache = new (memoize.Cache || _MapCache);
+	  return memoized;
+	}
+
+	// Expose `MapCache`.
+	memoize.Cache = _MapCache;
+
+	var memoize_1 = memoize;
+
+	/** Used as the maximum memoize cache size. */
+	var MAX_MEMOIZE_SIZE = 500;
+
+	/**
+	 * A specialized version of `_.memoize` which clears the memoized function's
+	 * cache when it exceeds `MAX_MEMOIZE_SIZE`.
+	 *
+	 * @private
+	 * @param {Function} func The function to have its output memoized.
+	 * @returns {Function} Returns the new memoized function.
+	 */
+	function memoizeCapped(func) {
+	  var result = memoize_1(func, function(key) {
+	    if (cache.size === MAX_MEMOIZE_SIZE) {
+	      cache.clear();
+	    }
+	    return key;
+	  });
+
+	  var cache = result.cache;
+	  return result;
+	}
+
+	var _memoizeCapped = memoizeCapped;
+
+	/** Used to match property names within property paths. */
+	var rePropName = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))/g;
+
+	/** Used to match backslashes in property paths. */
+	var reEscapeChar = /\\(\\)?/g;
+
+	/**
+	 * Converts `string` to a property path array.
+	 *
+	 * @private
+	 * @param {string} string The string to convert.
+	 * @returns {Array} Returns the property path array.
+	 */
+	var stringToPath = _memoizeCapped(function(string) {
+	  var result = [];
+	  if (string.charCodeAt(0) === 46 /* . */) {
+	    result.push('');
+	  }
+	  string.replace(rePropName, function(match, number, quote, subString) {
+	    result.push(quote ? subString.replace(reEscapeChar, '$1') : (number || match));
+	  });
+	  return result;
+	});
+
+	var _stringToPath = stringToPath;
+
+	/**
+	 * A specialized version of `_.map` for arrays without support for iteratee
+	 * shorthands.
+	 *
+	 * @private
+	 * @param {Array} [array] The array to iterate over.
+	 * @param {Function} iteratee The function invoked per iteration.
+	 * @returns {Array} Returns the new mapped array.
+	 */
+	function arrayMap(array, iteratee) {
+	  var index = -1,
+	      length = array == null ? 0 : array.length,
+	      result = Array(length);
+
+	  while (++index < length) {
+	    result[index] = iteratee(array[index], index, array);
+	  }
+	  return result;
+	}
+
+	var _arrayMap = arrayMap;
+
+	/** Used as references for various `Number` constants. */
+	var INFINITY = 1 / 0;
+
+	/** Used to convert symbols to primitives and strings. */
+	var symbolProto = _Symbol ? _Symbol.prototype : undefined,
+	    symbolToString = symbolProto ? symbolProto.toString : undefined;
+
+	/**
+	 * The base implementation of `_.toString` which doesn't convert nullish
+	 * values to empty strings.
+	 *
+	 * @private
+	 * @param {*} value The value to process.
+	 * @returns {string} Returns the string.
+	 */
+	function baseToString(value) {
+	  // Exit early for strings to avoid a performance hit in some environments.
+	  if (typeof value == 'string') {
+	    return value;
+	  }
+	  if (isArray_1(value)) {
+	    // Recursively convert values (susceptible to call stack limits).
+	    return _arrayMap(value, baseToString) + '';
+	  }
+	  if (isSymbol_1(value)) {
+	    return symbolToString ? symbolToString.call(value) : '';
+	  }
+	  var result = (value + '');
+	  return (result == '0' && (1 / value) == -INFINITY) ? '-0' : result;
+	}
+
+	var _baseToString = baseToString;
+
+	/**
+	 * Converts `value` to a string. An empty string is returned for `null`
+	 * and `undefined` values. The sign of `-0` is preserved.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 4.0.0
+	 * @category Lang
+	 * @param {*} value The value to convert.
+	 * @returns {string} Returns the converted string.
+	 * @example
+	 *
+	 * _.toString(null);
+	 * // => ''
+	 *
+	 * _.toString(-0);
+	 * // => '-0'
+	 *
+	 * _.toString([1, 2, 3]);
+	 * // => '1,2,3'
+	 */
+	function toString(value) {
+	  return value == null ? '' : _baseToString(value);
+	}
+
+	var toString_1 = toString;
+
+	/**
+	 * Casts `value` to a path array if it's not one.
+	 *
+	 * @private
+	 * @param {*} value The value to inspect.
+	 * @param {Object} [object] The object to query keys on.
+	 * @returns {Array} Returns the cast property path array.
+	 */
+	function castPath(value, object) {
+	  if (isArray_1(value)) {
+	    return value;
+	  }
+	  return _isKey(value, object) ? [value] : _stringToPath(toString_1(value));
+	}
+
+	var _castPath = castPath;
+
+	/** Used as references for various `Number` constants. */
+	var INFINITY$1 = 1 / 0;
+
+	/**
+	 * Converts `value` to a string key if it's not a string or symbol.
+	 *
+	 * @private
+	 * @param {*} value The value to inspect.
+	 * @returns {string|symbol} Returns the key.
+	 */
+	function toKey(value) {
+	  if (typeof value == 'string' || isSymbol_1(value)) {
+	    return value;
+	  }
+	  var result = (value + '');
+	  return (result == '0' && (1 / value) == -INFINITY$1) ? '-0' : result;
+	}
+
+	var _toKey = toKey;
+
+	/**
+	 * The base implementation of `_.get` without support for default values.
+	 *
+	 * @private
+	 * @param {Object} object The object to query.
+	 * @param {Array|string} path The path of the property to get.
+	 * @returns {*} Returns the resolved value.
+	 */
+	function baseGet(object, path) {
+	  path = _castPath(path, object);
+
+	  var index = 0,
+	      length = path.length;
+
+	  while (object != null && index < length) {
+	    object = object[_toKey(path[index++])];
+	  }
+	  return (index && index == length) ? object : undefined;
+	}
+
+	var _baseGet = baseGet;
+
+	var defineProperty$2 = (function() {
+	  try {
+	    var func = _getNative(Object, 'defineProperty');
+	    func({}, '', {});
+	    return func;
+	  } catch (e) {}
+	}());
+
+	var _defineProperty$4 = defineProperty$2;
+
+	/**
+	 * The base implementation of `assignValue` and `assignMergeValue` without
+	 * value checks.
+	 *
+	 * @private
+	 * @param {Object} object The object to modify.
+	 * @param {string} key The key of the property to assign.
+	 * @param {*} value The value to assign.
+	 */
+	function baseAssignValue(object, key, value) {
+	  if (key == '__proto__' && _defineProperty$4) {
+	    _defineProperty$4(object, key, {
+	      'configurable': true,
+	      'enumerable': true,
+	      'value': value,
+	      'writable': true
+	    });
+	  } else {
+	    object[key] = value;
+	  }
+	}
+
+	var _baseAssignValue = baseAssignValue;
+
+	/** Used for built-in method references. */
+	var objectProto$9 = Object.prototype;
+
+	/** Used to check objects for own properties. */
+	var hasOwnProperty$7 = objectProto$9.hasOwnProperty;
+
+	/**
+	 * Assigns `value` to `key` of `object` if the existing value is not equivalent
+	 * using [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
+	 * for equality comparisons.
+	 *
+	 * @private
+	 * @param {Object} object The object to modify.
+	 * @param {string} key The key of the property to assign.
+	 * @param {*} value The value to assign.
+	 */
+	function assignValue(object, key, value) {
+	  var objValue = object[key];
+	  if (!(hasOwnProperty$7.call(object, key) && eq_1(objValue, value)) ||
+	      (value === undefined && !(key in object))) {
+	    _baseAssignValue(object, key, value);
+	  }
+	}
+
+	var _assignValue = assignValue;
+
+	/** Used as references for various `Number` constants. */
+	var MAX_SAFE_INTEGER$1 = 9007199254740991;
+
+	/** Used to detect unsigned integer values. */
+	var reIsUint = /^(?:0|[1-9]\d*)$/;
+
+	/**
+	 * Checks if `value` is a valid array-like index.
+	 *
+	 * @private
+	 * @param {*} value The value to check.
+	 * @param {number} [length=MAX_SAFE_INTEGER] The upper bounds of a valid index.
+	 * @returns {boolean} Returns `true` if `value` is a valid index, else `false`.
+	 */
+	function isIndex(value, length) {
+	  var type = typeof value;
+	  length = length == null ? MAX_SAFE_INTEGER$1 : length;
+
+	  return !!length &&
+	    (type == 'number' ||
+	      (type != 'symbol' && reIsUint.test(value))) &&
+	        (value > -1 && value % 1 == 0 && value < length);
+	}
+
+	var _isIndex = isIndex;
+
+	/**
+	 * The base implementation of `_.set`.
+	 *
+	 * @private
+	 * @param {Object} object The object to modify.
+	 * @param {Array|string} path The path of the property to set.
+	 * @param {*} value The value to set.
+	 * @param {Function} [customizer] The function to customize path creation.
+	 * @returns {Object} Returns `object`.
+	 */
+	function baseSet(object, path, value, customizer) {
+	  if (!isObject_1(object)) {
+	    return object;
+	  }
+	  path = _castPath(path, object);
+
+	  var index = -1,
+	      length = path.length,
+	      lastIndex = length - 1,
+	      nested = object;
+
+	  while (nested != null && ++index < length) {
+	    var key = _toKey(path[index]),
+	        newValue = value;
+
+	    if (index != lastIndex) {
+	      var objValue = nested[key];
+	      newValue = customizer ? customizer(objValue, key, nested) : undefined;
+	      if (newValue === undefined) {
+	        newValue = isObject_1(objValue)
+	          ? objValue
+	          : (_isIndex(path[index + 1]) ? [] : {});
+	      }
+	    }
+	    _assignValue(nested, key, newValue);
+	    nested = nested[key];
+	  }
+	  return object;
+	}
+
+	var _baseSet = baseSet;
+
+	/**
+	 * The base implementation of  `_.pickBy` without support for iteratee shorthands.
+	 *
+	 * @private
+	 * @param {Object} object The source object.
+	 * @param {string[]} paths The property paths to pick.
+	 * @param {Function} predicate The function invoked per property.
+	 * @returns {Object} Returns the new object.
+	 */
+	function basePickBy(object, paths, predicate) {
+	  var index = -1,
+	      length = paths.length,
+	      result = {};
+
+	  while (++index < length) {
+	    var path = paths[index],
+	        value = _baseGet(object, path);
+
+	    if (predicate(value, path)) {
+	      _baseSet(result, _castPath(path, object), value);
+	    }
+	  }
+	  return result;
+	}
+
+	var _basePickBy = basePickBy;
+
+	/**
+	 * The base implementation of `_.hasIn` without support for deep paths.
+	 *
+	 * @private
+	 * @param {Object} [object] The object to query.
+	 * @param {Array|string} key The key to check.
+	 * @returns {boolean} Returns `true` if `key` exists, else `false`.
+	 */
+	function baseHasIn(object, key) {
+	  return object != null && key in Object(object);
+	}
+
+	var _baseHasIn = baseHasIn;
+
+	/**
+	 * Checks if `path` exists on `object`.
+	 *
+	 * @private
+	 * @param {Object} object The object to query.
+	 * @param {Array|string} path The path to check.
+	 * @param {Function} hasFunc The function to check properties.
+	 * @returns {boolean} Returns `true` if `path` exists, else `false`.
+	 */
+	function hasPath(object, path, hasFunc) {
+	  path = _castPath(path, object);
+
+	  var index = -1,
+	      length = path.length,
+	      result = false;
+
+	  while (++index < length) {
+	    var key = _toKey(path[index]);
+	    if (!(result = object != null && hasFunc(object, key))) {
+	      break;
+	    }
+	    object = object[key];
+	  }
+	  if (result || ++index != length) {
+	    return result;
+	  }
+	  length = object == null ? 0 : object.length;
+	  return !!length && isLength_1(length) && _isIndex(key, length) &&
+	    (isArray_1(object) || isArguments_1(object));
+	}
+
+	var _hasPath = hasPath;
+
+	/**
+	 * Checks if `path` is a direct or inherited property of `object`.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 4.0.0
+	 * @category Object
+	 * @param {Object} object The object to query.
+	 * @param {Array|string} path The path to check.
+	 * @returns {boolean} Returns `true` if `path` exists, else `false`.
+	 * @example
+	 *
+	 * var object = _.create({ 'a': _.create({ 'b': 2 }) });
+	 *
+	 * _.hasIn(object, 'a');
+	 * // => true
+	 *
+	 * _.hasIn(object, 'a.b');
+	 * // => true
+	 *
+	 * _.hasIn(object, ['a', 'b']);
+	 * // => true
+	 *
+	 * _.hasIn(object, 'b');
+	 * // => false
+	 */
+	function hasIn(object, path) {
+	  return object != null && _hasPath(object, path, _baseHasIn);
+	}
+
+	var hasIn_1 = hasIn;
+
+	/**
+	 * The base implementation of `_.pick` without support for individual
+	 * property identifiers.
+	 *
+	 * @private
+	 * @param {Object} object The source object.
+	 * @param {string[]} paths The property paths to pick.
+	 * @returns {Object} Returns the new object.
+	 */
+	function basePick(object, paths) {
+	  return _basePickBy(object, paths, function(value, path) {
+	    return hasIn_1(object, path);
+	  });
+	}
+
+	var _basePick = basePick;
+
+	/**
+	 * Appends the elements of `values` to `array`.
+	 *
+	 * @private
+	 * @param {Array} array The array to modify.
+	 * @param {Array} values The values to append.
+	 * @returns {Array} Returns `array`.
+	 */
+	function arrayPush(array, values) {
+	  var index = -1,
+	      length = values.length,
+	      offset = array.length;
+
+	  while (++index < length) {
+	    array[offset + index] = values[index];
+	  }
+	  return array;
+	}
+
+	var _arrayPush = arrayPush;
+
+	/** Built-in value references. */
+	var spreadableSymbol = _Symbol ? _Symbol.isConcatSpreadable : undefined;
+
+	/**
+	 * Checks if `value` is a flattenable `arguments` object or array.
+	 *
+	 * @private
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is flattenable, else `false`.
+	 */
+	function isFlattenable(value) {
+	  return isArray_1(value) || isArguments_1(value) ||
+	    !!(spreadableSymbol && value && value[spreadableSymbol]);
+	}
+
+	var _isFlattenable = isFlattenable;
+
+	/**
+	 * The base implementation of `_.flatten` with support for restricting flattening.
+	 *
+	 * @private
+	 * @param {Array} array The array to flatten.
+	 * @param {number} depth The maximum recursion depth.
+	 * @param {boolean} [predicate=isFlattenable] The function invoked per iteration.
+	 * @param {boolean} [isStrict] Restrict to values that pass `predicate` checks.
+	 * @param {Array} [result=[]] The initial result value.
+	 * @returns {Array} Returns the new flattened array.
+	 */
+	function baseFlatten(array, depth, predicate, isStrict, result) {
+	  var index = -1,
+	      length = array.length;
+
+	  predicate || (predicate = _isFlattenable);
+	  result || (result = []);
+
+	  while (++index < length) {
+	    var value = array[index];
+	    if (depth > 0 && predicate(value)) {
+	      if (depth > 1) {
+	        // Recursively flatten arrays (susceptible to call stack limits).
+	        baseFlatten(value, depth - 1, predicate, isStrict, result);
+	      } else {
+	        _arrayPush(result, value);
+	      }
+	    } else if (!isStrict) {
+	      result[result.length] = value;
+	    }
+	  }
+	  return result;
+	}
+
+	var _baseFlatten = baseFlatten;
+
+	/**
+	 * Flattens `array` a single level deep.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 0.1.0
+	 * @category Array
+	 * @param {Array} array The array to flatten.
+	 * @returns {Array} Returns the new flattened array.
+	 * @example
+	 *
+	 * _.flatten([1, [2, [3, [4]], 5]]);
+	 * // => [1, 2, [3, [4]], 5]
+	 */
+	function flatten(array) {
+	  var length = array == null ? 0 : array.length;
+	  return length ? _baseFlatten(array, 1) : [];
+	}
+
+	var flatten_1 = flatten;
+
+	/**
+	 * A faster alternative to `Function#apply`, this function invokes `func`
+	 * with the `this` binding of `thisArg` and the arguments of `args`.
+	 *
+	 * @private
+	 * @param {Function} func The function to invoke.
+	 * @param {*} thisArg The `this` binding of `func`.
+	 * @param {Array} args The arguments to invoke `func` with.
+	 * @returns {*} Returns the result of `func`.
+	 */
+	function apply(func, thisArg, args) {
+	  switch (args.length) {
+	    case 0: return func.call(thisArg);
+	    case 1: return func.call(thisArg, args[0]);
+	    case 2: return func.call(thisArg, args[0], args[1]);
+	    case 3: return func.call(thisArg, args[0], args[1], args[2]);
+	  }
+	  return func.apply(thisArg, args);
+	}
+
+	var _apply = apply;
+
+	/* Built-in method references for those with the same name as other `lodash` methods. */
+	var nativeMax = Math.max;
+
+	/**
+	 * A specialized version of `baseRest` which transforms the rest array.
+	 *
+	 * @private
+	 * @param {Function} func The function to apply a rest parameter to.
+	 * @param {number} [start=func.length-1] The start position of the rest parameter.
+	 * @param {Function} transform The rest array transform.
+	 * @returns {Function} Returns the new function.
+	 */
+	function overRest(func, start, transform) {
+	  start = nativeMax(start === undefined ? (func.length - 1) : start, 0);
+	  return function() {
+	    var args = arguments,
+	        index = -1,
+	        length = nativeMax(args.length - start, 0),
+	        array = Array(length);
+
+	    while (++index < length) {
+	      array[index] = args[start + index];
+	    }
+	    index = -1;
+	    var otherArgs = Array(start + 1);
+	    while (++index < start) {
+	      otherArgs[index] = args[index];
+	    }
+	    otherArgs[start] = transform(array);
+	    return _apply(func, this, otherArgs);
+	  };
+	}
+
+	var _overRest = overRest;
+
+	/**
+	 * Creates a function that returns `value`.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 2.4.0
+	 * @category Util
+	 * @param {*} value The value to return from the new function.
+	 * @returns {Function} Returns the new constant function.
+	 * @example
+	 *
+	 * var objects = _.times(2, _.constant({ 'a': 1 }));
+	 *
+	 * console.log(objects);
+	 * // => [{ 'a': 1 }, { 'a': 1 }]
+	 *
+	 * console.log(objects[0] === objects[1]);
+	 * // => true
+	 */
+	function constant(value) {
+	  return function() {
+	    return value;
+	  };
+	}
+
+	var constant_1 = constant;
+
+	/**
+	 * This method returns the first argument it receives.
+	 *
+	 * @static
+	 * @since 0.1.0
+	 * @memberOf _
+	 * @category Util
+	 * @param {*} value Any value.
+	 * @returns {*} Returns `value`.
+	 * @example
+	 *
+	 * var object = { 'a': 1 };
+	 *
+	 * console.log(_.identity(object) === object);
+	 * // => true
+	 */
+	function identity$1(value) {
+	  return value;
+	}
+
+	var identity_1 = identity$1;
+
+	/**
+	 * The base implementation of `setToString` without support for hot loop shorting.
+	 *
+	 * @private
+	 * @param {Function} func The function to modify.
+	 * @param {Function} string The `toString` result.
+	 * @returns {Function} Returns `func`.
+	 */
+	var baseSetToString = !_defineProperty$4 ? identity_1 : function(func, string) {
+	  return _defineProperty$4(func, 'toString', {
+	    'configurable': true,
+	    'enumerable': false,
+	    'value': constant_1(string),
+	    'writable': true
+	  });
+	};
+
+	var _baseSetToString = baseSetToString;
+
+	/** Used to detect hot functions by number of calls within a span of milliseconds. */
+	var HOT_COUNT = 800,
+	    HOT_SPAN = 16;
+
+	/* Built-in method references for those with the same name as other `lodash` methods. */
+	var nativeNow = Date.now;
+
+	/**
+	 * Creates a function that'll short out and invoke `identity` instead
+	 * of `func` when it's called `HOT_COUNT` or more times in `HOT_SPAN`
+	 * milliseconds.
+	 *
+	 * @private
+	 * @param {Function} func The function to restrict.
+	 * @returns {Function} Returns the new shortable function.
+	 */
+	function shortOut(func) {
+	  var count = 0,
+	      lastCalled = 0;
+
+	  return function() {
+	    var stamp = nativeNow(),
+	        remaining = HOT_SPAN - (stamp - lastCalled);
+
+	    lastCalled = stamp;
+	    if (remaining > 0) {
+	      if (++count >= HOT_COUNT) {
+	        return arguments[0];
+	      }
+	    } else {
+	      count = 0;
+	    }
+	    return func.apply(undefined, arguments);
+	  };
+	}
+
+	var _shortOut = shortOut;
+
+	/**
+	 * Sets the `toString` method of `func` to return `string`.
+	 *
+	 * @private
+	 * @param {Function} func The function to modify.
+	 * @param {Function} string The `toString` result.
+	 * @returns {Function} Returns `func`.
+	 */
+	var setToString = _shortOut(_baseSetToString);
+
+	var _setToString = setToString;
+
+	/**
+	 * A specialized version of `baseRest` which flattens the rest array.
+	 *
+	 * @private
+	 * @param {Function} func The function to apply a rest parameter to.
+	 * @returns {Function} Returns the new function.
+	 */
+	function flatRest(func) {
+	  return _setToString(_overRest(func, undefined, flatten_1), func + '');
+	}
+
+	var _flatRest = flatRest;
+
+	/**
+	 * Creates an object composed of the picked `object` properties.
+	 *
+	 * @static
+	 * @since 0.1.0
+	 * @memberOf _
+	 * @category Object
+	 * @param {Object} object The source object.
+	 * @param {...(string|string[])} [paths] The property paths to pick.
+	 * @returns {Object} Returns the new object.
+	 * @example
+	 *
+	 * var object = { 'a': 1, 'b': '2', 'c': 3 };
+	 *
+	 * _.pick(object, ['a', 'c']);
+	 * // => { 'a': 1, 'c': 3 }
+	 */
+	var pick = _flatRest(function(object, paths) {
+	  return object == null ? {} : _basePick(object, paths);
+	});
+
+	var pick_1 = pick;
+
+	//      
 	/**
 	 * Device command to be sent
 	 * @param  {string} hubId
 	 * @param  {string} deviceId
 	 * @param  {Object} state
+	 * @param  {Array<string>} properties - optional properties
 	 * @return {Promise}
 	 */
 
-	function sendDeviceCmd(hubId, deviceId, state) {
+	function sendDeviceCmd(hubId, deviceId, state, properties) {
 	  return new Promise((resolve, reject) => {
 	    const stateNow = store.getState();
 	    const user = userState.selectors.getUser(stateNow);
 
 	    if (!user || !user.authKey) {
-	      reject(new Error("Device command error: No userKey!"));
+	      reject(new Error('Device command error: No userKey!'));
 	      return;
 	    }
 
 	    const hubs = hubsState.selectors.getHubs(stateNow);
 
 	    if (!hubs[hubId] || !hubs[hubId].hubKey) {
-	      reject(new Error("Device command error: No hubKey!"));
+	      reject(new Error('Device command error: No hubKey!'));
 	      return;
 	    }
 
-	    const authKey = user.authKey;
-	    const hubKey = hubs[hubId].hubKey;
+	    const {
+	      authKey
+	    } = user;
+	    const {
+	      hubKey
+	    } = hubs[hubId];
+	    let sendState = state;
+
+	    if (!isEmpty_1(properties)) {
+	      sendState = pick_1(sendState, properties);
+	    }
+
 	    send({
 	      command: COMMANDS.CMD_DEVICE,
-	      authKey: authKey,
-	      hubKey: hubKey,
+	      authKey,
+	      hubId,
+	      hubKey,
 	      data: [{
 	        id: deviceId,
-	        state: state
+	        state: sendState
 	      }]
 	    }).then(response => {
+	      console.debug('sendDeviceCmd ok', response);
 	      resolve(response);
 	    }).catch(error => {
-	      //console.error(error);
-	      reject(new Error("Device command error: send failed"));
+	      console.error(error);
+	      reject(new Error('Device command error!'));
 	    });
 	  });
 	}

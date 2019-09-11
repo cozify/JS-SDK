@@ -1,60 +1,64 @@
 // 
 
 /**
+ * Helper to check if run environment is Node
+ * @type {Boolean}
+ */
+let isNodeInUse = false;
+
+if (typeof process === 'object') {
+  if (typeof process.versions === 'object') {
+    if (typeof process.versions.node !== 'undefined') {
+      isNodeInUse = true;
+      console.log('Running in node.js');
+    } else {
+      console.log('Running in browser');
+    }
+  }
+}
+
+export const isNode = isNodeInUse;
+
+/**
  * Helper method to Base64 decode
  * @param  {string} encoded - string to be decoded
  * @return {string}  - decoded string
  */
 export function urlBase64Decode(encoded) {
-  let str = encoded.replace(/-/g, "+").replace(/_/g, "/");
+  const str = encoded.replace(/-/g, '+').replace(/_/g, '/');
   let output = str;
   switch (output.length % 4) {
-      case 0:
-      case 2:
-          output += "==";
-          break;
-      case 3:
-          output += "=";
-          break;
-      default:
-          throw "Illegal base64url string!"
+    case 0:
+    case 2:
+      output += '==';
+      break;
+    case 3:
+      output += '=';
+      break;
+    default:
+      throw new Error('Illegal base64url string!');
   }
-  var retVal = "";
+  let retVal = '';
 
-  let atob = function(a) {};
-  if(!isNode){
-    atob  = window.atob;
+  let atob = (a) => { console.error('Invalid atob for string ', a); return 'invalid atob'; };
+  if (!isNodeInUse) {
+    atob = window.atob;
   } else {
-    atob = function(a) {
-      return new Buffer(a, 'base64').toString('binary');
+    const nodeAtob = (a) => {
+      const binVal = Buffer.from(a, 'base64').toString('binary');
+      return binVal;
     };
+    atob = nodeAtob;
   }
 
   try {
-        retVal = atob(str);
-  } catch(error){
-      try {
-        retVal = atob(output);
-      } catch(error){
-        console.error( "urlBase64Decode: trying atob failed");
-      }
-  }
-  return retVal
-
-}
-
-/**
- * Helper to check if run environment is Node
- * @type {Boolean}
- */
-export let isNode = false;
-if (typeof process === 'object') {
-  if (typeof process.versions === 'object') {
-    if (typeof process.versions.node !== 'undefined') {
-      isNode = true;
-      console.log("Running in node.js");
-    } else {
-      console.log("Running in browser");
+    retVal = atob(str);
+  } catch (error) {
+    try {
+      retVal = atob(output);
+    } catch (error2) {
+      console.error('urlBase64Decode: trying atob failed');
     }
   }
+  return retVal;
 }

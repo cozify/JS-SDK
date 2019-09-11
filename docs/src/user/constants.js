@@ -44,5 +44,3 @@ export const ROLES = Object.freeze({
   GUEST: 2,
   ANONYMOUS: 1,
 });
-
-

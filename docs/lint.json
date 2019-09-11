@@ -1,1 +1,34 @@
-[]
+[
+  {
+    "name": "setHubConnectionState",
+    "filePath": "src/connection/state.js",
+    "lines": [
+      {
+        "lineNumber": 25,
+        "line": "/**"
+      },
+      {
+        "lineNumber": 26,
+        "line": " * Change hub connection state"
+      },
+      {
+        "lineNumber": 27,
+        "line": " * @param {{hubId: string, state: HUB_CONNECTION_STATE_TYPE}} hubAndState - hubId and new state"
+      },
+      {
+        "lineNumber": 28,
+        "line": " */"
+      },
+      {
+        "lineNumber": 29,
+        "line": "export function setHubConnectionState(paramHubAndState) {"
+      }
+    ],
+    "codeParams": [
+      "paramHubAndState"
+    ],
+    "docParams": [
+      "hubAndState"
+    ]
+  }
+]

@@ -33,8 +33,10 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-urlBase64Decode">urlBase64Decode</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-store">store</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-isNode">isNode</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#connection">connection</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-retryCondition">retryCondition</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#connection">connection</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-resetRetry">resetRetry</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-retryCondition">retryCondition</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-cloudErrorState">cloudErrorState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getAPIversion">getAPIversion</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hubErrorState">hubErrorState</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-testSSLCertificate">testSSLCertificate</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-send">send</a></span></span></li>
@@ -47,6 +49,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_FINGERPRINTS_SHA1">CLOUD_FINGERPRINTS_SHA1</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_HOST">CLOUD_HOST</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_URL">CLOUD_URL</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-MAX_API_VERSION">MAX_API_VERSION</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-CLOUD_CONNECTION_STATE_TYPE">CLOUD_CONNECTION_STATE_TYPE</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-COMMANDS_TYPE">COMMANDS_TYPE</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-COMMANDS_TYPE">COMMANDS_TYPE</a></span></span></li>
@@ -67,6 +70,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-POLL_INTERVAL_MS">POLL_INTERVAL_MS</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#reducers">reducers</a><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-connectionsState">connectionsState</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setCloudConnectionState">setCloudConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-devicesReducer">devicesReducer</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-devicesState">devicesState</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setDevices">setDevices</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-hubsReducer">hubsReducer</a></span></span></li>
@@ -190,7 +194,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_URL">CLOUD_URL</a></span></span><span class="code" data-ice="signature">: <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_URL">CLOUD_URL</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></span>
         </p>
       </div>
       <div>
@@ -362,6 +366,34 @@ NONE, EN_UK or FI_FI</p>
           
           
           
+          <span class="code" data-ice="name"><span><a href="variable/index.html#static-variable-MAX_API_VERSION">MAX_API_VERSION</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
           <span class="code" data-ice="name"><span><a href="variable/index.html#static-variable-POLL_INTERVAL_MS">POLL_INTERVAL_MS</a></span></span><span class="code" data-ice="signature">: <span>*</span></span>
         </p>
       </div>
@@ -512,6 +544,34 @@ WAITING_LANGUAGE, LANGUAGE_SET, WAITING_LOGIN, LOGIN_DONE, WAITING_EULA, EULA_AC
           
           
           
+          <span class="code" data-ice="name"><span><a href="variable/index.html#static-variable-devicesReducer">devicesReducer</a></span></span><span class="code" data-ice="signature">: <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
           <span class="code" data-ice="name"><span><a href="variable/index.html#static-variable-devicesState">devicesState</a></span></span><span class="code" data-ice="signature">: <span> {
   slice : string,
   reducer : ReducerFunction,
@@ -608,14 +668,13 @@ WAITING_LANGUAGE, LANGUAGE_SET, WAITING_LOGIN, LOGIN_DONE, WAITING_EULA, EULA_AC
           
           
           
-          <span class="code" data-ice="name"><span><a href="variable/index.html#static-variable-isNode">isNode</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></span></span>
+          <span class="code" data-ice="name"><span><a href="variable/index.html#static-variable-isNode">isNode</a></span></span><span class="code" data-ice="signature">: <span>*</span></span>
         </p>
       </div>
       <div>
         
         
-        <div data-ice="description"><p>Helper to check if run environment is Node</p>
-</div>
+        
       </div>
     </td>
     <td>
@@ -844,11 +903,11 @@ WAITING_LANGUAGE, LANGUAGE_SET, WAITING_LOGIN, LOGIN_DONE, WAITING_EULA, EULA_AC
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/connection/constants.js.html#lineNumber16">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/connection/constants.js.html#lineNumber19">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {CLOUD_API_VERSION} from &apos;<span><a href="file/src/connection/constants.js.html#lineNumber16">cozify-sdk/src/connection/constants.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {CLOUD_API_VERSION} from &apos;<span><a href="file/src/connection/constants.js.html#lineNumber19">cozify-sdk/src/connection/constants.js</a></span>&apos;</code></pre></div>
   
   
   
@@ -930,11 +989,11 @@ WAITING_LANGUAGE, LANGUAGE_SET, WAITING_LOGIN, LOGIN_DONE, WAITING_EULA, EULA_AC
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/connection/constants.js.html#lineNumber14">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/connection/constants.js.html#lineNumber17">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {CLOUD_HOST} from &apos;<span><a href="file/src/connection/constants.js.html#lineNumber14">cozify-sdk/src/connection/constants.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {CLOUD_HOST} from &apos;<span><a href="file/src/connection/constants.js.html#lineNumber17">cozify-sdk/src/connection/constants.js</a></span>&apos;</code></pre></div>
   
   
   
@@ -969,15 +1028,15 @@ WAITING_LANGUAGE, LANGUAGE_SET, WAITING_LOGIN, LOGIN_DONE, WAITING_EULA, EULA_AC
     
     
     
-    <span class="code" data-ice="name">CLOUD_URL</span><span class="code" data-ice="signature">: <span>*</span></span>
+    <span class="code" data-ice="name">CLOUD_URL</span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/connection/constants.js.html#lineNumber18">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/connection/constants.js.html#lineNumber21">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {CLOUD_URL} from &apos;<span><a href="file/src/connection/constants.js.html#lineNumber18">cozify-sdk/src/connection/constants.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {CLOUD_URL} from &apos;<span><a href="file/src/connection/constants.js.html#lineNumber21">cozify-sdk/src/connection/constants.js</a></span>&apos;</code></pre></div>
   
   
   
@@ -1224,6 +1283,49 @@ NONE, EN_UK or FI_FI</p>
   
 </div>
 <div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="static-variable-MAX_API_VERSION">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    
+    <span class="code" data-ice="name">MAX_API_VERSION</span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/connection/constants.js.html#lineNumber23">source</a></span></span>
+    </span>
+  </h3>
+
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {MAX_API_VERSION} from &apos;<span><a href="file/src/connection/constants.js.html#lineNumber23">cozify-sdk/src/connection/constants.js</a></span>&apos;</code></pre></div>
+  
+  
+  
+
+  
+
+  <div data-ice="properties">
+</div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
   <h3 data-ice="anchor" id="static-variable-POLL_INTERVAL_MS">
     <span class="access" data-ice="access">public</span>
     
@@ -1368,11 +1470,11 @@ WAITING_LANGUAGE, LANGUAGE_SET, WAITING_LOGIN, LOGIN_DONE, WAITING_EULA, EULA_AC
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/reducers/user.js.html#lineNumber133">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/reducers/user.js.html#lineNumber137">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {changeState} from &apos;<span><a href="file/src/reducers/user.js.html#lineNumber133">cozify-sdk/src/reducers/user.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {changeState} from &apos;<span><a href="file/src/reducers/user.js.html#lineNumber137">cozify-sdk/src/reducers/user.js</a></span>&apos;</code></pre></div>
   
   
   
@@ -1466,6 +1568,49 @@ WAITING_LANGUAGE, LANGUAGE_SET, WAITING_LOGIN, LOGIN_DONE, WAITING_EULA, EULA_AC
   
 </div>
 <div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="static-variable-devicesReducer">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    
+    <span class="code" data-ice="name">devicesReducer</span><span class="code" data-ice="signature">: <span>*</span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/reducers/devices.js.html#lineNumber70">source</a></span></span>
+    </span>
+  </h3>
+
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {devicesReducer} from &apos;<span><a href="file/src/reducers/devices.js.html#lineNumber70">cozify-sdk/src/reducers/devices.js</a></span>&apos;</code></pre></div>
+  
+  
+  
+
+  
+
+  <div data-ice="properties">
+</div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
   <h3 data-ice="anchor" id="static-variable-devicesState">
     <span class="access" data-ice="access">public</span>
     
@@ -1543,11 +1688,11 @@ WAITING_LANGUAGE, LANGUAGE_SET, WAITING_LOGIN, LOGIN_DONE, WAITING_EULA, EULA_AC
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/reducers/hubs.js.html#lineNumber79">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/reducers/hubs.js.html#lineNumber89">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {hubsReducer} from &apos;<span><a href="file/src/reducers/hubs.js.html#lineNumber79">cozify-sdk/src/reducers/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {hubsReducer} from &apos;<span><a href="file/src/reducers/hubs.js.html#lineNumber89">cozify-sdk/src/reducers/hubs.js</a></span>&apos;</code></pre></div>
   
   
   
@@ -1648,19 +1793,18 @@ WAITING_LANGUAGE, LANGUAGE_SET, WAITING_LOGIN, LOGIN_DONE, WAITING_EULA, EULA_AC
     
     
     
-    <span class="code" data-ice="name">isNode</span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></span></span>
+    <span class="code" data-ice="name">isNode</span><span class="code" data-ice="signature">: <span>*</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/utils.js.html#lineNumber50">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/utils.js.html#lineNumber20">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {isNode} from &apos;<span><a href="file/src/utils.js.html#lineNumber50">cozify-sdk/src/utils.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {isNode} from &apos;<span><a href="file/src/utils.js.html#lineNumber20">cozify-sdk/src/utils.js</a></span>&apos;</code></pre></div>
   
   
-  <div data-ice="description"><p>Helper to check if run environment is Node</p>
-</div>
+  
 
   
 
@@ -1700,7 +1844,7 @@ WAITING_LANGUAGE, LANGUAGE_SET, WAITING_LOGIN, LOGIN_DONE, WAITING_EULA, EULA_AC
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {rootReducer} from &apos;<span><a href="file/src/reducers/index.js.html#lineNumber10">cozify-sdk/src/reducers/index.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import rootReducer from &apos;<span><a href="file/src/reducers/index.js.html#lineNumber10">cozify-sdk/src/reducers/index.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Root reducer</p>
@@ -1740,11 +1884,11 @@ WAITING_LANGUAGE, LANGUAGE_SET, WAITING_LOGIN, LOGIN_DONE, WAITING_EULA, EULA_AC
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/reducers/connections.js.html#lineNumber54">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/reducers/connections.js.html#lineNumber55">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {setCloudConnectionState} from &apos;<span><a href="file/src/reducers/connections.js.html#lineNumber54">cozify-sdk/src/reducers/connections.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {setCloudConnectionState} from &apos;<span><a href="file/src/reducers/connections.js.html#lineNumber55">cozify-sdk/src/reducers/connections.js</a></span>&apos;</code></pre></div>
   
   
   
@@ -1783,11 +1927,11 @@ WAITING_LANGUAGE, LANGUAGE_SET, WAITING_LOGIN, LOGIN_DONE, WAITING_EULA, EULA_AC
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/reducers/devices.js.html#lineNumber78">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/reducers/devices.js.html#lineNumber83">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {setDevices} from &apos;<span><a href="file/src/reducers/devices.js.html#lineNumber78">cozify-sdk/src/reducers/devices.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {setDevices} from &apos;<span><a href="file/src/reducers/devices.js.html#lineNumber83">cozify-sdk/src/reducers/devices.js</a></span>&apos;</code></pre></div>
   
   
   
@@ -1870,11 +2014,11 @@ WAITING_LANGUAGE, LANGUAGE_SET, WAITING_LOGIN, LOGIN_DONE, WAITING_EULA, EULA_AC
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/reducers/hubs.js.html#lineNumber92">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/reducers/hubs.js.html#lineNumber102">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {updateHubs} from &apos;<span><a href="file/src/reducers/hubs.js.html#lineNumber92">cozify-sdk/src/reducers/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {updateHubs} from &apos;<span><a href="file/src/reducers/hubs.js.html#lineNumber102">cozify-sdk/src/reducers/hubs.js</a></span>&apos;</code></pre></div>
   
   
   
@@ -1913,11 +2057,11 @@ WAITING_LANGUAGE, LANGUAGE_SET, WAITING_LOGIN, LOGIN_DONE, WAITING_EULA, EULA_AC
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/reducers/user.js.html#lineNumber123">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/reducers/user.js.html#lineNumber127">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {userReducer} from &apos;<span><a href="file/src/reducers/user.js.html#lineNumber123">cozify-sdk/src/reducers/user.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {userReducer} from &apos;<span><a href="file/src/reducers/user.js.html#lineNumber127">cozify-sdk/src/reducers/user.js</a></span>&apos;</code></pre></div>
   
   
   
