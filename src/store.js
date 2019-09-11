@@ -1,34 +1,34 @@
 
-import { configureStore, getDefaultMiddleware } from 'redux-starter-kit';
-import {rootReducer} from './reducers';
+import { configureStore } from 'redux-starter-kit';
+import get from 'get-value';
+import rootReducer from './reducers';
 
-import get from 'get-value'
 
 /**
  * store as a redux state store
  * @type {Object}
  */
 export const store = configureStore({
-  reducer: rootReducer
-  //middleware: [...getDefaultMiddleware(), logger]
+  reducer: rootReducer,
+  // middleware: [...getDefaultMiddleware(), logger]
   // default true like: devTools: process.env.NODE_ENV !== 'production'
-  //preloadedState
-  //enhancers: [reduxBatch]
+  // preloadedState
+  // enhancers: [reduxBatch]
 });
-console.log("Store Initial State: ", store.getState())
+console.log('Store Initial State: ', store.getState());
 
 function watchState (getState, objectPath) {
-  var currentValue = get(getState(), objectPath)
+  let currentValue = get(getState(), objectPath);
   return function w (fn) {
-    return function () {
-      var newValue = get(getState(), objectPath)
+    return () => {
+      const newValue = get(getState(), objectPath);
       if (currentValue !== newValue) {
-        var oldValue = currentValue
-        currentValue = newValue
-        fn(newValue, oldValue)
+        const oldValue = currentValue;
+        currentValue = newValue;
+        fn(newValue, oldValue);
       }
-    }
-  }
+    };
+  };
 }
 
 /**
@@ -38,8 +38,7 @@ function watchState (getState, objectPath) {
  * @param  {Object} optionalStore - optional store for unit tests etc.
  */
 export function watchChanges(path, changed, optionalStore) {
-    let selectedStore = optionalStore ? optionalStore : store
-    let watchFn = watchState(selectedStore.getState, path);
-    selectedStore.subscribe(watchFn(changed));
+  const selectedStore = optionalStore || store;
+  const watchFn = watchState(selectedStore.getState, path);
+  selectedStore.subscribe(watchFn(changed));
 }
-

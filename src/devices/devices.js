@@ -1,10 +1,32 @@
-//@flow
+// @flow
+import { store } from '../store';
+import { devicesState } from '../reducers/devices';
 
-import { ROLES } from '../user/constants'
-import { store } from '../store'
-import { devicesState, devicesReducer } from '../reducers/devices'
+import type { DEVICES_MAP_TYPE, HUB_DEVICES_MAP_TYPE } from './constants';
 
-import type {DEVICE_TYPE, DEVICES_MAP_TYPE, HUB_DEVICES_MAP_TYPE} from './constants'
+
+/**
+ * Get devices of all selected hubs
+ * @return {HUB_DEVICES_MAP_TYPE}
+ */
+export function getDevices(): HUB_DEVICES_MAP_TYPE {
+  const stateNow = store.getState();
+  return devicesState.selectors.getDevices(stateNow);
+}
+
+/**
+ * Get devices of given hub
+ * @param  {string} hubId
+ * @return {DEVICES_MAP_TYPE}
+ */
+export function getHubDevices(hubId: string): ?DEVICES_MAP_TYPE {
+  let retVal: ?DEVICES_MAP_TYPE;
+  const devices: HUB_DEVICES_MAP_TYPE = getDevices();
+  if (devices && devices[hubId]) {
+    retVal = devices[hubId];
+  }
+  return retVal;
+}
 
 /**
  * Device handler for poll delta results
@@ -13,8 +35,8 @@ import type {DEVICE_TYPE, DEVICES_MAP_TYPE, HUB_DEVICES_MAP_TYPE} from './consta
  * @param  {Object} devices
  */
 export function deviceDeltaHandler(hubId: string, reset: boolean, devices: Object) {
-  let oldHubDevices: DEVICES_MAP_TYPE = {}
-  const storedDevices: HUB_DEVICES_MAP_TYPE = getDevices()
+  let oldHubDevices: DEVICES_MAP_TYPE = {};
+  const storedDevices: HUB_DEVICES_MAP_TYPE = getDevices();
   if (storedDevices && storedDevices[hubId]) {
     oldHubDevices = storedDevices[hubId];
   }
@@ -22,16 +44,16 @@ export function deviceDeltaHandler(hubId: string, reset: boolean, devices: Objec
   if (reset) {
     // If reset then set  devices as they are received
     const stateDevices = {
-      hubId: hubId,
-      devices: devices
+      hubId,
+      devices,
     };
     store.dispatch(devicesState.actions.setDevices(stateDevices));
   } else {
     // Loop devices to check could it be added or should be removed
     Object.entries(devices).forEach(([key, device]) => {
       const stateDevice = {
-        hubId: hubId,
-        device: device
+        hubId,
+        device,
       };
       if (key && device) {
         store.dispatch(devicesState.actions.setDevice(stateDevice));
@@ -41,27 +63,3 @@ export function deviceDeltaHandler(hubId: string, reset: boolean, devices: Objec
     });
   }
 }
-
-/**
- * Get devices of given hub
- * @param  {string} hubId
- * @return {DEVICES_MAP_TYPE}
- */
-export function getHubDevices(hubId: string): ?DEVICES_MAP_TYPE {
-  let retVal: ?DEVICES_MAP_TYPE  = undefined;
-  const devices: HUB_DEVICES_MAP_TYPE = getDevices();
-  if (devices && devices[hubId]) {
-    retVal = devices[hubId];
-  }
-  return retVal;
-}
-
-/**
- * Get devices of all selected hubs
- * @return {HUB_DEVICES_MAP_TYPE}
- */
-export function getDevices(): HUB_DEVICES_MAP_TYPE {
-  const stateNow = store.getState();
-  return devicesState.selectors.getDevices(stateNow)
-}
-

@@ -1,37 +1,75 @@
 // @flow
 
-import { CLOUD_CONNECTION_STATES, HUB_CONNECTION_STATES, CLOUD_FINGERPRINTS_SHA1, CLOUD_HOST } from './constants'
-import { isNode } from '../utils.js'
+import {
+  CLOUD_CONNECTION_STATES, HUB_CONNECTION_STATES, CLOUD_FINGERPRINTS_SHA1, CLOUD_HOST,
+} from './constants';
+import { isNode } from '../utils';
 
-import type { CLOUD_CONNECTION_STATE_TYPE, HUB_CONNECTION_STATE_TYPE } from './constants'
+import type { CLOUD_CONNECTION_STATE_TYPE, HUB_CONNECTION_STATE_TYPE } from './constants';
 
-const SSL_CHECK_INTERVALL = 1000 * 60  * 60 //One hour
+const SSL_CHECK_INTERVALL = 1000 * 60 * 60; // One hour
 
+/*
+ * Returns > 0 if v1 > v2 and < 0 if v1 < v2 and 0 if v1 == v2
+ */
+function compareVersions(v1: string, v2: string): number {
+  const v1Parts = v1.split('.');
+  const v2Parts = v2.split('.');
+  const minLength = Math.min(v1Parts.length, v2Parts.length);
+  if (minLength > 0) {
+    for (let idx = 0; idx < minLength - 1; idx += 1) {
+      const diff = Number(v1Parts[idx]) - Number(v2Parts[idx]);
+      if (diff !== 0) {
+        return diff;
+      }
+    }
+  }
+  return v1Parts.length - v2Parts.length;
+}
 
- /*
+/*
+ * Get API version, or given MAX version, from given hubVersion string
+ * e.g. 1.12.0.5
+ */
+export function getAPIversion(hubVersion: string, maxVersion: string): string {
+  let retVal = '0.0';
+  const majorEnd = hubVersion.indexOf('.');
+  let minorEnd = -1;
+  if (majorEnd !== -1) {
+    minorEnd = hubVersion.indexOf('.', majorEnd + 1);
+  }
+  if (minorEnd !== -1) {
+    retVal = hubVersion.substring(0, minorEnd);
+  }
+  if (compareVersions(retVal, maxVersion) > 0) {
+    retVal = maxVersion;
+  }
+  return retVal;
+}
+/*
  * Return cloud connection state based on error
  */
 export function cloudErrorState(error: Object) {
-  let retVal: CLOUD_CONNECTION_STATE_TYPE = CLOUD_CONNECTION_STATES.UNCONNECTED
+  let retVal: CLOUD_CONNECTION_STATE_TYPE = CLOUD_CONNECTION_STATES.UNCONNECTED;
   if (error && error.response && error.response.status === 401) {
     // 401 Authentication information missing or expired.
-    retVal = CLOUD_CONNECTION_STATES.UNAUTHENTICATED
-    console.error("send: authentication error ", error);
+    retVal = CLOUD_CONNECTION_STATES.UNAUTHENTICATED;
+    console.error('send: authentication error ', error);
   } else if (error && error.response && error.response.status === 403) {
     // 402 Late payment - > no remote access
-    retVal = CLOUD_CONNECTION_STATES.LATE_PAYMENT
-    console.error("send: unauhorized error ", error);
+    retVal = CLOUD_CONNECTION_STATES.LATE_PAYMENT;
+    console.error('send: unauhorized error ', error);
   } else if (error && error.response && error.response.status === 403) {
     // 403 Unauthorized
-    retVal = CLOUD_CONNECTION_STATES.UNAUTHORIZED
-    console.error("send: unauhorized error ", error);
+    retVal = CLOUD_CONNECTION_STATES.UNAUTHORIZED;
+    console.error('send: unauhorized error ', error);
   } else if (error && error.response && error.response.status === 410) {
     // 410 Version problem
-    retVal = CLOUD_CONNECTION_STATES.OBSOLETE_API_VERSION
-    console.error("send: version error ", error);
+    retVal = CLOUD_CONNECTION_STATES.OBSOLETE_API_VERSION;
+    console.error('send: version error ', error);
   }
 
-  return retVal
+  return retVal;
 }
 
 
@@ -41,82 +79,74 @@ export function cloudErrorState(error: Object) {
  * @return {string} hub's connectionState
  */
 export function hubErrorState(error: Object) {
-  let retVal: HUB_CONNECTION_STATE_TYPE = HUB_CONNECTION_STATES.UNCONNECTED
+  let retVal: HUB_CONNECTION_STATE_TYPE = HUB_CONNECTION_STATES.UNCONNECTED;
   if (error && error.response && error.response.status === 400) {
     // no connection to offline hub
-    console.log("send: no-connection error ", error);
+    console.log('send: no-connection error ', error);
   } else if (error && error.response && error.response.status === 401) {
     // 401 Authentication information missing or expired.
-    retVal = HUB_CONNECTION_STATES.UNAUTHENTICATED
-    console.error("send: authentication error ", error);
+    retVal = HUB_CONNECTION_STATES.UNAUTHENTICATED;
+    console.error('send: authentication error ', error);
   } else if (error && error.response && error.response.status === 403) {
     // 403 Unauthorized
-    retVal = HUB_CONNECTION_STATES.UNAUTHORIZED
-    console.error("send: unauhorized error ", error);
+    retVal = HUB_CONNECTION_STATES.UNAUTHORIZED;
+    console.error('send: unauhorized error ', error);
   } else if (error && error.response && error.response.status === 410) {
     // 410 Version problem
-    retVal = HUB_CONNECTION_STATES.OBSOLETE_API_VERSION
-    console.error("send: version error ", error);
+    retVal = HUB_CONNECTION_STATES.OBSOLETE_API_VERSION;
+    console.error('send: version error ', error);
   }
 
-  return retVal
+  return retVal;
 }
 
 
-let _ongoingSSLCertificateCheck: boolean = false;
-let _lastSSLCertificateCheckTime: ?number = null;
+let ongoingSSLCertificateCheck: boolean = false;
+let lastSSLCertificateCheckTime: ?number = null;
 
 /*
  * Palceholder function for certificate checker
  * @return {Promise}
  */
 export function testSSLCertificate(remoteConnection: boolean): Promise<boolean> {
-  return new Promise( (resolve, reject) => {
-
-    if(!remoteConnection) {
+  return new Promise((resolve) => {
+    if (!remoteConnection) {
       // All requests are now complete
       resolve(true);
       return;
     }
 
-    let now = new Date().getTime()
-    if (!_ongoingSSLCertificateCheck && ( !_lastSSLCertificateCheckTime || (now - _lastSSLCertificateCheckTime  >  SSL_CHECK_INTERVALL ) ) ){
-      _ongoingSSLCertificateCheck = true
-      _lastSSLCertificateCheckTime = now
+    const now = new Date().getTime();
+    if (!ongoingSSLCertificateCheck && (!lastSSLCertificateCheckTime || (now - lastSSLCertificateCheckTime > SSL_CHECK_INTERVALL))) {
+      ongoingSSLCertificateCheck = true;
+      lastSSLCertificateCheckTime = now;
 
       // Cordova plugin?
       if (!isNode && window && window.plugins && window.plugins.sslCertificateChecker) {
-          window.plugins.sslCertificateChecker.check(
-              (successMsg) => {
-                  _ongoingSSLCertificateCheck = false;
-                  resolve(true);
-              }
-              ,(errorMsg) => {
-                  if (errorMsg === "CONNECTION_NOT_SECURE") {
-                    _ongoingSSLCertificateCheck = false
-                    resolve(false);
-                  }
-                  else{
-                    _ongoingSSLCertificateCheck = false
-                    _lastSSLCertificateCheckTime = undefined
-                    resolve(true);
-                  }
-              }
-              , CLOUD_HOST
-              , CLOUD_FINGERPRINTS_SHA1
-          )
+        window.plugins.sslCertificateChecker.check(
+          () => {
+            ongoingSSLCertificateCheck = false;
+            resolve(true);
+          },
+          (errorMsg) => {
+            if (errorMsg === 'CONNECTION_NOT_SECURE') {
+              ongoingSSLCertificateCheck = false;
+              resolve(false);
+            } else {
+              ongoingSSLCertificateCheck = false;
+              lastSSLCertificateCheckTime = undefined;
+              resolve(true);
+            }
+          },
+          CLOUD_HOST,
+          CLOUD_FINGERPRINTS_SHA1,
+        );
       } else {
-          setTimeout(function() {_ongoingSSLCertificateCheck = false}, SSL_CHECK_INTERVALL);
-          resolve(true);
+        setTimeout(() => { ongoingSSLCertificateCheck = false; }, SSL_CHECK_INTERVALL);
+        resolve(true);
       }
     } else {
       resolve(true);
     }
-
   });
-
 }
-
-
-
-

@@ -1,7 +1,7 @@
 // @flow
 
 // This actionreducer uses internally https://github.com/mweststrate/immer, so it's safe to modify given state directly
-import { createSlice } from 'redux-starter-kit'
+import { createSlice } from 'redux-starter-kit';
 
 /**
  * Devices action creators object
@@ -23,13 +23,17 @@ export const devicesState = createSlice({
      * @param {Object} action
      */
     setDevices(state, action) {
-      const hubId = action.payload.hubId;
-      const devices = action.payload.devices;
-      const hubDevices = {}
-      for (const [id, device] of Object.entries(devices)) {
-        hubDevices[id] = {...device};
-      }
-      state[hubId] = {...hubDevices};
+      const stateToSet = state;
+      const { hubId } = action.payload;
+      const { devices } = action.payload;
+      const hubDevices = {};
+
+
+      Object.entries(devices).forEach((entry) => {
+        const [id, device] = entry;
+        hubDevices[id] = { ...device };
+      });
+      stateToSet[hubId] = { ...hubDevices };
     },
 
     /*
@@ -38,10 +42,11 @@ export const devicesState = createSlice({
      * @param {payload:{Object{hubId:string, device:Object}}} action
      */
     setDevice(state, action) {
-      const hubId = action.payload.hubId;
-      const device = action.payload.device;
-      if(state[hubId]) {
-        state[hubId][device.id] = {...device}
+      const stateToSet = state;
+      const { hubId } = action.payload;
+      const { device } = action.payload;
+      if (stateToSet[hubId]) {
+        stateToSet[hubId][device.id] = { ...device };
       }
     },
 
@@ -51,23 +56,23 @@ export const devicesState = createSlice({
      * @param {payload:{Object{hubId:string, device:Object}}} action
      */
     deleteDevice(state, action) {
-      const hubId = action.payload.hubId;
-      const device = action.payload.device;
-      if(state[hubId]) {
-        delete state[hubId][device.id]
+      const stateToSet = state;
+      const { hubId } = action.payload;
+      const { device } = action.payload;
+      if (stateToSet[hubId]) {
+        delete stateToSet[hubId][device.id];
       }
-    }
-  }
-})
+    },
+  },
+});
 
-const { actions, reducer } = devicesState
-
+const { actions, reducer } = devicesState;
+const devicesReducer = reducer;
 /**
  * Devices reducer
  * @type {function} reducer
  */
-export {reducer as devicesReducer}
-
+export { reducer as devicesReducer };
 
 
 // Extract and export each action creator by name
@@ -75,6 +80,4 @@ export {reducer as devicesReducer}
 console.log(addDevice({ id: 123, name: 'Unnamed device' }))
 {type : "devices/addDevice", payload : {id : 123, name: 'Unnamed device' }}
 */
-export const { setDevices, deleteDevice } = actions
-
-
+export const { setDevices, deleteDevice } = actions;

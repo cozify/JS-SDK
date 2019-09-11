@@ -1,15 +1,14 @@
 // @flow
-import isEmpty  from 'lodash/isEmpty';
-import isString  from 'lodash/isString';
+import isString from 'lodash/isString';
 
 
-import { send, COMMANDS } from '../connection/send.js'
-import { store } from "../store.js"
-import { userState, userReducer } from "../reducers/user";
+import { send, COMMANDS } from '../connection/send';
+import { store } from '../store';
+import { userState } from '../reducers/user';
 
-import { USER_STATES, ROLES, LANGUAGES } from './constants.js';
-import type { USER_STATE_TYPE, ROLES_TYPE } from './constants.js';
-import type { LANGUAGES_TYPE } from '../user/constants.js';
+import { USER_STATES, LANGUAGES } from './constants';
+import type { LANGUAGES_TYPE } from './constants';
+
 
 /*
  * Helper to get user
@@ -25,7 +24,7 @@ function storedUser() {
  * @type {LANGUAGES_TYPE}
  */
 export function changeLanguage(newLanguage: LANGUAGES_TYPE): boolean {
-  let retVel = false
+  let retVel = false;
   if (Object.values(LANGUAGES).indexOf(newLanguage) > -1) {
     store.dispatch(userState.actions.setLanguage(newLanguage));
     if (storedUser().state === USER_STATES.WAITING_LANGUAGE) {
@@ -40,7 +39,7 @@ export function changeLanguage(newLanguage: LANGUAGES_TYPE): boolean {
  * User action to accept EULA
  */
 export function acceptEula(): boolean {
-  let retVel = false
+  let retVel = false;
   store.dispatch(userState.actions.setEula(true));
   if (storedUser().state === USER_STATES.WAITING_EULA) {
     store.dispatch(userState.actions.changeState(USER_STATES.EULA_ACCEPTED));
@@ -56,8 +55,8 @@ export function acceptEula(): boolean {
  * @param {password} password  - fixed password
  */
 export function doPwLogin(email: string, password: string): Promise<Object> {
-  return new Promise( (resolve, reject) => {
-    send( {command: COMMANDS.USER_LOGIN,  data:{email:email, password:password} })
+  return new Promise((resolve, reject) => {
+    send({ command: COMMANDS.USER_LOGIN, data: { email, password } })
       .then((response) => {
         if (response && isString(response)) {
           store.dispatch(userState.actions.setAuthKey(response));
@@ -68,8 +67,8 @@ export function doPwLogin(email: string, password: string): Promise<Object> {
         resolve(response);
       })
       .catch((error) => {
-        //console.error(error);
-        reject(false)
+        console.debug('doPwLogin error', error);
+        reject(new Error('Login failure'));
       });
   });
 }
@@ -79,7 +78,5 @@ export function doPwLogin(email: string, password: string): Promise<Object> {
  * Get state of user state-machine
  */
 export function getUserState() {
-  return storedUser().state
+  return storedUser().state;
 }
-
-

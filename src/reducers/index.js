@@ -1,7 +1,7 @@
-import {connectionsReducer} from './connections';
-import {devicesReducer} from './devices';
-import {hubsReducer} from './hubs';
-import {userReducer} from './user';
+import { connectionsReducer } from './connections';
+import { devicesReducer } from './devices';
+import { hubsReducer } from './hubs';
+import { userReducer } from './user';
 
 /**
  * Root reducer
@@ -14,6 +14,4 @@ const rootReducer = {
   user: userReducer,
 };
 
-export {rootReducer}
-
-
+export default rootReducer;
