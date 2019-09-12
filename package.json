@@ -1,13 +1,13 @@
 {
   "name": "cozify-sdk",
-  "version": "1.0.4",
+  "version": "1.0.8",
   "description": "JavaScript SDK for Cozify REST API",
   "author": "tech-admin",
   "license": "MIT",
   "repository": "cozify/JS-SDK",
-  "module": "dist/index.es.js",
   "node": "dist/sdk-node.js",
-  "browser": "dist/sdk-browser.js",
+  "iife": "dist/sdk-browser.js",
+  "module": "dist/index.es.js",
   "jsnext:main": "dist/index.es.js",
   "engines": {
     "node": ">=8",

@@ -16,6 +16,18 @@ const isProduction = process.env.NODE_ENV === 'production';
 export default {
   input: 'src/index.js',
   output: [
+    // Existence of browser version causes problem to run es ersion in react-example, so remove them from dist before starting react-example
+    {
+      file: pkg.iife,
+      name: 'CozifySDK',
+      format: 'iife',
+      globals: {
+        'lodash/isEmpty': 'isEmpty',
+        'axios': 'axios',
+        'retry-axios': 'retry-axios'
+      },
+      sourcemap: true
+    },
     {
       file: pkg.node,
       format: 'cjs',
@@ -26,18 +38,6 @@ export default {
       format: 'es',
       sourcemap: true
     },
-    // Existence of browser version causes problem to run es ersion in react-example, so remove them from dist before starting react-example
-    {
-      file: pkg.browser,
-      name: 'CozifySDK',
-      format: 'iife',
-      globals: {
-        'lodash/isEmpty': 'isEmpty',
-        'axios': 'axios',
-        'retry-axios': 'retry-axios'
-      },
-      sourcemap: true
-    }
   ],
   plugins: [
     replace({
@@ -64,10 +64,10 @@ export default {
       include: ['node_modules/**']
     })
     // copy Flow definitions from source to destination directory
-    , copy({
-      files: ['src/*.flow'],
-      dest: 'dist',
-    }),
+    // , copy({
+    //  files: ['src/*.flow'],
+    //  dest: 'dist',
+    //}),
 
   ],
   external: ['axios']
