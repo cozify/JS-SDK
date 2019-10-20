@@ -13,27 +13,27 @@ import { createSlice } from 'redux-starter-kit';
  *   selectors : Object<string, Selector>
  *   }}
  */
-export const devicesState = createSlice({
-  slice: 'devices',
+export const pairingsState = createSlice({
+  slice: 'pairings',
   initialState: {},
   reducers: {
     /*
-     * Reducer action of setting devices state - sets all given devices of given hub, keeps existing states
+     * Reducer action of setting pairing devices state - sets all given devices of given hub, keeps existing states
      * @param {Object} state
      * @param {Object} action
      */
-    setDevices(state, action) {
+    setPairingDevices(state, action) {
       const stateToSet = state;
       const { hubId } = action.payload;
       const { devices } = action.payload;
-      const hubDevices = {};
+      const hubPairingDevices = {};
 
 
       Object.entries(devices).forEach((entry) => {
         const [id, device] = entry;
-        hubDevices[id] = { ...device };
+        hubPairingDevices[id] = { ...device };
       });
-      stateToSet[hubId] = { ...hubDevices };
+      stateToSet[hubId] = { ...hubPairingDevices };
     },
 
     /*
@@ -41,7 +41,7 @@ export const devicesState = createSlice({
      * @param {Object} state
      * @param {payload:{Object{hubId:string, device:Object}}} action
      */
-    setDevice(state, action) {
+    setPairingDevice(state, action) {
       const stateToSet = state;
       const { hubId } = action.payload;
       const { device } = action.payload;
@@ -55,11 +55,10 @@ export const devicesState = createSlice({
      * @param {Object} state
      * @param {payload:{Object{hubId:string, device:Object}}} action
      */
-    deleteDevice(state, action) {
+    deletePairingDevice(state, action) {
       const stateToSet = state;
       const { hubId } = action.payload;
       const { deviceId } = action.payload;
-
       if (hubId && deviceId && stateToSet[hubId] && stateToSet[hubId][deviceId]) {
         delete stateToSet[hubId][deviceId];
       }
@@ -67,17 +66,17 @@ export const devicesState = createSlice({
   },
 });
 
-const { actions, reducer } = devicesState;
+const { actions, reducer } = pairingsState;
 
 /**
  * Devices reducer
  * @type {function} reducer
  */
-export { reducer as devicesReducer };
+export { reducer as pairingsReducer };
 
 // Extract and export each action creator by name
 /*
 console.log(addDevice({ id: 123, name: 'Unnamed device' }))
 {type : "devices/addDevice", payload : {id : 123, name: 'Unnamed device' }}
 */
-export const { setDevices, deleteDevice } = actions;
+export const { setPairingDevices, deletePairingDevice } = actions;

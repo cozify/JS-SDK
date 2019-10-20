@@ -29,7 +29,8 @@ export const USER_STATES = Object.freeze({
   WAITING_EULA: 'wait eula',
   EULA_ACCEPTED: 'eula accepted',
   AUTHENTICATED: 'logged in',
-  LOGGED_OUT: 'loged out',
+  KEYED: 'key entered',
+  LOGGED_OUT: 'logged out',
 });
 export type USER_STATE_TYPE = $Values<typeof USER_STATES>;
 

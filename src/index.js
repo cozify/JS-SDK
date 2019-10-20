@@ -3,8 +3,10 @@
 // try { process.env.NODE_ENV } catch(e) { var process = { env: { NODE_ENV: 'production' } }; }
 
 
-export { store, watchChanges } from './store';
+import rootReducer from './reducers';
 
+export { rootReducer as cozifyReducer };
+export { store, watchChanges } from './store';
 
 // import logger from 'redux-logger'
 // const middleware = [...getDefaultMiddleware(), logger]
@@ -15,11 +17,22 @@ export { HUB_STATES } from './hubs/constants';
 
 export { getCloudConnectionState, getHubConnectionState } from './connection/state';
 export {
-  changeLanguage, doPwLogin, acceptEula, getUserState,
+  changeLanguage, doPwLogin, setAuthenticated, acceptEula, getUserState,
 } from './user/user';
-export { getHubs, selectHubById, unSelectHubById } from './hubs/hubs';
-export { getDevices, getHubDevices } from './devices/devices';
-export { sendDeviceCmd } from './devices/device';
+export {
+  getHubs, selectHubById, unSelectHubById,
+  startDiscoveringHubs, stopDiscoveringHubs,
+  startPolling, stopPolling,
+  startPairing, stopPairing, ignorePairing,
+} from './hubs/hubs';
+export {
+  getDevices, getHubDevices,
+  getPairingDevices, getHubPairingDevices,
+} from './devices/devices';
+export {
+  sendDeviceStateCmd, sendDeviceCmd,
+  unpairDevice, identifyDevice, setDeviceMeta,
+} from './devices/device';
 
 
 export { devicesState, setDevices, deleteDevice } from './reducers/devices';

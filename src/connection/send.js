@@ -214,16 +214,18 @@ export function send({
       }
     }
 
-    /*
     if (command.params) {
-      command.params.forEach(param => {
-        if (isArray(data)){
-          body[0][param] = data[param];
+      if (!command.params.includes('type')) {
+        command.params.push('type');
+      }
+      command.params.forEach((param) => {
+        if (isArray(data)) {
+          body[0][param] = data[0][param];
         } else {
           body[param] = data[param];
         }
       });
-    } */
+    }
 
     if (command.urlParams) {
       const params: Array<string> = [];

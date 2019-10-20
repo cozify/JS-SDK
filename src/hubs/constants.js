@@ -44,5 +44,11 @@ export const DISCOVERY_INTERVAL_MS: number = 45 * 1000;
  */
 export const POLL_INTERVAL_MS: number = 1 * 1000;
 
+/*
+ * Interval defining how often hubs are polled when paired at max
+ * This value is used as is in local connection, and multiplied in remote connection
+ */
+export const PAIRING_POLL_INTERVAL_MS: number = 5 * 1000;
+
 export const HUB_PROTOCOL: string = 'http://';
 export const HUB_PORT: string = '8893';

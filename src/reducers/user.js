@@ -79,6 +79,7 @@ export const userState = createSlice({
       }
     },
 
+
     /*
      * Reducer action of setting user's eula to accepted
      * @param  {Object} state
@@ -109,6 +110,17 @@ export const userState = createSlice({
       stateToSet.authKey = action.payload;
     },
 
+    /*
+     * Reducer action of setting user's authKey and state
+     * @param  {Object} state
+     * @param  {payload:{state:USER_STATE_TYPE}} action
+     */
+    setAuthenticated(state, action) {
+      const stateToSet = state;
+      stateToSet.authKey = action.payload;
+      stateToSet.state = USER_STATES.KEYED;
+    }
+
   },
 });
 
@@ -124,7 +136,6 @@ console.log(user)
 
 
 const { actions, reducer } = userState;
-const userReducer = reducer;
 
 /**
  * Hubs reducer

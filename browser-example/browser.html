@@ -14,11 +14,20 @@
       let fixedPassword = 'xxx'
       let fixedHubId = 'xxxx-xxxx'
       let fixedDeviceId = 'abcd-efgh'
+      let fixedDeviceName = 'Windpow'
 
 
       let LANGUAGES = CozifySDK.LANGUAGES;
       let USER_STATES = CozifySDK.USER_STATES;
 
+      CozifySDK.watchChanges('user.state', (newState, oldState) => {
+        console.log('user.state changed from %s to %s', oldState, newState);
+      });
+
+      /** Listener for specific changes */
+      CozifySDK.watchChanges('connections.cloudState', (newState, oldState) => {
+        console.log('connections.cloudState changed from %s to %s', oldState, newState);
+      });
 
       console.info(`Initial user state ${CozifySDK.getUserState()}`);
       console.info(`--1--`);
@@ -27,6 +36,10 @@
       console.info(`--2--`);
 
 
+      CozifySDK.setAuthenticated( cozifyCloudToken )
+
+
+      /*
       CozifySDK.doPwLogin( fixedUsername, fixedPassword )
         .then((response) => {
           CozifySDK.acceptEula();
@@ -39,27 +52,26 @@
         .catch(function (error) {
           console.info(`Pw failure when user state ${CozifySDK.getCloudConnectionState()}`, error);
         })
+      */
 
-
-      /** Listener for specific changes */
-      CozifySDK.watchChanges('connections.cloudState', (newState, oldState) => {
-        console.log('connections.cloudState changed from %s to %s', oldState, newState);
-      });
-
-      CozifySDK.watchChanges('user.state', (newState, oldState) => {
-        console.log('user.state changed from %s to %s', oldState, newState);
-      });
+      CozifySDK.startDiscoveringHubs(fixedHubId);
 
       CozifySDK.watchChanges('hubs', (newHubsState, oldHubsState) => {
         if (newHubsState[fixedHubId] && !newHubsState[fixedHubId].selected) {
-          CozifySDK.selectHubById(fixedHubId);
-
+          CozifySDK.selectHubById(fixedHubId, true);
+          CozifySDK.stopDiscoveringHubs(fixedHubId);
           setTimeout(function() {
-            CozifySDK.unSelectHubById(fixedHubId);
-          }, 10000);
-
+            CozifySDK.stopPolling(fixedHubId);
+          }, 20000);
         };
+        if (newHubsState[fixedHubId].connectionState == CozifySDK.HUB_CONNECTION_STATES.LOCAL){
+          CozifySDK.startPairing(fixedHubId, true)
+          setTimeout(function() {
+                      CozifySDK.stopPairing(fixedHubId);
+                      console.error('Pairing stopped')
+                    }, 30000);
 
+        }
         if (newHubsState[fixedHubId] && oldHubsState[fixedHubId]){
           if (newHubsState[fixedHubId].connectionState !== oldHubsState[fixedHubId].connectionState) {
             console.log('Hub connectionState changed from %s to %s', oldHubsState[fixedHubId].connectionState, newHubsState[fixedHubId].connectionState);
@@ -68,15 +80,69 @@
 
       });
 
+      let devicePaired = false;
+      CozifySDK.watchChanges('pairings', (newPairingsState, oldPairingsState) => {
+         if ( newPairingsState[fixedHubId]) {
+            Object.values(newPairingsState[fixedHubId]).forEach((pairing)=> {
+              const device = pairing.status
+              if (device && device.name === fixedDeviceName && !devicePaired ) {
+                if (pairing.pairingStatus === "CONNECTED") {
+                  {
+                    devicePaired = true;
+
+                    if (pairing.actionRequired){
+                      alert(device.actionRequired)
+                    } else {
+                      let state = device.state;
+                      state.isOn = !state.isOn;
+
+                      // CozifySDK.sendDeviceStateCmd(fixedHubId, device.id, state, ['isOn', 'type']);
+                      CozifySDK.identifyDevice(fixedHubId, device.id)
+                      CozifySDK.ignorePairing(fixedHubId, device.id, false)
+                      CozifySDK.setDeviceMeta(fixedHubId, device.id, fixedDeviceName, ["652ec684-c02f-4490-9f9a-b6b29f81a92d"])
+                      /*
+                      setTimeout(function() {
+                        console.error('Device will be paired', device.id)
+
+                      }, 5000)
+                      */
+                    }
+
+                  }
+                }
+                /*
+                setTimeout(function() { CozifySDK.identifyDevice(fixedHubId, device.id) }, 5000)
+                setTimeout(function() { CozifySDK.setDeviceMeta(fixedHubId, device.id, fixedDeviceName) }, 6000)
+                setTimeout(function() { CozifySDK.ignorePairing(fixedHubId, device.id, false) }, 7000)
+                */
+
+
+
+              }
+            })
+         }
+
+      });
+
       let deviceStateChanged = false;
       CozifySDK.watchChanges('devices', (newDevicesState, oldDevicesState) => {
-        if ( newDevicesState[fixedHubId] && newDevicesState[fixedHubId][fixedDeviceId] && newDevicesState[fixedHubId][fixedDeviceId].state ) {
-          if (!deviceStateChanged) {
-            deviceStateChanged = true;
-            let state = newDevicesState[fixedHubId][fixedDeviceId].state;
-            state.isOn = !state.isOn;
-            CozifySDK.sendDeviceCmd(fixedHubId, fixedDeviceId, state, ['isOn', 'type']);
-          }
+        if ( newDevicesState[fixedHubId]) {
+          Object.values(newDevicesState[fixedHubId]).forEach((device)=> {
+            if (device.name === fixedDeviceName && device.state && !deviceStateChanged ) {
+              let state = device.state;
+              state.isOn = !state.isOn;
+              /*
+              CozifySDK.sendDeviceStateCmd(fixedHubId, device.id, state, ['isOn', 'type']);
+              */
+              deviceStateChanged = true;
+              /*
+              setTimeout(function() {
+                CozifySDK.unpairDevice(fixedHubId, device.id, true)
+                console.error('Device will be ignored', device.id)
+              }, 2000);
+              */
+            }
+          })
         }
       });
 
@@ -87,6 +153,7 @@
         //console.info("Hub connection:", CozifySDK.getHubConnectionState(fixedHubId));
         console.info("Hubs", storeNow.hubs)
         console.info("Devices:", CozifySDK.getDevices()[fixedHubId])
+        console.info("Pairings:", CozifySDK.getPairingDevices()[fixedHubId])
       })
 
     </script>
