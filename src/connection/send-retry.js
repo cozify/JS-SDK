@@ -46,10 +46,11 @@ function isSafeRequestError(error) {
 }
 
 const httpRetries = {};
-const RETRY_COUNT = 1;
+const RETRY_COUNT = 2;
 
 export function resetRetry(url) {
   if (httpRetries[url]) {
+    console.warn('resetRetry to 0');
     httpRetries[url] = 0;
     delete httpRetries[url];
   }
@@ -64,11 +65,14 @@ export function retryCondition(error) {
     if (httpRetries[error.config.url]) {
       if (httpRetries[error.config.url] >= RETRY_COUNT) {
         httpRetries[error.config.url] = 0;
+        console.error('retryCondition count >', RETRY_COUNT);
         return false;
       }
       httpRetries[error.config.url] += httpRetries[error.config.url];
+      console.info('retryCondition count set ', httpRetries[error.config.url]);
     } else {
       httpRetries[error.config.url] = 1;
+      console.info('retryCondition count set to 1');
     }
   } else {
     console.error('retryCondition unknown', error);
@@ -77,12 +81,14 @@ export function retryCondition(error) {
   }
 
   if (isSafeRequestError(error) && IDEMPOTENT_HTTP_METHODS.indexOf(error.config.method) !== -1) {
-    console.error('retryCondition condition true', error.config);
+    console.info('retryCondition condition true', error.config);
   } else {
-    console.error('retryCondition condition false', error.config);
+    console.info('retryCondition condition false', error.config);
     httpRetries[error.config.url] = 0;
   }
-  return isSafeRequestError(error) && IDEMPOTENT_HTTP_METHODS.indexOf(error.config.method) !== -1;
+  const retVal = isSafeRequestError(error) && IDEMPOTENT_HTTP_METHODS.indexOf(error.config.method) !== -1;
+  console.info('retryCondition return ', retVal);
+  return retVal;
 }
 
 /*

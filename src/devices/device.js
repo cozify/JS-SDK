@@ -9,7 +9,7 @@ import { store } from '../store';
 import { userState } from '../reducers/user';
 import { hubsState } from '../reducers/hubs';
 import { HUB_CONNECTION_STATES } from '../connection/constants';
-
+import type { COMMAND_TYPE } from '../connection/constants';
 /**
  * Device state command to be sent
  * @param  {string} hubId
@@ -49,7 +49,7 @@ export function sendDeviceStateCmd(hubId: string, deviceId: string, state: Objec
       })
       .catch((error) => {
         console.error(error);
-        // reject(new Error('Device state command error!'));
+        reject(new Error('Device state command error!'));
       });
   });
 }
@@ -62,7 +62,7 @@ export function sendDeviceStateCmd(hubId: string, deviceId: string, state: Objec
  * @param  {Array<string>} properties - optional properties
  * @return {Promise}
  */
-export function sendDeviceCmd(hubId: string, deviceId: string, commandType: string, data: Object, properties?: Array<string>): Promise<Object> {
+export function sendDeviceCmd(hubId: string, deviceId: string, commandType: any, data: Object, properties?: Array<string>): Promise<Object> {
   return new Promise((resolve, reject) => {
     const stateNow = store.getState();
     const user = userState.selectors.getUser(stateNow);
@@ -75,21 +75,22 @@ export function sendDeviceCmd(hubId: string, deviceId: string, commandType: stri
     const hub = hubs[hubId];
     const { hubKey } = hubs[hubId];
     if (!hub || !hubKey) {
-      // reject(new Error('Device command error: No hubKey!'));
+      reject(new Error('Device command error: No hubKey!'));
       console.error('SDK sendDeviceCmd error: No hubKey!');
       return;
     }
 
     if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
       console.error('SDK: sendDeviceCmd error: No Hub connection');
+      reject(new Error('Device command error: No hub connection'));
       return;
     }
 
 
     const { authKey } = user;
     if (!authKey) {
-      // reject(new Error('Device command error: No hubKey!'));
       console.error('SDK sendDeviceCmd error: No authKey!');
+      reject(new Error('Device command error: No hubKey!'));
       return;
     }
 
@@ -97,18 +98,19 @@ export function sendDeviceCmd(hubId: string, deviceId: string, commandType: stri
     if (!isEmpty(properties)) {
       sendData = pick(sendData, properties);
     }
-
-    send({
-      command: commandType, authKey, hubId, localUrl: hub.url, hubKey, data: [sendData],
-    })
-      .then((response) => {
-        console.debug('SDK: sendDeviceCmd ok', response);
-        resolve(response);
+    if (commandType) {
+      send({
+        command: commandType, method: undefined, authKey, hubId, localUrl: hub.url, hubKey, data: [sendData],
       })
-      .catch((error) => {
-        console.error(error);
-        // reject(new Error('Device command error!'));
-      });
+        .then((response) => {
+          console.debug('SDK: sendDeviceCmd ok', response);
+          resolve(response);
+        })
+        .catch((error) => {
+          console.error(error);
+          reject(new Error('Device command error!'));
+        });
+    }
   });
 }
 
@@ -119,7 +121,7 @@ export function sendDeviceCmd(hubId: string, deviceId: string, commandType: stri
  * @return {Promise}
  */
 export function unpairDevice(hubId: string, deviceId: string): Promise<Object> {
-  sendDeviceCmd(hubId, deviceId, COMMANDS.CMD_DEVICE_IGNORE, { id: deviceId });
+  return sendDeviceCmd(hubId, deviceId, COMMANDS.CMD_DEVICE_IGNORE, { id: deviceId }).then()
 }
 
 /**
@@ -129,7 +131,7 @@ export function unpairDevice(hubId: string, deviceId: string): Promise<Object> {
  * @return {Promise}
  */
 export function identifyDevice(hubId: string, deviceId: string): Promise<Object> {
-  sendDeviceCmd(hubId, deviceId, COMMANDS.CMD_DEVICE_IDENTIFY, { id: deviceId });
+  return sendDeviceCmd(hubId, deviceId, COMMANDS.CMD_DEVICE_IDENTIFY, { id: deviceId });
 }
 
 /**
@@ -141,7 +143,7 @@ export function identifyDevice(hubId: string, deviceId: string): Promise<Object>
  * @return {Promise}
  */
 export function setDeviceMeta(hubId: string, deviceId: string, name: string, rooms: Array<number>): Promise<Object> {
-  sendDeviceCmd(hubId, deviceId, COMMANDS.CMD_DEVICE_META, { id: deviceId, name, room: rooms });
+  return sendDeviceCmd(hubId, deviceId, COMMANDS.CMD_DEVICE_META, { id: deviceId, name, room: rooms });
 }
 
 

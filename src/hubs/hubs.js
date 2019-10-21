@@ -364,16 +364,23 @@ export function startPairing(hubId: string, reset: boolean) {
   pairingIntervals[hubId] = setInterval(doPairing, intervalTime, hubId, reset);
 }
 
-
+let stopPairingInAction = false;
 /**
  * Stop pairing on given hub
  * @param {string} hubId
  * @return none
  */
 export function stopPairing(hubId: string) {
+  if (stopPairingInAction) {
+    return;
+  }
+  stopPairingInAction = true;
+
   const { authKey } = storedUser();
   const hub: HUB_TYPE = getHubs()[hubId];
   const { hubKey } = hub;
+
+
   clearInterval(pairingIntervals[hubId]);
   send({
     command: COMMANDS.PAIR_STOP, hubId, authKey, hubKey, localUrl: hub.url,
@@ -381,10 +388,12 @@ export function stopPairing(hubId: string) {
     .then((data) => {
       console.debug('SDK: pairingStopped: Ok , data: ', data);
       pairingStopped = true;
+      stopPairingInAction = false;
     })
     .catch((error) => {
     // store.dispatch(hubsState.actions.hubPollFailed())
       console.error('SDK: pairingStopped error: ', error.message);
+      stopPairingInAction = false;
     });
 }
 

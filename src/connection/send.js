@@ -105,7 +105,7 @@ axiosRetry(axios, {
   retryDelay: (retryCount, error) => {
     // console.error('axiosRetry ', retryCount); DOESN'T WORK , see send_retry.js
     console.error('axiosRetry ', error);
-    return 1000; // retryCount * 1000;
+    return 5000; // retryCount * 1000;
   },
 });
 
@@ -136,6 +136,7 @@ export function send({
 }: COMMAND_TYPE): Promise<any> {
   let sendMethod = method;
   let sendUrl = url;
+  let sendTimeout = timeout;
   let sendAuthKey = authKey;
   let sendHubKey = hubKey;
   let sendConfig = config;
@@ -208,8 +209,10 @@ export function send({
 
     if (command.type && body) {
       if (isArray(body)) {
-        body[0].type = command.type;
-      } else {
+        if (body[0]) {
+          body[0].type = command.type;
+        }
+      } else if (body) {
         body.type = command.type;
       }
     }
@@ -220,8 +223,10 @@ export function send({
       }
       command.params.forEach((param) => {
         if (isArray(data)) {
-          body[0][param] = data[0][param];
-        } else {
+          if (body && body[0] && data && data[0]) {
+            body[0][param] = data[0][param];
+          }
+        } else if (body && data) {
           body[param] = data[param];
         }
       });
@@ -239,6 +244,10 @@ export function send({
       }
     }
 
+    if (command.timeout) {
+      sendTimeout = command.timeout;
+    }
+
     if (command.config) {
       sendConfig = command.config;
     }
@@ -247,7 +256,7 @@ export function send({
   const bodyString = JSON.stringify(body);
 
   const reqConf = {
-    timeout: timeout || 1000,
+    timeout: sendTimeout || 15000,
     method: sendMethod,
     // withCredentials: false,
     headers: {

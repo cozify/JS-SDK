@@ -32,7 +32,7 @@ export const COMMANDS = Object.freeze({
   USER_LOGIN: {
     method: 'POST', url: `${CLOUD_URL}user/login`, params: ['password', 'email'], config: { responseType: isNode ? 'blob' : 'stream', timeout: 15000 },
   },
-  HUB_KEYS: { method: 'GET', url: `${CLOUD_URL}user/hubkeys` },
+  HUB_KEYS: { method: 'GET', url: `${CLOUD_URL}user/hubkeys`, timeout: 15000 },
   REFRESH_AUTHKEY: { method: 'GET', url: `${CLOUD_URL}user/refreshsession` },
   CLOUD_IP: { method: 'GET', url: `${CLOUD_URL}hub/lan_ip` },
   CLOUD_META: { method: 'GET', url: `${CLOUD_URL}hub/remote/hub` },
@@ -59,7 +59,8 @@ export const COMMANDS = Object.freeze({
 
 export type COMMANDS_TYPE = $Values<typeof COMMANDS>;
 
-
+type dataArray = ?Array<{ [key: string | number]: any }>
+type dataObject = ?{ [key: string | number]: any }
 /**
  * COMMAND_TYPE
  *  @typedef {Object} COMMANDS_TYPE
@@ -83,8 +84,8 @@ export type COMMAND_TYPE = {
   method?: ?string,
   authKey?: ?string,
   hubKey?: ?string,
-  config?: Object,
-  data?: ?Object,
+  config?: ?any,
+  data?: ?any,
   type?: ?string,
   hubId?: ?string
 }
