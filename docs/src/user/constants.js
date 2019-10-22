@@ -9,8 +9,9 @@
   */
 export const LANGUAGES = Object.freeze({
   NONE: 'none',
-  EN_UK: 'en-uk',
-  FI_FI: 'fi-fi',
+  EN_EN: 'en',
+  EN_UK: 'en-UK',
+  FI_FI: 'fi-FI',
 });
 
 
@@ -28,7 +29,8 @@ export const USER_STATES = Object.freeze({
   WAITING_EULA: 'wait eula',
   EULA_ACCEPTED: 'eula accepted',
   AUTHENTICATED: 'logged in',
-  LOGGED_OUT: 'loged out',
+  KEYED: 'key entered',
+  LOGGED_OUT: 'logged out',
 });
 
 

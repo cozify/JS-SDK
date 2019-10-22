@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">src/rooms/rooms.js | Cozify SDK</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Cozify UI SDK for REST aPI"><meta property="og:type" content="website"><meta property="og:url" content="http://my-library.org"><meta property="og:site_name" content="Cozify SDK"><meta property="og:title" content="Cozify SDK"><meta property="og:image" content="http://my-library.org/logo.png"><meta property="og:description" content="Cozify UI SDK for REST aPI"><meta property="og:author" content="https://twitter.com/foo"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="Cozify SDK"><meta property="twitter:description" content="Cozify UI SDK for REST aPI"><meta property="twitter:image" content="http://my-library.org/logo.png"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./" style="display: flex; align-items: center;"><img src="./image/brand_logo.png" style="width:34px;"></a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/foo/bar"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-watchChanges">watchChanges</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-urlBase64Decode">urlBase64Decode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-store">store</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-isNode">isNode</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#connection">connection</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-resetRetry">resetRetry</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-retryCondition">retryCondition</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-cloudErrorState">cloudErrorState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getAPIversion">getAPIversion</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hubErrorState">hubErrorState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-testSSLCertificate">testSSLCertificate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-send">send</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sendAll">sendAll</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getCloudConnectionState">getCloudConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubConnectionState">getHubConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setCloudConnectionState">setCloudConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setHubConnectionState">setHubConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_API_VERSION">CLOUD_API_VERSION</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_FINGERPRINTS_SHA1">CLOUD_FINGERPRINTS_SHA1</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_HOST">CLOUD_HOST</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_URL">CLOUD_URL</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-MAX_API_VERSION">MAX_API_VERSION</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-CLOUD_CONNECTION_STATE_TYPE">CLOUD_CONNECTION_STATE_TYPE</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-COMMANDS_TYPE">COMMANDS_TYPE</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-COMMANDS_TYPE">COMMANDS_TYPE</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-HUB_CONNECTION_STATE_TYPE">HUB_CONNECTION_STATE_TYPE</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#devices">devices</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-identifyDevice">identifyDevice</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sendDeviceCmd">sendDeviceCmd</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sendDeviceStateCmd">sendDeviceStateCmd</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setDeviceMeta">setDeviceMeta</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-unpairDevice">unpairDevice</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-devicesDeltaHandler">devicesDeltaHandler</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDevices">getDevices</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubDevices">getHubDevices</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubPairingDevices">getHubPairingDevices</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getPairingDevices">getPairingDevices</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-pairingDevicesDeltaHandler">pairingDevicesDeltaHandler</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#hubs">hubs</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubs">getHubs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ignorePairing">ignorePairing</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-selectHubById">selectHubById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-startDiscoveringHubs">startDiscoveringHubs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-startPairing">startPairing</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-startPolling">startPolling</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-stopDiscoveringHubs">stopDiscoveringHubs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-stopPairing">stopPairing</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-stopPolling">stopPolling</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-unSelectHubById">unSelectHubById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-DISCOVERY_INTERVAL_MS">DISCOVERY_INTERVAL_MS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-HUB_PORT">HUB_PORT</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-HUB_PROTOCOL">HUB_PROTOCOL</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-HUB_STATES">HUB_STATES</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-PAIRING_POLL_INTERVAL_MS">PAIRING_POLL_INTERVAL_MS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-POLL_INTERVAL_MS">POLL_INTERVAL_MS</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#reducers">reducers</a><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-connectionsState">connectionsState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setCloudConnectionState">setCloudConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-devicesState">devicesState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setDevices">setDevices</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-hubsState">hubsState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-updateHubs">updateHubs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-rootReducer">rootReducer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-pairingsState">pairingsState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setPairingDevices">setPairingDevices</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-roomsState">roomsState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setRooms">setRooms</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-changeState">changeState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-userState">userState</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#rooms">rooms</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-addRoom">addRoom</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-editRoom">editRoom</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubRooms">getHubRooms</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getRooms">getRooms</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-removeRoom">removeRoom</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-roomsDeltaHandler">roomsDeltaHandler</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sendRoomCmd">sendRoomCmd</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ROOMS_EN">ROOMS_EN</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ROOMS_FI">ROOMS_FI</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#user">user</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-acceptEula">acceptEula</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-changeLanguage">changeLanguage</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-doPwLogin">doPwLogin</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getUserState">getUserState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setAuthenticated">setAuthenticated</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-LANGUAGES">LANGUAGES</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ROLES">ROLES</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-USER_STATES">USER_STATES</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/rooms/rooms.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">// 
+// import isEmpty from &apos;lodash/isEmpty&apos;;
+// import isArray from &apos;lodash/isArray&apos;;
+// import pick from &apos;lodash/pick&apos;;
+import { store } from &apos;../store&apos;;
+import { roomsState } from &apos;../reducers/rooms&apos;;
+import { hubsState } from &apos;../reducers/hubs&apos;;
+import { userState } from &apos;../reducers/user&apos;;
+import { send, COMMANDS } from &apos;../connection/send&apos;;
+import { HUB_CONNECTION_STATES } from &apos;../connection/constants&apos;;
+
+
+// import { ROOMS_FI, ROOMS_EN } from &apos;./constants&apos;;
+
+/**
+ * Get rooms of all selected hubs
+ * @return {HUB_ROOMS_MAP_TYPE}
+ */
+export function getRooms() {
+  const stateNow = store.getState();
+  return roomsState.selectors.getRooms(stateNow);
+}
+
+/**
+ * Get rooms of given hub
+ * @param  {string} hubId
+ * @return {ROOMS_MAP_TYPE}
+ */
+export function getHubRooms(hubId) {
+  let retVal;
+  const rooms = getRooms();
+  if (rooms &amp;&amp; rooms[hubId]) {
+    retVal = rooms[hubId];
+  }
+  return retVal;
+}
+
+export function sendRoomCmd(hubId, commandType, data) {
+  return new Promise((resolve, reject) =&gt; {
+    const stateNow = store.getState();
+    const user = userState.selectors.getUser(stateNow);
+
+
+    if (!user || !user.authKey) {
+      console.error(&apos;SDK sendRoomCmd error: No userKey!&apos;);
+      reject(new Error(&apos;Room command error: No userKey!&apos;));
+      return;
+    }
+
+    const hubs = hubsState.selectors.getHubs(stateNow);
+    const hub = hubs[hubId];
+    const { hubKey } = hubs[hubId];
+    if (!hub || !hubKey) {
+      console.error(&apos;SDK sendRoomCmd error: No hubKey!&apos;);
+      reject(new Error(&apos;Room command error: No hubKey!&apos;));
+      return;
+    }
+
+    if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL &amp;&amp; hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
+      console.error(&apos;SDK sendRoomCmd error: No Hub connection&apos;);
+      reject(new Error(&apos;Room command error: No hub connection&apos;));
+      return;
+    }
+
+    const { authKey } = user;
+    if (!authKey) {
+      console.error(&apos;SDK sendRoomCmd error: No authKey!&apos;);
+      reject(new Error(&apos;Room command error: No authKey!&apos;));
+      return;
+    }
+
+    if (commandType) {
+      send({
+        command: commandType, authKey, hubId, localUrl: hub.url, hubKey, data,
+      })
+        .then((status) =&gt; {
+          console.debug(&apos;SDK sendRoomCmd ok&apos;, status);
+
+          send({
+            command: COMMANDS.CMD_GET_ROOMS, authKey, hubId, localUrl: hub.url, hubKey,
+          })
+            .then((rooms) =&gt; {
+              console.debug(&apos;SDK sendRoomCmd refresh rooms ok&apos;, rooms);
+              store.dispatch(roomsState.actions.setRooms({ hubId, rooms }));
+              resolve(rooms);
+            })
+            .catch((error) =&gt; {
+              console.error(&apos;SDK Room command error:&apos;, error);
+              reject(error);
+            });
+        })
+        .catch((error) =&gt; {
+          console.error(&apos;SDK Room command error:&apos;, error);
+          reject(error);
+        });
+    }
+  });
+}
+
+/**
+ * Add room to given hub
+ * do not usr store.dispatch(roomsState.actions.addRoom(hubId, room)) as rooms are coming back in delta
+ * @param  {string} hubI
+ * @param  {Object} room
+ * @return {Promise&lt;Object&gt;} rooms
+ */
+export async function addRoom(hubId, room) {
+  return new Promise((resolve, reject) =&gt; {
+    sendRoomCmd(hubId, COMMANDS.CMD_SET_ROOM, [room])
+      .then((rooms) =&gt; {
+        resolve(rooms);
+      })
+      .catch((error) =&gt; {
+        debugger;
+        reject(error);
+      });
+  });
+}
+
+/**
+ * Edit room of given hub
+ * do not usr store.dispatch(roomsState.actions.editRoom(hubId, room)) as rooms are coming back in delta
+ * @param  {string} hubId
+ * @param  {Object} room
+ * @return {Promise&lt;Object&gt;} rooms
+ */
+export async function editRoom(hubId, room) {
+  return new Promise((resolve, reject) =&gt; {
+    sendRoomCmd(hubId, COMMANDS.CMD_SET_ROOM, [room])
+      .then((rooms) =&gt; {
+        resolve(rooms);
+      })
+      .catch((error) =&gt; {
+        debugger;
+        reject(error);
+      });
+  });
+}
+
+/**
+ * Remove given room of given hub
+ * @param  {string} hubI
+ * @param  {Object} room
+ */
+export async function removeRoom(hubId, room) {
+  // store.dispatch(roomsState.actions.removeRoom(hubId, room));
+  return new Promise((resolve, reject) =&gt; {
+    sendRoomCmd(hubId, COMMANDS.CMD_REMOVE_ROOM, { roomId: room.id })
+      .then((rooms) =&gt; {
+        resolve(rooms);
+      })
+      .catch((error) =&gt; {
+        if (error.response &amp;&amp; error.response.status &amp;&amp; error.response.status === 404) {
+          const storedRooms = getRooms();
+          resolve(storedRooms[hubId]);
+        }
+        reject(error);
+      });
+  });
+}
+
+/**
+ * Rooms handler for poll delta results
+ * @param  {string} hubId
+ * @param  {boolean} reset
+ * @param  {Object} rooms
+ */
+export function roomsDeltaHandler(hubId, reset, rooms) {
+  let oldHubRooms = {};
+  const storedRooms = getRooms();
+  if (storedRooms &amp;&amp; storedRooms[hubId]) {
+    oldHubRooms = storedRooms[hubId];
+  }
+
+  if (reset) {
+    // If reset then set rooms as they are received
+    const stateRooms = {
+      hubId,
+      rooms,
+    };
+    store.dispatch(roomsState.actions.setRooms(stateRooms));
+  } else {
+    // Loop rooms to check could it be added or should be removed
+    Object.entries(rooms).forEach(([key, room]) =&gt; {
+      const stateRoom = {
+        hubId,
+        room,
+      };
+      if (key &amp;&amp; room) {
+        store.dispatch(roomsState.actions.setRoom(stateRoom));
+      } else if (key &amp;&amp; oldHubRooms[key]) {
+        store.dispatch(roomsState.actions.removeRoom(key));
+      }
+    });
+  }
+}
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

@@ -20,38 +20,38 @@ function storedUser() {
 
 /**
  * User action to change current language
- * @type {LANGUAGES_TYPE}
+ * @param {LANGUAGES_TYPE} newLanguage - language to be changed to
+ * @return {Boolean} true if language was set
  */
 export function changeLanguage(newLanguage) {
   let retVel = false;
   if (Object.values(LANGUAGES).indexOf(newLanguage) > -1) {
     store.dispatch(userState.actions.setLanguage(newLanguage));
+    retVel = true;
     if (storedUser().state === USER_STATES.WAITING_LANGUAGE) {
       store.dispatch(userState.actions.changeState(USER_STATES.LANGUAGE_SET));
     }
-    retVel = true;
   }
   return retVel;
 }
 
 /**
  * User action to accept EULA
+ * @return {Boolean} true if EULA was accepted
  */
 export function acceptEula() {
-  let retVel = false;
   store.dispatch(userState.actions.setEula(true));
   if (storedUser().state === USER_STATES.WAITING_EULA) {
     store.dispatch(userState.actions.changeState(USER_STATES.EULA_ACCEPTED));
   }
-  retVel = true;
-
-  return retVel;
+  return true;
 }
 
 /**
  * User action to log in
  * @param {string} email - email address
  * @param {password} password  - fixed password
+ * @return { Promise}
  */
 export function doPwLogin(email, password) {
   return new Promise((resolve, reject) => {
@@ -72,9 +72,19 @@ export function doPwLogin(email, password) {
   });
 }
 
+/**
+ * User action to set user token
+ * @param {string} userToken - Cozify user/cloud token
+ * @return {USER_STATE_TYPE}
+ */
+export function setAuthenticated(userToken) {
+  store.dispatch(userState.actions.setAuthenticated(userToken));
+  return storedUser().state;
+}
 
 /**
  * Get state of user state-machine
+ * @return {USER_STATE_TYPE}
  */
 export function getUserState() {
   return storedUser().state;

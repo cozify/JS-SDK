@@ -60,6 +60,12 @@ window.esdocSearchIndex = [
     "variable"
   ],
   [
+    "cozify-sdk/src/hubs/constants.js~pairing_poll_interval_ms",
+    "variable/index.html#static-variable-PAIRING_POLL_INTERVAL_MS",
+    "<span>PAIRING_POLL_INTERVAL_MS</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/constants.js</span>",
+    "variable"
+  ],
+  [
     "cozify-sdk/src/hubs/constants.js~poll_interval_ms",
     "variable/index.html#static-variable-POLL_INTERVAL_MS",
     "<span>POLL_INTERVAL_MS</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/constants.js</span>",
@@ -72,6 +78,18 @@ window.esdocSearchIndex = [
     "variable"
   ],
   [
+    "cozify-sdk/src/rooms/constants.js~rooms_en",
+    "variable/index.html#static-variable-ROOMS_EN",
+    "<span>ROOMS_EN</span> <span class=\"search-result-import-path\">cozify-sdk/src/rooms/constants.js</span>",
+    "variable"
+  ],
+  [
+    "cozify-sdk/src/rooms/constants.js~rooms_fi",
+    "variable/index.html#static-variable-ROOMS_FI",
+    "<span>ROOMS_FI</span> <span class=\"search-result-import-path\">cozify-sdk/src/rooms/constants.js</span>",
+    "variable"
+  ],
+  [
     "cozify-sdk/src/user/constants.js~user_states",
     "variable/index.html#static-variable-USER_STATES",
     "<span>USER_STATES</span> <span class=\"search-result-import-path\">cozify-sdk/src/user/constants.js</span>",
@@ -81,6 +99,12 @@ window.esdocSearchIndex = [
     "cozify-sdk/src/user/user.js~accepteula",
     "function/index.html#static-function-acceptEula",
     "<span>acceptEula</span> <span class=\"search-result-import-path\">cozify-sdk/src/user/user.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/rooms/rooms.js~addroom",
+    "function/index.html#static-function-addRoom",
+    "<span>addRoom</span> <span class=\"search-result-import-path\">cozify-sdk/src/rooms/rooms.js</span>",
     "function"
   ],
   [
@@ -108,16 +132,10 @@ window.esdocSearchIndex = [
     "variable"
   ],
   [
-    "cozify-sdk/src/devices/devices.js~devicedeltahandler",
-    "function/index.html#static-function-deviceDeltaHandler",
-    "<span>deviceDeltaHandler</span> <span class=\"search-result-import-path\">cozify-sdk/src/devices/devices.js</span>",
+    "cozify-sdk/src/devices/devices.js~devicesdeltahandler",
+    "function/index.html#static-function-devicesDeltaHandler",
+    "<span>devicesDeltaHandler</span> <span class=\"search-result-import-path\">cozify-sdk/src/devices/devices.js</span>",
     "function"
-  ],
-  [
-    "cozify-sdk/src/reducers/devices.js~devicesreducer",
-    "variable/index.html#static-variable-devicesReducer",
-    "<span>devicesReducer</span> <span class=\"search-result-import-path\">cozify-sdk/src/reducers/devices.js</span>",
-    "variable"
   ],
   [
     "cozify-sdk/src/reducers/devices.js~devicesstate",
@@ -129,6 +147,12 @@ window.esdocSearchIndex = [
     "cozify-sdk/src/user/user.js~dopwlogin",
     "function/index.html#static-function-doPwLogin",
     "<span>doPwLogin</span> <span class=\"search-result-import-path\">cozify-sdk/src/user/user.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/rooms/rooms.js~editroom",
+    "function/index.html#static-function-editRoom",
+    "<span>editRoom</span> <span class=\"search-result-import-path\">cozify-sdk/src/rooms/rooms.js</span>",
     "function"
   ],
   [
@@ -162,9 +186,33 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
+    "cozify-sdk/src/devices/devices.js~gethubpairingdevices",
+    "function/index.html#static-function-getHubPairingDevices",
+    "<span>getHubPairingDevices</span> <span class=\"search-result-import-path\">cozify-sdk/src/devices/devices.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/rooms/rooms.js~gethubrooms",
+    "function/index.html#static-function-getHubRooms",
+    "<span>getHubRooms</span> <span class=\"search-result-import-path\">cozify-sdk/src/rooms/rooms.js</span>",
+    "function"
+  ],
+  [
     "cozify-sdk/src/hubs/hubs.js~gethubs",
     "function/index.html#static-function-getHubs",
     "<span>getHubs</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/hubs.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/devices/devices.js~getpairingdevices",
+    "function/index.html#static-function-getPairingDevices",
+    "<span>getPairingDevices</span> <span class=\"search-result-import-path\">cozify-sdk/src/devices/devices.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/rooms/rooms.js~getrooms",
+    "function/index.html#static-function-getRooms",
+    "<span>getRooms</span> <span class=\"search-result-import-path\">cozify-sdk/src/rooms/rooms.js</span>",
     "function"
   ],
   [
@@ -180,22 +228,46 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
-    "cozify-sdk/src/reducers/hubs.js~hubsreducer",
-    "variable/index.html#static-variable-hubsReducer",
-    "<span>hubsReducer</span> <span class=\"search-result-import-path\">cozify-sdk/src/reducers/hubs.js</span>",
-    "variable"
-  ],
-  [
     "cozify-sdk/src/reducers/hubs.js~hubsstate",
     "variable/index.html#static-variable-hubsState",
     "<span>hubsState</span> <span class=\"search-result-import-path\">cozify-sdk/src/reducers/hubs.js</span>",
     "variable"
   ],
   [
+    "cozify-sdk/src/devices/device.js~identifydevice",
+    "function/index.html#static-function-identifyDevice",
+    "<span>identifyDevice</span> <span class=\"search-result-import-path\">cozify-sdk/src/devices/device.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/hubs/hubs.js~ignorepairing",
+    "function/index.html#static-function-ignorePairing",
+    "<span>ignorePairing</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/hubs.js</span>",
+    "function"
+  ],
+  [
     "cozify-sdk/src/utils.js~isnode",
     "variable/index.html#static-variable-isNode",
     "<span>isNode</span> <span class=\"search-result-import-path\">cozify-sdk/src/utils.js</span>",
     "variable"
+  ],
+  [
+    "cozify-sdk/src/devices/devices.js~pairingdevicesdeltahandler",
+    "function/index.html#static-function-pairingDevicesDeltaHandler",
+    "<span>pairingDevicesDeltaHandler</span> <span class=\"search-result-import-path\">cozify-sdk/src/devices/devices.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/reducers/pairings.js~pairingsstate",
+    "variable/index.html#static-variable-pairingsState",
+    "<span>pairingsState</span> <span class=\"search-result-import-path\">cozify-sdk/src/reducers/pairings.js</span>",
+    "variable"
+  ],
+  [
+    "cozify-sdk/src/rooms/rooms.js~removeroom",
+    "function/index.html#static-function-removeRoom",
+    "<span>removeRoom</span> <span class=\"search-result-import-path\">cozify-sdk/src/rooms/rooms.js</span>",
+    "function"
   ],
   [
     "cozify-sdk/src/connection/send-retry.js~resetretry",
@@ -208,6 +280,18 @@ window.esdocSearchIndex = [
     "function/index.html#static-function-retryCondition",
     "<span>retryCondition</span> <span class=\"search-result-import-path\">cozify-sdk/src/connection/send-retry.js</span>",
     "function"
+  ],
+  [
+    "cozify-sdk/src/rooms/rooms.js~roomsdeltahandler",
+    "function/index.html#static-function-roomsDeltaHandler",
+    "<span>roomsDeltaHandler</span> <span class=\"search-result-import-path\">cozify-sdk/src/rooms/rooms.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/reducers/rooms.js~roomsstate",
+    "variable/index.html#static-variable-roomsState",
+    "<span>roomsState</span> <span class=\"search-result-import-path\">cozify-sdk/src/reducers/rooms.js</span>",
+    "variable"
   ],
   [
     "cozify-sdk/src/reducers/index.js~rootreducer",
@@ -240,6 +324,24 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
+    "cozify-sdk/src/devices/device.js~senddevicestatecmd",
+    "function/index.html#static-function-sendDeviceStateCmd",
+    "<span>sendDeviceStateCmd</span> <span class=\"search-result-import-path\">cozify-sdk/src/devices/device.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/rooms/rooms.js~sendroomcmd",
+    "function/index.html#static-function-sendRoomCmd",
+    "<span>sendRoomCmd</span> <span class=\"search-result-import-path\">cozify-sdk/src/rooms/rooms.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/user/user.js~setauthenticated",
+    "function/index.html#static-function-setAuthenticated",
+    "<span>setAuthenticated</span> <span class=\"search-result-import-path\">cozify-sdk/src/user/user.js</span>",
+    "function"
+  ],
+  [
     "cozify-sdk/src/connection/state.js~setcloudconnectionstate",
     "function/index.html#static-function-setCloudConnectionState",
     "<span>setCloudConnectionState</span> <span class=\"search-result-import-path\">cozify-sdk/src/connection/state.js</span>",
@@ -250,6 +352,12 @@ window.esdocSearchIndex = [
     "variable/index.html#static-variable-setCloudConnectionState",
     "<span>setCloudConnectionState</span> <span class=\"search-result-import-path\">cozify-sdk/src/reducers/connections.js</span>",
     "variable"
+  ],
+  [
+    "cozify-sdk/src/devices/device.js~setdevicemeta",
+    "function/index.html#static-function-setDeviceMeta",
+    "<span>setDeviceMeta</span> <span class=\"search-result-import-path\">cozify-sdk/src/devices/device.js</span>",
+    "function"
   ],
   [
     "cozify-sdk/src/reducers/devices.js~setdevices",
@@ -264,15 +372,51 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
+    "cozify-sdk/src/reducers/pairings.js~setpairingdevices",
+    "variable/index.html#static-variable-setPairingDevices",
+    "<span>setPairingDevices</span> <span class=\"search-result-import-path\">cozify-sdk/src/reducers/pairings.js</span>",
+    "variable"
+  ],
+  [
+    "cozify-sdk/src/reducers/rooms.js~setrooms",
+    "variable/index.html#static-variable-setRooms",
+    "<span>setRooms</span> <span class=\"search-result-import-path\">cozify-sdk/src/reducers/rooms.js</span>",
+    "variable"
+  ],
+  [
     "cozify-sdk/src/hubs/hubs.js~startdiscoveringhubs",
     "function/index.html#static-function-startDiscoveringHubs",
     "<span>startDiscoveringHubs</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/hubs.js</span>",
     "function"
   ],
   [
+    "cozify-sdk/src/hubs/hubs.js~startpairing",
+    "function/index.html#static-function-startPairing",
+    "<span>startPairing</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/hubs.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/hubs/hubs.js~startpolling",
+    "function/index.html#static-function-startPolling",
+    "<span>startPolling</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/hubs.js</span>",
+    "function"
+  ],
+  [
     "cozify-sdk/src/hubs/hubs.js~stopdiscoveringhubs",
     "function/index.html#static-function-stopDiscoveringHubs",
     "<span>stopDiscoveringHubs</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/hubs.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/hubs/hubs.js~stoppairing",
+    "function/index.html#static-function-stopPairing",
+    "<span>stopPairing</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/hubs.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/hubs/hubs.js~stoppolling",
+    "function/index.html#static-function-stopPolling",
+    "<span>stopPolling</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/hubs.js</span>",
     "function"
   ],
   [
@@ -294,6 +438,12 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
+    "cozify-sdk/src/devices/device.js~unpairdevice",
+    "function/index.html#static-function-unpairDevice",
+    "<span>unpairDevice</span> <span class=\"search-result-import-path\">cozify-sdk/src/devices/device.js</span>",
+    "function"
+  ],
+  [
     "cozify-sdk/src/reducers/hubs.js~updatehubs",
     "variable/index.html#static-variable-updateHubs",
     "<span>updateHubs</span> <span class=\"search-result-import-path\">cozify-sdk/src/reducers/hubs.js</span>",
@@ -304,12 +454,6 @@ window.esdocSearchIndex = [
     "function/index.html#static-function-urlBase64Decode",
     "<span>urlBase64Decode</span> <span class=\"search-result-import-path\">cozify-sdk/src/utils.js</span>",
     "function"
-  ],
-  [
-    "cozify-sdk/src/reducers/user.js~userreducer",
-    "variable/index.html#static-variable-userReducer",
-    "<span>userReducer</span> <span class=\"search-result-import-path\">cozify-sdk/src/reducers/user.js</span>",
-    "variable"
   ],
   [
     "cozify-sdk/src/reducers/user.js~userstate",
@@ -720,9 +864,33 @@ window.esdocSearchIndex = [
     "file"
   ],
   [
+    "src/reducers/pairings.js",
+    "file/src/reducers/pairings.js.html",
+    "src/reducers/pairings.js",
+    "file"
+  ],
+  [
+    "src/reducers/rooms.js",
+    "file/src/reducers/rooms.js.html",
+    "src/reducers/rooms.js",
+    "file"
+  ],
+  [
     "src/reducers/user.js",
     "file/src/reducers/user.js.html",
     "src/reducers/user.js",
+    "file"
+  ],
+  [
+    "src/rooms/constants.js",
+    "file/src/rooms/constants.js.html",
+    "src/rooms/constants.js",
+    "file"
+  ],
+  [
+    "src/rooms/rooms.js",
+    "file/src/rooms/rooms.js.html",
+    "src/rooms/rooms.js",
     "file"
   ],
   [

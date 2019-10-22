@@ -86,7 +86,6 @@ export const hubsState = createSlice({
 
 // console.log('hubsState ', hubsState)
 const { actions, reducer } = hubsState;
-const hubsReducer = reducer;
 
 /**
  * Hubs reducer

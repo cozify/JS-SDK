@@ -1,10 +1,16 @@
 // import { configureStore } from 'redux-starter-kit';
 // import deepFreeze from 'deep-freeze';
-import { devicesState } from './devices';
+import { devicesState, devicesReducer } from './devices';
 import { store } from '../store';
 // deepFreeze(state) to test state immutability
 
-describe('devicesReducer', () => {
+describe('Pure devicesReducer', () => {
+  it('should handle initial state', () => {
+    expect(devicesReducer(undefined, {})).toEqual({});
+  });
+});
+
+describe('Store devicesReducer', () => {
   it('setDevices and setDevice will add devices', () => {
     const device1 = { id: 111, name: 'testiI' };
     const devices = { hubId: '007', devices: { 111: device1 } };

@@ -1,7 +1,7 @@
 {
-  "coverage": "60.63%",
-  "expectCount": 94,
-  "actualCount": 57,
+  "coverage": "62.4%",
+  "expectCount": 125,
+  "actualCount": 78,
   "files": {
     "src/connection/constants.js": {
       "expectCount": 5,
@@ -38,8 +38,8 @@
       "expectCount": 6,
       "actualCount": 4,
       "undocumentLines": [
-        25,
-        112
+        26,
+        113
       ]
     },
     "src/connection/state.js": {
@@ -48,35 +48,42 @@
       "undocumentLines": []
     },
     "src/devices/device.js": {
-      "expectCount": 1,
-      "actualCount": 1,
+      "expectCount": 5,
+      "actualCount": 5,
       "undocumentLines": []
     },
     "src/devices/devices.js": {
-      "expectCount": 3,
-      "actualCount": 3,
+      "expectCount": 6,
+      "actualCount": 6,
       "undocumentLines": []
     },
     "src/hubs/constants.js": {
-      "expectCount": 5,
+      "expectCount": 6,
       "actualCount": 1,
       "undocumentLines": [
         22,
         28,
-        30,
-        31
+        34,
+        36,
+        37
       ]
     },
     "src/hubs/hubs.js": {
-      "expectCount": 23,
-      "actualCount": 17,
+      "expectCount": 33,
+      "actualCount": 21,
       "undocumentLines": [
-        18,
-        242,
+        19,
+        243,
         269,
         270,
         271,
-        272
+        272,
+        367,
+        405,
+        406,
+        407,
+        408,
+        409
       ]
     },
     "src/reducers/connections.js": {
@@ -88,21 +95,19 @@
       ]
     },
     "src/reducers/devices.js": {
-      "expectCount": 4,
+      "expectCount": 3,
       "actualCount": 1,
       "undocumentLines": [
-        69,
-        83,
-        70
+        70,
+        83
       ]
     },
     "src/reducers/hubs.js": {
-      "expectCount": 4,
+      "expectCount": 3,
       "actualCount": 1,
       "undocumentLines": [
         88,
-        102,
-        89
+        101
       ]
     },
     "src/reducers/index.js": {
@@ -110,14 +115,42 @@
       "actualCount": 1,
       "undocumentLines": []
     },
-    "src/reducers/user.js": {
-      "expectCount": 4,
+    "src/reducers/pairings.js": {
+      "expectCount": 3,
       "actualCount": 1,
       "undocumentLines": [
-        126,
-        137,
-        127
+        69,
+        82
       ]
+    },
+    "src/reducers/rooms.js": {
+      "expectCount": 3,
+      "actualCount": 1,
+      "undocumentLines": [
+        97,
+        110
+      ]
+    },
+    "src/reducers/user.js": {
+      "expectCount": 3,
+      "actualCount": 1,
+      "undocumentLines": [
+        138,
+        148
+      ]
+    },
+    "src/rooms/constants.js": {
+      "expectCount": 2,
+      "actualCount": 0,
+      "undocumentLines": [
+        2,
+        11
+      ]
+    },
+    "src/rooms/rooms.js": {
+      "expectCount": 7,
+      "actualCount": 7,
+      "undocumentLines": []
     },
     "src/store.js": {
       "expectCount": 3,
@@ -130,8 +163,8 @@
       "undocumentLines": []
     },
     "src/user/user.js": {
-      "expectCount": 5,
-      "actualCount": 5,
+      "expectCount": 6,
+      "actualCount": 6,
       "undocumentLines": []
     },
     "src/utils.js": {

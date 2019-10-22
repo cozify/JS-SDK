@@ -1,8 +1,14 @@
 // import { configureStore } from 'redux-starter-kit';
-import { hubsState } from './hubs';
+import { hubsState, hubsReducer } from './hubs';
 import { store } from '../store';
 
-describe('hubsReducer', () => {
+describe('Pure hubsReducer', () => {
+  it('should handle initial state', () => {
+    expect(hubsReducer(undefined, {})).toEqual({});
+  });
+});
+
+describe('Store hubsReducer', () => {
   it('add hubs with action updateHubs', () => {
     const hub1 = { id: '111', name: 'testi' };
     const hub2 = { id: '123', name: 'testiII' };

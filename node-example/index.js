@@ -2,11 +2,16 @@
 const CozifySDK = require('../dist/sdk-node.js');
 console.log('Testing Cozify SDK from node.js')
 
+ // Fill them as should
 let fixedUsername = '...@cozify.fi'
 let fixedPassword = 'xxx'
 let fixedHubId = 'xxxx-xxxx'
 let fixedDeviceId = 'abcd-efgh'
 
+fixedUsername = 'alpha.cozify@outlook.com'
+fixedPassword = 'Test1234!'
+fixedHubId = 'cd3bd9e4-7943-11e5-a567-544a168673f2'
+fixedDeviceId = '53d59fdc-bd8d-4231-a4a0-d6c6ee51d30e'
 
 let LANGUAGES = CozifySDK.LANGUAGES;
 let USER_STATES = CozifySDK.USER_STATES;
@@ -43,7 +48,7 @@ CozifySDK.watchChanges('user.state', (newState, oldState) => {
 
 CozifySDK.watchChanges('hubs', (newHubsState, oldHubsState) => {
   if (newHubsState[fixedHubId] && !newHubsState[fixedHubId].selected) {
-    CozifySDK.selectHubById(fixedHubId);
+    CozifySDK.selectHubById(fixedHubId, true);
 
     setTimeout(function() {
       CozifySDK.unSelectHubById(fixedHubId);
@@ -66,7 +71,7 @@ CozifySDK.watchChanges('devices', (newDevicesState, oldDevicesState) => {
       deviceStateChanged = true;
       let state = newDevicesState[fixedHubId][fixedDeviceId].state;
       state.isOn = !state.isOn;
-      CozifySDK.sendDeviceCmd(fixedHubId, fixedDeviceId, state, ['isOn', 'type']);
+      CozifySDK.sendDeviceStateCmd(fixedHubId, fixedDeviceId, state, ['isOn', 'type']);
     }
   }
 });

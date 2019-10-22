@@ -30,5 +30,198 @@
     "docParams": [
       "hubAndState"
     ]
+  },
+  {
+    "name": "sendDeviceCmd",
+    "filePath": "src/devices/device.js",
+    "lines": [
+      {
+        "lineNumber": 60,
+        "line": "/**"
+      },
+      {
+        "lineNumber": 61,
+        "line": " * General device command to be sent"
+      },
+      {
+        "lineNumber": 62,
+        "line": " * @param  {string} hubId"
+      },
+      {
+        "lineNumber": 63,
+        "line": " * @param  {string} deviceId"
+      },
+      {
+        "lineNumber": 64,
+        "line": " * @param  {Object} state"
+      },
+      {
+        "lineNumber": 65,
+        "line": " * @param  {Array<string>} properties - optional properties"
+      },
+      {
+        "lineNumber": 66,
+        "line": " * @return {Promise}"
+      },
+      {
+        "lineNumber": 67,
+        "line": " */"
+      },
+      {
+        "lineNumber": 68,
+        "line": "export function sendDeviceCmd(hubId, deviceId, commandType, data, properties) {"
+      }
+    ],
+    "codeParams": [
+      "hubId",
+      "deviceId",
+      "commandType",
+      "data",
+      "properties"
+    ],
+    "docParams": [
+      "hubId",
+      "deviceId",
+      "state",
+      "properties"
+    ]
+  },
+  {
+    "name": "setDeviceMeta",
+    "filePath": "src/devices/device.js",
+    "lines": [
+      {
+        "lineNumber": 141,
+        "line": "/**"
+      },
+      {
+        "lineNumber": 142,
+        "line": " * Identify device"
+      },
+      {
+        "lineNumber": 143,
+        "line": " * @param  {string} hubId"
+      },
+      {
+        "lineNumber": 144,
+        "line": " * @param  {string} deviceId"
+      },
+      {
+        "lineNumber": 145,
+        "line": " * @param  {string} name"
+      },
+      {
+        "lineNumber": 146,
+        "line": " * @param  {Array<string>} roomId"
+      },
+      {
+        "lineNumber": 147,
+        "line": " * @return {Promise}"
+      },
+      {
+        "lineNumber": 148,
+        "line": " */"
+      },
+      {
+        "lineNumber": 149,
+        "line": "export function setDeviceMeta(hubId, deviceId, name, rooms) {"
+      }
+    ],
+    "codeParams": [
+      "hubId",
+      "deviceId",
+      "name",
+      "rooms"
+    ],
+    "docParams": [
+      "hubId",
+      "deviceId",
+      "name",
+      "roomId"
+    ]
+  },
+  {
+    "name": "addRoom",
+    "filePath": "src/rooms/rooms.js",
+    "lines": [
+      {
+        "lineNumber": 99,
+        "line": "/**"
+      },
+      {
+        "lineNumber": 100,
+        "line": " * Add room to given hub"
+      },
+      {
+        "lineNumber": 101,
+        "line": " * do not usr store.dispatch(roomsState.actions.addRoom(hubId, room)) as rooms are coming back in delta"
+      },
+      {
+        "lineNumber": 102,
+        "line": " * @param  {string} hubI"
+      },
+      {
+        "lineNumber": 103,
+        "line": " * @param  {Object} room"
+      },
+      {
+        "lineNumber": 104,
+        "line": " * @return {Promise<Object>} rooms"
+      },
+      {
+        "lineNumber": 105,
+        "line": " */"
+      },
+      {
+        "lineNumber": 106,
+        "line": "export async function addRoom(hubId, room) {"
+      }
+    ],
+    "codeParams": [
+      "hubId",
+      "room"
+    ],
+    "docParams": [
+      "hubI",
+      "room"
+    ]
+  },
+  {
+    "name": "removeRoom",
+    "filePath": "src/rooms/rooms.js",
+    "lines": [
+      {
+        "lineNumber": 139,
+        "line": "/**"
+      },
+      {
+        "lineNumber": 140,
+        "line": " * Remove given room of given hub"
+      },
+      {
+        "lineNumber": 141,
+        "line": " * @param  {string} hubI"
+      },
+      {
+        "lineNumber": 142,
+        "line": " * @param  {Object} room"
+      },
+      {
+        "lineNumber": 143,
+        "line": " */"
+      },
+      {
+        "lineNumber": 144,
+        "line": "export async function removeRoom(hubId, room) {"
+      }
+    ],
+    "codeParams": [
+      "hubId",
+      "room"
+    ],
+    "docParams": [
+      "hubI",
+      "room"
+    ]
   }
 ]

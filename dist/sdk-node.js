@@ -4353,128 +4353,6 @@ function createSlice(options) {
   };
 }
 
-/*!
- * isobject <https://github.com/jonschlinkert/isobject>
- *
- * Copyright (c) 2014-2017, Jon Schlinkert.
- * Released under the MIT License.
- */
-
-var isobject = function isObject(val) {
-  return val != null && typeof val === 'object' && Array.isArray(val) === false;
-};
-
-/*!
- * get-value <https://github.com/jonschlinkert/get-value>
- *
- * Copyright (c) 2014-2018, Jon Schlinkert.
- * Released under the MIT License.
- */
-
-
-
-var getValue = function(target, path, options) {
-  if (!isobject(options)) {
-    options = { default: options };
-  }
-
-  if (!isValidObject(target)) {
-    return typeof options.default !== 'undefined' ? options.default : target;
-  }
-
-  if (typeof path === 'number') {
-    path = String(path);
-  }
-
-  const isArray = Array.isArray(path);
-  const isString = typeof path === 'string';
-  const splitChar = options.separator || '.';
-  const joinChar = options.joinChar || (typeof splitChar === 'string' ? splitChar : '.');
-
-  if (!isString && !isArray) {
-    return target;
-  }
-
-  if (isString && path in target) {
-    return isValid(path, target, options) ? target[path] : options.default;
-  }
-
-  let segs = isArray ? path : split(path, splitChar, options);
-  let len = segs.length;
-  let idx = 0;
-
-  do {
-    let prop = segs[idx];
-    if (typeof prop === 'number') {
-      prop = String(prop);
-    }
-
-    while (prop && prop.slice(-1) === '\\') {
-      prop = join([prop.slice(0, -1), segs[++idx] || ''], joinChar, options);
-    }
-
-    if (prop in target) {
-      if (!isValid(prop, target, options)) {
-        return options.default;
-      }
-
-      target = target[prop];
-    } else {
-      let hasProp = false;
-      let n = idx + 1;
-
-      while (n < len) {
-        prop = join([prop, segs[n++]], joinChar, options);
-
-        if ((hasProp = prop in target)) {
-          if (!isValid(prop, target, options)) {
-            return options.default;
-          }
-
-          target = target[prop];
-          idx = n - 1;
-          break;
-        }
-      }
-
-      if (!hasProp) {
-        return options.default;
-      }
-    }
-  } while (++idx < len && isValidObject(target));
-
-  if (idx === len) {
-    return target;
-  }
-
-  return options.default;
-};
-
-function join(segs, joinChar, options) {
-  if (typeof options.join === 'function') {
-    return options.join(segs);
-  }
-  return segs[0] + joinChar + segs[1];
-}
-
-function split(path, splitChar, options) {
-  if (typeof options.split === 'function') {
-    return options.split(path);
-  }
-  return path.split(splitChar);
-}
-
-function isValid(key, target, options) {
-  if (typeof options.isValid === 'function') {
-    return options.isValid(key, target);
-  }
-  return true;
-}
-
-function isValidObject(val) {
-  return isobject(val) || Array.isArray(val) || typeof val === 'function';
-}
-
 //      
 
 /**
@@ -4586,12 +4464,13 @@ const COMMANDS = Object.freeze({
     params: ['password', 'email'],
     config: {
       responseType: isNode ? 'blob' : 'stream',
-      timeout: 5000
+      timeout: 15000
     }
   },
   HUB_KEYS: {
     method: 'GET',
-    url: `${CLOUD_URL}user/hubkeys`
+    url: `${CLOUD_URL}user/hubkeys`,
+    timeout: 15000
   },
   REFRESH_AUTHKEY: {
     method: 'GET',
@@ -4610,13 +4489,63 @@ const COMMANDS = Object.freeze({
     url: `${CLOUD_URL}hub/remote/cc/$API_VER/hub/poll`,
     urlParams: ['ts']
   },
-  CMD_DEVICE: {
+  PAIR_START: {
+    method: 'GET',
+    url: `${CLOUD_URL}hub/remote/cc/$API_VER/hub/scan`,
+    urlParams: ['ts']
+  },
+  PAIR_IGNORE: {
+    method: 'PUT',
+    url: `${CLOUD_URL}hub/remote/cc/$API_VER/hub/scan`,
+    type: 'SET_SCAN_RESULT',
+    params: ['id', 'ignored']
+  },
+  PAIR_STOP: {
+    method: 'GET',
+    url: `${CLOUD_URL}hub/remote/cc/$API_VER/hub/stopscan`
+  },
+  CMD_DEVICE_STATE: {
     method: 'PUT',
     url: `${CLOUD_URL}hub/remote/cc/$API_VER/devices/command`,
     type: 'CMD_DEVICE',
     params: ['id', 'state']
+  },
+  CMD_DEVICE_IGNORE: {
+    method: 'PUT',
+    url: `${CLOUD_URL}hub/remote/cc/$API_VER/devices/command`,
+    type: 'CMD_IGNORE_DEVICE',
+    params: ['id']
+  },
+  CMD_DEVICE_IDENTIFY: {
+    method: 'PUT',
+    url: `${CLOUD_URL}hub/remote/cc/$API_VER/devices/command`,
+    type: 'CMD_IDENTIFY',
+    params: ['id']
+  },
+  CMD_DEVICE_META: {
+    method: 'PUT',
+    url: `${CLOUD_URL}hub/remote/cc/$API_VER/devices/command`,
+    type: 'CMD_DEVICE_META',
+    params: ['id', 'name', 'room']
+  },
+  CMD_GET_ROOMS: {
+    method: 'GET',
+    url: `${CLOUD_URL}hub/remote/cc/$API_VER/rooms`
+  },
+  CMD_SET_ROOM: {
+    method: 'PUT',
+    url: `${CLOUD_URL}hub/remote/cc/$API_VER/rooms`,
+    type: 'CMD_ROOM',
+    params: ['id', 'name', 'order']
+  },
+  CMD_REMOVE_ROOM: {
+    method: 'DELETE',
+    url: `${CLOUD_URL}hub/remote/cc/$API_VER/rooms`,
+    urlParams: ['roomId']
   }
-});
+}); // type dataArray = ?Array<{ [key: string | number]: any }>
+// type dataObject = ?{ [key: string | number]: any }
+
 /**
  * COMMAND_TYPE
  *  @typedef {Object} COMMANDS_TYPE
@@ -4759,6 +4688,87 @@ var objectSpread = _objectSpread$2;
  *   }}
  */
 
+const pairingsState = createSlice({
+  slice: 'pairings',
+  initialState: {},
+  reducers: {
+    /*
+     * Reducer action of setting pairing devices state - sets all given devices of given hub, keeps existing states
+     * @param {Object} state
+     * @param {Object} action
+     */
+    setPairingDevices(state, action) {
+      const stateToSet = state;
+      const {
+        hubId
+      } = action.payload;
+      const {
+        devices
+      } = action.payload;
+      const hubPairingDevices = {};
+      Object.entries(devices).forEach(entry => {
+        const [id, device] = entry;
+        hubPairingDevices[id] = objectSpread({}, device);
+      });
+      stateToSet[hubId] = objectSpread({}, hubPairingDevices);
+    },
+
+    /*
+     * Reducer action of setting device state - sets  given device of given hub, keeps existing states
+     * @param {Object} state
+     * @param {payload:{Object{hubId:string, device:Object}}} action
+     */
+    setPairingDevice(state, action) {
+      const stateToSet = state;
+      const {
+        hubId
+      } = action.payload;
+      const {
+        device
+      } = action.payload;
+
+      if (stateToSet[hubId]) {
+        stateToSet[hubId][device.id] = objectSpread({}, device);
+      }
+    },
+
+    /*
+     * Reducer action to remove device from state - sets all given devices of given hub, keeps existing states
+     * @param {Object} state
+     * @param {payload:{Object{hubId:string, device:Object}}} action
+     */
+    deletePairingDevice(state, action) {
+      const stateToSet = state;
+      const {
+        hubId
+      } = action.payload;
+      const {
+        deviceId
+      } = action.payload;
+
+      if (hubId && deviceId && stateToSet[hubId] && stateToSet[hubId][deviceId]) {
+        delete stateToSet[hubId][deviceId];
+      }
+    }
+
+  }
+});
+const {
+  actions: actions$1,
+  reducer: reducer$1
+} = pairingsState;
+
+/**
+ * Devices action creators object
+ * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
+ * @return { {
+ *   slice : string,
+ *   reducer : ReducerFunction,
+ *   actions : Object<string, ActionCreator},
+ *   selectors : Object<string, Selector>
+ *   }}
+ */
+
 const devicesState = createSlice({
   slice: 'devices',
   initialState: {},
@@ -4785,7 +4795,7 @@ const devicesState = createSlice({
     },
 
     /*
-     * Reducer action of setting device state - sets all given devices of given hub, keeps existing states
+     * Reducer action of setting device state - sets  given device of given hub, keeps existing states
      * @param {Object} state
      * @param {payload:{Object{hubId:string, device:Object}}} action
      */
@@ -4814,19 +4824,19 @@ const devicesState = createSlice({
         hubId
       } = action.payload;
       const {
-        device
+        deviceId
       } = action.payload;
 
-      if (stateToSet[hubId]) {
-        delete stateToSet[hubId][device.id];
+      if (hubId && deviceId && stateToSet[hubId] && stateToSet[hubId][deviceId]) {
+        delete stateToSet[hubId][deviceId];
       }
     }
 
   }
 });
 const {
-  actions: actions$1,
-  reducer: reducer$1
+  actions: actions$2,
+  reducer: reducer$2
 } = devicesState;
 
 /*
@@ -4837,7 +4847,7 @@ console.log(addDevice({ id: 123, name: 'Unnamed device' }))
 const {
   setDevices,
   deleteDevice
-} = actions$1;
+} = actions$2;
 
 /**
  * Hubs action creators object
@@ -4928,8 +4938,8 @@ const hubsState = createSlice({
 }); // console.log('hubsState ', hubsState)
 
 const {
-  actions: actions$2,
-  reducer: reducer$2
+  actions: actions$3,
+  reducer: reducer$3
 } = hubsState;
 
 /*
@@ -4942,7 +4952,7 @@ const {
   selectHub,
   unSelectHub,
   setHubConnectionState
-} = actions$2;
+} = actions$3;
 
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
@@ -5292,11 +5302,11 @@ var _baseIsNative = baseIsNative;
  * @param {string} key The key of the property to get.
  * @returns {*} Returns the property value.
  */
-function getValue$1(object, key) {
+function getValue(object, key) {
   return object == null ? undefined : object[key];
 }
 
-var _getValue = getValue$1;
+var _getValue = getValue;
 
 /**
  * Gets the native function at `key` of `object`.
@@ -5826,8 +5836,9 @@ var isEmpty_1 = isEmpty;
   */
 const LANGUAGES = Object.freeze({
   NONE: 'none',
-  EN_UK: 'en-uk',
-  FI_FI: 'fi-fi'
+  EN_EN: 'en',
+  EN_UK: 'en-UK',
+  FI_FI: 'fi-FI'
 });
 /**
   * Enumeration of user state, that could be
@@ -5844,7 +5855,8 @@ const USER_STATES = Object.freeze({
   WAITING_EULA: 'wait eula',
   EULA_ACCEPTED: 'eula accepted',
   AUTHENTICATED: 'logged in',
-  LOGGED_OUT: 'loged out'
+  KEYED: 'key entered',
+  LOGGED_OUT: 'logged out'
 });
 /**
   * Enumeration of ROLES, that could be
@@ -5977,6 +5989,17 @@ const userState = createSlice({
     setAuthKey(state, action) {
       const stateToSet = state;
       stateToSet.authKey = action.payload;
+    },
+
+    /*
+     * Reducer action of setting user's authKey and state
+     * @param  {Object} state
+     * @param  {payload:{state:USER_STATE_TYPE}} action
+     */
+    setAuthenticated(state, action) {
+      const stateToSet = state;
+      stateToSet.authKey = action.payload;
+      stateToSet.state = USER_STATES.KEYED;
     }
 
   }
@@ -5992,9 +6015,117 @@ console.log(user)
 */
 
 const {
-  actions: actions$3,
-  reducer: reducer$3
+  actions: actions$4,
+  reducer: reducer$4
 } = userState;
+
+/**
+ * Rooms action creators object
+ * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
+ * @return { {
+ *   slice : string,
+ *   reducer : ReducerFunction,
+ *   actions : Object<string, ActionCreator},
+ *   selectors : Object<string, Selector>
+ *   }}
+ */
+
+const roomsState = createSlice({
+  slice: 'rooms',
+  initialState: {},
+  reducers: {
+    /*
+     * Reducer action of setting rooms state - sets all given rooms of given hub, keeps existing states
+     * @param {Object} state
+     * @param {Object} action
+     */
+    setRooms(state, action) {
+      const stateToSet = state;
+      const {
+        hubId
+      } = action.payload;
+      const {
+        rooms
+      } = action.payload;
+      const hubRooms = {};
+      Object.entries(rooms).forEach(entry => {
+        const [id, room] = entry;
+        hubRooms[id] = objectSpread({}, room);
+      });
+      stateToSet[hubId] = objectSpread({}, hubRooms);
+    },
+
+    /*
+     * Reducer action of set room state
+     * @param {Object} state
+     * @param {Object} action
+     */
+    setRoom(state, action) {
+      const stateToSet = state;
+      const {
+        hubId
+      } = action.payload;
+      const {
+        room
+      } = action.payload;
+
+      if (hubId && stateToSet[hubId]) {
+        stateToSet[hubId][room.id] = objectSpread({}, room);
+      }
+    },
+
+    /*
+     * Reducer action of removing room state
+     * @param {Object} state
+     * @param {Object} action
+     */
+    removeRoom(state, action) {
+      const stateToSet = state;
+      const {
+        hubId
+      } = action.payload;
+      const {
+        roomId
+      } = action.payload;
+
+      if (hubId && roomId && stateToSet[hubId] && stateToSet[hubId][roomId]) {
+        delete stateToSet[hubId][roomId];
+      }
+    },
+
+    /*
+     * Reducer action of updating room state
+     * @param {Object} state
+     * @param {Object} action
+     */
+    editRoom(state, action) {
+      const stateToSet = state;
+      const {
+        hubId
+      } = action.payload;
+      const {
+        room
+      } = action.payload;
+
+      if (stateToSet[hubId]) {
+        stateToSet[hubId][room.id] = objectSpread({}, room);
+      }
+    }
+
+  }
+});
+/*
+todos.selectors.getCompletedTodoCount = createSelector(
+  [todos.selectors.getTodos],
+  todos =>
+    todos.reduce((count, todo) => (todo.completed ? count + 1 : count), 0)
+);
+*/
+
+const {
+  actions: actions$5,
+  reducer: reducer$5
+} = roomsState;
 
 /**
  * Root reducer
@@ -6003,10 +6134,134 @@ const {
 
 const rootReducer = {
   connections: reducer,
-  devices: reducer$1,
-  hubs: reducer$2,
-  user: reducer$3
+  pairings: reducer$1,
+  devices: reducer$2,
+  hubs: reducer$3,
+  user: reducer$4,
+  rooms: reducer$5
 };
+
+/*!
+ * isobject <https://github.com/jonschlinkert/isobject>
+ *
+ * Copyright (c) 2014-2017, Jon Schlinkert.
+ * Released under the MIT License.
+ */
+
+var isobject = function isObject(val) {
+  return val != null && typeof val === 'object' && Array.isArray(val) === false;
+};
+
+/*!
+ * get-value <https://github.com/jonschlinkert/get-value>
+ *
+ * Copyright (c) 2014-2018, Jon Schlinkert.
+ * Released under the MIT License.
+ */
+
+
+
+var getValue$1 = function(target, path, options) {
+  if (!isobject(options)) {
+    options = { default: options };
+  }
+
+  if (!isValidObject(target)) {
+    return typeof options.default !== 'undefined' ? options.default : target;
+  }
+
+  if (typeof path === 'number') {
+    path = String(path);
+  }
+
+  const isArray = Array.isArray(path);
+  const isString = typeof path === 'string';
+  const splitChar = options.separator || '.';
+  const joinChar = options.joinChar || (typeof splitChar === 'string' ? splitChar : '.');
+
+  if (!isString && !isArray) {
+    return target;
+  }
+
+  if (isString && path in target) {
+    return isValid(path, target, options) ? target[path] : options.default;
+  }
+
+  let segs = isArray ? path : split(path, splitChar, options);
+  let len = segs.length;
+  let idx = 0;
+
+  do {
+    let prop = segs[idx];
+    if (typeof prop === 'number') {
+      prop = String(prop);
+    }
+
+    while (prop && prop.slice(-1) === '\\') {
+      prop = join([prop.slice(0, -1), segs[++idx] || ''], joinChar, options);
+    }
+
+    if (prop in target) {
+      if (!isValid(prop, target, options)) {
+        return options.default;
+      }
+
+      target = target[prop];
+    } else {
+      let hasProp = false;
+      let n = idx + 1;
+
+      while (n < len) {
+        prop = join([prop, segs[n++]], joinChar, options);
+
+        if ((hasProp = prop in target)) {
+          if (!isValid(prop, target, options)) {
+            return options.default;
+          }
+
+          target = target[prop];
+          idx = n - 1;
+          break;
+        }
+      }
+
+      if (!hasProp) {
+        return options.default;
+      }
+    }
+  } while (++idx < len && isValidObject(target));
+
+  if (idx === len) {
+    return target;
+  }
+
+  return options.default;
+};
+
+function join(segs, joinChar, options) {
+  if (typeof options.join === 'function') {
+    return options.join(segs);
+  }
+  return segs[0] + joinChar + segs[1];
+}
+
+function split(path, splitChar, options) {
+  if (typeof options.split === 'function') {
+    return options.split(path);
+  }
+  return path.split(splitChar);
+}
+
+function isValid(key, target, options) {
+  if (typeof options.isValid === 'function') {
+    return options.isValid(key, target);
+  }
+  return true;
+}
+
+function isValidObject(val) {
+  return isobject(val) || Array.isArray(val) || typeof val === 'function';
+}
 
 /**
  * store as a redux state store
@@ -6023,10 +6278,10 @@ const store = configureStore({
 console.log('Store Initial State: ', store.getState());
 
 function watchState(getState, objectPath) {
-  let currentValue = getValue(getState(), objectPath);
+  let currentValue = getValue$1(getState(), objectPath);
   return function w(fn) {
     return () => {
-      const newValue = getValue(getState(), objectPath);
+      const newValue = getValue$1(getState(), objectPath);
 
       if (currentValue !== newValue) {
         const oldValue = currentValue;
@@ -6072,6 +6327,12 @@ const HUB_STATES = Object.freeze({
  */
 
 const POLL_INTERVAL_MS = 1 * 1000;
+/*
+ * Interval defining how often hubs are polled when paired at max
+ * This value is used as is in local connection, and multiplied in remote connection
+ */
+
+const PAIRING_POLL_INTERVAL_MS = 5 * 1000;
 const HUB_PROTOCOL = 'http://';
 const HUB_PORT = '8893';
 
@@ -6675,9 +6936,10 @@ function isSafeRequestError(error) {
 }
 
 const httpRetries = {};
-const RETRY_COUNT = 1;
+const RETRY_COUNT = 2;
 function resetRetry(url) {
   if (httpRetries[url]) {
+    console.warn('resetRetry to 0');
     httpRetries[url] = 0;
     delete httpRetries[url];
   }
@@ -6693,12 +6955,15 @@ function retryCondition(error) {
     if (httpRetries[error.config.url]) {
       if (httpRetries[error.config.url] >= RETRY_COUNT) {
         httpRetries[error.config.url] = 0;
+        console.error('retryCondition count >', RETRY_COUNT);
         return false;
       }
 
       httpRetries[error.config.url] += httpRetries[error.config.url];
+      console.info('retryCondition count set ', httpRetries[error.config.url]);
     } else {
       httpRetries[error.config.url] = 1;
+      console.info('retryCondition count set to 1');
     }
   } else {
     console.error('retryCondition unknown', error); // Cannot determine if the request can be retried
@@ -6707,13 +6972,15 @@ function retryCondition(error) {
   }
 
   if (isSafeRequestError(error) && IDEMPOTENT_HTTP_METHODS.indexOf(error.config.method) !== -1) {
-    console.error('retryCondition condition true', error.config);
+    console.info('retryCondition condition true', error.config);
   } else {
-    console.error('retryCondition condition false', error.config);
+    console.info('retryCondition condition false', error.config);
     httpRetries[error.config.url] = 0;
   }
 
-  return isSafeRequestError(error) && IDEMPOTENT_HTTP_METHODS.indexOf(error.config.method) !== -1;
+  const retVal = isSafeRequestError(error) && IDEMPOTENT_HTTP_METHODS.indexOf(error.config.method) !== -1;
+  console.info('retryCondition return ', retVal);
+  return retVal;
 }
 /*
  * @param  {Error}  error
@@ -6810,7 +7077,7 @@ axiosRetry(axios, {
   retryDelay: (retryCount, error) => {
     // console.error('axiosRetry ', retryCount); DOESN'T WORK , see send_retry.js
     console.error('axiosRetry ', error);
-    return 1000; // retryCount * 1000;
+    return 5000; // retryCount * 1000;
   }
 });
 /* Flag to indicate SSL failures */
@@ -6851,6 +7118,7 @@ function send({
 }) {
   let sendMethod = method;
   let sendUrl = url;
+  let sendTimeout = timeout;
   let sendAuthKey = authKey;
   let sendHubKey = hubKey;
   let sendConfig = config;
@@ -6877,6 +7145,8 @@ function send({
   let remoteConnection = false; // Flag to indicate are we sending hub command meaning using commandAPI (vrs. some cloud/videocloud command like login, log etc)
 
   const hubCommand = !isEmpty_1(hubId);
+  const stateNow = store.getState();
+  const user = userState.selectors.getUser(stateNow); // const { storedAuthKey } = user;
 
   if (typeof command !== 'undefined' && command) {
     if (command.method) {
@@ -6886,7 +7156,6 @@ function send({
     if (isEmpty_1(sendUrl) && command.url) {
       // command with Hub API version
       if (command.url.indexOf('$API_VER') !== -1) {
-        const stateNow = store.getState();
         const hubs = hubsState.selectors.getHubs(stateNow);
 
         if (!hubs[hubId] || !hubs[hubId].hubKey) {
@@ -6931,22 +7200,29 @@ function send({
 
     if (command.type && body) {
       if (isArray_1(body)) {
-        body[0].type = command.type;
-      } else {
+        if (body[0]) {
+          body[0].type = command.type;
+        }
+      } else if (body) {
         body.type = command.type;
       }
     }
-    /*
+
     if (command.params) {
+      if (!command.params.includes('type')) {
+        command.params.push('type');
+      }
+
       command.params.forEach(param => {
-        if (isArray(data)){
-          body[0][param] = data[param];
-        } else {
+        if (isArray_1(data)) {
+          if (body && body[0] && data && data[0]) {
+            body[0][param] = data[0][param];
+          }
+        } else if (body && data) {
           body[param] = data[param];
         }
       });
-    } */
-
+    }
 
     if (command.urlParams) {
       const params = [];
@@ -6961,6 +7237,10 @@ function send({
       }
     }
 
+    if (command.timeout) {
+      sendTimeout = command.timeout;
+    }
+
     if (command.config) {
       sendConfig = command.config;
     }
@@ -6968,14 +7248,15 @@ function send({
 
   const bodyString = JSON.stringify(body);
   const reqConf = {
-    timeout: timeout || 1000,
+    timeout: sendTimeout || 15000,
     method: sendMethod,
     // withCredentials: false,
     headers: {
       Accept: 'application/json, application/binary, text/plain, */*',
       'Content-Type': sendType,
       Authorization: sendAuthKey || null,
-      'X-Hub-Key': sendHubKey || null
+      'X-Hub-Key': sendHubKey || null,
+      'Accept-Language': user.language && user.language !== LANGUAGES.NONE ? user.language : null
     },
     crossDomain: true,
     responseType: 'application/json',
@@ -7038,9 +7319,19 @@ function send({
 
             resolve(response.data);
           }).catch(error => {
+            let errorMsg = 'SDK Send error:';
+
             if (error && error.response) {
               // The request was made and the server responded with a status code
               // that falls out of the range of 2xx
+              if (error.response.data && error.response.data.message) {
+                errorMsg = errorMsg.concat(error.response.data.message);
+              }
+
+              if (error.response.status) {
+                errorMsg = errorMsg.concat(`Status: ${error.response.status}`);
+              }
+
               if (remoteConnection) {
                 if (command !== COMMANDS.CLOUD_META) {
                   setCloudConnectionState(cloudErrorState(error));
@@ -7079,22 +7370,27 @@ function send({
                     state: HUB_CONNECTION_STATES.UNCONNECTED
                   });
                 }
+
+                errorMsg = errorMsg.concat(`Cloud unconnected in remote. Status ${error.request.status}`);
               } else if (hubCommand && hubId) {
                 // Local connection
                 setHubConnectionState$1({
                   hubId,
                   state: HUB_CONNECTION_STATES.UNCONNECTED
                 });
+                errorMsg = errorMsg.concat(`Hub unconnected. Status ${error.request.status}`);
               }
             } else if (remoteConnection) {
               // Something happened in setting up the request that triggered an Error
               setCloudConnectionState(CLOUD_CONNECTION_STATES.UNCONNECTED);
+              errorMsg = errorMsg.concat('Cloud unconnected in remote');
 
               if (hubCommand && hubId) {
                 setHubConnectionState$1({
                   hubId,
                   state: HUB_CONNECTION_STATES.UNCONNECTED
                 });
+                errorMsg = errorMsg.concat('Hub unconnected in remote');
               }
             } else if (hubCommand && hubId) {
               // Local connection
@@ -7102,10 +7398,11 @@ function send({
                 hubId,
                 state: HUB_CONNECTION_STATES.UNCONNECTED
               });
+              errorMsg = errorMsg.concat('Hub unconnected');
             }
 
-            console.error('SDK send: error ', error);
-            reject(new Error('SDK Error: Send error'));
+            console.error(errorMsg);
+            reject(error);
           });
         }
       });
@@ -7126,7 +7423,8 @@ function storedUser() {
 }
 /**
  * User action to change current language
- * @type {LANGUAGES_TYPE}
+ * @param {LANGUAGES_TYPE} newLanguage - language to be changed to
+ * @return {Boolean} true if language was set
  */
 
 
@@ -7135,35 +7433,34 @@ function changeLanguage(newLanguage) {
 
   if (Object.values(LANGUAGES).indexOf(newLanguage) > -1) {
     store.dispatch(userState.actions.setLanguage(newLanguage));
+    retVel = true;
 
     if (storedUser().state === USER_STATES.WAITING_LANGUAGE) {
       store.dispatch(userState.actions.changeState(USER_STATES.LANGUAGE_SET));
     }
-
-    retVel = true;
   }
 
   return retVel;
 }
 /**
  * User action to accept EULA
+ * @return {Boolean} true if EULA was accepted
  */
 
 function acceptEula() {
-  let retVel = false;
   store.dispatch(userState.actions.setEula(true));
 
   if (storedUser().state === USER_STATES.WAITING_EULA) {
     store.dispatch(userState.actions.changeState(USER_STATES.EULA_ACCEPTED));
   }
 
-  retVel = true;
-  return retVel;
+  return true;
 }
 /**
  * User action to log in
  * @param {string} email - email address
  * @param {password} password  - fixed password
+ * @return { Promise}
  */
 
 function doPwLogin(email, password) {
@@ -7191,7 +7488,18 @@ function doPwLogin(email, password) {
   });
 }
 /**
+ * User action to set user token
+ * @param {string} userToken - Cozify user/cloud token
+ * @return {USER_STATE_TYPE}
+ */
+
+function setAuthenticated(userToken) {
+  store.dispatch(userState.actions.setAuthenticated(userToken));
+  return storedUser().state;
+}
+/**
  * Get state of user state-machine
+ * @return {USER_STATE_TYPE}
  */
 
 function getUserState() {
@@ -7207,6 +7515,15 @@ function getUserState() {
 function getDevices() {
   const stateNow = store.getState();
   return devicesState.selectors.getDevices(stateNow);
+}
+/**
+ * Get pairing devices of all selected hubs
+ * @return {HUB_DEVICES_MAP_TYPE}
+ */
+
+function getPairingDevices() {
+  const stateNow = store.getState();
+  return pairingsState.selectors.getPairings(stateNow);
 }
 /**
  * Get devices of given hub
@@ -7225,13 +7542,29 @@ function getHubDevices(hubId) {
   return retVal;
 }
 /**
+ * Get pairing devices of given hub
+ * @param  {string} hubId
+ * @return {DEVICES_MAP_TYPE}
+ */
+
+function getHubPairingDevices(hubId) {
+  let retVal;
+  const devices = getPairingDevices();
+
+  if (devices && devices[hubId]) {
+    retVal = devices[hubId];
+  }
+
+  return retVal;
+}
+/**
  * Device handler for poll delta results
  * @param  {string} hubId
  * @param  {boolean} reset
  * @param  {Object} devices
  */
 
-function deviceDeltaHandler(hubId, reset, devices) {
+function devicesDeltaHandler(hubId, reset, devices) {
   let oldHubDevices = {};
   const storedDevices = getDevices();
 
@@ -7257,7 +7590,254 @@ function deviceDeltaHandler(hubId, reset, devices) {
       if (key && device) {
         store.dispatch(devicesState.actions.setDevice(stateDevice));
       } else if (key && oldHubDevices[key]) {
-        store.dispatch(devicesState.actions.deleteDevice(stateDevice));
+        store.dispatch(devicesState.actions.deleteDevice(key));
+      }
+    });
+  }
+}
+/**
+ * Device handler for poll delta results
+ * @param  {string} hubId
+ * @param  {boolean} reset
+ * @param  {Array} pairingDevices
+ */
+
+function pairingDevicesDeltaHandler(hubId, reset, pairingDevices) {
+  let oldPairingDevices = {};
+  const storedPairingDevices = getPairingDevices();
+
+  if (storedPairingDevices && storedPairingDevices[hubId]) {
+    oldPairingDevices = storedPairingDevices[hubId];
+  }
+
+  const statePairingDevices = {
+    hubId,
+    devices: {}
+  };
+  pairingDevices.map(device => {
+    statePairingDevices.devices[device.id] = device;
+    return true;
+  });
+
+  if (reset) {
+    // If reset then set  devices as they are received
+    store.dispatch(pairingsState.actions.setPairingDevices(statePairingDevices));
+  } else {
+    // Loop devices to check could it be added or should be removed
+    Object.entries(statePairingDevices.devices).forEach(([key, device]) => {
+      const statePairingDevice = {
+        hubId,
+        device
+      };
+      /*
+      for(devRoom in device.status.room){
+        for room in _rooms when devRoom is room.id
+            device.status.room = angular.copy room
+      }
+      */
+
+      if (key && device) {
+        store.dispatch(pairingsState.actions.setPairingDevice(statePairingDevice));
+      } else if (key && oldPairingDevices[key]) {
+        store.dispatch(pairingsState.actions.deletePairingDevice(key));
+      }
+    });
+  }
+}
+
+//      
+
+/**
+ * Get rooms of all selected hubs
+ * @return {HUB_ROOMS_MAP_TYPE}
+ */
+
+function getRooms() {
+  const stateNow = store.getState();
+  return roomsState.selectors.getRooms(stateNow);
+}
+/**
+ * Get rooms of given hub
+ * @param  {string} hubId
+ * @return {ROOMS_MAP_TYPE}
+ */
+
+function getHubRooms(hubId) {
+  let retVal;
+  const rooms = getRooms();
+
+  if (rooms && rooms[hubId]) {
+    retVal = rooms[hubId];
+  }
+
+  return retVal;
+}
+function sendRoomCmd(hubId, commandType, data) {
+  return new Promise((resolve, reject) => {
+    const stateNow = store.getState();
+    const user = userState.selectors.getUser(stateNow);
+
+    if (!user || !user.authKey) {
+      console.error('SDK sendRoomCmd error: No userKey!');
+      reject(new Error('Room command error: No userKey!'));
+      return;
+    }
+
+    const hubs = hubsState.selectors.getHubs(stateNow);
+    const hub = hubs[hubId];
+    const {
+      hubKey
+    } = hubs[hubId];
+
+    if (!hub || !hubKey) {
+      console.error('SDK sendRoomCmd error: No hubKey!');
+      reject(new Error('Room command error: No hubKey!'));
+      return;
+    }
+
+    if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
+      console.error('SDK sendRoomCmd error: No Hub connection');
+      reject(new Error('Room command error: No hub connection'));
+      return;
+    }
+
+    const {
+      authKey
+    } = user;
+
+    if (!authKey) {
+      console.error('SDK sendRoomCmd error: No authKey!');
+      reject(new Error('Room command error: No authKey!'));
+      return;
+    }
+
+    if (commandType) {
+      send({
+        command: commandType,
+        authKey,
+        hubId,
+        localUrl: hub.url,
+        hubKey,
+        data
+      }).then(status => {
+        console.debug('SDK sendRoomCmd ok', status);
+        send({
+          command: COMMANDS.CMD_GET_ROOMS,
+          authKey,
+          hubId,
+          localUrl: hub.url,
+          hubKey
+        }).then(rooms => {
+          console.debug('SDK sendRoomCmd refresh rooms ok', rooms);
+          store.dispatch(roomsState.actions.setRooms({
+            hubId,
+            rooms
+          }));
+          resolve(rooms);
+        }).catch(error => {
+          console.error('SDK Room command error:', error);
+          reject(error);
+        });
+      }).catch(error => {
+        console.error('SDK Room command error:', error);
+        reject(error);
+      });
+    }
+  });
+}
+/**
+ * Add room to given hub
+ * do not usr store.dispatch(roomsState.actions.addRoom(hubId, room)) as rooms are coming back in delta
+ * @param  {string} hubI
+ * @param  {Object} room
+ * @return {Promise<Object>} rooms
+ */
+
+async function addRoom(hubId, room) {
+  return new Promise((resolve, reject) => {
+    sendRoomCmd(hubId, COMMANDS.CMD_SET_ROOM, [room]).then(rooms => {
+      resolve(rooms);
+    }).catch(error => {
+      debugger;
+      reject(error);
+    });
+  });
+}
+/**
+ * Edit room of given hub
+ * do not usr store.dispatch(roomsState.actions.editRoom(hubId, room)) as rooms are coming back in delta
+ * @param  {string} hubId
+ * @param  {Object} room
+ * @return {Promise<Object>} rooms
+ */
+
+async function editRoom(hubId, room) {
+  return new Promise((resolve, reject) => {
+    sendRoomCmd(hubId, COMMANDS.CMD_SET_ROOM, [room]).then(rooms => {
+      resolve(rooms);
+    }).catch(error => {
+      debugger;
+      reject(error);
+    });
+  });
+}
+/**
+ * Remove given room of given hub
+ * @param  {string} hubI
+ * @param  {Object} room
+ */
+
+async function removeRoom(hubId, room) {
+  // store.dispatch(roomsState.actions.removeRoom(hubId, room));
+  return new Promise((resolve, reject) => {
+    sendRoomCmd(hubId, COMMANDS.CMD_REMOVE_ROOM, {
+      roomId: room.id
+    }).then(rooms => {
+      resolve(rooms);
+    }).catch(error => {
+      if (error.response && error.response.status && error.response.status === 404) {
+        const storedRooms = getRooms();
+        resolve(storedRooms[hubId]);
+      }
+
+      reject(error);
+    });
+  });
+}
+/**
+ * Rooms handler for poll delta results
+ * @param  {string} hubId
+ * @param  {boolean} reset
+ * @param  {Object} rooms
+ */
+
+function roomsDeltaHandler(hubId, reset, rooms) {
+  let oldHubRooms = {};
+  const storedRooms = getRooms();
+
+  if (storedRooms && storedRooms[hubId]) {
+    oldHubRooms = storedRooms[hubId];
+  }
+
+  if (reset) {
+    // If reset then set rooms as they are received
+    const stateRooms = {
+      hubId,
+      rooms
+    };
+    store.dispatch(roomsState.actions.setRooms(stateRooms));
+  } else {
+    // Loop rooms to check could it be added or should be removed
+    Object.entries(rooms).forEach(([key, room]) => {
+      const stateRoom = {
+        hubId,
+        room
+      };
+
+      if (key && room) {
+        store.dispatch(roomsState.actions.setRoom(stateRoom));
+      } else if (key && oldHubRooms[key]) {
+        store.dispatch(roomsState.actions.removeRoom(key));
       }
     });
   }
@@ -7287,7 +7867,7 @@ function extractHubInfo(HUBKeys) {
         info.role = payload.role;
         info.roleString = '';
         Object.keys(ROLES).forEach(roleKey => {
-          if (ROLES[hubKey] === info.role) info.roleString = roleKey;
+          if (ROLES[roleKey] === info.role) info.roleString = roleKey;
         });
       }
 
@@ -7501,6 +8081,8 @@ function fetchHubs() {
     });
   });
 }
+
+const discoveryInterval = undefined;
 /**
  * Start discovering hubs every DISCOVERY_INTERVAL_MS
  * Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local meta-infos
@@ -7513,24 +8095,200 @@ function startDiscoveringHubs() {
     // discoveryInterval = setInterval(fetchHubs, DISCOVERY_INTERVAL_MS);
   }
 }
+/**
+ * Stop discovering hubs
+ */
+
+function stopDiscoveringHubs() {
+  clearInterval(discoveryInterval);
+}
+/*
+** Pairing
+ */
+
+const pairingIntervals = {};
+let pairingStopped = false;
+let pairingTimeStamp = 0;
+let pairingInAction = false;
+/*
+ * Do pairing if hub connection is ok
+ * Remote pairing is executed only every second call
+ * @param {string} hubId
+ * @param {booleam} reset - set true for full scan, false if delta only
+ * @return none
+ */
+
+function doPairing(hubId, reset) {
+  if (pairingStopped) {
+    console.debug('doPairing: pairing stopped');
+    return;
+  }
+
+  const hub = getHubs()[hubId];
+  const {
+    authKey
+  } = storedUser$1();
+  const {
+    hubKey
+  } = hub;
+  console.debug('doPairing connection state: ', hub.connectionState);
+
+  if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
+    console.error('SDK doPairing error: no Hub connection');
+    return;
+  }
+
+  if (pairingInAction) {
+    return;
+  }
+
+  pairingInAction = true; // reset = pairingTimeStamp === 0;
+
+  if (reset) pairingTimeStamp = 0;
+  send({
+    command: COMMANDS.PAIR_START,
+    hubId,
+    authKey,
+    hubKey,
+    localUrl: hub.url,
+    data: {
+      ts: pairingTimeStamp
+    }
+  }).then(delta => {
+    if (delta) {
+      pairingTimeStamp = delta.timestamp;
+
+      switch (delta.type) {
+        case 'SCAN_DELTA':
+          {
+            pairingDevicesDeltaHandler(hubId, reset, delta.devices);
+            break;
+          }
+
+        default:
+          {
+            break;
+          }
+      }
+    }
+
+    pairingInAction = false;
+  }).catch(error => {
+    // store.dispatch(hubsState.actions.hubPollFailed())
+    console.error('SDK: doPairing error: ', error.message);
+    pairingInAction = false;
+  });
+}
+/**
+ * Set pairing ignore flag of given device in given hub
+ * @param {string} hubId
+ * @param {string} deviceId
+ * @param {boolean} ignore
+ * @return none
+ */
+
+
+function ignorePairing(hubId, deviceId, ignore) {
+  const {
+    authKey
+  } = storedUser$1();
+  const hub = getHubs()[hubId];
+  const {
+    hubKey
+  } = hub;
+  send({
+    command: COMMANDS.PAIR_IGNORE,
+    hubId,
+    authKey,
+    hubKey,
+    localUrl: hub.url,
+    data: {
+      id: deviceId,
+      ignored: ignore
+    }
+  }).then(data => {
+    console.debug('SDK: scanIgnore: Ok , data: ', data);
+  }).catch(error => {
+    // store.dispatch(hubsState.actions.hubPollFailed())
+    console.error('SDK: scanIgnore error: ', error.message);
+  });
+}
+/**
+ * Start pairing on given hub
+ * @param {string} hubId
+ * @param {booleam} reset - set true for full scan, false if delta only
+ * @return none
+ */
+
+function startPairing(hubId, reset) {
+  const intervalTime = PAIRING_POLL_INTERVAL_MS;
+  pairingStopped = false;
+  doPairing(hubId, reset);
+  pairingIntervals[hubId] = setInterval(doPairing, intervalTime, hubId, reset);
+}
+let stopPairingInAction = false;
+/**
+ * Stop pairing on given hub
+ * @param {string} hubId
+ * @return none
+ */
+
+function stopPairing(hubId) {
+  if (stopPairingInAction) {
+    return;
+  }
+
+  stopPairingInAction = true;
+  const {
+    authKey
+  } = storedUser$1();
+  const hub = getHubs()[hubId];
+  const {
+    hubKey
+  } = hub;
+  clearInterval(pairingIntervals[hubId]);
+  send({
+    command: COMMANDS.PAIR_STOP,
+    hubId,
+    authKey,
+    hubKey,
+    localUrl: hub.url
+  }).then(data => {
+    console.debug('SDK: pairingStopped: Ok , data: ', data);
+    pairingStopped = true;
+    stopPairingInAction = false;
+  }).catch(error => {
+    // store.dispatch(hubsState.actions.hubPollFailed())
+    console.error('SDK: pairingStopped error: ', error.message);
+    stopPairingInAction = false;
+  });
+}
 /*
 ** Polling
 */
 
 const pollIntervals = {};
+let pollingStopped = false;
 let pollTimeStamp = 0;
 let pollInAction = false;
 let secondPoll = false;
-/*
- * Do poll if hub connection is ok
+/**
+ * Do poll on given hub if hub connection is ok
+ * @param {string} hubId
  * Remote poll is executed only every second call
  */
 
 function doPoll(hubId) {
+  if (pollingStopped) {
+    console.debug('doPolling: polling stopped');
+    return;
+  }
+
   const hub = getHubs()[hubId];
-  console.error('doPoll connection state: ', hub.connectionState);
+  console.debug('doPoll connection state: ', hub.connectionState);
 
   if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
+    console.error('SDK doPoll error: No Hub connection');
     return;
   } // just return every second -> not doing so often as in local connection
 
@@ -7579,7 +8337,7 @@ function doPoll(hubId) {
         switch (delta.type) {
           case 'DEVICE_DELTA':
             {
-              deviceDeltaHandler(hubId, reset, delta.devices);
+              devicesDeltaHandler(hubId, reset, delta.devices);
               break;
             }
 
@@ -7605,6 +8363,7 @@ function doPoll(hubId) {
 
           case 'ROOM_DELTA':
             {
+              roomsDeltaHandler(hubId, reset, delta.rooms);
               break;
             }
 
@@ -7629,37 +8388,42 @@ function doPoll(hubId) {
     pollInAction = false;
   }).catch(error => {
     // store.dispatch(hubsState.actions.hubPollFailed())
-    console.error('doPoll error: ', error.message);
+    console.error('SDK doPoll error: ', error.message);
     pollInAction = false;
   });
 }
-/*
- * Start polling of given hub
+/**
+ * Start polling on given hub
+ * @param {string} hubId
+ * @return none
  */
 
 
 function startPolling(hubId) {
+  pollingStopped = false;
   const intervalTime = POLL_INTERVAL_MS;
   pollIntervals[hubId] = setInterval(doPoll, intervalTime, hubId);
 }
-/*
- * Stop polling of given hub
+/**
+ * Stop polling on given hub
+ * @param {string} hubId   - hub id to be selected
+ * @return none
  */
 
-
 function stopPolling(hubId) {
+  pollingStopped = true;
   clearInterval(pollIntervals[hubId]);
 }
 /**
  * Unselect hub by id, stops hub polling
- * @param  {string} selectedId   - hub id to be selected
+ * @param  {string} hubId   - hub id to be selected
+ * @return none
  */
 
-
-function unSelectHubById(selectedId) {
+function unSelectHubById(hubId) {
   const hubs = getHubs();
   Object.values(hubs).forEach(hub => {
-    if (selectedId === hub.id) {
+    if (hubId === hub.id) {
       store.dispatch(hubsState.actions.unSelectHub({
         hubId: hub.id
       }));
@@ -7669,17 +8433,28 @@ function unSelectHubById(selectedId) {
 }
 /**
  * Select hub by id, starts hub polling
- * @param  {string} selectedId   - hub id to be selected
+ * @param  {string} hubId   - hub id to be selected
+ * @param  {boolean} poll  - flag to start polling when connected, defaults to false
+ * @return none
  */
 
-function selectHubById(selectedId) {
+function selectHubById(hubId, poll = false) {
   const hubs = getHubs();
   Object.values(hubs).forEach(hub => {
-    if (selectedId === hub.id) {
+    if (hubId === hub.id) {
       store.dispatch(hubsState.actions.selectHub({
         hubId: hub.id
       }));
-      startPolling(hub.id);
+
+      if (hub.hubKey && poll) {
+        startPolling(hub.id);
+      } else {
+        if (!hub.hubKey) {
+          console.error('SDK selectHubById: No hub key error');
+        }
+
+        console.debug('SDK selectHubById: Ready to start polling');
+      }
     }
   });
 }
@@ -9045,8 +9820,9 @@ var pick = _flatRest(function(object, paths) {
 var pick_1 = pick;
 
 //      
+
 /**
- * Device command to be sent
+ * Device state command to be sent
  * @param  {string} hubId
  * @param  {string} deviceId
  * @param  {Object} state
@@ -9054,12 +9830,13 @@ var pick_1 = pick;
  * @return {Promise}
  */
 
-function sendDeviceCmd(hubId, deviceId, state, properties) {
+function sendDeviceStateCmd(hubId, deviceId, state, properties) {
   return new Promise((resolve, reject) => {
     const stateNow = store.getState();
     const user = userState.selectors.getUser(stateNow);
 
     if (!user || !user.authKey) {
+      console.error('SDK sendDeviceStateCmd error: No userKey!');
       reject(new Error('Device command error: No userKey!'));
       return;
     }
@@ -9067,6 +9844,7 @@ function sendDeviceCmd(hubId, deviceId, state, properties) {
     const hubs = hubsState.selectors.getHubs(stateNow);
 
     if (!hubs[hubId] || !hubs[hubId].hubKey) {
+      console.error('SDK sendDeviceStateCmd error: No hubKey!');
       reject(new Error('Device command error: No hubKey!'));
       return;
     }
@@ -9084,7 +9862,7 @@ function sendDeviceCmd(hubId, deviceId, state, properties) {
     }
 
     send({
-      command: COMMANDS.CMD_DEVICE,
+      command: COMMANDS.CMD_DEVICE_STATE,
       authKey,
       hubId,
       hubKey,
@@ -9093,12 +9871,126 @@ function sendDeviceCmd(hubId, deviceId, state, properties) {
         state: sendState
       }]
     }).then(response => {
-      console.debug('sendDeviceCmd ok', response);
+      console.debug('SDK sendDeviceCmd ok', response);
       resolve(response);
     }).catch(error => {
       console.error(error);
-      reject(new Error('Device command error!'));
+      console.error('SDK sendDeviceStateCmd error:', error);
+      reject(new Error('Device state command error!'));
     });
+  });
+}
+/**
+ * General device command to be sent
+ * @param  {string} hubId
+ * @param  {string} deviceId
+ * @param  {Object} state
+ * @param  {Array<string>} properties - optional properties
+ * @return {Promise}
+ */
+
+function sendDeviceCmd(hubId, deviceId, commandType, data, properties) {
+  return new Promise((resolve, reject) => {
+    const stateNow = store.getState();
+    const user = userState.selectors.getUser(stateNow);
+
+    if (!user || !user.authKey) {
+      console.error('SDK sendDeviceCmd error: No userKey!');
+      reject(new Error('Device command error: No userKey!'));
+      return;
+    }
+
+    const hubs = hubsState.selectors.getHubs(stateNow);
+    const hub = hubs[hubId];
+    const {
+      hubKey
+    } = hubs[hubId];
+
+    if (!hub || !hubKey) {
+      console.error('SDK sendDeviceCmd error: No hubKey!');
+      reject(new Error('Device command error: No hubKey!'));
+      return;
+    }
+
+    if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
+      console.error('SDK sendDeviceCmd error: No Hub connection');
+      reject(new Error('Device command error: No hub connection'));
+      return;
+    }
+
+    const {
+      authKey
+    } = user;
+
+    if (!authKey) {
+      console.error('SDK sendDeviceCmd error: No authKey!');
+      reject(new Error('Device command error: No hubKey!'));
+      return;
+    }
+
+    let sendData = data;
+
+    if (!isEmpty_1(properties)) {
+      sendData = pick_1(sendData, properties);
+    }
+
+    if (commandType) {
+      send({
+        command: commandType,
+        method: undefined,
+        authKey,
+        hubId,
+        localUrl: hub.url,
+        hubKey,
+        data: [sendData]
+      }).then(response => {
+        console.debug('SDK sendDeviceCmd ok', response);
+        resolve(response);
+      }).catch(error => {
+        console.error('SDK sendDeviceCmd error:', error);
+        reject(new Error('Device command error!'));
+      });
+    }
+  });
+}
+/**
+ * Unpair device
+ * @param  {string} hubId
+ * @param  {string} deviceId
+ * @return {Promise}
+ */
+
+function unpairDevice(hubId, deviceId) {
+  return sendDeviceCmd(hubId, deviceId, COMMANDS.CMD_DEVICE_IGNORE, {
+    id: deviceId
+  });
+}
+/**
+ * Identify device
+ * @param  {string} hubId
+ * @param  {string} deviceId
+ * @return {Promise}
+ */
+
+function identifyDevice(hubId, deviceId) {
+  return sendDeviceCmd(hubId, deviceId, COMMANDS.CMD_DEVICE_IDENTIFY, {
+    id: deviceId
+  });
+}
+/**
+ * Identify device
+ * @param  {string} hubId
+ * @param  {string} deviceId
+ * @param  {string} name
+ * @param  {Array<string>} roomId
+ * @return {Promise}
+ */
+
+function setDeviceMeta(hubId, deviceId, name, rooms) {
+  return sendDeviceCmd(hubId, deviceId, COMMANDS.CMD_DEVICE_META, {
+    id: deviceId,
+    name,
+    room: rooms
   });
 }
 
@@ -9111,22 +10003,42 @@ exports.LANGUAGES = LANGUAGES;
 exports.ROLES = ROLES;
 exports.USER_STATES = USER_STATES;
 exports.acceptEula = acceptEula;
+exports.addRoom = addRoom;
 exports.changeLanguage = changeLanguage;
+exports.cozifyReducer = rootReducer;
 exports.deleteDevice = deleteDevice;
 exports.devicesState = devicesState;
 exports.doPwLogin = doPwLogin;
+exports.editRoom = editRoom;
 exports.getCloudConnectionState = getCloudConnectionState;
 exports.getDevices = getDevices;
 exports.getHubConnectionState = getHubConnectionState;
 exports.getHubDevices = getHubDevices;
+exports.getHubPairingDevices = getHubPairingDevices;
+exports.getHubRooms = getHubRooms;
 exports.getHubs = getHubs;
+exports.getPairingDevices = getPairingDevices;
+exports.getRooms = getRooms;
 exports.getUserState = getUserState;
 exports.hubsState = hubsState;
+exports.identifyDevice = identifyDevice;
+exports.ignorePairing = ignorePairing;
+exports.removeRoom = removeRoom;
 exports.selectHubById = selectHubById;
 exports.sendDeviceCmd = sendDeviceCmd;
+exports.sendDeviceStateCmd = sendDeviceStateCmd;
+exports.setAuthenticated = setAuthenticated;
+exports.setDeviceMeta = setDeviceMeta;
 exports.setDevices = setDevices;
+exports.startDiscoveringHubs = startDiscoveringHubs;
+exports.startPairing = startPairing;
+exports.startPolling = startPolling;
+exports.stopDiscoveringHubs = stopDiscoveringHubs;
+exports.stopPairing = stopPairing;
+exports.stopPolling = stopPolling;
 exports.store = store;
 exports.unSelectHubById = unSelectHubById;
+exports.unpairDevice = unpairDevice;
 exports.updateHubs = updateHubs;
 exports.watchChanges = watchChanges;
 //# sourceMappingURL=sdk-node.js.map

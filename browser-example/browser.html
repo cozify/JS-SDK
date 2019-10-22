@@ -15,6 +15,7 @@
       let fixedHubId = 'xxxx-xxxx'
       let fixedDeviceId = 'abcd-efgh'
       let fixedDeviceName = 'Windpow'
+
       let LANGUAGES = CozifySDK.LANGUAGES;
       let USER_STATES = CozifySDK.USER_STATES;
 
@@ -30,7 +31,7 @@
       console.info(`Initial user state ${CozifySDK.getUserState()}`);
       console.info(`--1--`);
 
-      CozifySDK.changeLanguage(LANGUAGES.FI_FI);
+      CozifySDK.changeLanguage(LANGUAGES.EN_EN);
       console.info(`--2--`);
 
 
@@ -39,6 +40,7 @@
 
       CozifySDK.startDiscoveringHubs(fixedHubId);
 
+      // POLLINGS
       CozifySDK.watchChanges('hubs', (newHubsState, oldHubsState) => {
         if (newHubsState[fixedHubId] && !newHubsState[fixedHubId].selected) {
           CozifySDK.selectHubById(fixedHubId, true);
@@ -63,6 +65,7 @@
 
       });
 
+      // PAIRIMGS
       let devicePaired = false;
       CozifySDK.watchChanges('pairings', (newPairingsState, oldPairingsState) => {
          if ( newPairingsState[fixedHubId]) {
@@ -93,6 +96,43 @@
 
       });
 
+      // ROOMS
+      let roomAdded = false;
+      let roomEdited = false;
+      let roomRemoved = false;
+
+      const EditRemove = async (room)=> {
+          if (room && room.name === 'Living Room'  ) {
+            if (!roomEdited) {
+              roomEdited = true;
+              const newRooms = await CozifySDK.editRoom(fixedHubId, {id: room.id, name: 'Old living room'});
+              console.log("Edited", newRooms)
+            }
+          }
+          if (room && room.name === 'Old living room'  ) {
+            if (!roomRemoved) {
+              roomRemoved = true;
+              const newRooms = await CozifySDK.removeRoom(fixedHubId, room)
+              console.log("Removed", newRooms)
+            }
+
+          }
+        }
+
+      const modifyRooms = async (newRoomsState) => {
+        if (!roomAdded) {
+          roomAdded = true;
+          const newRooms = await CozifySDK.addRoom(fixedHubId, {name: 'Living Room'});
+          console.log("Added", newRooms)
+        }
+        Object.values(newRoomsState[fixedHubId]).forEach(EditRemove)
+      }
+
+      CozifySDK.watchChanges('rooms', (newRoomsState, oldRoomsState) => {
+        modifyRooms(newRoomsState)
+      })
+
+      // DEVICES
       let deviceStateChanged = false;
       CozifySDK.watchChanges('devices', (newDevicesState, oldDevicesState) => {
         if ( newDevicesState[fixedHubId]) {
@@ -100,11 +140,11 @@
             if (device.name === fixedDeviceName && device.state && !deviceStateChanged ) {
               let state = device.state;
               state.isOn = !state.isOn;
-
+              /*
               CozifySDK.sendDeviceStateCmd(fixedHubId, device.id, state, ['isOn', 'type']);
               deviceStateChanged = true;
               CozifySDK.unpairDevice(fixedHubId, device.id, true)
-
+              */
             }
           })
         }
@@ -118,6 +158,7 @@
         console.info("Hubs", storeNow.hubs)
         console.info("Devices:", CozifySDK.getDevices()[fixedHubId])
         console.info("Pairings:", CozifySDK.getPairingDevices()[fixedHubId])
+        console.info("Rooms:", CozifySDK.getRooms()[fixedHubId])
       })
 
     </script>

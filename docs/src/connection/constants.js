@@ -30,19 +30,41 @@ export const MAX_API_VERSION = '1.12';
   */
 export const COMMANDS = Object.freeze({
   USER_LOGIN: {
-    method: 'POST', url: `${CLOUD_URL}user/login`, params: ['password', 'email'], config: { responseType: isNode ? 'blob' : 'stream', timeout: 5000 },
+    method: 'POST', url: `${CLOUD_URL}user/login`, params: ['password', 'email'], config: { responseType: isNode ? 'blob' : 'stream', timeout: 15000 },
   },
-  HUB_KEYS: { method: 'GET', url: `${CLOUD_URL}user/hubkeys` },
+  HUB_KEYS: { method: 'GET', url: `${CLOUD_URL}user/hubkeys`, timeout: 15000 },
   REFRESH_AUTHKEY: { method: 'GET', url: `${CLOUD_URL}user/refreshsession` },
   CLOUD_IP: { method: 'GET', url: `${CLOUD_URL}hub/lan_ip` },
   CLOUD_META: { method: 'GET', url: `${CLOUD_URL}hub/remote/hub` },
   POLL: { method: 'GET', url: `${CLOUD_URL}hub/remote/cc/$API_VER/hub/poll`, urlParams: ['ts'] },
-  CMD_DEVICE: {
+  PAIR_START: { method: 'GET', url: `${CLOUD_URL}hub/remote/cc/$API_VER/hub/scan`, urlParams: ['ts'] },
+  PAIR_IGNORE: {
+    method: 'PUT', url: `${CLOUD_URL}hub/remote/cc/$API_VER/hub/scan`, type: 'SET_SCAN_RESULT', params: ['id', 'ignored'],
+  },
+  PAIR_STOP: { method: 'GET', url: `${CLOUD_URL}hub/remote/cc/$API_VER/hub/stopscan` },
+  CMD_DEVICE_STATE: {
     method: 'PUT', url: `${CLOUD_URL}hub/remote/cc/$API_VER/devices/command`, type: 'CMD_DEVICE', params: ['id', 'state'],
   },
+  CMD_DEVICE_IGNORE: {
+    method: 'PUT', url: `${CLOUD_URL}hub/remote/cc/$API_VER/devices/command`, type: 'CMD_IGNORE_DEVICE', params: ['id'],
+  },
+  CMD_DEVICE_IDENTIFY: {
+    method: 'PUT', url: `${CLOUD_URL}hub/remote/cc/$API_VER/devices/command`, type: 'CMD_IDENTIFY', params: ['id'],
+  },
+  CMD_DEVICE_META: {
+    method: 'PUT', url: `${CLOUD_URL}hub/remote/cc/$API_VER/devices/command`, type: 'CMD_DEVICE_META', params: ['id', 'name', 'room'],
+  },
+  CMD_GET_ROOMS: { method: 'GET', url: `${CLOUD_URL}hub/remote/cc/$API_VER/rooms` },
+  CMD_SET_ROOM: {
+    method: 'PUT', url: `${CLOUD_URL}hub/remote/cc/$API_VER/rooms`, type: 'CMD_ROOM', params: ['id', 'name', 'order'],
+  },
+  CMD_REMOVE_ROOM: { method: 'DELETE', url: `${CLOUD_URL}hub/remote/cc/$API_VER/rooms`, urlParams: ['roomId'] },
 });
 
 
+
+// type dataArray = ?Array<{ [key: string | number]: any }>
+// type dataObject = ?{ [key: string | number]: any }
 
 /**
  * COMMAND_TYPE

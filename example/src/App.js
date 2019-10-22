@@ -37,7 +37,7 @@ doPwLogin( fixedUsername, fixedPassword )
 
 watchChanges('hubs', (newHubsState, oldHubsState) => {
   if (newHubsState[fixedHubId] && !newHubsState[fixedHubId].selected) {
-    selectHubById(fixedHubId);
+    selectHubById(fixedHubId, true);
     /*
     setTimeout(function() {
       CozifySDK.unSelectHubById(fixedHubId);

@@ -13,6 +13,7 @@ import {
 } from './send-utilities';
 import { setCloudConnectionState, setHubConnectionState } from './state';
 import { userState } from '../reducers/user';
+import { LANGUAGES } from '../user/constants';
 import { hubsState } from '../reducers/hubs';
 import { store } from '../store';
 
@@ -104,7 +105,7 @@ axiosRetry(axios, {
   retryDelay: (retryCount, error) => {
     // console.error('axiosRetry ', retryCount); DOESN'T WORK , see send_retry.js
     console.error('axiosRetry ', error);
-    return 1000; // retryCount * 1000;
+    return 5000; // retryCount * 1000;
   },
 });
 
@@ -135,6 +136,7 @@ export function send({
 }) {
   let sendMethod = method;
   let sendUrl = url;
+  let sendTimeout = timeout;
   let sendAuthKey = authKey;
   let sendHubKey = hubKey;
   let sendConfig = config;
@@ -159,7 +161,10 @@ export function send({
 
   // Flag to indicate are we sending hub command meaning using commandAPI (vrs. some cloud/videocloud command like login, log etc)
   const hubCommand = !isEmpty(hubId);
+  const stateNow = store.getState();
+  const user = userState.selectors.getUser(stateNow);
 
+  // const { storedAuthKey } = user;
 
   if (typeof command !== 'undefined' && command) {
     if (command.method) {
@@ -168,7 +173,6 @@ export function send({
     if (isEmpty(sendUrl) && command.url) {
       // command with Hub API version
       if (command.url.indexOf('$API_VER') !== -1) {
-        const stateNow = store.getState();
         const hubs = hubsState.selectors.getHubs(stateNow);
         if (!hubs[hubId] || !hubs[hubId].hubKey) {
           return new Promise((resolve, reject) => {
@@ -207,22 +211,28 @@ export function send({
 
     if (command.type && body) {
       if (isArray(body)) {
-        body[0].type = command.type;
-      } else {
+        if (body[0]) {
+          body[0].type = command.type;
+        }
+      } else if (body) {
         body.type = command.type;
       }
     }
 
-    /*
     if (command.params) {
-      command.params.forEach(param => {
-        if (isArray(data)){
-          body[0][param] = data[param];
-        } else {
+      if (!command.params.includes('type')) {
+        command.params.push('type');
+      }
+      command.params.forEach((param) => {
+        if (isArray(data)) {
+          if (body && body[0] && data && data[0]) {
+            body[0][param] = data[0][param];
+          }
+        } else if (body && data) {
           body[param] = data[param];
         }
       });
-    } */
+    }
 
     if (command.urlParams) {
       const params = [];
@@ -236,6 +246,10 @@ export function send({
       }
     }
 
+    if (command.timeout) {
+      sendTimeout = command.timeout;
+    }
+
     if (command.config) {
       sendConfig = command.config;
     }
@@ -244,7 +258,7 @@ export function send({
   const bodyString = JSON.stringify(body);
 
   const reqConf = {
-    timeout: timeout || 1000,
+    timeout: sendTimeout || 15000,
     method: sendMethod,
     // withCredentials: false,
     headers: {
@@ -252,6 +266,7 @@ export function send({
       'Content-Type': sendType,
       Authorization: sendAuthKey || null,
       'X-Hub-Key': sendHubKey || null,
+      'Accept-Language': (user.language && user.language !== LANGUAGES.NONE) ? user.language : null,
     },
     crossDomain: true,
     responseType: 'application/json',
@@ -314,9 +329,18 @@ export function send({
                 resolve(response.data);
               })
               .catch((error) => {
+                let errorMsg = 'SDK Send error:';
                 if (error && error.response) {
                   // The request was made and the server responded with a status code
                   // that falls out of the range of 2xx
+
+                  if (error.response.data && error.response.data.message) {
+                    errorMsg = errorMsg.concat(error.response.data.message);
+                  }
+                  if (error.response.status) {
+                    errorMsg = errorMsg.concat(`Status: ${error.response.status}`);
+                  }
+
                   if (remoteConnection) {
                     if (command !== COMMANDS.CLOUD_META) {
                       setCloudConnectionState(cloudErrorState(error));
@@ -343,22 +367,27 @@ export function send({
                     if (hubCommand && hubId) {
                       setHubConnectionState({ hubId, state: HUB_CONNECTION_STATES.UNCONNECTED });
                     }
+                    errorMsg = errorMsg.concat(`Cloud unconnected in remote. Status ${error.request.status}`);
                   } else if (hubCommand && hubId) {
                     // Local connection
                     setHubConnectionState({ hubId, state: HUB_CONNECTION_STATES.UNCONNECTED });
+                    errorMsg = errorMsg.concat(`Hub unconnected. Status ${error.request.status}`);
                   }
                 } else if (remoteConnection) {
                   // Something happened in setting up the request that triggered an Error
                   setCloudConnectionState(CLOUD_CONNECTION_STATES.UNCONNECTED);
+                  errorMsg = errorMsg.concat('Cloud unconnected in remote');
                   if (hubCommand && hubId) {
                     setHubConnectionState({ hubId, state: HUB_CONNECTION_STATES.UNCONNECTED });
+                    errorMsg = errorMsg.concat('Hub unconnected in remote');
                   }
                 } else if (hubCommand && hubId) {
                   // Local connection
                   setHubConnectionState({ hubId, state: HUB_CONNECTION_STATES.UNCONNECTED });
+                  errorMsg = errorMsg.concat('Hub unconnected');
                 }
-                console.error('SDK send: error ', error);
-                reject(new Error('SDK Error: Send error'));
+                console.error(errorMsg);
+                reject(error);
               });
           }
         });

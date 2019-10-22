@@ -37,7 +37,7 @@ export const devicesState = createSlice({
     },
 
     /*
-     * Reducer action of setting device state - sets all given devices of given hub, keeps existing states
+     * Reducer action of setting device state - sets  given device of given hub, keeps existing states
      * @param {Object} state
      * @param {payload:{Object{hubId:string, device:Object}}} action
      */
@@ -58,22 +58,22 @@ export const devicesState = createSlice({
     deleteDevice(state, action) {
       const stateToSet = state;
       const { hubId } = action.payload;
-      const { device } = action.payload;
-      if (stateToSet[hubId]) {
-        delete stateToSet[hubId][device.id];
+      const { deviceId } = action.payload;
+
+      if (hubId && deviceId && stateToSet[hubId] && stateToSet[hubId][deviceId]) {
+        delete stateToSet[hubId][deviceId];
       }
     },
   },
 });
 
 const { actions, reducer } = devicesState;
-const devicesReducer = reducer;
+
 /**
  * Devices reducer
  * @type {function} reducer
  */
 export { reducer as devicesReducer };
-
 
 // Extract and export each action creator by name
 /*
