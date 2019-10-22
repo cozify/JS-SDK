@@ -58,7 +58,7 @@ export function getHubPairingDevices(hubId: string): ?DEVICES_MAP_TYPE {
  * @param  {boolean} reset
  * @param  {Object} devices
  */
-export function deviceDeltaHandler(hubId: string, reset: boolean, devices: Object) {
+export function devicesDeltaHandler(hubId: string, reset: boolean, devices: Object) {
   let oldHubDevices: DEVICES_MAP_TYPE = {};
   const storedDevices: HUB_DEVICES_MAP_TYPE = getDevices();
   if (storedDevices && storedDevices[hubId]) {
@@ -94,7 +94,7 @@ export function deviceDeltaHandler(hubId: string, reset: boolean, devices: Objec
  * @param  {boolean} reset
  * @param  {Array} pairingDevices
  */
-export function devicePairingDeltaHandler(hubId: string, reset: boolean, pairingDevices: Array<Object>) {
+export function pairingDevicesDeltaHandler(hubId: string, reset: boolean, pairingDevices: Array<Object>) {
   let oldPairingDevices: DEVICES_MAP_TYPE = {};
   const storedPairingDevices: HUB_DEVICES_MAP_TYPE = getPairingDevices();
   if (storedPairingDevices && storedPairingDevices[hubId]) {

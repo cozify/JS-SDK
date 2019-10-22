@@ -33,6 +33,10 @@ export {
   sendDeviceStateCmd, sendDeviceCmd,
   unpairDevice, identifyDevice, setDeviceMeta,
 } from './devices/device';
+export {
+  getRooms, getHubRooms,
+  addRoom, editRoom, removeRoom,
+} from './rooms/rooms';
 
 
 export { devicesState, setDevices, deleteDevice } from './reducers/devices';

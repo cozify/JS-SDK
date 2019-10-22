@@ -3,6 +3,7 @@ import { pairingsReducer } from './pairings';
 import { devicesReducer } from './devices';
 import { hubsReducer } from './hubs';
 import { userReducer } from './user';
+import { roomsReducer } from './rooms';
 
 /**
  * Root reducer
@@ -14,6 +15,7 @@ const rootReducer = {
   devices: devicesReducer,
   hubs: hubsReducer,
   user: userReducer,
+  rooms: roomsReducer,
 };
 
 export default rootReducer;

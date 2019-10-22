@@ -54,13 +54,19 @@ export const COMMANDS = Object.freeze({
   CMD_DEVICE_META: {
     method: 'PUT', url: `${CLOUD_URL}hub/remote/cc/$API_VER/devices/command`, type: 'CMD_DEVICE_META', params: ['id', 'name', 'room'],
   },
+  CMD_GET_ROOMS: { method: 'GET', url: `${CLOUD_URL}hub/remote/cc/$API_VER/rooms` },
+  CMD_SET_ROOM: {
+    method: 'PUT', url: `${CLOUD_URL}hub/remote/cc/$API_VER/rooms`, type: 'CMD_ROOM', params: ['id', 'name', 'order'],
+  },
+  CMD_REMOVE_ROOM: { method: 'DELETE', url: `${CLOUD_URL}hub/remote/cc/$API_VER/rooms`, urlParams: ['roomId'] },
 });
 
 
 export type COMMANDS_TYPE = $Values<typeof COMMANDS>;
 
-type dataArray = ?Array<{ [key: string | number]: any }>
-type dataObject = ?{ [key: string | number]: any }
+// type dataArray = ?Array<{ [key: string | number]: any }>
+// type dataObject = ?{ [key: string | number]: any }
+
 /**
  * COMMAND_TYPE
  *  @typedef {Object} COMMANDS_TYPE

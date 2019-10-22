@@ -7,7 +7,8 @@ import { USER_STATES, ROLES } from '../user/constants';
 import { HUB_CONNECTION_STATES } from '../connection/constants';
 import { COMMANDS, send, sendAll } from '../connection/send';
 
-import { deviceDeltaHandler, devicePairingDeltaHandler } from '../devices/devices';
+import { devicesDeltaHandler, pairingDevicesDeltaHandler } from '../devices/devices';
+import { roomsDeltaHandler } from '../rooms/rooms';
 import { urlBase64Decode } from '../utils';
 import { store, watchChanges } from '../store';
 import { hubsState } from '../reducers/hubs';
@@ -310,7 +311,7 @@ function doPairing(hubId: string, reset: boolean) {
         pairingTimeStamp = delta.timestamp;
         switch (delta.type) {
           case 'SCAN_DELTA': {
-            devicePairingDeltaHandler(hubId, reset, delta.devices);
+            pairingDevicesDeltaHandler(hubId, reset, delta.devices);
             break;
           }
           default: {
@@ -461,7 +462,7 @@ function doPoll(hubId: string) {
         deltas.polls.forEach((delta) => {
           switch (delta.type) {
             case 'DEVICE_DELTA': {
-              deviceDeltaHandler(hubId, reset, delta.devices);
+              devicesDeltaHandler(hubId, reset, delta.devices);
               break;
             }
             case 'GROUP_DELTA': {
@@ -477,6 +478,7 @@ function doPoll(hubId: string) {
               break;
             }
             case 'ROOM_DELTA': {
+              roomsDeltaHandler(hubId, reset, delta.rooms);
               break;
             }
             case 'ZONE_DELTA': {
