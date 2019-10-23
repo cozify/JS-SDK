@@ -6319,6 +6319,11 @@ var CozifySDK = (function (exports, axios) {
 	  CONNECTED: 'connected'
 	});
 	/*
+	 * Intervall defining how often hubkeys and metadatas are fetched
+	 */
+
+	const DISCOVERY_INTERVAL_MS = 45 * 1000;
+	/*
 	 * Interval defining how often hubs are polled at max
 	 * This value is used as is in local connection, and multiplied in remote connection
 	 */
@@ -7487,12 +7492,12 @@ var CozifySDK = (function (exports, axios) {
 	/**
 	 * User action to set user token
 	 * @param {string} userToken - Cozify user/cloud token
-	 * @return {USER_STATE_TYPE}
+	 * @return {Object} user
 	 */
 
 	function setAuthenticated(userToken) {
 	  store.dispatch(userState.actions.setAuthenticated(userToken));
-	  return storedUser().state;
+	  return storedUser();
 	}
 	/**
 	 * Get state of user state-machine
@@ -8079,17 +8084,18 @@ var CozifySDK = (function (exports, axios) {
 	  });
 	}
 
-	const discoveryInterval = undefined;
+	let discoveryInterval;
 	/**
 	 * Start discovering hubs every DISCOVERY_INTERVAL_MS
 	 * Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local meta-infos
 	 */
 
 	function startDiscoveringHubs() {
-	  {
+	  if (!discoveryInterval) {
 	    // call immediately...
 	    fetchHubs(); // and then every DISCOVERY_INTERVAL_MS (30s?)
-	    // discoveryInterval = setInterval(fetchHubs, DISCOVERY_INTERVAL_MS);
+
+	    discoveryInterval = setInterval(fetchHubs, DISCOVERY_INTERVAL_MS);
 	  }
 	}
 	/**
@@ -8104,19 +8110,19 @@ var CozifySDK = (function (exports, axios) {
 	 */
 
 	const pairingIntervals = {};
-	let pairingStopped = false;
-	let pairingTimeStamp = 0;
-	let pairingInAction = false;
+	const pairingStopped = {};
+	const pairingTimeStamp = {};
+	const pairingInAction = {};
 	/*
-	 * Do pairing if hub connection is ok
+	 * Do pairing of given hub if hub connection is ok
 	 * Remote pairing is executed only every second call
 	 * @param {string} hubId
 	 * @param {booleam} reset - set true for full scan, false if delta only
 	 * @return none
 	 */
 
-	function doPairing(hubId, reset) {
-	  if (pairingStopped) {
+	function doPairingById(hubId, reset) {
+	  if (pairingStopped[hubId]) {
 	    console.debug('doPairing: pairing stopped');
 	    return;
 	  }
@@ -8135,13 +8141,13 @@ var CozifySDK = (function (exports, axios) {
 	    return;
 	  }
 
-	  if (pairingInAction) {
+	  if (pairingInAction[hubId]) {
 	    return;
 	  }
 
-	  pairingInAction = true; // reset = pairingTimeStamp === 0;
+	  pairingInAction[hubId] = true; // reset = pairingTimeStamp === 0;
 
-	  if (reset) pairingTimeStamp = 0;
+	  if (reset) pairingTimeStamp[hubId] = 0;
 	  send({
 	    command: COMMANDS.PAIR_START,
 	    hubId,
@@ -8149,11 +8155,11 @@ var CozifySDK = (function (exports, axios) {
 	    hubKey,
 	    localUrl: hub.url,
 	    data: {
-	      ts: pairingTimeStamp
+	      ts: pairingTimeStamp[hubId]
 	    }
 	  }).then(delta => {
 	    if (delta) {
-	      pairingTimeStamp = delta.timestamp;
+	      pairingTimeStamp[hubId] = delta.timestamp;
 
 	      switch (delta.type) {
 	        case 'SCAN_DELTA':
@@ -8169,11 +8175,11 @@ var CozifySDK = (function (exports, axios) {
 	      }
 	    }
 
-	    pairingInAction = false;
+	    pairingInAction[hubId] = false;
 	  }).catch(error => {
 	    // store.dispatch(hubsState.actions.hubPollFailed())
 	    console.error('SDK: doPairing error: ', error.message);
-	    pairingInAction = false;
+	    pairingInAction[hubId] = false;
 	  });
 	}
 	/**
@@ -8185,7 +8191,7 @@ var CozifySDK = (function (exports, axios) {
 	 */
 
 
-	function ignorePairing(hubId, deviceId, ignore) {
+	function ignorePairingByIds(hubId, deviceId, ignore) {
 	  const {
 	    authKey
 	  } = storedUser$1();
@@ -8217,25 +8223,25 @@ var CozifySDK = (function (exports, axios) {
 	 * @return none
 	 */
 
-	function startPairing(hubId, reset) {
+	function startPairingById(hubId, reset) {
 	  const intervalTime = PAIRING_POLL_INTERVAL_MS;
-	  pairingStopped = false;
-	  doPairing(hubId, reset);
-	  pairingIntervals[hubId] = setInterval(doPairing, intervalTime, hubId, reset);
+	  pairingStopped[hubId] = false;
+	  doPairingById(hubId, reset);
+	  pairingIntervals[hubId] = setInterval(doPairingById, intervalTime, hubId, reset);
 	}
-	let stopPairingInAction = false;
+	const stopPairingInAction = {};
 	/**
 	 * Stop pairing on given hub
 	 * @param {string} hubId
 	 * @return none
 	 */
 
-	function stopPairing(hubId) {
-	  if (stopPairingInAction) {
+	function stopPairingById(hubId) {
+	  if (stopPairingInAction[hubId]) {
 	    return;
 	  }
 
-	  stopPairingInAction = true;
+	  stopPairingInAction[hubId] = true;
 	  const {
 	    authKey
 	  } = storedUser$1();
@@ -8252,12 +8258,23 @@ var CozifySDK = (function (exports, axios) {
 	    localUrl: hub.url
 	  }).then(data => {
 	    console.debug('SDK: pairingStopped: Ok , data: ', data);
-	    pairingStopped = true;
-	    stopPairingInAction = false;
+	    pairingStopped[hubId] = true;
+	    stopPairingInAction[hubId] = false;
 	  }).catch(error => {
 	    // store.dispatch(hubsState.actions.hubPollFailed())
 	    console.error('SDK: pairingStopped error: ', error.message);
-	    stopPairingInAction = false;
+	    stopPairingInAction[hubId] = false;
+	  });
+	}
+	/**
+	 * Stop pairing on all hubs
+	 * @return none
+	 */
+
+	function stopPairings() {
+	  const hubs = getHubs();
+	  Object.values(hubs).forEach(hub => {
+	    stopPairingById(hub.id);
 	  });
 	}
 	/*
@@ -8265,10 +8282,10 @@ var CozifySDK = (function (exports, axios) {
 	*/
 
 	const pollIntervals = {};
-	let pollingStopped = false;
-	let pollTimeStamp = 0;
-	let pollInAction = false;
-	let secondPoll = false;
+	const pollingStopped = {};
+	const pollTimeStamp = {};
+	const pollInAction = {};
+	const secondPoll = {};
 	/**
 	 * Do poll on given hub if hub connection is ok
 	 * @param {string} hubId
@@ -8276,7 +8293,7 @@ var CozifySDK = (function (exports, axios) {
 	 */
 
 	function doPoll(hubId) {
-	  if (pollingStopped) {
+	  if (pollingStopped[hubId]) {
 	    console.debug('doPolling: polling stopped');
 	    return;
 	  }
@@ -8291,12 +8308,12 @@ var CozifySDK = (function (exports, axios) {
 
 
 	  if (hub.connectionState === HUB_CONNECTION_STATES.REMOTE) {
-	    if (secondPoll) {
-	      secondPoll = false;
+	    if (secondPoll[hubId]) {
+	      secondPoll[hubId] = false;
 	      return;
 	    }
 
-	    secondPoll = true;
+	    secondPoll[hubId] = true;
 	  }
 
 	  const {
@@ -8306,12 +8323,12 @@ var CozifySDK = (function (exports, axios) {
 	    hubKey
 	  } = hub;
 
-	  if (pollInAction) {
+	  if (pollInAction[hubId]) {
 	    return;
 	  }
 
-	  pollInAction = true;
-	  let reset = pollTimeStamp === 0;
+	  pollInAction[hubId] = true;
+	  let reset = pollTimeStamp[hubId] === 0;
 	  send({
 	    command: COMMANDS.POLL,
 	    hubId,
@@ -8319,17 +8336,17 @@ var CozifySDK = (function (exports, axios) {
 	    hubKey,
 	    localUrl: hub.url,
 	    data: {
-	      ts: pollTimeStamp
+	      ts: pollTimeStamp[hubId]
 	    }
 	  }).then(deltas => {
 	    if (deltas) {
 	      // console.log(JSON.stringify(deltas));
 	      // Return can be null poll, even if not asked that
-	      if (pollTimeStamp === 0 || deltas.full) {
+	      if (pollTimeStamp[hubId] === 0 || deltas.full) {
 	        reset = true;
 	      }
 
-	      pollTimeStamp = deltas.timestamp;
+	      pollTimeStamp[hubId] = deltas.timestamp;
 	      deltas.polls.forEach(delta => {
 	        switch (delta.type) {
 	          case 'DEVICE_DELTA':
@@ -8382,11 +8399,11 @@ var CozifySDK = (function (exports, axios) {
 	      });
 	    }
 
-	    pollInAction = false;
+	    pollInAction[hubId] = false;
 	  }).catch(error => {
 	    // store.dispatch(hubsState.actions.hubPollFailed())
 	    console.error('SDK doPoll error: ', error.message);
-	    pollInAction = false;
+	    pollInAction[hubId] = false;
 	  });
 	}
 	/**
@@ -8396,8 +8413,8 @@ var CozifySDK = (function (exports, axios) {
 	 */
 
 
-	function startPolling(hubId) {
-	  pollingStopped = false;
+	function startPollingById(hubId) {
+	  pollingStopped[hubId] = false;
 	  const intervalTime = POLL_INTERVAL_MS;
 	  pollIntervals[hubId] = setInterval(doPoll, intervalTime, hubId);
 	}
@@ -8407,26 +8424,9 @@ var CozifySDK = (function (exports, axios) {
 	 * @return none
 	 */
 
-	function stopPolling(hubId) {
-	  pollingStopped = true;
+	function stopPollingById(hubId) {
+	  pollingStopped[hubId] = true;
 	  clearInterval(pollIntervals[hubId]);
-	}
-	/**
-	 * Unselect hub by id, stops hub polling
-	 * @param  {string} hubId   - hub id to be selected
-	 * @return none
-	 */
-
-	function unSelectHubById(hubId) {
-	  const hubs = getHubs();
-	  Object.values(hubs).forEach(hub => {
-	    if (hubId === hub.id) {
-	      store.dispatch(hubsState.actions.unSelectHub({
-	        hubId: hub.id
-	      }));
-	      stopPolling(hub.id);
-	    }
-	  });
 	}
 	/**
 	 * Select hub by id, starts hub polling
@@ -8444,7 +8444,7 @@ var CozifySDK = (function (exports, axios) {
 	      }));
 
 	      if (hub.hubKey && poll) {
-	        startPolling(hub.id);
+	        startPollingById(hub.id);
 	      } else {
 	        if (!hub.hubKey) {
 	          console.error('SDK selectHubById: No hub key error');
@@ -8452,6 +8452,37 @@ var CozifySDK = (function (exports, axios) {
 
 	        console.debug('SDK selectHubById: Ready to start polling');
 	      }
+	    }
+	  });
+	}
+	/**
+	 * Unselect hubs, stops hub pollings
+	 * @return none
+	 */
+
+	function unSelectHubs() {
+	  const hubs = getHubs();
+	  Object.values(hubs).forEach(hub => {
+	    store.dispatch(hubsState.actions.unSelectHub({
+	      hubId: hub.id
+	    }));
+	    stopPollingById(hub.id);
+	  });
+	}
+	/**
+	 * Unselect hub by id, stops hub polling
+	 * @param  {string} hubId   - hub id to be selected
+	 * @return none
+	 */
+
+	function unSelectHubById(hubId) {
+	  const hubs = getHubs();
+	  Object.values(hubs).forEach(hub => {
+	    if (hubId === hub.id) {
+	      store.dispatch(hubsState.actions.unSelectHub({
+	        hubId: hub.id
+	      }));
+	      stopPollingById(hub.id);
 	    }
 	  });
 	}
@@ -10019,7 +10050,7 @@ var CozifySDK = (function (exports, axios) {
 	exports.getUserState = getUserState;
 	exports.hubsState = hubsState;
 	exports.identifyDevice = identifyDevice;
-	exports.ignorePairing = ignorePairing;
+	exports.ignorePairingByIds = ignorePairingByIds;
 	exports.removeRoom = removeRoom;
 	exports.selectHubById = selectHubById;
 	exports.sendDeviceCmd = sendDeviceCmd;
@@ -10028,13 +10059,15 @@ var CozifySDK = (function (exports, axios) {
 	exports.setDeviceMeta = setDeviceMeta;
 	exports.setDevices = setDevices;
 	exports.startDiscoveringHubs = startDiscoveringHubs;
-	exports.startPairing = startPairing;
-	exports.startPolling = startPolling;
+	exports.startPairingById = startPairingById;
+	exports.startPollingById = startPollingById;
 	exports.stopDiscoveringHubs = stopDiscoveringHubs;
-	exports.stopPairing = stopPairing;
-	exports.stopPolling = stopPolling;
+	exports.stopPairingById = stopPairingById;
+	exports.stopPairings = stopPairings;
+	exports.stopPollingById = stopPollingById;
 	exports.store = store;
 	exports.unSelectHubById = unSelectHubById;
+	exports.unSelectHubs = unSelectHubs;
 	exports.unpairDevice = unpairDevice;
 	exports.updateHubs = updateHubs;
 	exports.watchChanges = watchChanges;

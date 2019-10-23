@@ -240,9 +240,9 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
-    "cozify-sdk/src/hubs/hubs.js~ignorepairing",
-    "function/index.html#static-function-ignorePairing",
-    "<span>ignorePairing</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/hubs.js</span>",
+    "cozify-sdk/src/hubs/hubs.js~ignorepairingbyids",
+    "function/index.html#static-function-ignorePairingByIds",
+    "<span>ignorePairingByIds</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/hubs.js</span>",
     "function"
   ],
   [
@@ -390,15 +390,15 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
-    "cozify-sdk/src/hubs/hubs.js~startpairing",
-    "function/index.html#static-function-startPairing",
-    "<span>startPairing</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/hubs.js</span>",
+    "cozify-sdk/src/hubs/hubs.js~startpairingbyid",
+    "function/index.html#static-function-startPairingById",
+    "<span>startPairingById</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/hubs.js</span>",
     "function"
   ],
   [
-    "cozify-sdk/src/hubs/hubs.js~startpolling",
-    "function/index.html#static-function-startPolling",
-    "<span>startPolling</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/hubs.js</span>",
+    "cozify-sdk/src/hubs/hubs.js~startpollingbyid",
+    "function/index.html#static-function-startPollingById",
+    "<span>startPollingById</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/hubs.js</span>",
     "function"
   ],
   [
@@ -408,15 +408,21 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
-    "cozify-sdk/src/hubs/hubs.js~stoppairing",
-    "function/index.html#static-function-stopPairing",
-    "<span>stopPairing</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/hubs.js</span>",
+    "cozify-sdk/src/hubs/hubs.js~stoppairingbyid",
+    "function/index.html#static-function-stopPairingById",
+    "<span>stopPairingById</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/hubs.js</span>",
     "function"
   ],
   [
-    "cozify-sdk/src/hubs/hubs.js~stoppolling",
-    "function/index.html#static-function-stopPolling",
-    "<span>stopPolling</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/hubs.js</span>",
+    "cozify-sdk/src/hubs/hubs.js~stoppairings",
+    "function/index.html#static-function-stopPairings",
+    "<span>stopPairings</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/hubs.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/hubs/hubs.js~stoppollingbyid",
+    "function/index.html#static-function-stopPollingById",
+    "<span>stopPollingById</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/hubs.js</span>",
     "function"
   ],
   [
@@ -435,6 +441,12 @@ window.esdocSearchIndex = [
     "cozify-sdk/src/hubs/hubs.js~unselecthubbyid",
     "function/index.html#static-function-unSelectHubById",
     "<span>unSelectHubById</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/hubs.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/hubs/hubs.js~unselecthubs",
+    "function/index.html#static-function-unSelectHubs",
+    "<span>unSelectHubs</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/hubs.js</span>",
     "function"
   ],
   [

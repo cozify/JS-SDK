@@ -2396,7 +2396,7 @@
     "__docId__": 110,
     "kind": "file",
     "name": "src/hubs/hubs.js",
-    "content": "// \nimport isEmpty from 'lodash/isEmpty';\nimport {\n  POLL_INTERVAL_MS, PAIRING_POLL_INTERVAL_MS, HUB_PROTOCOL, HUB_PORT,\n} from './constants';\nimport { USER_STATES, ROLES } from '../user/constants';\nimport { HUB_CONNECTION_STATES } from '../connection/constants';\nimport { COMMANDS, send, sendAll } from '../connection/send';\n\nimport { devicesDeltaHandler, pairingDevicesDeltaHandler } from '../devices/devices';\nimport { roomsDeltaHandler } from '../rooms/rooms';\nimport { urlBase64Decode } from '../utils';\nimport { store, watchChanges } from '../store';\nimport { hubsState } from '../reducers/hubs';\nimport { userState } from '../reducers/user';\n\n\n\nlet hubsMap = {};\n\n\n/*\n * Helper method to extract hub info from JWT based hub keys\n */\nfunction extractHubInfo(HUBKeys) {\n  const hubs = {};\n  if (HUBKeys) {\n    Object.keys(HUBKeys).forEach((hubKey) => {\n      const coded = HUBKeys[hubKey].split('.')[1];\n      const decoded = urlBase64Decode(coded);\n      const payload = JSON.parse(decoded);\n      const info = {};\n      info.id = payload.hubId || payload.hub_id;\n      info.name = payload.hubName || payload.hub_name;\n      info.hubKey = HUBKeys[hubKey];\n      info.connectionState = HUB_CONNECTION_STATES.UNCONNECTED;\n      if (payload.role) {\n        info.role = payload.role;\n        info.roleString = '';\n        Object.keys(ROLES).forEach((roleKey) => {\n          if (ROLES[roleKey] === info.role) info.roleString = roleKey;\n        });\n      }\n      hubs[info.id] = info;\n    });\n  }\n  return hubs;\n}\n\n\n/*\n * Hub metadata is received and will be stored\n */\nfunction updateFoundHub(hubURL, hub) {\n  const foundHub = hub;\n  // Hub keys returns ids, idQuerys return hubId\n  if (foundHub.hubId) {\n    foundHub.id = foundHub.hubId;\n    delete foundHub.hubId;\n  }\n  if (!foundHub.id) {\n    return;\n  }\n\n  if (!hubsMap[foundHub.id]) {\n    hubsMap[foundHub.id] = {\n      id: foundHub.id,\n      name: foundHub.name || '',\n    };\n  }\n  hubsMap[foundHub.id].connected = foundHub.connected;\n  hubsMap[foundHub.id].features = foundHub.features;\n  hubsMap[foundHub.id].state = foundHub.state;\n  hubsMap[foundHub.id].version = foundHub.version;\n  hubsMap[foundHub.id].connectionState = foundHub.connected ? HUB_CONNECTION_STATES.REMOTE : HUB_CONNECTION_STATES.UNCONNECTED;\n  if (hubURL) {\n    hubsMap[foundHub.id].connectionState = HUB_CONNECTION_STATES.LOCAL;\n    hubsMap[foundHub.id].url = hubURL;\n  } else {\n    hubsMap[foundHub.id].url = undefined;\n  }\n}\n\n/*\n * Remote hub metamata request for version etc information\n */\nfunction doRemoteIdQuery(hubId, authKey, hubKey) {\n  return new Promise((resolve, reject) => {\n    send({\n      command: COMMANDS.CLOUD_META, authKey, hubKey, hubId,\n    })\n      .then((hubData) => {\n        updateFoundHub(undefined, hubData);\n        resolve(hubId);\n      })\n      .catch((error) => {\n        console.log(`doRemoteIdQuery ${hubId} error `, error.message);\n        reject(hubId);\n      });\n  });\n}\n\n/*\n * Local hub metadata request for version etc information\n */\nfunction doLocalIdQuery(ip) {\n  return new Promise((resolve) => {\n    if (ip) {\n      const hubURL = `${HUB_PROTOCOL + ip}:${HUB_PORT}`;\n      const url = `${hubURL}/hub`;\n      send({ url, timeout: 500 })\n        .then((hubData) => {\n          updateFoundHub(hubURL, hubData);\n          resolve(ip);\n        })\n        .catch((error) => {\n          console.log(`doLocalIdQuery ${ip} error `, error.message);\n          resolve(ip);\n        });\n    } else {\n      resolve();\n    }\n  });\n}\n\n/**\n * Helper to get current hubs from state\n * @return {HUBS_MAP_TYPE} - hubs\n */\nexport function getHubs() {\n  return hubsState.selectors.getHubs(store.getState());\n}\n\n/*\n * Check hubs that are currently selected and mark them selected also in map of given hubs\n */\nfunction setSelectedHubs(newHubs) {\n  const hubs = getHubs();\n  (Object.values(hubs)).forEach((hub) => {\n    if (hub.selected) {\n      const selectedNewHub = newHubs[hub.id];\n      if (selectedNewHub) {\n        selectedNewHub.selected = true;\n      }\n    }\n  });\n}\n\n/*\n * Fetch HUB IP addresses in the same network\n */\nfunction doCloudDiscovery() {\n  return new Promise((resolve) => {\n    send({ command: COMMANDS.CLOUD_IP })\n      .then((ips) => {\n        const queries = [];\n        if (ips && !isEmpty(ips)) {\n          ips.forEach((ip) => {\n            queries.push(doLocalIdQuery(ip));\n          });\n        }\n        sendAll(queries)\n          .finally(() => {\n            // mark selected hubs to be selected after\n            setSelectedHubs(hubsMap);\n            store.dispatch(hubsState.actions.updateHubs(hubsMap));\n            resolve('ok');\n          });\n      })\n      .catch((error) => {\n        console.error('doCloudDiscovery error: ', error.message);\n        store.dispatch(hubsState.actions.updateHubs(hubsMap));\n        resolve('error');\n      });\n  });\n}\n\n/*\n * Fetch hub metadatas\n */\nfunction fetchMetaData(hubs, authKey) {\n  return new Promise((resolve) => {\n    const queries = [];\n    (Object.values(hubs)).forEach((hub) => {\n      if (hub.hubKey) {\n        queries.push(doRemoteIdQuery(hub.id, authKey, hub.hubKey));\n      }\n    });\n    sendAll(queries)\n      .then((values) => {\n        console.debug('fetchMetaData values', values);\n      })\n      .catch((error) => {\n        console.debug('fetchMetaData error', error);\n      })\n      .finally(() => {\n        resolve();\n      });\n  });\n}\n\n\n/**\n * Helper to get current user from state\n */\nfunction storedUser() {\n  return userState.selectors.getUser(store.getState());\n}\n\n\n/*\n * Fetch Hub keys by user authKey and start fetching hub meta datas\n */\nfunction fetchHubs() {\n  const { authKey } = storedUser();\n  return new Promise((resolve, reject) => {\n    if (!authKey) {\n      reject(new Error('No userKey!'));\n      return;\n    }\n    send({ command: COMMANDS.HUB_KEYS, authKey })\n      .then((tokens) => {\n        if (tokens) {\n          hubsMap = extractHubInfo(tokens);\n          store.dispatch(hubsState.actions.updateHubs(hubsMap));\n          fetchMetaData(hubsMap, authKey)\n            .finally(() => {\n              doCloudDiscovery();\n              resolve(getHubs());\n            });\n        } else {\n          resolve(getHubs());\n        }\n      })\n      .catch((error) => {\n        console.error('fetchHubTokens error: ', error.message);\n        reject(error);\n      });\n  });\n}\n\n\nconst discoveryInterval = undefined;\n\n/**\n * Start discovering hubs every DISCOVERY_INTERVAL_MS\n * Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local meta-infos\n */\nexport function startDiscoveringHubs() {\n  if (!discoveryInterval) {\n    // call immediately...\n    fetchHubs();\n    // and then every DISCOVERY_INTERVAL_MS (30s?)\n    // discoveryInterval = setInterval(fetchHubs, DISCOVERY_INTERVAL_MS);\n  }\n}\n\n/**\n * Stop discovering hubs\n */\nexport function stopDiscoveringHubs() {\n  clearInterval(discoveryInterval);\n}\n\n/*\n** Pairing\n */\n\nconst pairingIntervals = {};\nlet pairingStopped = false;\nlet pairingTimeStamp = 0;\nlet pairingInAction = false;\n\n\n/*\n * Do pairing if hub connection is ok\n * Remote pairing is executed only every second call\n * @param {string} hubId\n * @param {booleam} reset - set true for full scan, false if delta only\n * @return none\n */\nfunction doPairing(hubId, reset) {\n  if (pairingStopped) {\n    console.debug('doPairing: pairing stopped');\n    return;\n  }\n  const hub = getHubs()[hubId];\n  const { authKey } = storedUser();\n  const { hubKey } = hub;\n\n  console.debug('doPairing connection state: ', hub.connectionState);\n  if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {\n    console.error('SDK doPairing error: no Hub connection');\n    return;\n  }\n\n  if (pairingInAction) {\n    return;\n  }\n  pairingInAction = true;\n\n  // reset = pairingTimeStamp === 0;\n  if (reset) pairingTimeStamp = 0;\n\n  send({\n    command: COMMANDS.PAIR_START, hubId, authKey, hubKey, localUrl: hub.url, data: { ts: pairingTimeStamp },\n  })\n    .then((delta) => {\n      if (delta) {\n        pairingTimeStamp = delta.timestamp;\n        switch (delta.type) {\n          case 'SCAN_DELTA': {\n            pairingDevicesDeltaHandler(hubId, reset, delta.devices);\n            break;\n          }\n          default: {\n            break;\n          }\n        }\n      }\n      pairingInAction = false;\n    })\n    .catch((error) => {\n    // store.dispatch(hubsState.actions.hubPollFailed())\n      console.error('SDK: doPairing error: ', error.message);\n      pairingInAction = false;\n    });\n}\n\n/**\n * Set pairing ignore flag of given device in given hub\n * @param {string} hubId\n * @param {string} deviceId\n * @param {boolean} ignore\n * @return none\n */\nexport function ignorePairing(hubId, deviceId, ignore) {\n  const { authKey } = storedUser();\n  const hub = getHubs()[hubId];\n  const { hubKey } = hub;\n  send({\n    command: COMMANDS.PAIR_IGNORE, hubId, authKey, hubKey, localUrl: hub.url, data: { id: deviceId, ignored: ignore },\n  })\n    .then((data) => {\n      console.debug('SDK: scanIgnore: Ok , data: ', data);\n    })\n    .catch((error) => {\n    // store.dispatch(hubsState.actions.hubPollFailed())\n      console.error('SDK: scanIgnore error: ', error.message);\n    });\n}\n\n\n/**\n * Start pairing on given hub\n * @param {string} hubId\n * @param {booleam} reset - set true for full scan, false if delta only\n * @return none\n */\nexport function startPairing(hubId, reset) {\n  const intervalTime = PAIRING_POLL_INTERVAL_MS;\n  pairingStopped = false;\n  doPairing(hubId, reset);\n  pairingIntervals[hubId] = setInterval(doPairing, intervalTime, hubId, reset);\n}\n\nlet stopPairingInAction = false;\n/**\n * Stop pairing on given hub\n * @param {string} hubId\n * @return none\n */\nexport function stopPairing(hubId) {\n  if (stopPairingInAction) {\n    return;\n  }\n  stopPairingInAction = true;\n\n  const { authKey } = storedUser();\n  const hub = getHubs()[hubId];\n  const { hubKey } = hub;\n\n\n  clearInterval(pairingIntervals[hubId]);\n  send({\n    command: COMMANDS.PAIR_STOP, hubId, authKey, hubKey, localUrl: hub.url,\n  })\n    .then((data) => {\n      console.debug('SDK: pairingStopped: Ok , data: ', data);\n      pairingStopped = true;\n      stopPairingInAction = false;\n    })\n    .catch((error) => {\n    // store.dispatch(hubsState.actions.hubPollFailed())\n      console.error('SDK: pairingStopped error: ', error.message);\n      stopPairingInAction = false;\n    });\n}\n\n\n/*\n** Polling\n*/\n\nconst pollIntervals = {};\nlet pollingStopped = false;\nlet pollTimeStamp = 0;\nlet pollInAction = false;\nlet secondPoll = false;\n\n\n/**\n * Do poll on given hub if hub connection is ok\n * @param {string} hubId\n * Remote poll is executed only every second call\n */\nfunction doPoll(hubId) {\n  if (pollingStopped) {\n    console.debug('doPolling: polling stopped');\n    return;\n  }\n\n  const hub = getHubs()[hubId];\n  console.debug('doPoll connection state: ', hub.connectionState);\n  if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {\n    console.error('SDK doPoll error: No Hub connection');\n    return;\n  }\n\n  // just return every second -> not doing so often as in local connection\n  if (hub.connectionState === HUB_CONNECTION_STATES.REMOTE) {\n    if (secondPoll) {\n      secondPoll = false;\n      return;\n    }\n    secondPoll = true;\n  }\n\n  const { authKey } = storedUser();\n  const { hubKey } = hub;\n\n  if (pollInAction) {\n    return;\n  }\n  pollInAction = true;\n\n  let reset = pollTimeStamp === 0;\n  send({\n    command: COMMANDS.POLL, hubId, authKey, hubKey, localUrl: hub.url, data: { ts: pollTimeStamp },\n  })\n    .then((deltas) => {\n      if (deltas) {\n      // console.log(JSON.stringify(deltas));\n      // Return can be null poll, even if not asked that\n        if (pollTimeStamp === 0 || deltas.full) {\n          reset = true;\n        }\n\n        pollTimeStamp = deltas.timestamp;\n\n        deltas.polls.forEach((delta) => {\n          switch (delta.type) {\n            case 'DEVICE_DELTA': {\n              devicesDeltaHandler(hubId, reset, delta.devices);\n              break;\n            }\n            case 'GROUP_DELTA': {\n              break;\n            }\n            case 'SCENE_DELTA': {\n              break;\n            }\n            case 'RULE_DELTA': {\n              break;\n            }\n            case 'USERS_DELTA': {\n              break;\n            }\n            case 'ROOM_DELTA': {\n              roomsDeltaHandler(hubId, reset, delta.rooms);\n              break;\n            }\n            case 'ZONE_DELTA': {\n              break;\n            }\n            case 'ALARM_DELTA': {\n              break;\n            }\n            default: {\n              break;\n            }\n          }\n        });\n      }\n      pollInAction = false;\n    })\n    .catch((error) => {\n    // store.dispatch(hubsState.actions.hubPollFailed())\n      console.error('SDK doPoll error: ', error.message);\n      pollInAction = false;\n    });\n}\n\n\n/**\n * Start polling on given hub\n * @param {string} hubId\n * @return none\n */\nexport function startPolling(hubId) {\n  pollingStopped = false;\n  const intervalTime = POLL_INTERVAL_MS;\n  pollIntervals[hubId] = setInterval(doPoll, intervalTime, hubId);\n}\n\n/**\n * Stop polling on given hub\n * @param {string} hubId   - hub id to be selected\n * @return none\n */\nexport function stopPolling(hubId) {\n  pollingStopped = true;\n  clearInterval(pollIntervals[hubId]);\n}\n\n/**\n * Unselect hub by id, stops hub polling\n * @param  {string} hubId   - hub id to be selected\n * @return none\n */\nexport function unSelectHubById(hubId) {\n  const hubs = getHubs();\n  (Object.values(hubs)).forEach((hub) => {\n    if (hubId === hub.id) {\n      store.dispatch(hubsState.actions.unSelectHub({ hubId: hub.id }));\n      stopPolling(hub.id);\n    }\n  });\n}\n\n\n/**\n * Select hub by id, starts hub polling\n * @param  {string} hubId   - hub id to be selected\n * @param  {boolean} poll  - flag to start polling when connected, defaults to false\n * @return none\n */\nexport function selectHubById(hubId, poll = false) {\n  const hubs = getHubs();\n\n  (Object.values(hubs)).forEach((hub) => {\n    if (hubId === hub.id) {\n      store.dispatch(hubsState.actions.selectHub({ hubId: hub.id }));\n      if (hub.hubKey && poll) {\n        startPolling(hub.id);\n      } else {\n        if (!hub.hubKey) {\n          console.error('SDK selectHubById: No hub key error');\n        }\n        console.debug('SDK selectHubById: Ready to start polling');\n      }\n    }\n  });\n}\n\n\n/*\n * Listener of User state changes\n * Hub discovery is started when user's new state is AUTHENTICATED\n */\nwatchChanges('user.state', (newState) => {\n  // Start discovery when user is authenticated\n  if (newState === USER_STATES.AUTHENTICATED) {\n    startDiscoveringHubs();\n  }\n});\n",
+    "content": "// \nimport isEmpty from 'lodash/isEmpty';\nimport {\n  DISCOVERY_INTERVAL_MS, POLL_INTERVAL_MS, PAIRING_POLL_INTERVAL_MS, HUB_PROTOCOL, HUB_PORT,\n} from './constants';\nimport { USER_STATES, ROLES } from '../user/constants';\nimport { HUB_CONNECTION_STATES } from '../connection/constants';\nimport { COMMANDS, send, sendAll } from '../connection/send';\n\nimport { devicesDeltaHandler, pairingDevicesDeltaHandler } from '../devices/devices';\nimport { roomsDeltaHandler } from '../rooms/rooms';\nimport { urlBase64Decode } from '../utils';\nimport { store, watchChanges } from '../store';\nimport { hubsState } from '../reducers/hubs';\nimport { userState } from '../reducers/user';\n\n\n\nlet hubsMap = {};\n\n\n/*\n * Helper method to extract hub info from JWT based hub keys\n */\nfunction extractHubInfo(HUBKeys) {\n  const hubs = {};\n  if (HUBKeys) {\n    Object.keys(HUBKeys).forEach((hubKey) => {\n      const coded = HUBKeys[hubKey].split('.')[1];\n      const decoded = urlBase64Decode(coded);\n      const payload = JSON.parse(decoded);\n      const info = {};\n      info.id = payload.hubId || payload.hub_id;\n      info.name = payload.hubName || payload.hub_name;\n      info.hubKey = HUBKeys[hubKey];\n      info.connectionState = HUB_CONNECTION_STATES.UNCONNECTED;\n      if (payload.role) {\n        info.role = payload.role;\n        info.roleString = '';\n        Object.keys(ROLES).forEach((roleKey) => {\n          if (ROLES[roleKey] === info.role) info.roleString = roleKey;\n        });\n      }\n      hubs[info.id] = info;\n    });\n  }\n  return hubs;\n}\n\n\n/*\n * Hub metadata is received and will be stored\n */\nfunction updateFoundHub(hubURL, hub) {\n  const foundHub = hub;\n  // Hub keys returns ids, idQuerys return hubId\n  if (foundHub.hubId) {\n    foundHub.id = foundHub.hubId;\n    delete foundHub.hubId;\n  }\n  if (!foundHub.id) {\n    return;\n  }\n\n  if (!hubsMap[foundHub.id]) {\n    hubsMap[foundHub.id] = {\n      id: foundHub.id,\n      name: foundHub.name || '',\n    };\n  }\n  hubsMap[foundHub.id].connected = foundHub.connected;\n  hubsMap[foundHub.id].features = foundHub.features;\n  hubsMap[foundHub.id].state = foundHub.state;\n  hubsMap[foundHub.id].version = foundHub.version;\n  hubsMap[foundHub.id].connectionState = foundHub.connected ? HUB_CONNECTION_STATES.REMOTE : HUB_CONNECTION_STATES.UNCONNECTED;\n  if (hubURL) {\n    hubsMap[foundHub.id].connectionState = HUB_CONNECTION_STATES.LOCAL;\n    hubsMap[foundHub.id].url = hubURL;\n  } else {\n    hubsMap[foundHub.id].url = undefined;\n  }\n}\n\n/*\n * Remote hub metamata request for version etc information\n */\nfunction doRemoteIdQuery(hubId, authKey, hubKey) {\n  return new Promise((resolve, reject) => {\n    send({\n      command: COMMANDS.CLOUD_META, authKey, hubKey, hubId,\n    })\n      .then((hubData) => {\n        updateFoundHub(undefined, hubData);\n        resolve(hubId);\n      })\n      .catch((error) => {\n        console.log(`doRemoteIdQuery ${hubId} error `, error.message);\n        reject(hubId);\n      });\n  });\n}\n\n/*\n * Local hub metadata request for version etc information\n */\nfunction doLocalIdQuery(ip) {\n  return new Promise((resolve) => {\n    if (ip) {\n      const hubURL = `${HUB_PROTOCOL + ip}:${HUB_PORT}`;\n      const url = `${hubURL}/hub`;\n      send({ url, timeout: 500 })\n        .then((hubData) => {\n          updateFoundHub(hubURL, hubData);\n          resolve(ip);\n        })\n        .catch((error) => {\n          console.log(`doLocalIdQuery ${ip} error `, error.message);\n          resolve(ip);\n        });\n    } else {\n      resolve();\n    }\n  });\n}\n\n/**\n * Helper to get current hubs from state\n * @return {HUBS_MAP_TYPE} - hubs\n */\nexport function getHubs() {\n  return hubsState.selectors.getHubs(store.getState());\n}\n\n/*\n * Check hubs that are currently selected and mark them selected also in map of given hubs\n */\nfunction setSelectedHubs(newHubs) {\n  const hubs = getHubs();\n  (Object.values(hubs)).forEach((hub) => {\n    if (hub.selected) {\n      const selectedNewHub = newHubs[hub.id];\n      if (selectedNewHub) {\n        selectedNewHub.selected = true;\n      }\n    }\n  });\n}\n\n/*\n * Fetch HUB IP addresses in the same network\n */\nfunction doCloudDiscovery() {\n  return new Promise((resolve) => {\n    send({ command: COMMANDS.CLOUD_IP })\n      .then((ips) => {\n        const queries = [];\n        if (ips && !isEmpty(ips)) {\n          ips.forEach((ip) => {\n            queries.push(doLocalIdQuery(ip));\n          });\n        }\n        sendAll(queries)\n          .finally(() => {\n            // mark selected hubs to be selected after\n            setSelectedHubs(hubsMap);\n            store.dispatch(hubsState.actions.updateHubs(hubsMap));\n            resolve('ok');\n          });\n      })\n      .catch((error) => {\n        console.error('doCloudDiscovery error: ', error.message);\n        store.dispatch(hubsState.actions.updateHubs(hubsMap));\n        resolve('error');\n      });\n  });\n}\n\n/*\n * Fetch hub metadatas\n */\nfunction fetchMetaData(hubs, authKey) {\n  return new Promise((resolve) => {\n    const queries = [];\n    (Object.values(hubs)).forEach((hub) => {\n      if (hub.hubKey) {\n        queries.push(doRemoteIdQuery(hub.id, authKey, hub.hubKey));\n      }\n    });\n    sendAll(queries)\n      .then((values) => {\n        console.debug('fetchMetaData values', values);\n      })\n      .catch((error) => {\n        console.debug('fetchMetaData error', error);\n      })\n      .finally(() => {\n        resolve();\n      });\n  });\n}\n\n\n/**\n * Helper to get current user from state\n */\nfunction storedUser() {\n  return userState.selectors.getUser(store.getState());\n}\n\n\n/*\n * Fetch Hub keys by user authKey and start fetching hub meta datas\n */\nfunction fetchHubs() {\n  const { authKey } = storedUser();\n  return new Promise((resolve, reject) => {\n    if (!authKey) {\n      reject(new Error('No userKey!'));\n      return;\n    }\n    send({ command: COMMANDS.HUB_KEYS, authKey })\n      .then((tokens) => {\n        if (tokens) {\n          hubsMap = extractHubInfo(tokens);\n          store.dispatch(hubsState.actions.updateHubs(hubsMap));\n          fetchMetaData(hubsMap, authKey)\n            .finally(() => {\n              doCloudDiscovery();\n              resolve(getHubs());\n            });\n        } else {\n          resolve(getHubs());\n        }\n      })\n      .catch((error) => {\n        console.error('fetchHubTokens error: ', error.message);\n        reject(error);\n      });\n  });\n}\n\n\nlet discoveryInterval;\n\n/**\n * Start discovering hubs every DISCOVERY_INTERVAL_MS\n * Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local meta-infos\n */\nexport function startDiscoveringHubs() {\n  if (!discoveryInterval) {\n    // call immediately...\n    fetchHubs();\n    // and then every DISCOVERY_INTERVAL_MS (30s?)\n    discoveryInterval = setInterval(fetchHubs, DISCOVERY_INTERVAL_MS);\n  }\n}\n\n/**\n * Stop discovering hubs\n */\nexport function stopDiscoveringHubs() {\n  clearInterval(discoveryInterval);\n}\n\n/*\n** Pairing\n */\n\nconst pairingIntervals = {};\nconst pairingStopped = {};\nconst pairingTimeStamp = {};\nconst pairingInAction = {};\n\n\n/*\n * Do pairing of given hub if hub connection is ok\n * Remote pairing is executed only every second call\n * @param {string} hubId\n * @param {booleam} reset - set true for full scan, false if delta only\n * @return none\n */\nfunction doPairingById(hubId, reset) {\n  if (pairingStopped[hubId]) {\n    console.debug('doPairing: pairing stopped');\n    return;\n  }\n  const hub = getHubs()[hubId];\n  const { authKey } = storedUser();\n  const { hubKey } = hub;\n\n  console.debug('doPairing connection state: ', hub.connectionState);\n  if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {\n    console.error('SDK doPairing error: no Hub connection');\n    return;\n  }\n\n  if (pairingInAction[hubId]) {\n    return;\n  }\n  pairingInAction[hubId] = true;\n\n  // reset = pairingTimeStamp === 0;\n  if (reset) pairingTimeStamp[hubId] = 0;\n\n  send({\n    command: COMMANDS.PAIR_START, hubId, authKey, hubKey, localUrl: hub.url, data: { ts: pairingTimeStamp[hubId] },\n  })\n    .then((delta) => {\n      if (delta) {\n        pairingTimeStamp[hubId] = delta.timestamp;\n        switch (delta.type) {\n          case 'SCAN_DELTA': {\n            pairingDevicesDeltaHandler(hubId, reset, delta.devices);\n            break;\n          }\n          default: {\n            break;\n          }\n        }\n      }\n      pairingInAction[hubId] = false;\n    })\n    .catch((error) => {\n    // store.dispatch(hubsState.actions.hubPollFailed())\n      console.error('SDK: doPairing error: ', error.message);\n      pairingInAction[hubId] = false;\n    });\n}\n\n/**\n * Set pairing ignore flag of given device in given hub\n * @param {string} hubId\n * @param {string} deviceId\n * @param {boolean} ignore\n * @return none\n */\nexport function ignorePairingByIds(hubId, deviceId, ignore) {\n  const { authKey } = storedUser();\n  const hub = getHubs()[hubId];\n  const { hubKey } = hub;\n  send({\n    command: COMMANDS.PAIR_IGNORE, hubId, authKey, hubKey, localUrl: hub.url, data: { id: deviceId, ignored: ignore },\n  })\n    .then((data) => {\n      console.debug('SDK: scanIgnore: Ok , data: ', data);\n    })\n    .catch((error) => {\n    // store.dispatch(hubsState.actions.hubPollFailed())\n      console.error('SDK: scanIgnore error: ', error.message);\n    });\n}\n\n\n/**\n * Start pairing on given hub\n * @param {string} hubId\n * @param {booleam} reset - set true for full scan, false if delta only\n * @return none\n */\nexport function startPairingById(hubId, reset) {\n  const intervalTime = PAIRING_POLL_INTERVAL_MS;\n  pairingStopped[hubId] = false;\n  doPairingById(hubId, reset);\n  pairingIntervals[hubId] = setInterval(doPairingById, intervalTime, hubId, reset);\n}\n\nconst stopPairingInAction = {};\n/**\n * Stop pairing on given hub\n * @param {string} hubId\n * @return none\n */\nexport function stopPairingById(hubId) {\n  if (stopPairingInAction[hubId]) {\n    return;\n  }\n  stopPairingInAction[hubId] = true;\n\n  const { authKey } = storedUser();\n  const hub = getHubs()[hubId];\n  const { hubKey } = hub;\n\n\n  clearInterval(pairingIntervals[hubId]);\n  send({\n    command: COMMANDS.PAIR_STOP, hubId, authKey, hubKey, localUrl: hub.url,\n  })\n    .then((data) => {\n      console.debug('SDK: pairingStopped: Ok , data: ', data);\n      pairingStopped[hubId] = true;\n      stopPairingInAction[hubId] = false;\n    })\n    .catch((error) => {\n    // store.dispatch(hubsState.actions.hubPollFailed())\n      console.error('SDK: pairingStopped error: ', error.message);\n      stopPairingInAction[hubId] = false;\n    });\n}\n\n/**\n * Stop pairing on all hubs\n * @return none\n */\nexport function stopPairings() {\n  const hubs = getHubs();\n  (Object.values(hubs)).forEach((hub) => {\n    stopPairingById(hub.id);\n  });\n}\n\n/*\n** Polling\n*/\nconst pollIntervals = {};\nconst pollingStopped = {};\nconst pollTimeStamp = {};\nconst pollInAction = {};\nconst secondPoll = {};\n\n\n/**\n * Do poll on given hub if hub connection is ok\n * @param {string} hubId\n * Remote poll is executed only every second call\n */\nfunction doPoll(hubId) {\n  if (pollingStopped[hubId]) {\n    console.debug('doPolling: polling stopped');\n    return;\n  }\n\n  const hub = getHubs()[hubId];\n  console.debug('doPoll connection state: ', hub.connectionState);\n  if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {\n    console.error('SDK doPoll error: No Hub connection');\n    return;\n  }\n\n  // just return every second -> not doing so often as in local connection\n  if (hub.connectionState === HUB_CONNECTION_STATES.REMOTE) {\n    if (secondPoll[hubId]) {\n      secondPoll[hubId] = false;\n      return;\n    }\n    secondPoll[hubId] = true;\n  }\n\n  const { authKey } = storedUser();\n  const { hubKey } = hub;\n\n  if (pollInAction[hubId]) {\n    return;\n  }\n  pollInAction[hubId] = true;\n\n  let reset = pollTimeStamp[hubId] === 0;\n  send({\n    command: COMMANDS.POLL, hubId, authKey, hubKey, localUrl: hub.url, data: { ts: pollTimeStamp[hubId] },\n  })\n    .then((deltas) => {\n      if (deltas) {\n      // console.log(JSON.stringify(deltas));\n      // Return can be null poll, even if not asked that\n        if (pollTimeStamp[hubId] === 0 || deltas.full) {\n          reset = true;\n        }\n\n        pollTimeStamp[hubId] = deltas.timestamp;\n\n        deltas.polls.forEach((delta) => {\n          switch (delta.type) {\n            case 'DEVICE_DELTA': {\n              devicesDeltaHandler(hubId, reset, delta.devices);\n              break;\n            }\n            case 'GROUP_DELTA': {\n              break;\n            }\n            case 'SCENE_DELTA': {\n              break;\n            }\n            case 'RULE_DELTA': {\n              break;\n            }\n            case 'USERS_DELTA': {\n              break;\n            }\n            case 'ROOM_DELTA': {\n              roomsDeltaHandler(hubId, reset, delta.rooms);\n              break;\n            }\n            case 'ZONE_DELTA': {\n              break;\n            }\n            case 'ALARM_DELTA': {\n              break;\n            }\n            default: {\n              break;\n            }\n          }\n        });\n      }\n      pollInAction[hubId] = false;\n    })\n    .catch((error) => {\n    // store.dispatch(hubsState.actions.hubPollFailed())\n      console.error('SDK doPoll error: ', error.message);\n      pollInAction[hubId] = false;\n    });\n}\n\n\n/**\n * Start polling on given hub\n * @param {string} hubId\n * @return none\n */\nexport function startPollingById(hubId) {\n  pollingStopped[hubId] = false;\n  const intervalTime = POLL_INTERVAL_MS;\n  pollIntervals[hubId] = setInterval(doPoll, intervalTime, hubId);\n}\n\n/**\n * Stop polling on given hub\n * @param {string} hubId   - hub id to be selected\n * @return none\n */\nexport function stopPollingById(hubId) {\n  pollingStopped[hubId] = true;\n  clearInterval(pollIntervals[hubId]);\n}\n\n\n/**\n * Select hub by id, starts hub polling\n * @param  {string} hubId   - hub id to be selected\n * @param  {boolean} poll  - flag to start polling when connected, defaults to false\n * @return none\n */\nexport function selectHubById(hubId, poll = false) {\n  const hubs = getHubs();\n\n  (Object.values(hubs)).forEach((hub) => {\n    if (hubId === hub.id) {\n      store.dispatch(hubsState.actions.selectHub({ hubId: hub.id }));\n      if (hub.hubKey && poll) {\n        startPollingById(hub.id);\n      } else {\n        if (!hub.hubKey) {\n          console.error('SDK selectHubById: No hub key error');\n        }\n        console.debug('SDK selectHubById: Ready to start polling');\n      }\n    }\n  });\n}\n\n/**\n * Unselect hubs, stops hub pollings\n * @return none\n */\nexport function unSelectHubs() {\n  const hubs = getHubs();\n  (Object.values(hubs)).forEach((hub) => {\n    store.dispatch(hubsState.actions.unSelectHub({ hubId: hub.id }));\n    stopPollingById(hub.id);\n  });\n}\n\n/**\n * Unselect hub by id, stops hub polling\n * @param  {string} hubId   - hub id to be selected\n * @return none\n */\nexport function unSelectHubById(hubId) {\n  const hubs = getHubs();\n  (Object.values(hubs)).forEach((hub) => {\n    if (hubId === hub.id) {\n      store.dispatch(hubsState.actions.unSelectHub({ hubId: hub.id }));\n      stopPollingById(hub.id);\n    }\n  });\n}\n\n\n/*\n * Listener of User state changes\n * Hub discovery is started when user's new state is AUTHENTICATED\n */\nwatchChanges('user.state', (newState) => {\n  // Start discovery when user is authenticated\n  if (newState === USER_STATES.AUTHENTICATED) {\n    startDiscoveringHubs();\n  }\n});\n",
     "static": true,
     "longname": "/Users/vesa/code/JS-SDK/docs/src/hubs/hubs.js",
     "access": "public",
@@ -2756,27 +2756,6 @@
   },
   {
     "__docId__": 122,
-    "kind": "variable",
-    "name": "discoveryInterval",
-    "memberof": "src/hubs/hubs.js",
-    "static": true,
-    "longname": "src/hubs/hubs.js~discoveryInterval",
-    "access": "public",
-    "export": false,
-    "importPath": "cozify-sdk/src/hubs/hubs.js",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 243,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 123,
     "kind": "function",
     "name": "startDiscoveringHubs",
     "memberof": "src/hubs/hubs.js",
@@ -2794,7 +2773,7 @@
     "return": null
   },
   {
-    "__docId__": 124,
+    "__docId__": 123,
     "kind": "function",
     "name": "stopDiscoveringHubs",
     "memberof": "src/hubs/hubs.js",
@@ -2812,7 +2791,7 @@
     "return": null
   },
   {
-    "__docId__": 125,
+    "__docId__": 124,
     "kind": "variable",
     "name": "pairingIntervals",
     "memberof": "src/hubs/hubs.js",
@@ -2833,7 +2812,7 @@
     "ignore": true
   },
   {
-    "__docId__": 126,
+    "__docId__": 125,
     "kind": "variable",
     "name": "pairingStopped",
     "memberof": "src/hubs/hubs.js",
@@ -2848,13 +2827,13 @@
     "undocument": true,
     "type": {
       "types": [
-        "boolean"
+        "{}"
       ]
     },
     "ignore": true
   },
   {
-    "__docId__": 127,
+    "__docId__": 126,
     "kind": "variable",
     "name": "pairingTimeStamp",
     "memberof": "src/hubs/hubs.js",
@@ -2869,13 +2848,13 @@
     "undocument": true,
     "type": {
       "types": [
-        "number"
+        "{}"
       ]
     },
     "ignore": true
   },
   {
-    "__docId__": 128,
+    "__docId__": 127,
     "kind": "variable",
     "name": "pairingInAction",
     "memberof": "src/hubs/hubs.js",
@@ -2890,20 +2869,20 @@
     "undocument": true,
     "type": {
       "types": [
-        "boolean"
+        "{}"
       ]
     },
     "ignore": true
   },
   {
-    "__docId__": 129,
+    "__docId__": 128,
     "kind": "function",
-    "name": "doPairing",
+    "name": "doPairingById",
     "memberof": "src/hubs/hubs.js",
     "generator": false,
     "async": false,
     "static": true,
-    "longname": "src/hubs/hubs.js~doPairing",
+    "longname": "src/hubs/hubs.js~doPairingById",
     "access": "public",
     "export": false,
     "importPath": "cozify-sdk/src/hubs/hubs.js",
@@ -2936,18 +2915,18 @@
     "ignore": true
   },
   {
-    "__docId__": 130,
+    "__docId__": 129,
     "kind": "function",
-    "name": "ignorePairing",
+    "name": "ignorePairingByIds",
     "memberof": "src/hubs/hubs.js",
     "generator": false,
     "async": false,
     "static": true,
-    "longname": "src/hubs/hubs.js~ignorePairing",
+    "longname": "src/hubs/hubs.js~ignorePairingByIds",
     "access": "public",
     "export": true,
     "importPath": "cozify-sdk/src/hubs/hubs.js",
-    "importStyle": "{ignorePairing}",
+    "importStyle": "{ignorePairingByIds}",
     "description": "Set pairing ignore flag of given device in given hub",
     "lineNumber": 337,
     "params": [
@@ -2992,18 +2971,18 @@
     }
   },
   {
-    "__docId__": 131,
+    "__docId__": 130,
     "kind": "function",
-    "name": "startPairing",
+    "name": "startPairingById",
     "memberof": "src/hubs/hubs.js",
     "generator": false,
     "async": false,
     "static": true,
-    "longname": "src/hubs/hubs.js~startPairing",
+    "longname": "src/hubs/hubs.js~startPairingById",
     "access": "public",
     "export": true,
     "importPath": "cozify-sdk/src/hubs/hubs.js",
-    "importStyle": "{startPairing}",
+    "importStyle": "{startPairingById}",
     "description": "Start pairing on given hub",
     "lineNumber": 360,
     "params": [
@@ -3038,7 +3017,7 @@
     }
   },
   {
-    "__docId__": 132,
+    "__docId__": 131,
     "kind": "variable",
     "name": "stopPairingInAction",
     "memberof": "src/hubs/hubs.js",
@@ -3053,24 +3032,24 @@
     "undocument": true,
     "type": {
       "types": [
-        "boolean"
+        "{}"
       ]
     },
     "ignore": true
   },
   {
-    "__docId__": 133,
+    "__docId__": 132,
     "kind": "function",
-    "name": "stopPairing",
+    "name": "stopPairingById",
     "memberof": "src/hubs/hubs.js",
     "generator": false,
     "async": false,
     "static": true,
-    "longname": "src/hubs/hubs.js~stopPairing",
+    "longname": "src/hubs/hubs.js~stopPairingById",
     "access": "public",
     "export": true,
     "importPath": "cozify-sdk/src/hubs/hubs.js",
-    "importStyle": "{stopPairing}",
+    "importStyle": "{stopPairingById}",
     "description": "Stop pairing on given hub",
     "lineNumber": 373,
     "params": [
@@ -3095,6 +3074,31 @@
     }
   },
   {
+    "__docId__": 133,
+    "kind": "function",
+    "name": "stopPairings",
+    "memberof": "src/hubs/hubs.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/hubs/hubs.js~stopPairings",
+    "access": "public",
+    "export": true,
+    "importPath": "cozify-sdk/src/hubs/hubs.js",
+    "importStyle": "{stopPairings}",
+    "description": "Stop pairing on all hubs",
+    "lineNumber": 404,
+    "return": {
+      "nullable": null,
+      "types": [
+        "*"
+      ],
+      "spread": false,
+      "description": "none"
+    },
+    "params": []
+  },
+  {
     "__docId__": 134,
     "kind": "variable",
     "name": "pollIntervals",
@@ -3106,7 +3110,7 @@
     "importPath": "cozify-sdk/src/hubs/hubs.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 405,
+    "lineNumber": 414,
     "undocument": true,
     "type": {
       "types": [
@@ -3127,11 +3131,11 @@
     "importPath": "cozify-sdk/src/hubs/hubs.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 406,
+    "lineNumber": 415,
     "undocument": true,
     "type": {
       "types": [
-        "boolean"
+        "{}"
       ]
     },
     "ignore": true
@@ -3148,11 +3152,11 @@
     "importPath": "cozify-sdk/src/hubs/hubs.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 407,
+    "lineNumber": 416,
     "undocument": true,
     "type": {
       "types": [
-        "number"
+        "{}"
       ]
     },
     "ignore": true
@@ -3169,11 +3173,11 @@
     "importPath": "cozify-sdk/src/hubs/hubs.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 408,
+    "lineNumber": 417,
     "undocument": true,
     "type": {
       "types": [
-        "boolean"
+        "{}"
       ]
     },
     "ignore": true
@@ -3190,11 +3194,11 @@
     "importPath": "cozify-sdk/src/hubs/hubs.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 409,
+    "lineNumber": 418,
     "undocument": true,
     "type": {
       "types": [
-        "boolean"
+        "{}"
       ]
     },
     "ignore": true
@@ -3213,7 +3217,7 @@
     "importPath": "cozify-sdk/src/hubs/hubs.js",
     "importStyle": null,
     "description": "Do poll on given hub if hub connection is ok ",
-    "lineNumber": 417,
+    "lineNumber": 426,
     "params": [
       {
         "nullable": null,
@@ -3232,18 +3236,18 @@
   {
     "__docId__": 140,
     "kind": "function",
-    "name": "startPolling",
+    "name": "startPollingById",
     "memberof": "src/hubs/hubs.js",
     "generator": false,
     "async": false,
     "static": true,
-    "longname": "src/hubs/hubs.js~startPolling",
+    "longname": "src/hubs/hubs.js~startPollingById",
     "access": "public",
     "export": true,
     "importPath": "cozify-sdk/src/hubs/hubs.js",
-    "importStyle": "{startPolling}",
+    "importStyle": "{startPollingById}",
     "description": "Start polling on given hub",
-    "lineNumber": 510,
+    "lineNumber": 519,
     "params": [
       {
         "nullable": null,
@@ -3268,18 +3272,18 @@
   {
     "__docId__": 141,
     "kind": "function",
-    "name": "stopPolling",
+    "name": "stopPollingById",
     "memberof": "src/hubs/hubs.js",
     "generator": false,
     "async": false,
     "static": true,
-    "longname": "src/hubs/hubs.js~stopPolling",
+    "longname": "src/hubs/hubs.js~stopPollingById",
     "access": "public",
     "export": true,
     "importPath": "cozify-sdk/src/hubs/hubs.js",
-    "importStyle": "{stopPolling}",
+    "importStyle": "{stopPollingById}",
     "description": "Stop polling on given hub",
-    "lineNumber": 521,
+    "lineNumber": 530,
     "params": [
       {
         "nullable": null,
@@ -3304,42 +3308,6 @@
   {
     "__docId__": 142,
     "kind": "function",
-    "name": "unSelectHubById",
-    "memberof": "src/hubs/hubs.js",
-    "generator": false,
-    "async": false,
-    "static": true,
-    "longname": "src/hubs/hubs.js~unSelectHubById",
-    "access": "public",
-    "export": true,
-    "importPath": "cozify-sdk/src/hubs/hubs.js",
-    "importStyle": "{unSelectHubById}",
-    "description": "Unselect hub by id, stops hub polling",
-    "lineNumber": 531,
-    "params": [
-      {
-        "nullable": null,
-        "types": [
-          "string"
-        ],
-        "spread": false,
-        "optional": false,
-        "name": "hubId",
-        "description": "hub id to be selected"
-      }
-    ],
-    "return": {
-      "nullable": null,
-      "types": [
-        "*"
-      ],
-      "spread": false,
-      "description": "none"
-    }
-  },
-  {
-    "__docId__": 143,
-    "kind": "function",
     "name": "selectHubById",
     "memberof": "src/hubs/hubs.js",
     "generator": false,
@@ -3351,7 +3319,7 @@
     "importPath": "cozify-sdk/src/hubs/hubs.js",
     "importStyle": "{selectHubById}",
     "description": "Select hub by id, starts hub polling",
-    "lineNumber": 548,
+    "lineNumber": 542,
     "params": [
       {
         "nullable": null,
@@ -3384,10 +3352,71 @@
     }
   },
   {
+    "__docId__": 143,
+    "kind": "function",
+    "name": "unSelectHubs",
+    "memberof": "src/hubs/hubs.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/hubs/hubs.js~unSelectHubs",
+    "access": "public",
+    "export": true,
+    "importPath": "cozify-sdk/src/hubs/hubs.js",
+    "importStyle": "{unSelectHubs}",
+    "description": "Unselect hubs, stops hub pollings",
+    "lineNumber": 564,
+    "return": {
+      "nullable": null,
+      "types": [
+        "*"
+      ],
+      "spread": false,
+      "description": "none"
+    },
+    "params": []
+  },
+  {
     "__docId__": 144,
+    "kind": "function",
+    "name": "unSelectHubById",
+    "memberof": "src/hubs/hubs.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/hubs/hubs.js~unSelectHubById",
+    "access": "public",
+    "export": true,
+    "importPath": "cozify-sdk/src/hubs/hubs.js",
+    "importStyle": "{unSelectHubById}",
+    "description": "Unselect hub by id, stops hub polling",
+    "lineNumber": 577,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "hubId",
+        "description": "hub id to be selected"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "*"
+      ],
+      "spread": false,
+      "description": "none"
+    }
+  },
+  {
+    "__docId__": 145,
     "kind": "file",
     "name": "src/index.js",
-    "content": "// \n\n// try { process.env.NODE_ENV } catch(e) { var process = { env: { NODE_ENV: 'production' } }; }\n\n\nimport rootReducer from './reducers';\n\nexport { rootReducer as cozifyReducer };\nexport { store, watchChanges } from './store';\n\n// import logger from 'redux-logger'\n// const middleware = [...getDefaultMiddleware(), logger]\n\nexport { CLOUD_CONNECTION_STATES, HUB_CONNECTION_STATES } from './connection/constants';\nexport { LANGUAGES, USER_STATES, ROLES } from './user/constants';\nexport { HUB_STATES } from './hubs/constants';\n\nexport { getCloudConnectionState, getHubConnectionState } from './connection/state';\nexport {\n  changeLanguage, doPwLogin, setAuthenticated, acceptEula, getUserState,\n} from './user/user';\nexport {\n  getHubs, selectHubById, unSelectHubById,\n  startDiscoveringHubs, stopDiscoveringHubs,\n  startPolling, stopPolling,\n  startPairing, stopPairing, ignorePairing,\n} from './hubs/hubs';\nexport {\n  getDevices, getHubDevices,\n  getPairingDevices, getHubPairingDevices,\n} from './devices/devices';\nexport {\n  sendDeviceStateCmd, sendDeviceCmd,\n  unpairDevice, identifyDevice, setDeviceMeta,\n} from './devices/device';\nexport {\n  getRooms, getHubRooms,\n  addRoom, editRoom, removeRoom,\n} from './rooms/rooms';\n\n\nexport { devicesState, setDevices, deleteDevice } from './reducers/devices';\nexport { hubsState, updateHubs } from './reducers/hubs';\n",
+    "content": "// \n\n// try { process.env.NODE_ENV } catch(e) { var process = { env: { NODE_ENV: 'production' } }; }\n\n\nimport rootReducer from './reducers';\n\nexport { rootReducer as cozifyReducer };\nexport { store, watchChanges } from './store';\n\n// import logger from 'redux-logger'\n// const middleware = [...getDefaultMiddleware(), logger]\n\nexport { CLOUD_CONNECTION_STATES, HUB_CONNECTION_STATES } from './connection/constants';\nexport { LANGUAGES, USER_STATES, ROLES } from './user/constants';\nexport { HUB_STATES } from './hubs/constants';\n\nexport { getCloudConnectionState, getHubConnectionState } from './connection/state';\nexport {\n  changeLanguage, doPwLogin, setAuthenticated, acceptEula, getUserState,\n} from './user/user';\nexport {\n  getHubs, selectHubById, unSelectHubById, unSelectHubs,\n  startDiscoveringHubs, stopDiscoveringHubs,\n  startPollingById, stopPollingById,\n  startPairingById, stopPairingById, ignorePairingByIds, stopPairings,\n} from './hubs/hubs';\nexport {\n  getDevices, getHubDevices,\n  getPairingDevices, getHubPairingDevices,\n} from './devices/devices';\nexport {\n  sendDeviceStateCmd, sendDeviceCmd,\n  unpairDevice, identifyDevice, setDeviceMeta,\n} from './devices/device';\nexport {\n  getRooms, getHubRooms,\n  addRoom, editRoom, removeRoom,\n} from './rooms/rooms';\n\n\nexport { devicesState, setDevices, deleteDevice } from './reducers/devices';\nexport { hubsState, updateHubs } from './reducers/hubs';\n",
     "static": true,
     "longname": "/Users/vesa/code/JS-SDK/docs/src/index.js",
     "access": "public",
@@ -3395,7 +3424,7 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 145,
+    "__docId__": 146,
     "kind": "file",
     "name": "src/reducers/connections.js",
     "content": "// \n\n// This actionreducer uses internally https://github.com/mweststrate/immer, so it's safe to modify given state directly\nimport { createSlice } from 'redux-starter-kit';\nimport { CLOUD_CONNECTION_STATES } from '../connection/constants';\n// import type { CLOUD_CONNECTION_STATE_TYPE } from '../connection/constants';\n\n\n/**\n * Connections action creators object\n * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md\n * @return { {\n *   slice : string,\n *   reducer : ReducerFunction,\n *   actions : Object<string, ActionCreator},\n *   selectors : Object<string, Selector>\n *   }}\n */\nexport const connectionsState = createSlice({\n  slice: 'connections',\n  initialState: {\n    cloudState: CLOUD_CONNECTION_STATES.UNCONNECTED,\n  },\n  reducers: {\n    /*\n     * Reducer action of cloud connection state\n     * @param {Object} state\n     * @param {CLOUD_CONNECTION_STATES} action\n     */\n    setCloudConnectionState(state, action) {\n      const stateToSet = state;\n      const newState = action.payload;\n      const oldState = state.cloudState;\n      if (Object.values(CLOUD_CONNECTION_STATES).indexOf(newState) > -1) {\n        if (oldState !== newState) {\n          console.log(`CLOUD connection state ${oldState} -> ${newState}`);\n          stateToSet.cloudState = newState;\n        }\n      }\n    },\n\n\n  },\n});\n\n\nconst { actions, reducer } = connectionsState;\n/**\n * Connections reducer\n * @type {function} reducer\n */\nexport { reducer as connectionsReducer };\n\n// Extract and export each action creator by name\nexport const { setCloudConnectionState } = actions;\n",
@@ -3406,7 +3435,7 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 146,
+    "__docId__": 147,
     "kind": "variable",
     "name": "connectionsState",
     "memberof": "src/reducers/connections.js",
@@ -3436,7 +3465,7 @@
     }
   },
   {
-    "__docId__": 147,
+    "__docId__": 148,
     "kind": "variable",
     "name": "actions",
     "memberof": "src/reducers/connections.js",
@@ -3457,7 +3486,7 @@
     "ignore": true
   },
   {
-    "__docId__": 148,
+    "__docId__": 149,
     "kind": "variable",
     "name": "setCloudConnectionState",
     "memberof": "src/reducers/connections.js",
@@ -3477,7 +3506,7 @@
     }
   },
   {
-    "__docId__": 149,
+    "__docId__": 150,
     "kind": "file",
     "name": "src/reducers/devices.js",
     "content": "// \n\n// This actionreducer uses internally https://github.com/mweststrate/immer, so it's safe to modify given state directly\nimport { createSlice } from 'redux-starter-kit';\n\n/**\n * Devices action creators object\n * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md\n * @return { {\n *   slice : string,\n *   reducer : ReducerFunction,\n *   actions : Object<string, ActionCreator},\n *   selectors : Object<string, Selector>\n *   }}\n */\nexport const devicesState = createSlice({\n  slice: 'devices',\n  initialState: {},\n  reducers: {\n    /*\n     * Reducer action of setting devices state - sets all given devices of given hub, keeps existing states\n     * @param {Object} state\n     * @param {Object} action\n     */\n    setDevices(state, action) {\n      const stateToSet = state;\n      const { hubId } = action.payload;\n      const { devices } = action.payload;\n      const hubDevices = {};\n\n\n      Object.entries(devices).forEach((entry) => {\n        const [id, device] = entry;\n        hubDevices[id] = { ...device };\n      });\n      stateToSet[hubId] = { ...hubDevices };\n    },\n\n    /*\n     * Reducer action of setting device state - sets  given device of given hub, keeps existing states\n     * @param {Object} state\n     * @param {payload:{Object{hubId:string, device:Object}}} action\n     */\n    setDevice(state, action) {\n      const stateToSet = state;\n      const { hubId } = action.payload;\n      const { device } = action.payload;\n      if (stateToSet[hubId]) {\n        stateToSet[hubId][device.id] = { ...device };\n      }\n    },\n\n    /*\n     * Reducer action to remove device from state - sets all given devices of given hub, keeps existing states\n     * @param {Object} state\n     * @param {payload:{Object{hubId:string, device:Object}}} action\n     */\n    deleteDevice(state, action) {\n      const stateToSet = state;\n      const { hubId } = action.payload;\n      const { deviceId } = action.payload;\n\n      if (hubId && deviceId && stateToSet[hubId] && stateToSet[hubId][deviceId]) {\n        delete stateToSet[hubId][deviceId];\n      }\n    },\n  },\n});\n\nconst { actions, reducer } = devicesState;\n\n/**\n * Devices reducer\n * @type {function} reducer\n */\nexport { reducer as devicesReducer };\n\n// Extract and export each action creator by name\n/*\nconsole.log(addDevice({ id: 123, name: 'Unnamed device' }))\n{type : \"devices/addDevice\", payload : {id : 123, name: 'Unnamed device' }}\n*/\nexport const { setDevices, deleteDevice } = actions;\n",
@@ -3488,7 +3517,7 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 150,
+    "__docId__": 151,
     "kind": "variable",
     "name": "devicesState",
     "memberof": "src/reducers/devices.js",
@@ -3518,7 +3547,7 @@
     }
   },
   {
-    "__docId__": 151,
+    "__docId__": 152,
     "kind": "variable",
     "name": "actions",
     "memberof": "src/reducers/devices.js",
@@ -3539,7 +3568,7 @@
     "ignore": true
   },
   {
-    "__docId__": 152,
+    "__docId__": 153,
     "kind": "variable",
     "name": "setDevices",
     "memberof": "src/reducers/devices.js",
@@ -3559,7 +3588,7 @@
     }
   },
   {
-    "__docId__": 153,
+    "__docId__": 154,
     "kind": "file",
     "name": "src/reducers/hubs.js",
     "content": "// \n\n// This actionreducer uses internally https://github.com/mweststrate/immer, so it's safe to modify given state directly\nimport { createSlice } from 'redux-starter-kit';\nimport { HUB_CONNECTION_STATES } from '../connection/constants';\n\n/**\n * Hubs action creators object\n * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md\n * @return { {\n *   slice : string,\n *   reducer : ReducerFunction,\n *   actions : Object<string, ActionCreator},\n *   selectors : Object<string, Selector>\n *   }}\n */\nexport const hubsState = createSlice({\n  slice: 'hubs',\n  initialState: {},\n  reducers: {\n    /*\n     * Reducer action of setting many hubs to state\n     * @param  {Object} state\n     * @param  {payload:{hubs:HUBS_MAP_TYPE}} action\n     */\n    updateHubs(state, action) {\n      const stateToSet = state;\n      const hubs = action.payload;\n      console.log('updateHubs', hubs);\n      Object.entries(hubs).forEach((entry) => {\n        const [id, hub] = entry;\n        stateToSet[id] = { ...state[id], ...hub };\n      });\n    },\n\n\n    /*\n     * Reducer action of setting hub state to selected\n     * @param  {Object} state\n     * @param  {payload:{hubId:string}} action\n     */\n    selectHub(state, action) {\n      const stateToSet = state;\n      const { hubId } = action.payload;\n      console.log('selectHub', hubId);\n      if (state[hubId]) {\n        stateToSet[hubId].selected = true;\n        console.log('selectHub', state[hubId]);\n      }\n    },\n\n    /*\n     * Reducer action of setting hub state to unselected\n     * @param  {Object} state\n     * @param  {payload:{hubId:string}} action\n     */\n    unSelectHub(state, action) {\n      const stateToSet = state;\n      const { hubId } = action.payload;\n      if (state[hubId]) {\n        stateToSet[hubId].selected = false;\n        // console.log(\"selectHub\", state[action.payload]);\n      }\n    },\n\n    /*\n     * Reducer action of setting hub connection state\n     * @param  {Object} state\n     * @param  {payload:{hubId:string, state:HUB_STATES_TYPE}} action\n     */\n    setHubConnectionState(state, action) {\n      const { hubId } = action.payload;\n      const stateToSet = state;\n      const newState = action.payload.state;\n      const oldState = state[hubId] ? state[hubId].connectionState : undefined;\n      if (Object.values(HUB_CONNECTION_STATES).indexOf(newState) > -1) {\n        if (oldState && oldState !== newState) {\n          // console.log (`HUB ${hubId} connection state ${oldState} -> ${newState}`);\n          stateToSet[hubId].connectionState = newState;\n        }\n      }\n    },\n  },\n});\n\n\n// console.log('hubsState ', hubsState)\nconst { actions, reducer } = hubsState;\n\n/**\n * Hubs reducer\n * @type {function} reducer\n */\nexport { reducer as hubsReducer };\n\n// Extract and export each action creator by name\n/*\nconsole.log(updateHubs({ id: 123, name: 'Unnamed device' }))\n{type : \"hubs/updateHubs, payload : {id : 123, name: 'Unnamed device' }}\n*/\nexport const {\n  updateHubs, selectHub, unSelectHub, setHubConnectionState,\n} = actions;\n",
@@ -3570,7 +3599,7 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 154,
+    "__docId__": 155,
     "kind": "variable",
     "name": "hubsState",
     "memberof": "src/reducers/hubs.js",
@@ -3600,7 +3629,7 @@
     }
   },
   {
-    "__docId__": 155,
+    "__docId__": 156,
     "kind": "variable",
     "name": "actions",
     "memberof": "src/reducers/hubs.js",
@@ -3621,7 +3650,7 @@
     "ignore": true
   },
   {
-    "__docId__": 156,
+    "__docId__": 157,
     "kind": "variable",
     "name": "updateHubs",
     "memberof": "src/reducers/hubs.js",
@@ -3641,7 +3670,7 @@
     }
   },
   {
-    "__docId__": 157,
+    "__docId__": 158,
     "kind": "file",
     "name": "src/reducers/index.js",
     "content": "import { connectionsReducer } from './connections';\nimport { pairingsReducer } from './pairings';\nimport { devicesReducer } from './devices';\nimport { hubsReducer } from './hubs';\nimport { userReducer } from './user';\nimport { roomsReducer } from './rooms';\n\n/**\n * Root reducer\n * @type {Object}\n */\nconst rootReducer = {\n  connections: connectionsReducer,\n  pairings: pairingsReducer,\n  devices: devicesReducer,\n  hubs: hubsReducer,\n  user: userReducer,\n  rooms: roomsReducer,\n};\n\nexport default rootReducer;\n",
@@ -3652,7 +3681,7 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 158,
+    "__docId__": 159,
     "kind": "variable",
     "name": "rootReducer",
     "memberof": "src/reducers/index.js",
@@ -3674,7 +3703,7 @@
     }
   },
   {
-    "__docId__": 159,
+    "__docId__": 160,
     "kind": "file",
     "name": "src/reducers/pairings.js",
     "content": "// \n\n// This actionreducer uses internally https://github.com/mweststrate/immer, so it's safe to modify given state directly\nimport { createSlice } from 'redux-starter-kit';\n\n/**\n * Devices action creators object\n * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md\n * @return { {\n *   slice : string,\n *   reducer : ReducerFunction,\n *   actions : Object<string, ActionCreator},\n *   selectors : Object<string, Selector>\n *   }}\n */\nexport const pairingsState = createSlice({\n  slice: 'pairings',\n  initialState: {},\n  reducers: {\n    /*\n     * Reducer action of setting pairing devices state - sets all given devices of given hub, keeps existing states\n     * @param {Object} state\n     * @param {Object} action\n     */\n    setPairingDevices(state, action) {\n      const stateToSet = state;\n      const { hubId } = action.payload;\n      const { devices } = action.payload;\n      const hubPairingDevices = {};\n\n\n      Object.entries(devices).forEach((entry) => {\n        const [id, device] = entry;\n        hubPairingDevices[id] = { ...device };\n      });\n      stateToSet[hubId] = { ...hubPairingDevices };\n    },\n\n    /*\n     * Reducer action of setting device state - sets  given device of given hub, keeps existing states\n     * @param {Object} state\n     * @param {payload:{Object{hubId:string, device:Object}}} action\n     */\n    setPairingDevice(state, action) {\n      const stateToSet = state;\n      const { hubId } = action.payload;\n      const { device } = action.payload;\n      if (stateToSet[hubId]) {\n        stateToSet[hubId][device.id] = { ...device };\n      }\n    },\n\n    /*\n     * Reducer action to remove device from state - sets all given devices of given hub, keeps existing states\n     * @param {Object} state\n     * @param {payload:{Object{hubId:string, device:Object}}} action\n     */\n    deletePairingDevice(state, action) {\n      const stateToSet = state;\n      const { hubId } = action.payload;\n      const { deviceId } = action.payload;\n      if (hubId && deviceId && stateToSet[hubId] && stateToSet[hubId][deviceId]) {\n        delete stateToSet[hubId][deviceId];\n      }\n    },\n  },\n});\n\nconst { actions, reducer } = pairingsState;\n\n/**\n * Devices reducer\n * @type {function} reducer\n */\nexport { reducer as pairingsReducer };\n\n// Extract and export each action creator by name\n/*\nconsole.log(addDevice({ id: 123, name: 'Unnamed device' }))\n{type : \"devices/addDevice\", payload : {id : 123, name: 'Unnamed device' }}\n*/\nexport const { setPairingDevices, deletePairingDevice } = actions;\n",
@@ -3685,7 +3714,7 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 160,
+    "__docId__": 161,
     "kind": "variable",
     "name": "pairingsState",
     "memberof": "src/reducers/pairings.js",
@@ -3715,7 +3744,7 @@
     }
   },
   {
-    "__docId__": 161,
+    "__docId__": 162,
     "kind": "variable",
     "name": "actions",
     "memberof": "src/reducers/pairings.js",
@@ -3736,7 +3765,7 @@
     "ignore": true
   },
   {
-    "__docId__": 162,
+    "__docId__": 163,
     "kind": "variable",
     "name": "setPairingDevices",
     "memberof": "src/reducers/pairings.js",
@@ -3756,7 +3785,7 @@
     }
   },
   {
-    "__docId__": 163,
+    "__docId__": 164,
     "kind": "file",
     "name": "src/reducers/rooms.js",
     "content": "\n// \n\n// This actionreducer uses internally https://github.com/mweststrate/immer, so it's safe to modify given state directly\nimport { createSlice } from 'redux-starter-kit';\n\n\n/**\n * Rooms action creators object\n * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md\n * @return { {\n *   slice : string,\n *   reducer : ReducerFunction,\n *   actions : Object<string, ActionCreator},\n *   selectors : Object<string, Selector>\n *   }}\n */\nexport const roomsState = createSlice({\n  slice: 'rooms',\n  initialState: {},\n  reducers: {\n\n    /*\n     * Reducer action of setting rooms state - sets all given rooms of given hub, keeps existing states\n     * @param {Object} state\n     * @param {Object} action\n     */\n    setRooms(state, action) {\n      const stateToSet = state;\n      const { hubId } = action.payload;\n      const { rooms } = action.payload;\n      const hubRooms = {};\n\n\n      Object.entries(rooms).forEach((entry) => {\n        const [id, room] = entry;\n        hubRooms[id] = { ...room };\n      });\n      stateToSet[hubId] = { ...hubRooms };\n    },\n\n\n    /*\n     * Reducer action of set room state\n     * @param {Object} state\n     * @param {Object} action\n     */\n    setRoom(state, action) {\n      const stateToSet = state;\n      const { hubId } = action.payload;\n      const { room } = action.payload;\n\n      if (hubId && stateToSet[hubId]) {\n        stateToSet[hubId][room.id] = { ...room };\n      }\n    },\n\n    /*\n     * Reducer action of removing room state\n     * @param {Object} state\n     * @param {Object} action\n     */\n    removeRoom(state, action) {\n      const stateToSet = state;\n      const { hubId } = action.payload;\n      const { roomId } = action.payload;\n      if (hubId && roomId && stateToSet[hubId] && stateToSet[hubId][roomId]) {\n        delete stateToSet[hubId][roomId];\n      }\n    },\n\n    /*\n     * Reducer action of updating room state\n     * @param {Object} state\n     * @param {Object} action\n     */\n    editRoom(state, action) {\n      const stateToSet = state;\n      const { hubId } = action.payload;\n      const { room } = action.payload;\n      if (stateToSet[hubId]) {\n        stateToSet[hubId][room.id] = { ...room };\n      }\n    },\n\n  },\n});\n\n/*\ntodos.selectors.getCompletedTodoCount = createSelector(\n  [todos.selectors.getTodos],\n  todos =>\n    todos.reduce((count, todo) => (todo.completed ? count + 1 : count), 0)\n);\n*/\n\nconst { actions, reducer } = roomsState;\n\n/**\n * Devices reducer\n * @type {function} reducer\n */\nexport { reducer as roomsReducer };\n\n// Extract and export each action creator by name\n/*\nconsole.log(addDevice({ id: 123, name: 'Unnamed device' }))\n{type : \"devices/addDevice\", payload : {id : 123, name: 'Unnamed device' }}\n*/\nexport const {\n  setRooms, addRoom, deleteRoom, removeRoom,\n} = actions;\n",
@@ -3767,7 +3796,7 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 164,
+    "__docId__": 165,
     "kind": "variable",
     "name": "roomsState",
     "memberof": "src/reducers/rooms.js",
@@ -3797,7 +3826,7 @@
     }
   },
   {
-    "__docId__": 165,
+    "__docId__": 166,
     "kind": "variable",
     "name": "actions",
     "memberof": "src/reducers/rooms.js",
@@ -3818,7 +3847,7 @@
     "ignore": true
   },
   {
-    "__docId__": 166,
+    "__docId__": 167,
     "kind": "variable",
     "name": "setRooms",
     "memberof": "src/reducers/rooms.js",
@@ -3838,7 +3867,7 @@
     }
   },
   {
-    "__docId__": 167,
+    "__docId__": 168,
     "kind": "file",
     "name": "src/reducers/user.js",
     "content": "// \n\n// This actionreducer uses internally https://github.com/mweststrate/immer, so it's safe to modify given state directly\nimport { createSlice } from 'redux-starter-kit';\nimport isEmpty from 'lodash/isEmpty';\nimport { LANGUAGES, USER_STATES, ROLES } from '../user/constants';\n\n\n/**\n * User action creators object\n * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md\n * @return { {\n *   slice : string,\n *   reducer : ReducerFunction,\n *   actions : Object<string, ActionCreator},\n *   selectors : Object<string, Selector>\n *   }}\n */\nexport const userState = createSlice({\n  slice: 'user',\n  initialState: {\n    firstName: '',\n    lastName: '',\n    email: '',\n    language: LANGUAGES.NONE,\n    authKey: '',\n    role: ROLES.ANONYMOUS,\n    eulaAccepted: false,\n    state: USER_STATES.WAITING_LANGUAGE,\n  },\n  reducers: {\n    /*\n     * Reducer action of setting user's state\n     * @param  {Object} state\n     * @param  {payload:{state:USER_STATE_TYPE}} action\n     */\n    changeState(state, action) {\n      const stateToSet = state;\n      const newState = action.payload;\n      const oldState = state.state;\n      console.log(`User state ${oldState} -> ${newState}`);\n      switch (oldState) {\n        case USER_STATES.WAITING_LANGUAGE: {\n          if (newState === USER_STATES.LANGUAGE_SET) {\n            if (!isEmpty(state.language)) {\n              stateToSet.state = USER_STATES.WAITING_LOGIN;\n            }\n          }\n          break;\n        }\n        case USER_STATES.WAITING_LOGIN: {\n          if (newState === USER_STATES.LOGIN_DONE) {\n            if (!isEmpty(state.authKey)) {\n              if (isEmpty(state.eulaAcceted)) {\n                stateToSet.state = USER_STATES.WAITING_EULA;\n              } else {\n                stateToSet.state = USER_STATES.AUTHENTICATED;\n              }\n            }\n          }\n          break;\n        }\n        case USER_STATES.WAITING_EULA: {\n          if (newState === USER_STATES.EULA_ACCEPTED) {\n            stateToSet.state = USER_STATES.AUTHENTICATED;\n          }\n          break;\n        }\n        case USER_STATES.AUTHENTICATED: {\n          if (newState === USER_STATES.LOGGED_OUT) {\n            stateToSet.state = USER_STATES.WAITING_LOGIN;\n          }\n          break;\n        }\n        default: {\n          // statements;\n          break;\n        }\n      }\n    },\n\n\n    /*\n     * Reducer action of setting user's eula to accepted\n     * @param  {Object} state\n     * @param  {payload:boolean} action\n     */\n    setEula(state, action) {\n      const stateToSet = state;\n      stateToSet.eulaAccepted = action.payload;\n    },\n\n    /*\n     * Reducer action of setting user's language\n     * @param  {Object} state\n     * @param  {payload:LANGUAGES_TYPE} action\n     */\n    setLanguage(state, action) {\n      const stateToSet = state;\n      stateToSet.language = action.payload;\n    },\n\n    /*\n     * Reducer action of setting user's authKey\n     * @param  {Object} state\n     * @param  {payload:string} action\n     */\n    setAuthKey(state, action) {\n      const stateToSet = state;\n      stateToSet.authKey = action.payload;\n    },\n\n    /*\n     * Reducer action of setting user's authKey and state\n     * @param  {Object} state\n     * @param  {payload:{state:USER_STATE_TYPE}} action\n     */\n    setAuthenticated(state, action) {\n      const stateToSet = state;\n      stateToSet.authKey = action.payload;\n      stateToSet.state = USER_STATES.KEYED;\n    }\n\n  },\n});\n\n/*\nconsole.log(user)\n{\n    actions : {\n        setState\n    },\n    reducer\n}\n*/\n\n\nconst { actions, reducer } = userState;\n\n/**\n * Hubs reducer\n * @type {function} reducer\n */\nexport { reducer as userReducer };\n\n\n// Extract and export each action creator by name\nexport const {\n  changeState, setEula, setLanguage, setAuthKey,\n} = actions;\n",
@@ -3849,7 +3878,7 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 168,
+    "__docId__": 169,
     "kind": "variable",
     "name": "userState",
     "memberof": "src/reducers/user.js",
@@ -3879,7 +3908,7 @@
     }
   },
   {
-    "__docId__": 169,
+    "__docId__": 170,
     "kind": "variable",
     "name": "actions",
     "memberof": "src/reducers/user.js",
@@ -3900,7 +3929,7 @@
     "ignore": true
   },
   {
-    "__docId__": 170,
+    "__docId__": 171,
     "kind": "variable",
     "name": "changeState",
     "memberof": "src/reducers/user.js",
@@ -3920,7 +3949,7 @@
     }
   },
   {
-    "__docId__": 171,
+    "__docId__": 172,
     "kind": "file",
     "name": "src/rooms/constants.js",
     "content": "// \nexport const ROOMS_FI = Object.freeze({\n  LIVINGROOM: 'Olohuone',\n  BEDROOM: 'Makuuhuone',\n  KITCHEN: 'Keittiö',\n  HALLWAY: 'Eteinen',\n  BATHROOM: 'Kylpyhuone',\n});\n\n\nexport const ROOMS_EN = Object.freeze({\n  LIVINGROOM: 'Living Room',\n  BEDROOM: 'Bedroom',\n  KITCHEN: 'Kitchen',\n  HALLWAY: 'Hallway',\n  BATHROOM: 'Bathroom',\n});\n\n\n\n\n",
@@ -3931,7 +3960,7 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 172,
+    "__docId__": 173,
     "kind": "variable",
     "name": "ROOMS_FI",
     "memberof": "src/rooms/constants.js",
@@ -3951,7 +3980,7 @@
     }
   },
   {
-    "__docId__": 173,
+    "__docId__": 174,
     "kind": "variable",
     "name": "ROOMS_EN",
     "memberof": "src/rooms/constants.js",
@@ -3971,7 +4000,7 @@
     }
   },
   {
-    "__docId__": 174,
+    "__docId__": 175,
     "kind": "file",
     "name": "src/rooms/rooms.js",
     "content": "// \n// import isEmpty from 'lodash/isEmpty';\n// import isArray from 'lodash/isArray';\n// import pick from 'lodash/pick';\nimport { store } from '../store';\nimport { roomsState } from '../reducers/rooms';\nimport { hubsState } from '../reducers/hubs';\nimport { userState } from '../reducers/user';\nimport { send, COMMANDS } from '../connection/send';\nimport { HUB_CONNECTION_STATES } from '../connection/constants';\n\n\n// import { ROOMS_FI, ROOMS_EN } from './constants';\n\n/**\n * Get rooms of all selected hubs\n * @return {HUB_ROOMS_MAP_TYPE}\n */\nexport function getRooms() {\n  const stateNow = store.getState();\n  return roomsState.selectors.getRooms(stateNow);\n}\n\n/**\n * Get rooms of given hub\n * @param  {string} hubId\n * @return {ROOMS_MAP_TYPE}\n */\nexport function getHubRooms(hubId) {\n  let retVal;\n  const rooms = getRooms();\n  if (rooms && rooms[hubId]) {\n    retVal = rooms[hubId];\n  }\n  return retVal;\n}\n\nexport function sendRoomCmd(hubId, commandType, data) {\n  return new Promise((resolve, reject) => {\n    const stateNow = store.getState();\n    const user = userState.selectors.getUser(stateNow);\n\n\n    if (!user || !user.authKey) {\n      console.error('SDK sendRoomCmd error: No userKey!');\n      reject(new Error('Room command error: No userKey!'));\n      return;\n    }\n\n    const hubs = hubsState.selectors.getHubs(stateNow);\n    const hub = hubs[hubId];\n    const { hubKey } = hubs[hubId];\n    if (!hub || !hubKey) {\n      console.error('SDK sendRoomCmd error: No hubKey!');\n      reject(new Error('Room command error: No hubKey!'));\n      return;\n    }\n\n    if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {\n      console.error('SDK sendRoomCmd error: No Hub connection');\n      reject(new Error('Room command error: No hub connection'));\n      return;\n    }\n\n    const { authKey } = user;\n    if (!authKey) {\n      console.error('SDK sendRoomCmd error: No authKey!');\n      reject(new Error('Room command error: No authKey!'));\n      return;\n    }\n\n    if (commandType) {\n      send({\n        command: commandType, authKey, hubId, localUrl: hub.url, hubKey, data,\n      })\n        .then((status) => {\n          console.debug('SDK sendRoomCmd ok', status);\n\n          send({\n            command: COMMANDS.CMD_GET_ROOMS, authKey, hubId, localUrl: hub.url, hubKey,\n          })\n            .then((rooms) => {\n              console.debug('SDK sendRoomCmd refresh rooms ok', rooms);\n              store.dispatch(roomsState.actions.setRooms({ hubId, rooms }));\n              resolve(rooms);\n            })\n            .catch((error) => {\n              console.error('SDK Room command error:', error);\n              reject(error);\n            });\n        })\n        .catch((error) => {\n          console.error('SDK Room command error:', error);\n          reject(error);\n        });\n    }\n  });\n}\n\n/**\n * Add room to given hub\n * do not usr store.dispatch(roomsState.actions.addRoom(hubId, room)) as rooms are coming back in delta\n * @param  {string} hubI\n * @param  {Object} room\n * @return {Promise<Object>} rooms\n */\nexport async function addRoom(hubId, room) {\n  return new Promise((resolve, reject) => {\n    sendRoomCmd(hubId, COMMANDS.CMD_SET_ROOM, [room])\n      .then((rooms) => {\n        resolve(rooms);\n      })\n      .catch((error) => {\n        debugger;\n        reject(error);\n      });\n  });\n}\n\n/**\n * Edit room of given hub\n * do not usr store.dispatch(roomsState.actions.editRoom(hubId, room)) as rooms are coming back in delta\n * @param  {string} hubId\n * @param  {Object} room\n * @return {Promise<Object>} rooms\n */\nexport async function editRoom(hubId, room) {\n  return new Promise((resolve, reject) => {\n    sendRoomCmd(hubId, COMMANDS.CMD_SET_ROOM, [room])\n      .then((rooms) => {\n        resolve(rooms);\n      })\n      .catch((error) => {\n        debugger;\n        reject(error);\n      });\n  });\n}\n\n/**\n * Remove given room of given hub\n * @param  {string} hubI\n * @param  {Object} room\n */\nexport async function removeRoom(hubId, room) {\n  // store.dispatch(roomsState.actions.removeRoom(hubId, room));\n  return new Promise((resolve, reject) => {\n    sendRoomCmd(hubId, COMMANDS.CMD_REMOVE_ROOM, { roomId: room.id })\n      .then((rooms) => {\n        resolve(rooms);\n      })\n      .catch((error) => {\n        if (error.response && error.response.status && error.response.status === 404) {\n          const storedRooms = getRooms();\n          resolve(storedRooms[hubId]);\n        }\n        reject(error);\n      });\n  });\n}\n\n/**\n * Rooms handler for poll delta results\n * @param  {string} hubId\n * @param  {boolean} reset\n * @param  {Object} rooms\n */\nexport function roomsDeltaHandler(hubId, reset, rooms) {\n  let oldHubRooms = {};\n  const storedRooms = getRooms();\n  if (storedRooms && storedRooms[hubId]) {\n    oldHubRooms = storedRooms[hubId];\n  }\n\n  if (reset) {\n    // If reset then set rooms as they are received\n    const stateRooms = {\n      hubId,\n      rooms,\n    };\n    store.dispatch(roomsState.actions.setRooms(stateRooms));\n  } else {\n    // Loop rooms to check could it be added or should be removed\n    Object.entries(rooms).forEach(([key, room]) => {\n      const stateRoom = {\n        hubId,\n        room,\n      };\n      if (key && room) {\n        store.dispatch(roomsState.actions.setRoom(stateRoom));\n      } else if (key && oldHubRooms[key]) {\n        store.dispatch(roomsState.actions.removeRoom(key));\n      }\n    });\n  }\n}\n",
@@ -3982,7 +4011,7 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 175,
+    "__docId__": 176,
     "kind": "function",
     "name": "getRooms",
     "memberof": "src/rooms/rooms.js",
@@ -4007,7 +4036,7 @@
     "params": []
   },
   {
-    "__docId__": 176,
+    "__docId__": 177,
     "kind": "function",
     "name": "getHubRooms",
     "memberof": "src/rooms/rooms.js",
@@ -4043,7 +4072,7 @@
     }
   },
   {
-    "__docId__": 177,
+    "__docId__": 178,
     "kind": "function",
     "name": "sendRoomCmd",
     "memberof": "src/rooms/rooms.js",
@@ -4096,7 +4125,7 @@
     }
   },
   {
-    "__docId__": 178,
+    "__docId__": 179,
     "kind": "function",
     "name": "addRoom",
     "memberof": "src/rooms/rooms.js",
@@ -4142,7 +4171,7 @@
     }
   },
   {
-    "__docId__": 179,
+    "__docId__": 180,
     "kind": "function",
     "name": "editRoom",
     "memberof": "src/rooms/rooms.js",
@@ -4188,7 +4217,7 @@
     }
   },
   {
-    "__docId__": 180,
+    "__docId__": 181,
     "kind": "function",
     "name": "removeRoom",
     "memberof": "src/rooms/rooms.js",
@@ -4231,7 +4260,7 @@
     }
   },
   {
-    "__docId__": 181,
+    "__docId__": 182,
     "kind": "function",
     "name": "roomsDeltaHandler",
     "memberof": "src/rooms/rooms.js",
@@ -4280,7 +4309,7 @@
     "return": null
   },
   {
-    "__docId__": 182,
+    "__docId__": 183,
     "kind": "file",
     "name": "src/store.js",
     "content": "\nimport { configureStore } from 'redux-starter-kit';\nimport get from 'get-value';\nimport rootReducer from './reducers';\n\n\n/**\n * store as a redux state store\n * @type {Object}\n */\nexport const store = configureStore({\n  reducer: rootReducer,\n  // middleware: [...getDefaultMiddleware(), logger]\n  // default true like: devTools: process.env.NODE_ENV !== 'production'\n  // preloadedState\n  // enhancers: [reduxBatch]\n});\nconsole.log('Store Initial State: ', store.getState());\n\nfunction watchState (getState, objectPath) {\n  let currentValue = get(getState(), objectPath);\n  return function w (fn) {\n    return () => {\n      const newValue = get(getState(), objectPath);\n      if (currentValue !== newValue) {\n        const oldValue = currentValue;\n        currentValue = newValue;\n        fn(newValue, oldValue);\n      }\n    };\n  };\n}\n\n/**\n * Helper to subscribe to store changes\n * @param  {string} path - attribute path to watch changes, e.g. 'user.state'\n * @param  {function} changed - function to handle changes\n * @param  {Object} optionalStore - optional store for unit tests etc.\n */\nexport function watchChanges(path, changed, optionalStore) {\n  const selectedStore = optionalStore || store;\n  const watchFn = watchState(selectedStore.getState, path);\n  selectedStore.subscribe(watchFn(changed));\n}\n",
@@ -4291,7 +4320,7 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 183,
+    "__docId__": 184,
     "kind": "variable",
     "name": "store",
     "memberof": "src/store.js",
@@ -4313,7 +4342,7 @@
     }
   },
   {
-    "__docId__": 184,
+    "__docId__": 185,
     "kind": "function",
     "name": "watchState",
     "memberof": "src/store.js",
@@ -4357,7 +4386,7 @@
     "ignore": true
   },
   {
-    "__docId__": 185,
+    "__docId__": 186,
     "kind": "function",
     "name": "watchChanges",
     "memberof": "src/store.js",
@@ -4406,7 +4435,7 @@
     "return": null
   },
   {
-    "__docId__": 186,
+    "__docId__": 187,
     "kind": "file",
     "name": "src/user/constants.js",
     "content": "// \n\n\n/**\n  * Enumeration of language, that could be\n  * NONE, EN_UK or FI_FI\n  * @readonly\n  * @enum {string}\n  */\nexport const LANGUAGES = Object.freeze({\n  NONE: 'none',\n  EN_EN: 'en',\n  EN_UK: 'en-UK',\n  FI_FI: 'fi-FI',\n});\n\n\n/**\n  * Enumeration of user state, that could be\n  * WAITING_LANGUAGE, LANGUAGE_SET, WAITING_LOGIN, LOGIN_DONE, WAITING_EULA, EULA_ACCEPTED, AUTHENTICATED or LOGGED_OUT\n  * @readonly\n  * @enum {string}\n  */\nexport const USER_STATES = Object.freeze({\n  WAITING_LANGUAGE: 'wait language',\n  LANGUAGE_SET: 'language set',\n  WAITING_LOGIN: 'wait login',\n  LOGIN_DONE: 'login done',\n  WAITING_EULA: 'wait eula',\n  EULA_ACCEPTED: 'eula accepted',\n  AUTHENTICATED: 'logged in',\n  KEYED: 'key entered',\n  LOGGED_OUT: 'logged out',\n});\n\n\n/**\n  * Enumeration of ROLES, that could be\n  * ADMIN, USER, GUEST or ANONYMOUS\n  * @readonly\n  * @enum {string}\n  */\nexport const ROLES = Object.freeze({\n  ADMIN: 32,\n  USER: 8,\n  GUEST: 2,\n  ANONYMOUS: 1,\n});\n",
@@ -4417,7 +4446,7 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 187,
+    "__docId__": 188,
     "kind": "variable",
     "name": "LANGUAGES",
     "memberof": "src/user/constants.js",
@@ -4446,7 +4475,7 @@
     }
   },
   {
-    "__docId__": 188,
+    "__docId__": 189,
     "kind": "variable",
     "name": "USER_STATES",
     "memberof": "src/user/constants.js",
@@ -4475,7 +4504,7 @@
     }
   },
   {
-    "__docId__": 189,
+    "__docId__": 190,
     "kind": "variable",
     "name": "ROLES",
     "memberof": "src/user/constants.js",
@@ -4504,10 +4533,10 @@
     }
   },
   {
-    "__docId__": 190,
+    "__docId__": 191,
     "kind": "file",
     "name": "src/user/user.js",
-    "content": "// \nimport isString from 'lodash/isString';\n\n\nimport { send, COMMANDS } from '../connection/send';\nimport { store } from '../store';\nimport { userState } from '../reducers/user';\n\nimport { USER_STATES, LANGUAGES } from './constants';\n\n\n/*\n * Helper to get user\n * @return {Object} user\n */\nfunction storedUser() {\n  return userState.selectors.getUser(store.getState());\n}\n\n\n/**\n * User action to change current language\n * @param {LANGUAGES_TYPE} newLanguage - language to be changed to\n * @return {Boolean} true if language was set\n */\nexport function changeLanguage(newLanguage) {\n  let retVel = false;\n  if (Object.values(LANGUAGES).indexOf(newLanguage) > -1) {\n    store.dispatch(userState.actions.setLanguage(newLanguage));\n    retVel = true;\n    if (storedUser().state === USER_STATES.WAITING_LANGUAGE) {\n      store.dispatch(userState.actions.changeState(USER_STATES.LANGUAGE_SET));\n    }\n  }\n  return retVel;\n}\n\n/**\n * User action to accept EULA\n * @return {Boolean} true if EULA was accepted\n */\nexport function acceptEula() {\n  store.dispatch(userState.actions.setEula(true));\n  if (storedUser().state === USER_STATES.WAITING_EULA) {\n    store.dispatch(userState.actions.changeState(USER_STATES.EULA_ACCEPTED));\n  }\n  return true;\n}\n\n/**\n * User action to log in\n * @param {string} email - email address\n * @param {password} password  - fixed password\n * @return { Promise}\n */\nexport function doPwLogin(email, password) {\n  return new Promise((resolve, reject) => {\n    send({ command: COMMANDS.USER_LOGIN, data: { email, password } })\n      .then((response) => {\n        if (response && isString(response)) {\n          store.dispatch(userState.actions.setAuthKey(response));\n          if (storedUser().state === USER_STATES.WAITING_LOGIN) {\n            store.dispatch(userState.actions.changeState(USER_STATES.LOGIN_DONE));\n          }\n        }\n        resolve(response);\n      })\n      .catch((error) => {\n        console.debug('doPwLogin error', error);\n        reject(new Error('Login failure'));\n      });\n  });\n}\n\n/**\n * User action to set user token\n * @param {string} userToken - Cozify user/cloud token\n * @return {USER_STATE_TYPE}\n */\nexport function setAuthenticated(userToken) {\n  store.dispatch(userState.actions.setAuthenticated(userToken));\n  return storedUser().state;\n}\n\n/**\n * Get state of user state-machine\n * @return {USER_STATE_TYPE}\n */\nexport function getUserState() {\n  return storedUser().state;\n}\n",
+    "content": "// \nimport isString from 'lodash/isString';\n\n\nimport { send, COMMANDS } from '../connection/send';\nimport { store } from '../store';\nimport { userState } from '../reducers/user';\n\nimport { USER_STATES, LANGUAGES } from './constants';\n\n\n/*\n * Helper to get user\n * @return {Object} user\n */\nfunction storedUser() {\n  return userState.selectors.getUser(store.getState());\n}\n\n\n/**\n * User action to change current language\n * @param {LANGUAGES_TYPE} newLanguage - language to be changed to\n * @return {Boolean} true if language was set\n */\nexport function changeLanguage(newLanguage) {\n  let retVel = false;\n  if (Object.values(LANGUAGES).indexOf(newLanguage) > -1) {\n    store.dispatch(userState.actions.setLanguage(newLanguage));\n    retVel = true;\n    if (storedUser().state === USER_STATES.WAITING_LANGUAGE) {\n      store.dispatch(userState.actions.changeState(USER_STATES.LANGUAGE_SET));\n    }\n  }\n  return retVel;\n}\n\n/**\n * User action to accept EULA\n * @return {Boolean} true if EULA was accepted\n */\nexport function acceptEula() {\n  store.dispatch(userState.actions.setEula(true));\n  if (storedUser().state === USER_STATES.WAITING_EULA) {\n    store.dispatch(userState.actions.changeState(USER_STATES.EULA_ACCEPTED));\n  }\n  return true;\n}\n\n/**\n * User action to log in\n * @param {string} email - email address\n * @param {password} password  - fixed password\n * @return { Promise}\n */\nexport function doPwLogin(email, password) {\n  return new Promise((resolve, reject) => {\n    send({ command: COMMANDS.USER_LOGIN, data: { email, password } })\n      .then((response) => {\n        if (response && isString(response)) {\n          store.dispatch(userState.actions.setAuthKey(response));\n          if (storedUser().state === USER_STATES.WAITING_LOGIN) {\n            store.dispatch(userState.actions.changeState(USER_STATES.LOGIN_DONE));\n          }\n        }\n        resolve(response);\n      })\n      .catch((error) => {\n        console.debug('doPwLogin error', error);\n        reject(new Error('Login failure'));\n      });\n  });\n}\n\n/**\n * User action to set user token\n * @param {string} userToken - Cozify user/cloud token\n * @return {Object} user\n */\nexport function setAuthenticated(userToken) {\n  store.dispatch(userState.actions.setAuthenticated(userToken));\n  return storedUser();\n}\n\n/**\n * Get state of user state-machine\n * @return {USER_STATE_TYPE}\n */\nexport function getUserState() {\n  return storedUser().state;\n}\n",
     "static": true,
     "longname": "/Users/vesa/code/JS-SDK/docs/src/user/user.js",
     "access": "public",
@@ -4515,7 +4544,7 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 191,
+    "__docId__": 192,
     "kind": "function",
     "name": "storedUser",
     "memberof": "src/user/user.js",
@@ -4538,7 +4567,7 @@
     "ignore": true
   },
   {
-    "__docId__": 192,
+    "__docId__": 193,
     "kind": "function",
     "name": "changeLanguage",
     "memberof": "src/user/user.js",
@@ -4574,7 +4603,7 @@
     }
   },
   {
-    "__docId__": 193,
+    "__docId__": 194,
     "kind": "function",
     "name": "acceptEula",
     "memberof": "src/user/user.js",
@@ -4599,7 +4628,7 @@
     "params": []
   },
   {
-    "__docId__": 194,
+    "__docId__": 195,
     "kind": "function",
     "name": "doPwLogin",
     "memberof": "src/user/user.js",
@@ -4645,7 +4674,7 @@
     }
   },
   {
-    "__docId__": 195,
+    "__docId__": 196,
     "kind": "function",
     "name": "setAuthenticated",
     "memberof": "src/user/user.js",
@@ -4674,14 +4703,14 @@
     "return": {
       "nullable": null,
       "types": [
-        "USER_STATE_TYPE"
+        "Object"
       ],
       "spread": false,
-      "description": ""
+      "description": "user"
     }
   },
   {
-    "__docId__": 196,
+    "__docId__": 197,
     "kind": "function",
     "name": "getUserState",
     "memberof": "src/user/user.js",
@@ -4706,7 +4735,7 @@
     "params": []
   },
   {
-    "__docId__": 197,
+    "__docId__": 198,
     "kind": "file",
     "name": "src/utils.js",
     "content": "// \n\n/**\n * Helper to check if run environment is Node\n * @type {Boolean}\n */\nlet isNodeInUse = false;\n\nif (typeof process === 'object') {\n  if (typeof process.versions === 'object') {\n    if (typeof process.versions.node !== 'undefined') {\n      isNodeInUse = true;\n      console.log('Running in node.js');\n    } else {\n      console.log('Running in browser');\n    }\n  }\n}\n\nexport const isNode = isNodeInUse;\n\n/**\n * Helper method to Base64 decode\n * @param  {string} encoded - string to be decoded\n * @return {string}  - decoded string\n */\nexport function urlBase64Decode(encoded) {\n  const str = encoded.replace(/-/g, '+').replace(/_/g, '/');\n  let output = str;\n  switch (output.length % 4) {\n    case 0:\n    case 2:\n      output += '==';\n      break;\n    case 3:\n      output += '=';\n      break;\n    default:\n      throw new Error('Illegal base64url string!');\n  }\n  let retVal = '';\n\n  let atob = (a) => { console.error('Invalid atob for string ', a); return 'invalid atob'; };\n  if (!isNodeInUse) {\n    atob = window.atob;\n  } else {\n    const nodeAtob = (a) => {\n      const binVal = Buffer.from(a, 'base64').toString('binary');\n      return binVal;\n    };\n    atob = nodeAtob;\n  }\n\n  try {\n    retVal = atob(str);\n  } catch (error) {\n    try {\n      retVal = atob(output);\n    } catch (error2) {\n      console.error('urlBase64Decode: trying atob failed');\n    }\n  }\n  return retVal;\n}\n",
@@ -4717,7 +4746,7 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 198,
+    "__docId__": 199,
     "kind": "variable",
     "name": "isNodeInUse",
     "memberof": "src/utils.js",
@@ -4740,7 +4769,7 @@
     "ignore": true
   },
   {
-    "__docId__": 199,
+    "__docId__": 200,
     "kind": "variable",
     "name": "isNode",
     "memberof": "src/utils.js",
@@ -4760,7 +4789,7 @@
     }
   },
   {
-    "__docId__": 200,
+    "__docId__": 201,
     "kind": "function",
     "name": "urlBase64Decode",
     "memberof": "src/utils.js",

@@ -75,11 +75,11 @@ export function doPwLogin(email, password) {
 /**
  * User action to set user token
  * @param {string} userToken - Cozify user/cloud token
- * @return {USER_STATE_TYPE}
+ * @return {Object} user
  */
 export function setAuthenticated(userToken) {
   store.dispatch(userState.actions.setAuthenticated(userToken));
-  return storedUser().state;
+  return storedUser();
 }
 
 /**

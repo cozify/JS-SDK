@@ -20,10 +20,10 @@ export {
   changeLanguage, doPwLogin, setAuthenticated, acceptEula, getUserState,
 } from './user/user';
 export {
-  getHubs, selectHubById, unSelectHubById,
+  getHubs, selectHubById, unSelectHubById, unSelectHubs,
   startDiscoveringHubs, stopDiscoveringHubs,
-  startPolling, stopPolling,
-  startPairing, stopPairing, ignorePairing,
+  startPollingById, stopPollingById,
+  startPairingById, stopPairingById, ignorePairingByIds, stopPairings,
 } from './hubs/hubs';
 export {
   getDevices, getHubDevices,
