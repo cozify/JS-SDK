@@ -12,6 +12,8 @@ export const LANGUAGES = Object.freeze({
   EN_EN: 'en',
   EN_UK: 'en-UK',
   FI_FI: 'fi-FI',
+  FI: 'fi',
+  EN: 'en',
 });
 export type LANGUAGES_TYPE = $Values<typeof LANGUAGES>;
 
