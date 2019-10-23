@@ -8118,10 +8118,16 @@ const pairingInAction = {};
  * @return none
  */
 
-function doPairingById(hubId, reset) {
+function doPairingById(hubId, reset = false) {
+  let doRest = reset;
+
   if (pairingStopped[hubId]) {
     console.debug('doPairing: pairing stopped');
     return;
+  }
+
+  if (!pairingTimeStamp[hubId]) {
+    pairingTimeStamp[hubId] = 0;
   }
 
   const hub = getHubs()[hubId];
@@ -8142,9 +8148,9 @@ function doPairingById(hubId, reset) {
     return;
   }
 
-  pairingInAction[hubId] = true; // reset = pairingTimeStamp === 0;
-
-  if (reset) pairingTimeStamp[hubId] = 0;
+  pairingInAction[hubId] = true;
+  if (doRest) pairingTimeStamp[hubId] = 0;
+  doRest = pairingTimeStamp[hubId] === 0;
   send({
     command: COMMANDS.PAIR_START,
     hubId,
@@ -8161,7 +8167,7 @@ function doPairingById(hubId, reset) {
       switch (delta.type) {
         case 'SCAN_DELTA':
           {
-            pairingDevicesDeltaHandler(hubId, reset, delta.devices);
+            pairingDevicesDeltaHandler(hubId, doRest, delta.devices);
             break;
           }
 
@@ -8284,15 +8290,22 @@ const pollTimeStamp = {};
 const pollInAction = {};
 const secondPoll = {};
 /**
- * Do poll on given hub if hub connection is ok
+ * Do poll on given hub if hub connection is ok.
+ * Remote polls are executed only every second call.
  * @param {string} hubId
- * Remote poll is executed only every second call
+ * @param {booleam} reset - set true for full scan, false if delta only
  */
 
-function doPoll(hubId) {
+function doPoll(hubId, reset = false) {
+  let doRest = reset;
+
   if (pollingStopped[hubId]) {
     console.debug('doPolling: polling stopped');
     return;
+  }
+
+  if (!pollTimeStamp[hubId]) {
+    pollTimeStamp[hubId] = 0;
   }
 
   const hub = getHubs()[hubId];
@@ -8325,7 +8338,8 @@ function doPoll(hubId) {
   }
 
   pollInAction[hubId] = true;
-  let reset = pollTimeStamp[hubId] === 0;
+  if (doRest) pollTimeStamp[hubId] = 0;
+  doRest = pollTimeStamp[hubId] === 0;
   send({
     command: COMMANDS.POLL,
     hubId,
@@ -8340,7 +8354,7 @@ function doPoll(hubId) {
       // console.log(JSON.stringify(deltas));
       // Return can be null poll, even if not asked that
       if (pollTimeStamp[hubId] === 0 || deltas.full) {
-        reset = true;
+        doRest = true;
       }
 
       pollTimeStamp[hubId] = deltas.timestamp;
@@ -8348,7 +8362,7 @@ function doPoll(hubId) {
         switch (delta.type) {
           case 'DEVICE_DELTA':
             {
-              devicesDeltaHandler(hubId, reset, delta.devices);
+              devicesDeltaHandler(hubId, doRest, delta.devices);
               break;
             }
 
@@ -8374,7 +8388,7 @@ function doPoll(hubId) {
 
           case 'ROOM_DELTA':
             {
-              roomsDeltaHandler(hubId, reset, delta.rooms);
+              roomsDeltaHandler(hubId, doRest, delta.rooms);
               break;
             }
 
