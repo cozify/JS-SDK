@@ -280,11 +280,16 @@ const pairingInAction: Object = {};
  * @param {booleam} reset - set true for full scan, false if delta only
  * @return none
  */
-function doPairingById(hubId: string, reset: boolean) {
+function doPairingById(hubId: string, reset: boolean = false) {
+  let doRest = reset;
   if (pairingStopped[hubId]) {
     console.debug('doPairing: pairing stopped');
     return;
   }
+  if (!pairingTimeStamp[hubId]) {
+    pairingTimeStamp[hubId] = 0;
+  }
+
   const hub: HUB_TYPE = getHubs()[hubId];
   const { authKey } = storedUser();
   const { hubKey } = hub;
@@ -300,8 +305,8 @@ function doPairingById(hubId: string, reset: boolean) {
   }
   pairingInAction[hubId] = true;
 
-  // reset = pairingTimeStamp === 0;
-  if (reset) pairingTimeStamp[hubId] = 0;
+  if (doRest) pairingTimeStamp[hubId] = 0;
+  doRest = pairingTimeStamp[hubId] === 0;
 
   send({
     command: COMMANDS.PAIR_START, hubId, authKey, hubKey, localUrl: hub.url, data: { ts: pairingTimeStamp[hubId] },
@@ -311,7 +316,7 @@ function doPairingById(hubId: string, reset: boolean) {
         pairingTimeStamp[hubId] = delta.timestamp;
         switch (delta.type) {
           case 'SCAN_DELTA': {
-            pairingDevicesDeltaHandler(hubId, reset, delta.devices);
+            pairingDevicesDeltaHandler(hubId, doRest, delta.devices);
             break;
           }
           default: {
@@ -420,16 +425,20 @@ const secondPoll: Object = {};
 
 
 /**
- * Do poll on given hub if hub connection is ok
+ * Do poll on given hub if hub connection is ok.
+ * Remote polls are executed only every second call.
  * @param {string} hubId
- * Remote poll is executed only every second call
+ * @param {booleam} reset - set true for full scan, false if delta only
  */
-function doPoll(hubId: string) {
+function doPoll(hubId: string, reset: boolean = false) {
+  let doRest = reset;
   if (pollingStopped[hubId]) {
     console.debug('doPolling: polling stopped');
     return;
   }
-
+  if (!pollTimeStamp[hubId]) {
+    pollTimeStamp[hubId] = 0;
+  }
   const hub: HUB_TYPE = getHubs()[hubId];
   console.debug('doPoll connection state: ', hub.connectionState);
   if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
@@ -454,7 +463,9 @@ function doPoll(hubId: string) {
   }
   pollInAction[hubId] = true;
 
-  let reset = pollTimeStamp[hubId] === 0;
+  if (doRest) pollTimeStamp[hubId] = 0;
+  doRest = pollTimeStamp[hubId] === 0;
+
   send({
     command: COMMANDS.POLL, hubId, authKey, hubKey, localUrl: hub.url, data: { ts: pollTimeStamp[hubId] },
   })
@@ -463,7 +474,7 @@ function doPoll(hubId: string) {
       // console.log(JSON.stringify(deltas));
       // Return can be null poll, even if not asked that
         if (pollTimeStamp[hubId] === 0 || deltas.full) {
-          reset = true;
+          doRest = true;
         }
 
         pollTimeStamp[hubId] = deltas.timestamp;
@@ -471,7 +482,7 @@ function doPoll(hubId: string) {
         deltas.polls.forEach((delta) => {
           switch (delta.type) {
             case 'DEVICE_DELTA': {
-              devicesDeltaHandler(hubId, reset, delta.devices);
+              devicesDeltaHandler(hubId, doRest, delta.devices);
               break;
             }
             case 'GROUP_DELTA': {
@@ -487,7 +498,7 @@ function doPoll(hubId: string) {
               break;
             }
             case 'ROOM_DELTA': {
-              roomsDeltaHandler(hubId, reset, delta.rooms);
+              roomsDeltaHandler(hubId, doRest, delta.rooms);
               break;
             }
             case 'ZONE_DELTA': {
