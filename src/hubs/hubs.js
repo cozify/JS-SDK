@@ -1,7 +1,7 @@
 // @flow
 import isEmpty from 'lodash/isEmpty';
 import {
-  POLL_INTERVAL_MS, PAIRING_POLL_INTERVAL_MS, HUB_PROTOCOL, HUB_PORT,
+  DISCOVERY_INTERVAL_MS, POLL_INTERVAL_MS, PAIRING_POLL_INTERVAL_MS, HUB_PROTOCOL, HUB_PORT,
 } from './constants';
 import { USER_STATES, ROLES } from '../user/constants';
 import { HUB_CONNECTION_STATES } from '../connection/constants';
@@ -241,7 +241,7 @@ function fetchHubs(): Promise<Object> {
 }
 
 
-const discoveryInterval: ?Object = undefined;
+let discoveryInterval: IntervalID;
 
 /**
  * Start discovering hubs every DISCOVERY_INTERVAL_MS
@@ -252,7 +252,7 @@ export function startDiscoveringHubs() {
     // call immediately...
     fetchHubs();
     // and then every DISCOVERY_INTERVAL_MS (30s?)
-    // discoveryInterval = setInterval(fetchHubs, DISCOVERY_INTERVAL_MS);
+    discoveryInterval = setInterval(fetchHubs, DISCOVERY_INTERVAL_MS);
   }
 }
 
@@ -268,20 +268,20 @@ export function stopDiscoveringHubs() {
  */
 
 const pairingIntervals: Object = {};
-let pairingStopped: boolean = false;
-let pairingTimeStamp: number = 0;
-let pairingInAction: boolean = false;
+const pairingStopped: Object = {};
+const pairingTimeStamp: Object = {};
+const pairingInAction: Object = {};
 
 
 /*
- * Do pairing if hub connection is ok
+ * Do pairing of given hub if hub connection is ok
  * Remote pairing is executed only every second call
  * @param {string} hubId
  * @param {booleam} reset - set true for full scan, false if delta only
  * @return none
  */
-function doPairing(hubId: string, reset: boolean) {
-  if (pairingStopped) {
+function doPairingById(hubId: string, reset: boolean) {
+  if (pairingStopped[hubId]) {
     console.debug('doPairing: pairing stopped');
     return;
   }
@@ -295,20 +295,20 @@ function doPairing(hubId: string, reset: boolean) {
     return;
   }
 
-  if (pairingInAction) {
+  if (pairingInAction[hubId]) {
     return;
   }
-  pairingInAction = true;
+  pairingInAction[hubId] = true;
 
   // reset = pairingTimeStamp === 0;
-  if (reset) pairingTimeStamp = 0;
+  if (reset) pairingTimeStamp[hubId] = 0;
 
   send({
-    command: COMMANDS.PAIR_START, hubId, authKey, hubKey, localUrl: hub.url, data: { ts: pairingTimeStamp },
+    command: COMMANDS.PAIR_START, hubId, authKey, hubKey, localUrl: hub.url, data: { ts: pairingTimeStamp[hubId] },
   })
     .then((delta) => {
       if (delta) {
-        pairingTimeStamp = delta.timestamp;
+        pairingTimeStamp[hubId] = delta.timestamp;
         switch (delta.type) {
           case 'SCAN_DELTA': {
             pairingDevicesDeltaHandler(hubId, reset, delta.devices);
@@ -319,12 +319,12 @@ function doPairing(hubId: string, reset: boolean) {
           }
         }
       }
-      pairingInAction = false;
+      pairingInAction[hubId] = false;
     })
     .catch((error) => {
     // store.dispatch(hubsState.actions.hubPollFailed())
       console.error('SDK: doPairing error: ', error.message);
-      pairingInAction = false;
+      pairingInAction[hubId] = false;
     });
 }
 
@@ -335,7 +335,7 @@ function doPairing(hubId: string, reset: boolean) {
  * @param {boolean} ignore
  * @return none
  */
-export function ignorePairing(hubId: string, deviceId: string, ignore: boolean) {
+export function ignorePairingByIds(hubId: string, deviceId: string, ignore: boolean) {
   const { authKey } = storedUser();
   const hub: HUB_TYPE = getHubs()[hubId];
   const { hubKey } = hub;
@@ -358,24 +358,24 @@ export function ignorePairing(hubId: string, deviceId: string, ignore: boolean) 
  * @param {booleam} reset - set true for full scan, false if delta only
  * @return none
  */
-export function startPairing(hubId: string, reset: boolean) {
+export function startPairingById(hubId: string, reset: boolean) {
   const intervalTime = PAIRING_POLL_INTERVAL_MS;
-  pairingStopped = false;
-  doPairing(hubId, reset);
-  pairingIntervals[hubId] = setInterval(doPairing, intervalTime, hubId, reset);
+  pairingStopped[hubId] = false;
+  doPairingById(hubId, reset);
+  pairingIntervals[hubId] = setInterval(doPairingById, intervalTime, hubId, reset);
 }
 
-let stopPairingInAction = false;
+const stopPairingInAction = {};
 /**
  * Stop pairing on given hub
  * @param {string} hubId
  * @return none
  */
-export function stopPairing(hubId: string) {
-  if (stopPairingInAction) {
+export function stopPairingById(hubId: string) {
+  if (stopPairingInAction[hubId]) {
     return;
   }
-  stopPairingInAction = true;
+  stopPairingInAction[hubId] = true;
 
   const { authKey } = storedUser();
   const hub: HUB_TYPE = getHubs()[hubId];
@@ -388,26 +388,35 @@ export function stopPairing(hubId: string) {
   })
     .then((data) => {
       console.debug('SDK: pairingStopped: Ok , data: ', data);
-      pairingStopped = true;
-      stopPairingInAction = false;
+      pairingStopped[hubId] = true;
+      stopPairingInAction[hubId] = false;
     })
     .catch((error) => {
     // store.dispatch(hubsState.actions.hubPollFailed())
       console.error('SDK: pairingStopped error: ', error.message);
-      stopPairingInAction = false;
+      stopPairingInAction[hubId] = false;
     });
 }
 
+/**
+ * Stop pairing on all hubs
+ * @return none
+ */
+export function stopPairings() {
+  const hubs = getHubs();
+  (Object.values(hubs): any).forEach((hub: HUB_TYPE) => {
+    stopPairingById(hub.id);
+  });
+}
 
 /*
 ** Polling
 */
-
 const pollIntervals: Object = {};
-let pollingStopped: boolean = false;
-let pollTimeStamp: number = 0;
-let pollInAction: boolean = false;
-let secondPoll: boolean = false;
+const pollingStopped: Object = {};
+const pollTimeStamp: Object = {};
+const pollInAction: Object = {};
+const secondPoll: Object = {};
 
 
 /**
@@ -416,7 +425,7 @@ let secondPoll: boolean = false;
  * Remote poll is executed only every second call
  */
 function doPoll(hubId: string) {
-  if (pollingStopped) {
+  if (pollingStopped[hubId]) {
     console.debug('doPolling: polling stopped');
     return;
   }
@@ -430,34 +439,34 @@ function doPoll(hubId: string) {
 
   // just return every second -> not doing so often as in local connection
   if (hub.connectionState === HUB_CONNECTION_STATES.REMOTE) {
-    if (secondPoll) {
-      secondPoll = false;
+    if (secondPoll[hubId]) {
+      secondPoll[hubId] = false;
       return;
     }
-    secondPoll = true;
+    secondPoll[hubId] = true;
   }
 
   const { authKey } = storedUser();
   const { hubKey } = hub;
 
-  if (pollInAction) {
+  if (pollInAction[hubId]) {
     return;
   }
-  pollInAction = true;
+  pollInAction[hubId] = true;
 
-  let reset = pollTimeStamp === 0;
+  let reset = pollTimeStamp[hubId] === 0;
   send({
-    command: COMMANDS.POLL, hubId, authKey, hubKey, localUrl: hub.url, data: { ts: pollTimeStamp },
+    command: COMMANDS.POLL, hubId, authKey, hubKey, localUrl: hub.url, data: { ts: pollTimeStamp[hubId] },
   })
     .then((deltas) => {
       if (deltas) {
       // console.log(JSON.stringify(deltas));
       // Return can be null poll, even if not asked that
-        if (pollTimeStamp === 0 || deltas.full) {
+        if (pollTimeStamp[hubId] === 0 || deltas.full) {
           reset = true;
         }
 
-        pollTimeStamp = deltas.timestamp;
+        pollTimeStamp[hubId] = deltas.timestamp;
 
         deltas.polls.forEach((delta) => {
           switch (delta.type) {
@@ -493,12 +502,12 @@ function doPoll(hubId: string) {
           }
         });
       }
-      pollInAction = false;
+      pollInAction[hubId] = false;
     })
     .catch((error) => {
     // store.dispatch(hubsState.actions.hubPollFailed())
       console.error('SDK doPoll error: ', error.message);
-      pollInAction = false;
+      pollInAction[hubId] = false;
     });
 }
 
@@ -508,8 +517,8 @@ function doPoll(hubId: string) {
  * @param {string} hubId
  * @return none
  */
-export function startPolling(hubId: string) {
-  pollingStopped = false;
+export function startPollingById(hubId: string) {
+  pollingStopped[hubId] = false;
   const intervalTime = POLL_INTERVAL_MS;
   pollIntervals[hubId] = setInterval(doPoll, intervalTime, hubId);
 }
@@ -519,24 +528,9 @@ export function startPolling(hubId: string) {
  * @param {string} hubId   - hub id to be selected
  * @return none
  */
-export function stopPolling(hubId: string) {
-  pollingStopped = true;
+export function stopPollingById(hubId: string) {
+  pollingStopped[hubId] = true;
   clearInterval(pollIntervals[hubId]);
-}
-
-/**
- * Unselect hub by id, stops hub polling
- * @param  {string} hubId   - hub id to be selected
- * @return none
- */
-export function unSelectHubById(hubId: string) {
-  const hubs: HUBS_MAP_TYPE = getHubs();
-  (Object.values(hubs): any).forEach((hub: HUB_TYPE) => {
-    if (hubId === hub.id) {
-      store.dispatch(hubsState.actions.unSelectHub({ hubId: hub.id }));
-      stopPolling(hub.id);
-    }
-  });
 }
 
 
@@ -553,13 +547,40 @@ export function selectHubById(hubId: string, poll: boolean = false) {
     if (hubId === hub.id) {
       store.dispatch(hubsState.actions.selectHub({ hubId: hub.id }));
       if (hub.hubKey && poll) {
-        startPolling(hub.id);
+        startPollingById(hub.id);
       } else {
         if (!hub.hubKey) {
           console.error('SDK selectHubById: No hub key error');
         }
         console.debug('SDK selectHubById: Ready to start polling');
       }
+    }
+  });
+}
+
+/**
+ * Unselect hubs, stops hub pollings
+ * @return none
+ */
+export function unSelectHubs() {
+  const hubs: HUBS_MAP_TYPE = getHubs();
+  (Object.values(hubs): any).forEach((hub: HUB_TYPE) => {
+    store.dispatch(hubsState.actions.unSelectHub({ hubId: hub.id }));
+    stopPollingById(hub.id);
+  });
+}
+
+/**
+ * Unselect hub by id, stops hub polling
+ * @param  {string} hubId   - hub id to be selected
+ * @return none
+ */
+export function unSelectHubById(hubId: string) {
+  const hubs: HUBS_MAP_TYPE = getHubs();
+  (Object.values(hubs): any).forEach((hub: HUB_TYPE) => {
+    if (hubId === hub.id) {
+      store.dispatch(hubsState.actions.unSelectHub({ hubId: hub.id }));
+      stopPollingById(hub.id);
     }
   });
 }

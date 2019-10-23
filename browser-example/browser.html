@@ -16,6 +16,7 @@
       let fixedDeviceId = 'abcd-efgh'
       let fixedDeviceName = 'Windpow'
 
+
       let LANGUAGES = CozifySDK.LANGUAGES;
       let USER_STATES = CozifySDK.USER_STATES;
 
@@ -43,16 +44,17 @@
       // POLLINGS
       CozifySDK.watchChanges('hubs', (newHubsState, oldHubsState) => {
         if (newHubsState[fixedHubId] && !newHubsState[fixedHubId].selected) {
+          debugger
           CozifySDK.selectHubById(fixedHubId, true);
-          CozifySDK.stopDiscoveringHubs(fixedHubId);
+          CozifySDK.stopDiscoveringHubs();
           setTimeout(function() {
-            CozifySDK.stopPolling(fixedHubId);
+            CozifySDK.stopPollingById(fixedHubId);
           }, 20000);
         };
 
-          CozifySDK.startPairing(fixedHubId, true)
+          CozifySDK.startPairingById(fixedHubId, true)
           setTimeout(function() {
-            CozifySDK.stopPairing(fixedHubId);
+            CozifySDK.stopPairingById(fixedHubId);
             console.error('Pairing stopped')
           }, 30000);
 
@@ -84,7 +86,7 @@
 
                       // CozifySDK.sendDeviceStateCmd(fixedHubId, device.id, state, ['isOn', 'type']);
                       CozifySDK.identifyDevice(fixedHubId, device.id)
-                      CozifySDK.ignorePairing(fixedHubId, device.id, false)
+                      CozifySDK.ignorePairingByIds(fixedHubId, device.id, false)
                       CozifySDK.setDeviceMeta(fixedHubId, device.id, fixedDeviceName, ["652ec684-c02f-4490-9f9a-b6b29f81a92d"])
                     }
 
