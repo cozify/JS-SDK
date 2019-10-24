@@ -176,7 +176,7 @@ export function send({
         const hubs = hubsState.selectors.getHubs(stateNow);
         if (!hubs[hubId] || !hubs[hubId].hubKey) {
           return new Promise((resolve, reject) => {
-            reject(new Error('SDK Error: Send - No Hub id error'));
+            reject(new Error('SDK Error: Send - Hub or hubKey not found error'));
           });
         }
         const hub = hubs[hubId];
@@ -279,12 +279,12 @@ export function send({
   return new Promise((resolve, reject) => {
     if (command || sendUrl) {
       axios.interceptors.response.use((response) => {
-        if (response.headers['content-type'] === 'application/json' || response.headers['content-type'] === 'application/binary') {
+        if (response.headers['content-type'].includes('application/json') || response.headers['content-type'].includes('application/binary')) {
           resetRetry(sendUrl);
           return response;
         }
         console.error('send: unknown response type');
-        return Promise.reject(response);
+        return response; // Promise.reject(response);
       }, (error) => Promise.reject(error));
       /*
       axios.interceptors.request.use((reqConfig) => {

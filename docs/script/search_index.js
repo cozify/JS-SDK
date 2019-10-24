@@ -126,6 +126,12 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
+    "cozify-sdk/src/hubs/hubs.js~connecthubbytokens",
+    "function/index.html#static-function-connectHubByTokens",
+    "<span>connectHubByTokens</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/hubs.js</span>",
+    "function"
+  ],
+  [
     "cozify-sdk/src/reducers/connections.js~connectionsstate",
     "variable/index.html#static-variable-connectionsState",
     "<span>connectionsState</span> <span class=\"search-result-import-path\">cozify-sdk/src/reducers/connections.js</span>",
@@ -142,6 +148,12 @@ window.esdocSearchIndex = [
     "variable/index.html#static-variable-devicesState",
     "<span>devicesState</span> <span class=\"search-result-import-path\">cozify-sdk/src/reducers/devices.js</span>",
     "variable"
+  ],
+  [
+    "cozify-sdk/src/hubs/hubs.js~dopoll",
+    "function/index.html#static-function-doPoll",
+    "<span>doPoll</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/hubs.js</span>",
+    "function"
   ],
   [
     "cozify-sdk/src/user/user.js~dopwlogin",

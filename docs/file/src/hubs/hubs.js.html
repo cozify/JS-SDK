@@ -65,7 +65,9 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubPairingDevices">getHubPairingDevices</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getPairingDevices">getPairingDevices</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-pairingDevicesDeltaHandler">pairingDevicesDeltaHandler</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#hubs">hubs</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubs">getHubs</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#hubs">hubs</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-connectHubByTokens">connectHubByTokens</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-doPoll">doPoll</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubs">getHubs</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ignorePairingByIds">ignorePairingByIds</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-selectHubById">selectHubById</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-startDiscoveringHubs">startDiscoveringHubs</a></span></span></li>
@@ -267,7 +269,7 @@ function setSelectedHubs(newHubs) {
 }
 
 /*
- * Fetch HUB IP addresses in the same network
+ * Fetch HUB IP addresses and metadata of those in the same network
  */
 function doCloudDiscovery() {
   return new Promise((resolve) =&gt; {
@@ -296,9 +298,9 @@ function doCloudDiscovery() {
 }
 
 /*
- * Fetch hub metadatas
+ * Fetch hub metadatas from Cloud
  */
-function fetchMetaData(hubs, authKey) {
+function fetchCloudMetaData(hubs, authKey) {
   return new Promise((resolve) =&gt; {
     const queries = [];
     (Object.values(hubs)).forEach((hub) =&gt; {
@@ -308,10 +310,10 @@ function fetchMetaData(hubs, authKey) {
     });
     sendAll(queries)
       .then((values) =&gt; {
-        console.debug(&apos;fetchMetaData values&apos;, values);
+        console.debug(&apos;fetchCloudMetaData values&apos;, values);
       })
       .catch((error) =&gt; {
-        console.debug(&apos;fetchMetaData error&apos;, error);
+        console.error(&apos;fetchCloudMetaData error&apos;, error);
       })
       .finally(() =&gt; {
         resolve();
@@ -327,6 +329,25 @@ function storedUser() {
   return userState.selectors.getUser(store.getState());
 }
 
+/*
+ * Make hubsMap by fetching hub meta data from cloud and local
+ */
+function makeHubsMap(tokens, sync = false) {
+  const { authKey } = storedUser();
+  return new Promise((resolve) =&gt; {
+    hubsMap = extractHubInfo(tokens);
+    store.dispatch(hubsState.actions.updateHubs(hubsMap));
+    fetchCloudMetaData(hubsMap, authKey)
+      .finally(() =&gt; {
+        if (sync) {
+          doCloudDiscovery().then(() =&gt; resolve(getHubs())).catch(() =&gt; resolve(getHubs()));
+        } else {
+          doCloudDiscovery();
+          resolve(getHubs());
+        }
+      });
+  });
+}
 
 /*
  * Fetch Hub keys by user authKey and start fetching hub meta datas
@@ -341,13 +362,16 @@ function fetchHubs() {
     send({ command: COMMANDS.HUB_KEYS, authKey })
       .then((tokens) =&gt; {
         if (tokens) {
+          makeHubsMap(tokens).then((hubs) =&gt; resolve(hubs));
+          /*
           hubsMap = extractHubInfo(tokens);
           store.dispatch(hubsState.actions.updateHubs(hubsMap));
-          fetchMetaData(hubsMap, authKey)
+          fetchCloudMetaData(hubsMap, authKey)
             .finally(() =&gt; {
               doCloudDiscovery();
               resolve(getHubs());
             });
+          */
         } else {
           resolve(getHubs());
         }
@@ -548,97 +572,106 @@ const secondPoll = {};
  * Remote polls are executed only every second call.
  * @param {string} hubId
  * @param {booleam} reset - set true for full scan, false if delta only
+ * @return {Promise} status or error
  */
-function doPoll(hubId, reset = false) {
-  let doRest = reset;
-  if (pollingStopped[hubId]) {
-    console.debug(&apos;doPolling: polling stopped&apos;);
-    return;
-  }
-  if (!pollTimeStamp[hubId]) {
-    pollTimeStamp[hubId] = 0;
-  }
-  const hub = getHubs()[hubId];
-  console.debug(&apos;doPoll connection state: &apos;, hub.connectionState);
-  if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL &amp;&amp; hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
-    console.error(&apos;SDK doPoll error: No Hub connection&apos;);
-    return;
-  }
+export function doPoll(hubId, reset = false) {
+  return new Promise((resolve, reject) =&gt; {
+    let doReset = reset;
+    if (doReset) pollTimeStamp[hubId] = 0;
+    doReset = pollTimeStamp[hubId] === 0;
 
-  // just return every second -&gt; not doing so often as in local connection
-  if (hub.connectionState === HUB_CONNECTION_STATES.REMOTE) {
-    if (secondPoll[hubId]) {
-      secondPoll[hubId] = false;
+    if (pollingStopped[hubId]) {
+      console.debug(&apos;doPolling: polling stopped&apos;);
+      resolve(&apos;stopped&apos;);
       return;
     }
-    secondPoll[hubId] = true;
-  }
+    if (!pollTimeStamp[hubId]) {
+      pollTimeStamp[hubId] = 0;
+    }
+    const hub = getHubs()[hubId];
+    console.debug(&apos;doPoll connection state: &apos;, hub.connectionState);
+    if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL &amp;&amp; hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
+      console.error(&apos;SDK doPoll error: No Hub connection&apos;);
+      reject(new Error(&apos;doPoll error: No Hub connection&apos;));
+      return;
+    }
 
-  const { authKey } = storedUser();
-  const { hubKey } = hub;
-
-  if (pollInAction[hubId]) {
-    return;
-  }
-  pollInAction[hubId] = true;
-
-  if (doRest) pollTimeStamp[hubId] = 0;
-  doRest = pollTimeStamp[hubId] === 0;
-
-  send({
-    command: COMMANDS.POLL, hubId, authKey, hubKey, localUrl: hub.url, data: { ts: pollTimeStamp[hubId] },
-  })
-    .then((deltas) =&gt; {
-      if (deltas) {
-      // console.log(JSON.stringify(deltas));
-      // Return can be null poll, even if not asked that
-        if (pollTimeStamp[hubId] === 0 || deltas.full) {
-          doRest = true;
-        }
-
-        pollTimeStamp[hubId] = deltas.timestamp;
-
-        deltas.polls.forEach((delta) =&gt; {
-          switch (delta.type) {
-            case &apos;DEVICE_DELTA&apos;: {
-              devicesDeltaHandler(hubId, doRest, delta.devices);
-              break;
-            }
-            case &apos;GROUP_DELTA&apos;: {
-              break;
-            }
-            case &apos;SCENE_DELTA&apos;: {
-              break;
-            }
-            case &apos;RULE_DELTA&apos;: {
-              break;
-            }
-            case &apos;USERS_DELTA&apos;: {
-              break;
-            }
-            case &apos;ROOM_DELTA&apos;: {
-              roomsDeltaHandler(hubId, doRest, delta.rooms);
-              break;
-            }
-            case &apos;ZONE_DELTA&apos;: {
-              break;
-            }
-            case &apos;ALARM_DELTA&apos;: {
-              break;
-            }
-            default: {
-              break;
-            }
-          }
-        });
+    // just return every second -&gt; not doing so often as in local connection
+    if (hub.connectionState === HUB_CONNECTION_STATES.REMOTE &amp;&amp; !doReset) {
+      if (secondPoll[hubId]) {
+        secondPoll[hubId] = false;
+        resolve(&apos;skipped&apos;);
+        return;
       }
-      pollInAction[hubId] = false;
+      secondPoll[hubId] = true;
+    }
+
+    const { authKey } = storedUser();
+    const { hubKey } = hub;
+
+    if (pollInAction[hubId]) {
+      reject(new Error(&apos;doPoll error: Already polling&apos;));
+      return;
+    }
+    pollInAction[hubId] = true;
+
+    send({
+      command: COMMANDS.POLL, hubId, authKey, hubKey, localUrl: hub.url, data: { ts: pollTimeStamp[hubId] },
     })
-    .catch((error) =&gt; {
-    // store.dispatch(hubsState.actions.hubPollFailed())
-      console.error(&apos;SDK doPoll error: &apos;, error.message);
-      pollInAction[hubId] = false;
-    });
+      .then((deltas) =&gt; {
+        if (deltas) {
+        // console.log(JSON.stringify(deltas));
+        // Return can be null poll, even if not asked that
+          if (pollTimeStamp[hubId] === 0 || deltas.full) {
+            doReset = true;
+          }
+
+          pollTimeStamp[hubId] = deltas.timestamp;
+
+          deltas.polls.forEach((delta) =&gt; {
+            switch (delta.type) {
+              case &apos;DEVICE_DELTA&apos;: {
+                devicesDeltaHandler(hubId, doReset, delta.devices);
+                break;
+              }
+              case &apos;GROUP_DELTA&apos;: {
+                break;
+              }
+              case &apos;SCENE_DELTA&apos;: {
+                break;
+              }
+              case &apos;RULE_DELTA&apos;: {
+                break;
+              }
+              case &apos;USERS_DELTA&apos;: {
+                break;
+              }
+              case &apos;ROOM_DELTA&apos;: {
+                roomsDeltaHandler(hubId, doReset, delta.rooms);
+                break;
+              }
+              case &apos;ZONE_DELTA&apos;: {
+                break;
+              }
+              case &apos;ALARM_DELTA&apos;: {
+                break;
+              }
+              default: {
+                break;
+              }
+            }
+          });
+        }
+        pollInAction[hubId] = false;
+        resolve(&apos;done&apos;);
+      })
+      .catch((error) =&gt; {
+      // store.dispatch(hubsState.actions.hubPollFailed())
+        console.error(&apos;SDK doPoll error: &apos;, error.message);
+        pollInAction[hubId] = false;
+        reject(error);
+      });
+  });
 }
 
 
@@ -688,6 +721,7 @@ export function selectHubById(hubId, poll = false) {
   });
 }
 
+
 /**
  * Unselect hubs, stops hub pollings
  * @return none
@@ -715,6 +749,26 @@ export function unSelectHubById(hubId) {
   });
 }
 
+/**
+ * Connect to the given hub - local or remote.
+ * @param  {string} hubId
+ * @param  {string} hubKey
+ * @return {Promise} current hubs, should not reject never
+ */
+export function connectHubByTokens(hubId, hubKey) {
+  return new Promise((resolve, reject) =&gt; {
+    const { authKey } = storedUser();
+    if (!hubId) reject(new Error(&apos;No Hub Id&apos;));
+    if (!hubKey) reject(new Error(&apos;No hubKey&apos;));
+    if (!authKey) reject(new Error(&apos;No AuthKey&apos;));
+    const tokens = {};
+    tokens[hubId] = hubKey;
+    makeHubsMap(tokens, true).then(() =&gt; {
+      selectHubById(hubId, false);
+      resolve(getHubs());
+    }).catch((error) =&gt; reject(error));
+  });
+}
 
 /*
  * Listener of User state changes

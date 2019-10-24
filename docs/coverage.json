@@ -1,7 +1,7 @@
 {
-  "coverage": "63.49%",
-  "expectCount": 126,
-  "actualCount": 80,
+  "coverage": "64.06%",
+  "expectCount": 128,
+  "actualCount": 82,
   "files": {
     "src/connection/constants.js": {
       "expectCount": 5,
@@ -69,20 +69,20 @@
       ]
     },
     "src/hubs/hubs.js": {
-      "expectCount": 34,
-      "actualCount": 23,
+      "expectCount": 36,
+      "actualCount": 25,
       "undocumentLines": [
         19,
-        269,
-        270,
-        271,
-        272,
-        372,
-        419,
-        420,
-        421,
-        422,
-        423
+        291,
+        292,
+        293,
+        294,
+        394,
+        441,
+        442,
+        443,
+        444,
+        445
       ]
     },
     "src/reducers/connections.js": {

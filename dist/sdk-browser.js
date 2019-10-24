@@ -5835,7 +5835,9 @@ var CozifySDK = (function (exports, axios) {
 	  NONE: 'none',
 	  EN_EN: 'en',
 	  EN_UK: 'en-UK',
-	  FI_FI: 'fi-FI'
+	  FI_FI: 'fi-FI',
+	  FI: 'fi',
+	  EN: 'en'
 	});
 	/**
 	  * Enumeration of user state, that could be
@@ -7162,7 +7164,7 @@ var CozifySDK = (function (exports, axios) {
 
 	        if (!hubs[hubId] || !hubs[hubId].hubKey) {
 	          return new Promise((resolve, reject) => {
-	            reject(new Error('SDK Error: Send - No Hub id error'));
+	            reject(new Error('SDK Error: Send - Hub or hubKey not found error'));
 	          });
 	        }
 
@@ -7988,7 +7990,7 @@ var CozifySDK = (function (exports, axios) {
 	  });
 	}
 	/*
-	 * Fetch HUB IP addresses in the same network
+	 * Fetch HUB IP addresses and metadata of those in the same network
 	 */
 
 
@@ -8019,11 +8021,11 @@ var CozifySDK = (function (exports, axios) {
 	  });
 	}
 	/*
-	 * Fetch hub metadatas
+	 * Fetch hub metadatas from Cloud
 	 */
 
 
-	function fetchMetaData(hubs, authKey) {
+	function fetchCloudMetaData(hubs, authKey) {
 	  return new Promise(resolve => {
 	    const queries = [];
 	    Object.values(hubs).forEach(hub => {
@@ -8032,9 +8034,9 @@ var CozifySDK = (function (exports, axios) {
 	      }
 	    });
 	    sendAll(queries).then(values => {
-	      console.debug('fetchMetaData values', values);
+	      console.debug('fetchCloudMetaData values', values);
 	    }).catch(error => {
-	      console.debug('fetchMetaData error', error);
+	      console.error('fetchCloudMetaData error', error);
 	    }).finally(() => {
 	      resolve();
 	    });
@@ -8047,6 +8049,28 @@ var CozifySDK = (function (exports, axios) {
 
 	function storedUser$1() {
 	  return userState.selectors.getUser(store.getState());
+	}
+	/*
+	 * Make hubsMap by fetching hub meta data from cloud and local
+	 */
+
+
+	function makeHubsMap(tokens, sync = false) {
+	  const {
+	    authKey
+	  } = storedUser$1();
+	  return new Promise(resolve => {
+	    hubsMap = extractHubInfo(tokens);
+	    store.dispatch(hubsState.actions.updateHubs(hubsMap));
+	    fetchCloudMetaData(hubsMap, authKey).finally(() => {
+	      if (sync) {
+	        doCloudDiscovery().then(() => resolve(getHubs())).catch(() => resolve(getHubs()));
+	      } else {
+	        doCloudDiscovery();
+	        resolve(getHubs());
+	      }
+	    });
+	  });
 	}
 	/*
 	 * Fetch Hub keys by user authKey and start fetching hub meta datas
@@ -8068,12 +8092,16 @@ var CozifySDK = (function (exports, axios) {
 	      authKey
 	    }).then(tokens => {
 	      if (tokens) {
+	        makeHubsMap(tokens).then(hubs => resolve(hubs));
+	        /*
 	        hubsMap = extractHubInfo(tokens);
 	        store.dispatch(hubsState.actions.updateHubs(hubsMap));
-	        fetchMetaData(hubsMap, authKey).finally(() => {
-	          doCloudDiscovery();
-	          resolve(getHubs());
-	        });
+	        fetchCloudMetaData(hubsMap, authKey)
+	          .finally(() => {
+	            doCloudDiscovery();
+	            resolve(getHubs());
+	          });
+	        */
 	      } else {
 	        resolve(getHubs());
 	      }
@@ -8297,127 +8325,136 @@ var CozifySDK = (function (exports, axios) {
 	 * Remote polls are executed only every second call.
 	 * @param {string} hubId
 	 * @param {booleam} reset - set true for full scan, false if delta only
+	 * @return {Promise} status or error
 	 */
 
 	function doPoll(hubId, reset = false) {
-	  let doRest = reset;
+	  return new Promise((resolve, reject) => {
+	    let doReset = reset;
+	    if (doReset) pollTimeStamp[hubId] = 0;
+	    doReset = pollTimeStamp[hubId] === 0;
 
-	  if (pollingStopped[hubId]) {
-	    console.debug('doPolling: polling stopped');
-	    return;
-	  }
-
-	  if (!pollTimeStamp[hubId]) {
-	    pollTimeStamp[hubId] = 0;
-	  }
-
-	  const hub = getHubs()[hubId];
-	  console.debug('doPoll connection state: ', hub.connectionState);
-
-	  if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
-	    console.error('SDK doPoll error: No Hub connection');
-	    return;
-	  } // just return every second -> not doing so often as in local connection
-
-
-	  if (hub.connectionState === HUB_CONNECTION_STATES.REMOTE) {
-	    if (secondPoll[hubId]) {
-	      secondPoll[hubId] = false;
+	    if (pollingStopped[hubId]) {
+	      console.debug('doPolling: polling stopped');
+	      resolve('stopped');
 	      return;
 	    }
 
-	    secondPoll[hubId] = true;
-	  }
-
-	  const {
-	    authKey
-	  } = storedUser$1();
-	  const {
-	    hubKey
-	  } = hub;
-
-	  if (pollInAction[hubId]) {
-	    return;
-	  }
-
-	  pollInAction[hubId] = true;
-	  if (doRest) pollTimeStamp[hubId] = 0;
-	  doRest = pollTimeStamp[hubId] === 0;
-	  send({
-	    command: COMMANDS.POLL,
-	    hubId,
-	    authKey,
-	    hubKey,
-	    localUrl: hub.url,
-	    data: {
-	      ts: pollTimeStamp[hubId]
+	    if (!pollTimeStamp[hubId]) {
+	      pollTimeStamp[hubId] = 0;
 	    }
-	  }).then(deltas => {
-	    if (deltas) {
-	      // console.log(JSON.stringify(deltas));
-	      // Return can be null poll, even if not asked that
-	      if (pollTimeStamp[hubId] === 0 || deltas.full) {
-	        doRest = true;
+
+	    const hub = getHubs()[hubId];
+	    console.debug('doPoll connection state: ', hub.connectionState);
+
+	    if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
+	      console.error('SDK doPoll error: No Hub connection');
+	      reject(new Error('doPoll error: No Hub connection'));
+	      return;
+	    } // just return every second -> not doing so often as in local connection
+
+
+	    if (hub.connectionState === HUB_CONNECTION_STATES.REMOTE && !doReset) {
+	      if (secondPoll[hubId]) {
+	        secondPoll[hubId] = false;
+	        resolve('skipped');
+	        return;
 	      }
 
-	      pollTimeStamp[hubId] = deltas.timestamp;
-	      deltas.polls.forEach(delta => {
-	        switch (delta.type) {
-	          case 'DEVICE_DELTA':
-	            {
-	              devicesDeltaHandler(hubId, doRest, delta.devices);
-	              break;
-	            }
-
-	          case 'GROUP_DELTA':
-	            {
-	              break;
-	            }
-
-	          case 'SCENE_DELTA':
-	            {
-	              break;
-	            }
-
-	          case 'RULE_DELTA':
-	            {
-	              break;
-	            }
-
-	          case 'USERS_DELTA':
-	            {
-	              break;
-	            }
-
-	          case 'ROOM_DELTA':
-	            {
-	              roomsDeltaHandler(hubId, doRest, delta.rooms);
-	              break;
-	            }
-
-	          case 'ZONE_DELTA':
-	            {
-	              break;
-	            }
-
-	          case 'ALARM_DELTA':
-	            {
-	              break;
-	            }
-
-	          default:
-	            {
-	              break;
-	            }
-	        }
-	      });
+	      secondPoll[hubId] = true;
 	    }
 
-	    pollInAction[hubId] = false;
-	  }).catch(error => {
-	    // store.dispatch(hubsState.actions.hubPollFailed())
-	    console.error('SDK doPoll error: ', error.message);
-	    pollInAction[hubId] = false;
+	    const {
+	      authKey
+	    } = storedUser$1();
+	    const {
+	      hubKey
+	    } = hub;
+
+	    if (pollInAction[hubId]) {
+	      reject(new Error('doPoll error: Already polling'));
+	      return;
+	    }
+
+	    pollInAction[hubId] = true;
+	    send({
+	      command: COMMANDS.POLL,
+	      hubId,
+	      authKey,
+	      hubKey,
+	      localUrl: hub.url,
+	      data: {
+	        ts: pollTimeStamp[hubId]
+	      }
+	    }).then(deltas => {
+	      if (deltas) {
+	        // console.log(JSON.stringify(deltas));
+	        // Return can be null poll, even if not asked that
+	        if (pollTimeStamp[hubId] === 0 || deltas.full) {
+	          doReset = true;
+	        }
+
+	        pollTimeStamp[hubId] = deltas.timestamp;
+	        deltas.polls.forEach(delta => {
+	          switch (delta.type) {
+	            case 'DEVICE_DELTA':
+	              {
+	                devicesDeltaHandler(hubId, doReset, delta.devices);
+	                break;
+	              }
+
+	            case 'GROUP_DELTA':
+	              {
+	                break;
+	              }
+
+	            case 'SCENE_DELTA':
+	              {
+	                break;
+	              }
+
+	            case 'RULE_DELTA':
+	              {
+	                break;
+	              }
+
+	            case 'USERS_DELTA':
+	              {
+	                break;
+	              }
+
+	            case 'ROOM_DELTA':
+	              {
+	                roomsDeltaHandler(hubId, doReset, delta.rooms);
+	                break;
+	              }
+
+	            case 'ZONE_DELTA':
+	              {
+	                break;
+	              }
+
+	            case 'ALARM_DELTA':
+	              {
+	                break;
+	              }
+
+	            default:
+	              {
+	                break;
+	              }
+	          }
+	        });
+	      }
+
+	      pollInAction[hubId] = false;
+	      resolve('done');
+	    }).catch(error => {
+	      // store.dispatch(hubsState.actions.hubPollFailed())
+	      console.error('SDK doPoll error: ', error.message);
+	      pollInAction[hubId] = false;
+	      reject(error);
+	    });
 	  });
 	}
 	/**
@@ -8425,7 +8462,6 @@ var CozifySDK = (function (exports, axios) {
 	 * @param {string} hubId
 	 * @return none
 	 */
-
 
 	function startPollingById(hubId) {
 	  pollingStopped[hubId] = false;
@@ -8498,6 +8534,29 @@ var CozifySDK = (function (exports, axios) {
 	      }));
 	      stopPollingById(hub.id);
 	    }
+	  });
+	}
+	/**
+	 * Connect to the given hub - local or remote.
+	 * @param  {string} hubId
+	 * @param  {string} hubKey
+	 * @return {Promise} current hubs, should not reject never
+	 */
+
+	function connectHubByTokens(hubId, hubKey) {
+	  return new Promise((resolve, reject) => {
+	    const {
+	      authKey
+	    } = storedUser$1();
+	    if (!hubId) reject(new Error('No Hub Id'));
+	    if (!hubKey) reject(new Error('No hubKey'));
+	    if (!authKey) reject(new Error('No AuthKey'));
+	    const tokens = {};
+	    tokens[hubId] = hubKey;
+	    makeHubsMap(tokens, true).then(() => {
+	      selectHubById(hubId, false);
+	      resolve(getHubs());
+	    }).catch(error => reject(error));
 	  });
 	}
 	/*
@@ -10047,9 +10106,11 @@ var CozifySDK = (function (exports, axios) {
 	exports.acceptEula = acceptEula;
 	exports.addRoom = addRoom;
 	exports.changeLanguage = changeLanguage;
+	exports.connectHubByTokens = connectHubByTokens;
 	exports.cozifyReducer = rootReducer;
 	exports.deleteDevice = deleteDevice;
 	exports.devicesState = devicesState;
+	exports.doPoll = doPoll;
 	exports.doPwLogin = doPwLogin;
 	exports.editRoom = editRoom;
 	exports.getCloudConnectionState = getCloudConnectionState;
