@@ -300,59 +300,66 @@ const pairingInAction: Object = {};
  * Remote pairing is executed only every second call
  * @param {string} hubId
  * @param {booleam} reset - set true for full scan, false if delta only
- * @return none
+ * @return {Promise}
  */
-function doPairingById(hubId: string, reset: boolean = false) {
-  let doRest = reset;
-  if (pairingStopped[hubId]) {
-    console.debug('doPairing: pairing stopped');
-    return;
-  }
-  if (!pairingTimeStamp[hubId]) {
-    pairingTimeStamp[hubId] = 0;
-  }
+function doPairingById(hubId: string, reset: boolean = false): Promise<Object> {
+  return new Promise((resolve, reject) => {
+    let doRest = reset;
+    if (pairingStopped[hubId]) {
+      console.debug('doPairing: pairing stopped');
+      reject(new Error('pairing stopped'));
+      return;
+    }
+    if (!pairingTimeStamp[hubId]) {
+      pairingTimeStamp[hubId] = 0;
+    }
 
-  const hub: HUB_TYPE = getHubs()[hubId];
-  const { authKey } = storedUser();
-  const { hubKey } = hub;
+    const hub: HUB_TYPE = getHubs()[hubId];
+    const { authKey } = storedUser();
+    const { hubKey } = hub;
 
-  console.debug('doPairing connection state: ', hub.connectionState);
-  if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
-    console.error('SDK doPairing error: no Hub connection');
-    return;
-  }
+    console.debug('doPairing connection state: ', hub.connectionState);
+    if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
+      console.warn('SDK doPairing: no Hub connection');
+      reject(new Error('no hub connection'));
+      return;
+    }
 
-  if (pairingInAction[hubId]) {
-    return;
-  }
-  pairingInAction[hubId] = true;
+    if (pairingInAction[hubId]) {
+      reject(new Error('pairing already in action'));
+      return;
+    }
+    pairingInAction[hubId] = true;
 
-  if (doRest) pairingTimeStamp[hubId] = 0;
-  doRest = pairingTimeStamp[hubId] === 0;
+    if (doRest) pairingTimeStamp[hubId] = 0;
+    doRest = pairingTimeStamp[hubId] === 0;
 
-  send({
-    command: COMMANDS.PAIR_START, hubId, authKey, hubKey, localUrl: hub.url, data: { ts: pairingTimeStamp[hubId] },
-  })
-    .then((delta) => {
-      if (delta) {
-        pairingTimeStamp[hubId] = delta.timestamp;
-        switch (delta.type) {
-          case 'SCAN_DELTA': {
-            pairingDevicesDeltaHandler(hubId, doRest, delta.devices);
-            break;
-          }
-          default: {
-            break;
+    send({
+      command: COMMANDS.PAIR_START, hubId, authKey, hubKey, localUrl: hub.url, data: { ts: pairingTimeStamp[hubId] },
+    })
+      .then((delta) => {
+        if (delta) {
+          pairingTimeStamp[hubId] = delta.timestamp;
+          switch (delta.type) {
+            case 'SCAN_DELTA': {
+              pairingDevicesDeltaHandler(hubId, doRest, delta.devices);
+              break;
+            }
+            default: {
+              break;
+            }
           }
         }
-      }
-      pairingInAction[hubId] = false;
-    })
-    .catch((error) => {
-    // store.dispatch(hubsState.actions.hubPollFailed())
-      console.error('SDK: doPairing error: ', error.message);
-      pairingInAction[hubId] = false;
-    });
+        pairingInAction[hubId] = false;
+        resolve('ok');
+      })
+      .catch((error) => {
+      // store.dispatch(hubsState.actions.hubPollFailed())
+        console.error('SDK: doPairing error: ', error.message);
+        pairingInAction[hubId] = false;
+        reject(error);
+      });
+  });
 }
 
 /**
@@ -360,22 +367,15 @@ function doPairingById(hubId: string, reset: boolean = false) {
  * @param {string} hubId
  * @param {string} deviceId
  * @param {boolean} ignore
- * @return none
+ * @return {Promise}
  */
-export function ignorePairingByIds(hubId: string, deviceId: string, ignore: boolean) {
+export function ignorePairingByIds(hubId: string, deviceId: string, ignore: boolean): Promise<Object> {
   const { authKey } = storedUser();
   const hub: HUB_TYPE = getHubs()[hubId];
   const { hubKey } = hub;
-  send({
+  return send({
     command: COMMANDS.PAIR_IGNORE, hubId, authKey, hubKey, localUrl: hub.url, data: { id: deviceId, ignored: ignore },
-  })
-    .then((data) => {
-      console.debug('SDK: scanIgnore: Ok , data: ', data);
-    })
-    .catch((error) => {
-    // store.dispatch(hubsState.actions.hubPollFailed())
-      console.error('SDK: scanIgnore error: ', error.message);
-    });
+  });
 }
 
 
@@ -383,46 +383,57 @@ export function ignorePairingByIds(hubId: string, deviceId: string, ignore: bool
  * Start pairing on given hub
  * @param {string} hubId
  * @param {booleam} reset - set true for full scan, false if delta only
- * @return none
+ * @return {Promise}
  */
-export function startPairingById(hubId: string, reset: boolean) {
+export function startPairingById(hubId: string, reset: boolean): Promise<Object> {
   const intervalTime = PAIRING_POLL_INTERVAL_MS;
   pairingStopped[hubId] = false;
-  doPairingById(hubId, reset);
-  pairingIntervals[hubId] = setInterval(doPairingById, intervalTime, hubId, reset);
+  const doPairing = (callHubId, callReset) => doPairingById(callHubId, callReset).then(() => {}).catch(() => {});
+  try {
+    pairingIntervals[hubId] = setInterval(doPairing, intervalTime, hubId, reset);
+  } catch (error) {
+    console.error('Catch startPairingById: ', error);
+  }
+  return doPairingById(hubId, reset);
 }
 
 const stopPairingInAction = {};
 /**
  * Stop pairing on given hub
  * @param {string} hubId
- * @return none
+ * @return {Promise}
  */
-export function stopPairingById(hubId: string) {
-  if (stopPairingInAction[hubId]) {
-    return;
-  }
-  stopPairingInAction[hubId] = true;
+export function stopPairingById(hubId: string): Promise<Object> {
+  return new Promise((resolve, reject) => {
+    if (stopPairingInAction[hubId]) {
+      reject(new Error('already stopping'));
+      return;
+    }
+    stopPairingInAction[hubId] = true;
 
-  const { authKey } = storedUser();
-  const hub: HUB_TYPE = getHubs()[hubId];
-  const { hubKey } = hub;
+    const { authKey } = storedUser();
+    const hub: HUB_TYPE = getHubs()[hubId];
+    const { hubKey } = hub;
 
 
-  clearInterval(pairingIntervals[hubId]);
-  send({
-    command: COMMANDS.PAIR_STOP, hubId, authKey, hubKey, localUrl: hub.url,
-  })
-    .then((data) => {
-      console.debug('SDK: pairingStopped: Ok , data: ', data);
-      pairingStopped[hubId] = true;
-      stopPairingInAction[hubId] = false;
+    clearInterval(pairingIntervals[hubId]);
+
+    send({
+      command: COMMANDS.PAIR_STOP, hubId, authKey, hubKey, localUrl: hub.url,
     })
-    .catch((error) => {
-    // store.dispatch(hubsState.actions.hubPollFailed())
-      console.error('SDK: pairingStopped error: ', error.message);
-      stopPairingInAction[hubId] = false;
-    });
+      .then((data) => {
+        console.debug('SDK: pairingStopped: Ok , data: ', data);
+        pairingStopped[hubId] = true;
+        stopPairingInAction[hubId] = false;
+        resolve('ok');
+      })
+      .catch((error) => {
+      // store.dispatch(hubsState.actions.hubPollFailed())
+        console.error('SDK: pairingStopped error: ', error.message);
+        stopPairingInAction[hubId] = false;
+        reject(error);
+      });
+  });
 }
 
 /**
@@ -470,7 +481,7 @@ export function doPoll(hubId: string, reset: boolean = false): Promise<Object> {
     const hub: HUB_TYPE = getHubs()[hubId];
     console.debug('doPoll connection state: ', hub.connectionState);
     if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
-      console.error('SDK doPoll error: No Hub connection');
+      console.warn('SDK doPoll: No Hub connection');
       reject(new Error('doPoll error: No Hub connection'));
       return;
     }
@@ -557,12 +568,18 @@ export function doPoll(hubId: string, reset: boolean = false): Promise<Object> {
 /**
  * Start polling on given hub
  * @param {string} hubId
- * @return none
+ * @return {Promise} status or error
  */
-export function startPollingById(hubId: string) {
+export function startPollingById(hubId: string): Promise<Object> {
   pollingStopped[hubId] = false;
   const intervalTime = POLL_INTERVAL_MS;
-  pollIntervals[hubId] = setInterval(doPoll, intervalTime, hubId);
+  const pollCall = (callHubId) => doPoll(callHubId).then(() => {}).catch(() => {});
+  try {
+    pollIntervals[hubId] = setInterval(pollCall, intervalTime, hubId);
+  } catch (error) {
+    console.error('Catch startPollingById: ', error);
+  }
+  return doPoll(hubId);
 }
 
 /**
@@ -578,40 +595,50 @@ export function stopPollingById(hubId: string) {
 
 /**
  * Select hub by id, starts hub polling
- * @param  {string} hubId   - hub id to be selected
- * @param  {boolean} poll  - flag to start polling when connected, defaults to false
- * @return none
+ * @param  {string} hubId
+ * @param  {boolean} poll - flag to start polling when connected, defaults to false
+ * @return {Promise} status or error
  */
-export function selectHubById(hubId: string, poll: boolean = false) {
-  const hubs: HUBS_MAP_TYPE = getHubs();
-
-  (Object.values(hubs): any).forEach((hub: HUB_TYPE) => {
-    if (hubId === hub.id) {
-      store.dispatch(hubsState.actions.selectHub({ hubId: hub.id }));
-      if (hub.hubKey && poll) {
-        startPollingById(hub.id);
-      } else {
-        if (!hub.hubKey) {
-          console.error('SDK selectHubById: No hub key error');
+export function selectHubById(hubId: string, poll: boolean = false): Promise<Object> {
+  return new Promise((resolve, reject) => {
+    const hubs: HUBS_MAP_TYPE = getHubs();
+    if (!isEmpty(hubs)) {
+      let pollingHub = null;
+      let error = null;
+      (Object.values(hubs)).every((hub: any) => {
+        if (hubId === hub.id) {
+          store.dispatch(hubsState.actions.selectHub({ hubId: hub.id }));
+          if (hub.hubKey && poll) {
+            pollingHub = startPollingById(hub.id);
+            return false; // break
+          }
+          if (!hub.hubKey) {
+            console.error('SDK selectHubById: No hub key error');
+            error = (new Error('no hubKey'));
+            return false; // break
+          }
+          console.debug('SDK selectHubById: Ready to start polling');
+          return false; // break
         }
-        console.debug('SDK selectHubById: Ready to start polling');
+        return true; // continue
+      });
+      if (pollingHub) {
+        return pollingHub.then((status) => resolve(status)).catch(() => resolve('polling started'));
       }
+      if (error) {
+        reject(error);
+      } else if (!pollingHub && poll) {
+        reject(new Error('hub not found'));
+      } else {
+        resolve('ready to poll');
+      }
+      return true;
     }
+    reject(new Error('no hubs'));
+    return true;
   });
 }
 
-
-/**
- * Unselect hubs, stops hub pollings
- * @return none
- */
-export function unSelectHubs() {
-  const hubs: HUBS_MAP_TYPE = getHubs();
-  (Object.values(hubs): any).forEach((hub: HUB_TYPE) => {
-    store.dispatch(hubsState.actions.unSelectHub({ hubId: hub.id }));
-    stopPollingById(hub.id);
-  });
-}
 
 /**
  * Unselect hub by id, stops hub polling
@@ -625,6 +652,18 @@ export function unSelectHubById(hubId: string) {
       store.dispatch(hubsState.actions.unSelectHub({ hubId: hub.id }));
       stopPollingById(hub.id);
     }
+  });
+}
+
+/**
+ * Unselect hubs, stops hub pollings
+ * @return none
+ */
+export function unSelectHubs() {
+  const hubs: HUBS_MAP_TYPE = getHubs();
+  (Object.values(hubs): any).forEach((hub: HUB_TYPE) => {
+    store.dispatch(hubsState.actions.unSelectHub({ hubId: hub.id }));
+    stopPollingById(hub.id);
   });
 }
 
@@ -643,8 +682,9 @@ export function connectHubByTokens(hubId: string, hubKey: string): Promise<Objec
     const tokens = {};
     tokens[hubId] = hubKey;
     makeHubsMap(tokens, true).then(() => {
-      selectHubById(hubId, false);
-      resolve(getHubs());
+      selectHubById(hubId, false).then(() => {
+        resolve(getHubs());
+      }).catch((error) => reject(error));
     }).catch((error) => reject(error));
   });
 }
