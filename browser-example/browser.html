@@ -39,12 +39,36 @@
       CozifySDK.setAuthenticated( cozifyCloudToken )
 
 
+      /* Example use of just doing one poll
+      CozifySDK.connectHubByTokens(fixedHubId, cozifyHubKey)
+
+      CozifySDK.watchChanges('hubs', (newHubsState, oldHubsState) => {
+        if (newHubsState[fixedHubId] && !newHubsState[fixedHubId].selected) {
+          CozifySDK.doPoll(fixedHubId, true).then((status)=>{
+            console.info('Poll status', status)
+            CozifySDK.startPairingById(fixedHubId, true)
+              setTimeout(function() {
+                CozifySDK.stopPairingById(fixedHubId);
+                console.warn('Pairing stopped')
+              }, 30000);
+          }).catch((error)=>{console.error(error)})
+        };
+
+
+
+        if (newHubsState[fixedHubId] && oldHubsState[fixedHubId]){
+          if (newHubsState[fixedHubId].connectionState !== oldHubsState[fixedHubId].connectionState) {
+            console.log('Hub connectionState changed from %s to %s', oldHubsState[fixedHubId].connectionState, newHubsState[fixedHubId].connectionState);
+          }
+        }
+
+      });
+      */
       CozifySDK.startDiscoveringHubs(fixedHubId);
 
       // POLLINGS
       CozifySDK.watchChanges('hubs', (newHubsState, oldHubsState) => {
         if (newHubsState[fixedHubId] && !newHubsState[fixedHubId].selected) {
-          debugger
           CozifySDK.selectHubById(fixedHubId, true);
           CozifySDK.stopDiscoveringHubs();
           setTimeout(function() {
@@ -97,6 +121,7 @@
          }
 
       });
+
 
       // ROOMS
       let roomAdded = false;

@@ -177,7 +177,7 @@ export function send({
         const hubs = hubsState.selectors.getHubs(stateNow);
         if (!hubs[hubId] || !hubs[hubId].hubKey) {
           return new Promise((resolve, reject) => {
-            reject(new Error('SDK Error: Send - No Hub id error'));
+            reject(new Error('SDK Error: Send - Hub or hubKey not found error'));
           });
         }
         const hub = hubs[hubId];

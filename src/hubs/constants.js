@@ -33,6 +33,7 @@ export type HUB_TYPE = {
 
 export type HUBS_MAP_TYPE = {[hubId: string]: HUB_TYPE}
 
+export type HUB_KEYS_TYPE = { [hubId: string]: string }
 /*
  * Intervall defining how often hubkeys and metadatas are fetched
  */
