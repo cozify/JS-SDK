@@ -100,14 +100,16 @@ export function pairingDevicesDeltaHandler(hubId, reset, pairingDevices) {
     oldPairingDevices = storedPairingDevices[hubId];
   }
 
-  const statePairingDevices = {
-    hubId,
-    devices: {},
-  };
-  pairingDevices.map((device) => {
-    statePairingDevices.devices[device.id] = device;
-    return true;
-  });
+
+    // If reset then set  devices as they are received
+    const statePairingDevices = {
+      hubId,
+      devices: {},
+    };
+    pairingDevices.map((device) => {
+      statePairingDevices.devices[device.id] = device;
+      return true;
+    });
 
   if (reset) {
     // If reset then set  devices as they are received
