@@ -304,7 +304,7 @@ const pairingInAction: Object = {};
  */
 function doPairingById(hubId: string, reset: boolean = false): Promise<Object> {
   return new Promise((resolve, reject) => {
-    let doRest = reset;
+    let doReset = reset;
     if (pairingStopped[hubId]) {
       console.debug('doPairing: pairing stopped');
       reject(new Error('pairing stopped'));
@@ -331,8 +331,8 @@ function doPairingById(hubId: string, reset: boolean = false): Promise<Object> {
     }
     pairingInAction[hubId] = true;
 
-    if (doRest) pairingTimeStamp[hubId] = 0;
-    doRest = pairingTimeStamp[hubId] === 0;
+    if (doReset) pairingTimeStamp[hubId] = 0;
+    doReset = pairingTimeStamp[hubId] === 0;
 
     send({
       command: COMMANDS.PAIR_START, hubId, authKey, hubKey, localUrl: hub.url, data: { ts: pairingTimeStamp[hubId] },
@@ -342,7 +342,7 @@ function doPairingById(hubId: string, reset: boolean = false): Promise<Object> {
           pairingTimeStamp[hubId] = delta.timestamp;
           switch (delta.type) {
             case 'SCAN_DELTA': {
-              pairingDevicesDeltaHandler(hubId, doRest, delta.devices);
+              pairingDevicesDeltaHandler(hubId, doReset, delta.devices);
               break;
             }
             default: {
@@ -443,7 +443,9 @@ export function stopPairingById(hubId: string): Promise<Object> {
 export function stopPairings() {
   const hubs = getHubs();
   (Object.values(hubs): any).forEach((hub: HUB_TYPE) => {
-    stopPairingById(hub.id);
+    stopPairingById(hub.id)
+      .then(() => console.debug('SDK: pairingStopped: ', hub.id))
+      .catch(() => console.log('SDK: pairingStopped error: ', hub.id));
   });
 }
 
