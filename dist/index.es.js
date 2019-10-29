@@ -4442,7 +4442,7 @@ const CLOUD_API_VERSION = 'ui/0.2/';
 /* Cloud URL */
 
 const CLOUD_URL = `${CLOUD_HOST}/${CLOUD_API_VERSION}`;
-const MAX_API_VERSION = '1.12';
+const MAX_API_VERSION = '1.13';
 /**
  *  Enumeration of supported API commands, that could be
  *  USER_LOGIN, HUB_KEYS, REFRESH_AUTHKEY, CLOUD_IP, CLOUD_META, POLL, CMD_DEVICE
