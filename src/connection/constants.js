@@ -20,7 +20,7 @@ export const CLOUD_API_VERSION: string = 'ui/0.2/';
 /* Cloud URL */
 export const CLOUD_URL: string = `${CLOUD_HOST}/${CLOUD_API_VERSION}`;
 
-export const MAX_API_VERSION: string = '1.12';
+export const MAX_API_VERSION: string = '1.13';
 /**
  *  Enumeration of supported API commands, that could be
  *  USER_LOGIN, HUB_KEYS, REFRESH_AUTHKEY, CLOUD_IP, CLOUD_META, POLL, CMD_DEVICE
