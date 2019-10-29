@@ -218,6 +218,8 @@ function makeHubsMap(tokens: HUB_KEYS_TYPE, sync: boolean = false): Promise<Obje
     store.dispatch(hubsState.actions.updateHubs(hubsMap));
     fetchCloudMetaData(hubsMap, authKey)
       .finally(() => {
+        // Hubs map may be changed during fetching cloud metadata
+        store.dispatch(hubsState.actions.updateHubs(hubsMap));
         if (sync) {
           doCloudDiscovery().then(() => resolve(getHubs())).catch(() => resolve(getHubs()));
         } else {
@@ -242,15 +244,6 @@ function fetchHubs(): Promise<Object> {
       .then((tokens) => {
         if (tokens) {
           makeHubsMap(tokens).then((hubs) => resolve(hubs));
-          /*
-          hubsMap = extractHubInfo(tokens);
-          store.dispatch(hubsState.actions.updateHubs(hubsMap));
-          fetchCloudMetaData(hubsMap, authKey)
-            .finally(() => {
-              doCloudDiscovery();
-              resolve(getHubs());
-            });
-          */
         } else {
           resolve(getHubs());
         }
@@ -673,9 +666,10 @@ export function unSelectHubs() {
  * Connect to the given hub - local or remote.
  * @param  {string} hubId
  * @param  {string} hubKey
+ * @param  {boolean} true to wait local hubs reply, false to start with remote connection
  * @return {Promise} current hubs, should not reject never
  */
-export function connectHubByTokens(hubId: string, hubKey: string): Promise<Object> {
+export function connectHubByTokens(hubId: string, hubKey: string, sync: boolean = true): Promise<Object> {
   return new Promise((resolve, reject) => {
     const { authKey } = storedUser();
     if (!hubId) reject(new Error('No Hub Id'));
@@ -683,7 +677,7 @@ export function connectHubByTokens(hubId: string, hubKey: string): Promise<Objec
     if (!authKey) reject(new Error('No AuthKey'));
     const tokens = {};
     tokens[hubId] = hubKey;
-    makeHubsMap(tokens, true).then(() => {
+    makeHubsMap(tokens, sync).then(() => {
       selectHubById(hubId, false).then(() => {
         resolve(getHubs());
       }).catch((error) => reject(error));
