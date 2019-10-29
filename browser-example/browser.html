@@ -39,12 +39,12 @@
 
       CozifySDK.setAuthenticated( cozifyCloudToken )
 
-
-      // Example use of just doing one poll
-      CozifySDK.connectHubByTokens(fixedHubId, cozifyHubKey)
-
+      /*
+      // Example use of just doing one poll;
+      //
+      CozifySDK.connectHubByTokens(fixedHubId, cozifyHubKey, false)
       CozifySDK.watchChanges('hubs', (newHubsState, oldHubsState) => {
-        if (newHubsState[fixedHubId] && !newHubsState[fixedHubId].selected) {
+        if (newHubsState[fixedHubId] && newHubsState[fixedHubId].selected && !oldHubsState[fixedHubId].selected) {
           CozifySDK.doPoll(fixedHubId, true).then((status)=>{
             console.info('Poll status', status)
             CozifySDK.startPairingById(fixedHubId, true).then((status) => {
@@ -67,7 +67,9 @@
         }
 
       });
-      /*
+      */
+
+      // Example of doing full discory and starting to poll
       CozifySDK.startDiscoveringHubs(fixedHubId);
 
       // POLLINGS
@@ -98,7 +100,7 @@
         }
 
       });
-      */
+
       // PAIRIMGS
       let devicePaired = false;
       CozifySDK.watchChanges('pairings', (newPairingsState, oldPairingsState) => {

@@ -141,6 +141,54 @@
     ]
   },
   {
+    "name": "connectHubByTokens",
+    "filePath": "src/hubs/hubs.js",
+    "lines": [
+      {
+        "lineNumber": 663,
+        "line": "/**"
+      },
+      {
+        "lineNumber": 664,
+        "line": " * Connect to the given hub - local or remote."
+      },
+      {
+        "lineNumber": 665,
+        "line": " * @param  {string} hubId"
+      },
+      {
+        "lineNumber": 666,
+        "line": " * @param  {string} hubKey"
+      },
+      {
+        "lineNumber": 667,
+        "line": " * @param  {boolean} true to wait local hubs reply, false to start with remote connection"
+      },
+      {
+        "lineNumber": 668,
+        "line": " * @return {Promise} current hubs, should not reject never"
+      },
+      {
+        "lineNumber": 669,
+        "line": " */"
+      },
+      {
+        "lineNumber": 670,
+        "line": "export function connectHubByTokens(hubId, hubKey, sync = true) {"
+      }
+    ],
+    "codeParams": [
+      "hubId",
+      "hubKey",
+      "sync"
+    ],
+    "docParams": [
+      "hubId",
+      "hubKey",
+      "true"
+    ]
+  },
+  {
     "name": "addRoom",
     "filePath": "src/rooms/rooms.js",
     "lines": [

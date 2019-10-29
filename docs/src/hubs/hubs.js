@@ -217,6 +217,8 @@ function makeHubsMap(tokens, sync = false) {
     store.dispatch(hubsState.actions.updateHubs(hubsMap));
     fetchCloudMetaData(hubsMap, authKey)
       .finally(() => {
+        // Hubs map may be changed during fetching cloud metadata
+        store.dispatch(hubsState.actions.updateHubs(hubsMap));
         if (sync) {
           doCloudDiscovery().then(() => resolve(getHubs())).catch(() => resolve(getHubs()));
         } else {
@@ -241,15 +243,6 @@ function fetchHubs() {
       .then((tokens) => {
         if (tokens) {
           makeHubsMap(tokens).then((hubs) => resolve(hubs));
-          /*
-          hubsMap = extractHubInfo(tokens);
-          store.dispatch(hubsState.actions.updateHubs(hubsMap));
-          fetchCloudMetaData(hubsMap, authKey)
-            .finally(() => {
-              doCloudDiscovery();
-              resolve(getHubs());
-            });
-          */
         } else {
           resolve(getHubs());
         }
@@ -672,9 +665,10 @@ export function unSelectHubs() {
  * Connect to the given hub - local or remote.
  * @param  {string} hubId
  * @param  {string} hubKey
+ * @param  {boolean} true to wait local hubs reply, false to start with remote connection
  * @return {Promise} current hubs, should not reject never
  */
-export function connectHubByTokens(hubId, hubKey) {
+export function connectHubByTokens(hubId, hubKey, sync = true) {
   return new Promise((resolve, reject) => {
     const { authKey } = storedUser();
     if (!hubId) reject(new Error('No Hub Id'));
@@ -682,7 +676,7 @@ export function connectHubByTokens(hubId, hubKey) {
     if (!authKey) reject(new Error('No AuthKey'));
     const tokens = {};
     tokens[hubId] = hubKey;
-    makeHubsMap(tokens, true).then(() => {
+    makeHubsMap(tokens, sync).then(() => {
       selectHubById(hubId, false).then(() => {
         resolve(getHubs());
       }).catch((error) => reject(error));

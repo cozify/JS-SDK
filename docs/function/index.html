@@ -254,7 +254,7 @@ do not usr store.dispatch(roomsState.actions.addRoom(hubId, room)) as rooms are 
           
           
           
-          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-connectHubByTokens">connectHubByTokens</a></span></span><span class="code" data-ice="signature">(hubId: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, hubKey: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></span></span>
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-connectHubByTokens">connectHubByTokens</a></span></span><span class="code" data-ice="signature">(hubId: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, hubKey: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, true: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></span></span>
         </p>
       </div>
       <div>
@@ -1894,15 +1894,15 @@ do not usr store.dispatch(roomsState.actions.addRoom(hubId, room)) as rooms are 
     
     
     
-    <span class="code" data-ice="name">connectHubByTokens</span><span class="code" data-ice="signature">(hubId: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, hubKey: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></span></span>
+    <span class="code" data-ice="name">connectHubByTokens</span><span class="code" data-ice="signature">(hubId: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, hubKey: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, true: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber677">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber671">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {connectHubByTokens} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber677">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {connectHubByTokens} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber671">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Connect to the given hub - local or remote.</p>
@@ -1929,6 +1929,13 @@ do not usr store.dispatch(roomsState.actions.addRoom(hubId, room)) as rooms are 
       <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">true</td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"><p>to wait local hubs reply, false to start with remote connection</p>
+</td>
     </tr>
 </tbody>
   </table>
@@ -2049,11 +2056,11 @@ do not usr store.dispatch(roomsState.actions.addRoom(hubId, room)) as rooms are 
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber468">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber461">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {doPoll} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber468">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {doPoll} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber461">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Do poll on given hub if hub connection is ok.
@@ -3141,11 +3148,11 @@ do not usr store.dispatch(roomsState.actions.editRoom(hubId, room)) as rooms are
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber371">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber364">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {ignorePairingByIds} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber371">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {ignorePairingByIds} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber364">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Set pairing ignore flag of given device in given hub</p>
@@ -3577,11 +3584,11 @@ do not usr store.dispatch(roomsState.actions.editRoom(hubId, room)) as rooms are
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber603">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber596">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {selectHubById} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber603">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {selectHubById} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber596">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Select hub by id, starts hub polling</p>
@@ -4370,11 +4377,11 @@ do not usr store.dispatch(roomsState.actions.editRoom(hubId, room)) as rooms are
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber271">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber264">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {startDiscoveringHubs} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber271">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {startDiscoveringHubs} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber264">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Start discovering hubs every DISCOVERY_INTERVAL_MS
@@ -4415,11 +4422,11 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber387">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber380">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {startPairingById} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber387">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {startPairingById} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber380">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Start pairing on given hub</p>
@@ -4494,11 +4501,11 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber574">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber567">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {startPollingById} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber574">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {startPollingById} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber567">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Start polling on given hub</p>
@@ -4567,11 +4574,11 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber283">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber276">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {stopDiscoveringHubs} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber283">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {stopDiscoveringHubs} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber276">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Stop discovering hubs</p>
@@ -4611,11 +4618,11 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber405">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber398">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {stopPairingById} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber405">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {stopPairingById} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber398">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Stop pairing on given hub</p>
@@ -4683,11 +4690,11 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber442">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber435">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {stopPairings} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber442">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {stopPairings} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber435">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Stop pairing on all hubs</p>
@@ -4740,11 +4747,11 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber591">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber584">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {stopPollingById} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber591">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {stopPollingById} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber584">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Stop polling on given hub</p>
@@ -4885,11 +4892,11 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber649">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber642">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {unSelectHubById} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber649">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {unSelectHubById} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber642">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Unselect hub by id, stops hub polling</p>
@@ -4959,11 +4966,11 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber663">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber656">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {unSelectHubs} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber663">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {unSelectHubs} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber656">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Unselect hubs, stops hub pollings</p>
