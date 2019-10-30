@@ -33,7 +33,10 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-urlBase64Decode">urlBase64Decode</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-store">store</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-isNode">isNode</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#connection">connection</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-resetRetry">resetRetry</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#connection">connection</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getCloudHost">getCloudHost</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getCloudURL">getCloudURL</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-useTestcloud">useTestcloud</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-resetRetry">resetRetry</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-retryCondition">retryCondition</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-cloudErrorState">cloudErrorState</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getAPIversion">getAPIversion</a></span></span></li>
@@ -47,8 +50,6 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setHubConnectionState">setHubConnectionState</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_API_VERSION">CLOUD_API_VERSION</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_FINGERPRINTS_SHA1">CLOUD_FINGERPRINTS_SHA1</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_HOST">CLOUD_HOST</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_URL">CLOUD_URL</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-MAX_API_VERSION">MAX_API_VERSION</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-CLOUD_CONNECTION_STATE_TYPE">CLOUD_CONNECTION_STATE_TYPE</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-COMMANDS_TYPE">COMMANDS_TYPE</a></span></span></li>
@@ -135,14 +136,38 @@ export const CLOUD_FINGERPRINTS_SHA1 = [
   &apos;91 30 CF 20 17 F7 D7 EC F7 BA 43 30 8E 19 83 B4 CF DE 5A CC&apos;,
   &apos;26 B0 20 FA AB E8 A3 81 63 37 C6 B7 EF 94 4D 40 3D 1B 85 10&apos;,
 ];
+
 /* Cloud HTTPS host name */
-export const CLOUD_HOST = &apos;https://testapi.cozify.fi&apos;;
+const CLOUD_HOST = &apos;https://api.cozify.fi&apos;;
+const CLOUD_HOST_TEST = &apos;https://testapi.cozify.fi&apos;;
+
+
 /* Cloud API VERSION */
 export const CLOUD_API_VERSION = &apos;ui/0.2/&apos;;
-/* Cloud URL */
-export const CLOUD_URL = `${CLOUD_HOST}/${CLOUD_API_VERSION}`;
 
-export const MAX_API_VERSION = &apos;1.12&apos;;
+
+let cloudHost = CLOUD_HOST;
+
+/**
+ * Method to set Cozify test-cloud as an cloud API host.
+ * Must be called at the early stage of SDK usage, otherwise production
+ * cloud is used.
+ *
+ * @return {[type]} [description]
+ */
+export function useTestcloud() {
+  cloudHost = CLOUD_HOST_TEST;
+}
+
+export function getCloudHost() {
+  return cloudHost;
+}
+
+export function getCloudURL() {
+  return `${cloudHost}/${CLOUD_API_VERSION}`;
+}
+
+export const MAX_API_VERSION = &apos;1.13&apos;;
 /**
  *  Enumeration of supported API commands, that could be
  *  USER_LOGIN, HUB_KEYS, REFRESH_AUTHKEY, CLOUD_IP, CLOUD_META, POLL, CMD_DEVICE
@@ -152,35 +177,35 @@ export const MAX_API_VERSION = &apos;1.12&apos;;
   */
 export const COMMANDS = Object.freeze({
   USER_LOGIN: {
-    method: &apos;POST&apos;, url: `${CLOUD_URL}user/login`, params: [&apos;password&apos;, &apos;email&apos;], config: { responseType: isNode ? &apos;blob&apos; : &apos;stream&apos;, timeout: 15000 },
+    method: &apos;POST&apos;, url: &apos;user/login&apos;, params: [&apos;password&apos;, &apos;email&apos;], config: { responseType: isNode ? &apos;blob&apos; : &apos;stream&apos;, timeout: 15000 },
   },
-  HUB_KEYS: { method: &apos;GET&apos;, url: `${CLOUD_URL}user/hubkeys`, timeout: 15000 },
-  REFRESH_AUTHKEY: { method: &apos;GET&apos;, url: `${CLOUD_URL}user/refreshsession` },
-  CLOUD_IP: { method: &apos;GET&apos;, url: `${CLOUD_URL}hub/lan_ip` },
-  CLOUD_META: { method: &apos;GET&apos;, url: `${CLOUD_URL}hub/remote/hub` },
-  POLL: { method: &apos;GET&apos;, url: `${CLOUD_URL}hub/remote/cc/$API_VER/hub/poll`, urlParams: [&apos;ts&apos;] },
-  PAIR_START: { method: &apos;GET&apos;, url: `${CLOUD_URL}hub/remote/cc/$API_VER/hub/scan`, urlParams: [&apos;ts&apos;] },
+  HUB_KEYS: { method: &apos;GET&apos;, url: &apos;user/hubkeys&apos;, timeout: 15000 },
+  REFRESH_AUTHKEY: { method: &apos;GET&apos;, url: &apos;user/refreshsession&apos; },
+  CLOUD_IP: { method: &apos;GET&apos;, url: &apos;hub/lan_ip&apos; },
+  CLOUD_META: { method: &apos;GET&apos;, url: &apos;hub/remote/hub&apos; },
+  POLL: { method: &apos;GET&apos;, url: &apos;hub/remote/cc/$API_VER/hub/poll&apos;, urlParams: [&apos;ts&apos;] },
+  PAIR_START: { method: &apos;GET&apos;, url: &apos;hub/remote/cc/$API_VER/hub/scan&apos;, urlParams: [&apos;ts&apos;] },
   PAIR_IGNORE: {
-    method: &apos;PUT&apos;, url: `${CLOUD_URL}hub/remote/cc/$API_VER/hub/scan`, type: &apos;SET_SCAN_RESULT&apos;, params: [&apos;id&apos;, &apos;ignored&apos;],
+    method: &apos;PUT&apos;, url: &apos;hub/remote/cc/$API_VER/hub/scan&apos;, type: &apos;SET_SCAN_RESULT&apos;, params: [&apos;id&apos;, &apos;ignored&apos;],
   },
-  PAIR_STOP: { method: &apos;GET&apos;, url: `${CLOUD_URL}hub/remote/cc/$API_VER/hub/stopscan` },
+  PAIR_STOP: { method: &apos;GET&apos;, url: &apos;hub/remote/cc/$API_VER/hub/stopscan&apos; },
   CMD_DEVICE_STATE: {
-    method: &apos;PUT&apos;, url: `${CLOUD_URL}hub/remote/cc/$API_VER/devices/command`, type: &apos;CMD_DEVICE&apos;, params: [&apos;id&apos;, &apos;state&apos;],
+    method: &apos;PUT&apos;, url: &apos;hub/remote/cc/$API_VER/devices/command&apos;, type: &apos;CMD_DEVICE&apos;, params: [&apos;id&apos;, &apos;state&apos;],
   },
   CMD_DEVICE_IGNORE: {
-    method: &apos;PUT&apos;, url: `${CLOUD_URL}hub/remote/cc/$API_VER/devices/command`, type: &apos;CMD_IGNORE_DEVICE&apos;, params: [&apos;id&apos;],
+    method: &apos;PUT&apos;, url: &apos;hub/remote/cc/$API_VER/devices/command&apos;, type: &apos;CMD_IGNORE_DEVICE&apos;, params: [&apos;id&apos;],
   },
   CMD_DEVICE_IDENTIFY: {
-    method: &apos;PUT&apos;, url: `${CLOUD_URL}hub/remote/cc/$API_VER/devices/command`, type: &apos;CMD_IDENTIFY&apos;, params: [&apos;id&apos;],
+    method: &apos;PUT&apos;, url: &apos;hub/remote/cc/$API_VER/devices/command&apos;, type: &apos;CMD_IDENTIFY&apos;, params: [&apos;id&apos;],
   },
   CMD_DEVICE_META: {
-    method: &apos;PUT&apos;, url: `${CLOUD_URL}hub/remote/cc/$API_VER/devices/command`, type: &apos;CMD_DEVICE_META&apos;, params: [&apos;id&apos;, &apos;name&apos;, &apos;room&apos;],
+    method: &apos;PUT&apos;, url: &apos;hub/remote/cc/$API_VER/devices/command&apos;, type: &apos;CMD_DEVICE_META&apos;, params: [&apos;id&apos;, &apos;name&apos;, &apos;room&apos;],
   },
-  CMD_GET_ROOMS: { method: &apos;GET&apos;, url: `${CLOUD_URL}hub/remote/cc/$API_VER/rooms` },
+  CMD_GET_ROOMS: { method: &apos;GET&apos;, url: &apos;hub/remote/cc/$API_VER/rooms&apos; },
   CMD_SET_ROOM: {
-    method: &apos;PUT&apos;, url: `${CLOUD_URL}hub/remote/cc/$API_VER/rooms`, type: &apos;CMD_ROOM&apos;, params: [&apos;id&apos;, &apos;name&apos;, &apos;order&apos;],
+    method: &apos;PUT&apos;, url: &apos;hub/remote/cc/$API_VER/rooms&apos;, type: &apos;CMD_ROOM&apos;, params: [&apos;id&apos;, &apos;name&apos;, &apos;order&apos;],
   },
-  CMD_REMOVE_ROOM: { method: &apos;DELETE&apos;, url: `${CLOUD_URL}hub/remote/cc/$API_VER/rooms`, urlParams: [&apos;roomId&apos;] },
+  CMD_REMOVE_ROOM: { method: &apos;DELETE&apos;, url: &apos;hub/remote/cc/$API_VER/rooms&apos;, urlParams: [&apos;roomId&apos;] },
 });
 
 

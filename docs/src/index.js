@@ -11,7 +11,7 @@ export { store, watchChanges } from './store';
 // import logger from 'redux-logger'
 // const middleware = [...getDefaultMiddleware(), logger]
 
-export { CLOUD_CONNECTION_STATES, HUB_CONNECTION_STATES } from './connection/constants';
+export { CLOUD_CONNECTION_STATES, HUB_CONNECTION_STATES, useTestcloud } from './connection/constants';
 export { LANGUAGES, USER_STATES, ROLES } from './user/constants';
 export { HUB_STATES } from './hubs/constants';
 

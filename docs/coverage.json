@@ -1,17 +1,18 @@
 {
-  "coverage": "64.06%",
-  "expectCount": 128,
-  "actualCount": 82,
+  "coverage": "64.39%",
+  "expectCount": 132,
+  "actualCount": 85,
   "files": {
     "src/connection/constants.js": {
-      "expectCount": 5,
-      "actualCount": 0,
+      "expectCount": 9,
+      "actualCount": 3,
       "undocumentLines": [
         12,
-        17,
+        18,
         19,
-        21,
-        23
+        23,
+        26,
+        47
       ]
     },
     "src/connection/send-retry.js": {

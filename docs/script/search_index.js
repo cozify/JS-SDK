@@ -12,18 +12,6 @@ window.esdocSearchIndex = [
     "variable"
   ],
   [
-    "cozify-sdk/src/connection/constants.js~cloud_host",
-    "variable/index.html#static-variable-CLOUD_HOST",
-    "<span>CLOUD_HOST</span> <span class=\"search-result-import-path\">cozify-sdk/src/connection/constants.js</span>",
-    "variable"
-  ],
-  [
-    "cozify-sdk/src/connection/constants.js~cloud_url",
-    "variable/index.html#static-variable-CLOUD_URL",
-    "<span>CLOUD_URL</span> <span class=\"search-result-import-path\">cozify-sdk/src/connection/constants.js</span>",
-    "variable"
-  ],
-  [
     "cozify-sdk/src/hubs/constants.js~discovery_interval_ms",
     "variable/index.html#static-variable-DISCOVERY_INTERVAL_MS",
     "<span>DISCOVERY_INTERVAL_MS</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/constants.js</span>",
@@ -177,6 +165,18 @@ window.esdocSearchIndex = [
     "cozify-sdk/src/connection/state.js~getcloudconnectionstate",
     "function/index.html#static-function-getCloudConnectionState",
     "<span>getCloudConnectionState</span> <span class=\"search-result-import-path\">cozify-sdk/src/connection/state.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/connection/constants.js~getcloudhost",
+    "function/index.html#static-function-getCloudHost",
+    "<span>getCloudHost</span> <span class=\"search-result-import-path\">cozify-sdk/src/connection/constants.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/connection/constants.js~getcloudurl",
+    "function/index.html#static-function-getCloudURL",
+    "<span>getCloudURL</span> <span class=\"search-result-import-path\">cozify-sdk/src/connection/constants.js</span>",
     "function"
   ],
   [
@@ -477,6 +477,12 @@ window.esdocSearchIndex = [
     "cozify-sdk/src/utils.js~urlbase64decode",
     "function/index.html#static-function-urlBase64Decode",
     "<span>urlBase64Decode</span> <span class=\"search-result-import-path\">cozify-sdk/src/utils.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/connection/constants.js~usetestcloud",
+    "function/index.html#static-function-useTestcloud",
+    "<span>useTestcloud</span> <span class=\"search-result-import-path\">cozify-sdk/src/connection/constants.js</span>",
     "function"
   ],
   [

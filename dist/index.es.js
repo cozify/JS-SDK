@@ -4435,13 +4435,29 @@ function urlBase64Decode(encoded) {
 const CLOUD_FINGERPRINTS_SHA1 = ['91 30 CF 20 17 F7 D7 EC F7 BA 43 30 8E 19 83 B4 CF DE 5A CC', '26 B0 20 FA AB E8 A3 81 63 37 C6 B7 EF 94 4D 40 3D 1B 85 10'];
 /* Cloud HTTPS host name */
 
-const CLOUD_HOST = 'https://testapi.cozify.fi';
+const CLOUD_HOST = 'https://api.cozify.fi';
+const CLOUD_HOST_TEST = 'https://testapi.cozify.fi';
 /* Cloud API VERSION */
 
 const CLOUD_API_VERSION = 'ui/0.2/';
-/* Cloud URL */
+let cloudHost = CLOUD_HOST;
+/**
+ * Method to set Cozify test-cloud as an cloud API host.
+ * Must be called at the early stage of SDK usage, otherwise production
+ * cloud is used.
+ *
+ * @return {[type]} [description]
+ */
 
-const CLOUD_URL = `${CLOUD_HOST}/${CLOUD_API_VERSION}`;
+function useTestcloud() {
+  cloudHost = CLOUD_HOST_TEST;
+}
+function getCloudHost() {
+  return cloudHost;
+}
+function getCloudURL() {
+  return `${cloudHost}/${CLOUD_API_VERSION}`;
+}
 const MAX_API_VERSION = '1.13';
 /**
  *  Enumeration of supported API commands, that could be
@@ -4454,7 +4470,7 @@ const MAX_API_VERSION = '1.13';
 const COMMANDS = Object.freeze({
   USER_LOGIN: {
     method: 'POST',
-    url: `${CLOUD_URL}user/login`,
+    url: 'user/login',
     params: ['password', 'email'],
     config: {
       responseType: isNode ? 'blob' : 'stream',
@@ -4463,78 +4479,78 @@ const COMMANDS = Object.freeze({
   },
   HUB_KEYS: {
     method: 'GET',
-    url: `${CLOUD_URL}user/hubkeys`,
+    url: 'user/hubkeys',
     timeout: 15000
   },
   REFRESH_AUTHKEY: {
     method: 'GET',
-    url: `${CLOUD_URL}user/refreshsession`
+    url: 'user/refreshsession'
   },
   CLOUD_IP: {
     method: 'GET',
-    url: `${CLOUD_URL}hub/lan_ip`
+    url: 'hub/lan_ip'
   },
   CLOUD_META: {
     method: 'GET',
-    url: `${CLOUD_URL}hub/remote/hub`
+    url: 'hub/remote/hub'
   },
   POLL: {
     method: 'GET',
-    url: `${CLOUD_URL}hub/remote/cc/$API_VER/hub/poll`,
+    url: 'hub/remote/cc/$API_VER/hub/poll',
     urlParams: ['ts']
   },
   PAIR_START: {
     method: 'GET',
-    url: `${CLOUD_URL}hub/remote/cc/$API_VER/hub/scan`,
+    url: 'hub/remote/cc/$API_VER/hub/scan',
     urlParams: ['ts']
   },
   PAIR_IGNORE: {
     method: 'PUT',
-    url: `${CLOUD_URL}hub/remote/cc/$API_VER/hub/scan`,
+    url: 'hub/remote/cc/$API_VER/hub/scan',
     type: 'SET_SCAN_RESULT',
     params: ['id', 'ignored']
   },
   PAIR_STOP: {
     method: 'GET',
-    url: `${CLOUD_URL}hub/remote/cc/$API_VER/hub/stopscan`
+    url: 'hub/remote/cc/$API_VER/hub/stopscan'
   },
   CMD_DEVICE_STATE: {
     method: 'PUT',
-    url: `${CLOUD_URL}hub/remote/cc/$API_VER/devices/command`,
+    url: 'hub/remote/cc/$API_VER/devices/command',
     type: 'CMD_DEVICE',
     params: ['id', 'state']
   },
   CMD_DEVICE_IGNORE: {
     method: 'PUT',
-    url: `${CLOUD_URL}hub/remote/cc/$API_VER/devices/command`,
+    url: 'hub/remote/cc/$API_VER/devices/command',
     type: 'CMD_IGNORE_DEVICE',
     params: ['id']
   },
   CMD_DEVICE_IDENTIFY: {
     method: 'PUT',
-    url: `${CLOUD_URL}hub/remote/cc/$API_VER/devices/command`,
+    url: 'hub/remote/cc/$API_VER/devices/command',
     type: 'CMD_IDENTIFY',
     params: ['id']
   },
   CMD_DEVICE_META: {
     method: 'PUT',
-    url: `${CLOUD_URL}hub/remote/cc/$API_VER/devices/command`,
+    url: 'hub/remote/cc/$API_VER/devices/command',
     type: 'CMD_DEVICE_META',
     params: ['id', 'name', 'room']
   },
   CMD_GET_ROOMS: {
     method: 'GET',
-    url: `${CLOUD_URL}hub/remote/cc/$API_VER/rooms`
+    url: 'hub/remote/cc/$API_VER/rooms'
   },
   CMD_SET_ROOM: {
     method: 'PUT',
-    url: `${CLOUD_URL}hub/remote/cc/$API_VER/rooms`,
+    url: 'hub/remote/cc/$API_VER/rooms',
     type: 'CMD_ROOM',
     params: ['id', 'name', 'order']
   },
   CMD_REMOVE_ROOM: {
     method: 'DELETE',
-    url: `${CLOUD_URL}hub/remote/cc/$API_VER/rooms`,
+    url: 'hub/remote/cc/$API_VER/rooms',
     urlParams: ['roomId']
   }
 }); // type dataArray = ?Array<{ [key: string | number]: any }>
@@ -6877,7 +6893,7 @@ function testSSLCertificate(remoteConnection) {
             lastSSLCertificateCheckTime = undefined;
             resolve(true);
           }
-        }, CLOUD_HOST, CLOUD_FINGERPRINTS_SHA1);
+        }, getCloudHost(), CLOUD_FINGERPRINTS_SHA1);
       } else {
         setTimeout(() => {
           ongoingSSLCertificateCheck = false;
@@ -7174,9 +7190,9 @@ function send({
         }
 
         const hubVersion = getAPIversion(hub.version, MAX_API_VERSION);
-        sendUrl = command.url.replace('$API_VER', hubVersion);
+        sendUrl = getCloudURL().concat(command.url.replace('$API_VER', hubVersion));
       } else {
-        sendUrl = command.url;
+        sendUrl = getCloudURL().concat(command.url);
       }
     }
 
@@ -7195,7 +7211,7 @@ function send({
       }
     }
 
-    if (sendUrl && sendUrl.indexOf(CLOUD_URL) > -1) {
+    if (sendUrl && sendUrl.indexOf(getCloudURL()) > -1) {
       remoteConnection = true;
     }
 
@@ -10145,5 +10161,5 @@ function setDeviceMeta(hubId, deviceId, name, rooms) {
 
 //
 
-export { CLOUD_CONNECTION_STATES, HUB_CONNECTION_STATES, HUB_STATES, LANGUAGES, ROLES, USER_STATES, acceptEula, addRoom, changeLanguage, connectHubByTokens, rootReducer as cozifyReducer, deleteDevice, devicesState, doPoll, doPwLogin, editRoom, getCloudConnectionState, getDevices, getHubConnectionState, getHubDevices, getHubPairingDevices, getHubRooms, getHubs, getPairingDevices, getRooms, getUserState, hubsState, identifyDevice, ignorePairingByIds, removeRoom, selectHubById, sendDeviceCmd, sendDeviceStateCmd, setAuthenticated, setDeviceMeta, setDevices, startDiscoveringHubs, startPairingById, startPollingById, stopDiscoveringHubs, stopPairingById, stopPairings, stopPollingById, store, unSelectHubById, unSelectHubs, unpairDevice, updateHubs, watchChanges };
+export { CLOUD_CONNECTION_STATES, HUB_CONNECTION_STATES, HUB_STATES, LANGUAGES, ROLES, USER_STATES, acceptEula, addRoom, changeLanguage, connectHubByTokens, rootReducer as cozifyReducer, deleteDevice, devicesState, doPoll, doPwLogin, editRoom, getCloudConnectionState, getDevices, getHubConnectionState, getHubDevices, getHubPairingDevices, getHubRooms, getHubs, getPairingDevices, getRooms, getUserState, hubsState, identifyDevice, ignorePairingByIds, removeRoom, selectHubById, sendDeviceCmd, sendDeviceStateCmd, setAuthenticated, setDeviceMeta, setDevices, startDiscoveringHubs, startPairingById, startPollingById, stopDiscoveringHubs, stopPairingById, stopPairings, stopPollingById, store, unSelectHubById, unSelectHubs, unpairDevice, updateHubs, useTestcloud, watchChanges };
 //# sourceMappingURL=index.es.js.map
