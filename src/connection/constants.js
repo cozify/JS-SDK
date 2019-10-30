@@ -13,12 +13,36 @@ export const CLOUD_FINGERPRINTS_SHA1: Array<string> = [
   '91 30 CF 20 17 F7 D7 EC F7 BA 43 30 8E 19 83 B4 CF DE 5A CC',
   '26 B0 20 FA AB E8 A3 81 63 37 C6 B7 EF 94 4D 40 3D 1B 85 10',
 ];
+
 /* Cloud HTTPS host name */
-export const CLOUD_HOST: string = 'https://testapi.cozify.fi';
+const CLOUD_HOST: string = 'https://api.cozify.fi';
+const CLOUD_HOST_TEST: string = 'https://testapi.cozify.fi';
+
+
 /* Cloud API VERSION */
 export const CLOUD_API_VERSION: string = 'ui/0.2/';
-/* Cloud URL */
-export const CLOUD_URL: string = `${CLOUD_HOST}/${CLOUD_API_VERSION}`;
+
+
+let cloudHost = CLOUD_HOST;
+
+/**
+ * Method to set Cozify test-cloud as an cloud API host.
+ * Must be called at the early stage of SDK usage, otherwise production
+ * cloud is used.
+ *
+ * @return {[type]} [description]
+ */
+export function useTestcloud() {
+  cloudHost = CLOUD_HOST_TEST;
+}
+
+export function getCloudHost() {
+  return cloudHost;
+}
+
+export function getCloudURL() {
+  return `${cloudHost}/${CLOUD_API_VERSION}`;
+}
 
 export const MAX_API_VERSION: string = '1.13';
 /**
@@ -30,35 +54,35 @@ export const MAX_API_VERSION: string = '1.13';
   */
 export const COMMANDS = Object.freeze({
   USER_LOGIN: {
-    method: 'POST', url: `${CLOUD_URL}user/login`, params: ['password', 'email'], config: { responseType: isNode ? 'blob' : 'stream', timeout: 15000 },
+    method: 'POST', url: 'user/login', params: ['password', 'email'], config: { responseType: isNode ? 'blob' : 'stream', timeout: 15000 },
   },
-  HUB_KEYS: { method: 'GET', url: `${CLOUD_URL}user/hubkeys`, timeout: 15000 },
-  REFRESH_AUTHKEY: { method: 'GET', url: `${CLOUD_URL}user/refreshsession` },
-  CLOUD_IP: { method: 'GET', url: `${CLOUD_URL}hub/lan_ip` },
-  CLOUD_META: { method: 'GET', url: `${CLOUD_URL}hub/remote/hub` },
-  POLL: { method: 'GET', url: `${CLOUD_URL}hub/remote/cc/$API_VER/hub/poll`, urlParams: ['ts'] },
-  PAIR_START: { method: 'GET', url: `${CLOUD_URL}hub/remote/cc/$API_VER/hub/scan`, urlParams: ['ts'] },
+  HUB_KEYS: { method: 'GET', url: 'user/hubkeys', timeout: 15000 },
+  REFRESH_AUTHKEY: { method: 'GET', url: 'user/refreshsession' },
+  CLOUD_IP: { method: 'GET', url: 'hub/lan_ip' },
+  CLOUD_META: { method: 'GET', url: 'hub/remote/hub' },
+  POLL: { method: 'GET', url: 'hub/remote/cc/$API_VER/hub/poll', urlParams: ['ts'] },
+  PAIR_START: { method: 'GET', url: 'hub/remote/cc/$API_VER/hub/scan', urlParams: ['ts'] },
   PAIR_IGNORE: {
-    method: 'PUT', url: `${CLOUD_URL}hub/remote/cc/$API_VER/hub/scan`, type: 'SET_SCAN_RESULT', params: ['id', 'ignored'],
+    method: 'PUT', url: 'hub/remote/cc/$API_VER/hub/scan', type: 'SET_SCAN_RESULT', params: ['id', 'ignored'],
   },
-  PAIR_STOP: { method: 'GET', url: `${CLOUD_URL}hub/remote/cc/$API_VER/hub/stopscan` },
+  PAIR_STOP: { method: 'GET', url: 'hub/remote/cc/$API_VER/hub/stopscan' },
   CMD_DEVICE_STATE: {
-    method: 'PUT', url: `${CLOUD_URL}hub/remote/cc/$API_VER/devices/command`, type: 'CMD_DEVICE', params: ['id', 'state'],
+    method: 'PUT', url: 'hub/remote/cc/$API_VER/devices/command', type: 'CMD_DEVICE', params: ['id', 'state'],
   },
   CMD_DEVICE_IGNORE: {
-    method: 'PUT', url: `${CLOUD_URL}hub/remote/cc/$API_VER/devices/command`, type: 'CMD_IGNORE_DEVICE', params: ['id'],
+    method: 'PUT', url: 'hub/remote/cc/$API_VER/devices/command', type: 'CMD_IGNORE_DEVICE', params: ['id'],
   },
   CMD_DEVICE_IDENTIFY: {
-    method: 'PUT', url: `${CLOUD_URL}hub/remote/cc/$API_VER/devices/command`, type: 'CMD_IDENTIFY', params: ['id'],
+    method: 'PUT', url: 'hub/remote/cc/$API_VER/devices/command', type: 'CMD_IDENTIFY', params: ['id'],
   },
   CMD_DEVICE_META: {
-    method: 'PUT', url: `${CLOUD_URL}hub/remote/cc/$API_VER/devices/command`, type: 'CMD_DEVICE_META', params: ['id', 'name', 'room'],
+    method: 'PUT', url: 'hub/remote/cc/$API_VER/devices/command', type: 'CMD_DEVICE_META', params: ['id', 'name', 'room'],
   },
-  CMD_GET_ROOMS: { method: 'GET', url: `${CLOUD_URL}hub/remote/cc/$API_VER/rooms` },
+  CMD_GET_ROOMS: { method: 'GET', url: 'hub/remote/cc/$API_VER/rooms' },
   CMD_SET_ROOM: {
-    method: 'PUT', url: `${CLOUD_URL}hub/remote/cc/$API_VER/rooms`, type: 'CMD_ROOM', params: ['id', 'name', 'order'],
+    method: 'PUT', url: 'hub/remote/cc/$API_VER/rooms', type: 'CMD_ROOM', params: ['id', 'name', 'order'],
   },
-  CMD_REMOVE_ROOM: { method: 'DELETE', url: `${CLOUD_URL}hub/remote/cc/$API_VER/rooms`, urlParams: ['roomId'] },
+  CMD_REMOVE_ROOM: { method: 'DELETE', url: 'hub/remote/cc/$API_VER/rooms', urlParams: ['roomId'] },
 });
 
 

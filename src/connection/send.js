@@ -6,7 +6,7 @@ import axiosRetry from 'axios-retry';
 // import rax from 'retry-axios';
 import { urlBase64Decode } from '../utils';
 import {
-  COMMANDS, CLOUD_CONNECTION_STATES, CLOUD_URL, HUB_CONNECTION_STATES, MAX_API_VERSION,
+  COMMANDS, CLOUD_CONNECTION_STATES, getCloudURL, HUB_CONNECTION_STATES, MAX_API_VERSION,
 } from './constants';
 import {
   cloudErrorState, hubErrorState, testSSLCertificate, getAPIversion,
@@ -187,9 +187,9 @@ export function send({
           });
         }
         const hubVersion = getAPIversion(hub.version, MAX_API_VERSION);
-        sendUrl = command.url.replace('$API_VER', hubVersion);
+        sendUrl = getCloudURL().concat(command.url.replace('$API_VER', hubVersion));
       } else {
-        sendUrl = command.url;
+        sendUrl = getCloudURL().concat(command.url);
       }
     }
 
@@ -206,7 +206,7 @@ export function send({
       }
     }
 
-    if (sendUrl && sendUrl.indexOf(CLOUD_URL) > -1) {
+    if (sendUrl && sendUrl.indexOf(getCloudURL()) > -1) {
       remoteConnection = true;
     }
 

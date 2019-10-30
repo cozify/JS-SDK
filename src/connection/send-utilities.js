@@ -1,7 +1,7 @@
 // @flow
 
 import {
-  CLOUD_CONNECTION_STATES, HUB_CONNECTION_STATES, CLOUD_FINGERPRINTS_SHA1, CLOUD_HOST,
+  CLOUD_CONNECTION_STATES, HUB_CONNECTION_STATES, CLOUD_FINGERPRINTS_SHA1, getCloudHost,
 } from './constants';
 import { isNode } from '../utils';
 
@@ -138,7 +138,7 @@ export function testSSLCertificate(remoteConnection: boolean): Promise<boolean> 
               resolve(true);
             }
           },
-          CLOUD_HOST,
+          getCloudHost(),
           CLOUD_FINGERPRINTS_SHA1,
         );
       } else {
