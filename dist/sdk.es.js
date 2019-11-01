@@ -1,10 +1,4 @@
-'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
-
-var axios = _interopDefault(require('axios'));
+import axios from 'axios';
 
 function symbolObservablePonyfill(root) {
 	var result;
@@ -1497,14 +1491,18 @@ var setUseProxies = immer.setUseProxies.bind(immer);
  */
 var applyPatches$1 = immer.applyPatches.bind(immer);
 
-var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 function unwrapExports (x) {
-	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x.default : x;
+	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
 }
 
 function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
+}
+
+function getCjsExportFromNamespace (n) {
+	return n && n['default'] || n;
 }
 
 /**
@@ -1739,6 +1737,7 @@ var parse = function parse(path) {
 };
 
 var es = /*#__PURE__*/Object.freeze({
+	__proto__: null,
 	create: create,
 	parse: parse
 });
@@ -1788,6 +1787,7 @@ var identityLast = createIdentity(-1);
 var identitySecondLast = createIdentity(-2);
 
 var es$1 = /*#__PURE__*/Object.freeze({
+	__proto__: null,
 	createIdentity: createIdentity,
 	identity: identity,
 	identitySecond: identitySecond,
@@ -1797,7 +1797,7 @@ var es$1 = /*#__PURE__*/Object.freeze({
 
 var fastEquals = createCommonjsModule(function (module, exports) {
 (function (global, factory) {
-  factory(exports);
+   factory(exports) ;
 }(commonjsGlobal, function (exports) {
   /**
    * @constant {boolean} HAS_MAP_SUPPORT
@@ -2383,6 +2383,7 @@ function createStructuredSelector(selectors) {
 }
 
 var es$2 = /*#__PURE__*/Object.freeze({
+	__proto__: null,
 	defaultMemoize: defaultMemoize,
 	createSelectorCreator: createSelectorCreator,
 	createSelector: createSelector,
@@ -2391,7 +2392,7 @@ var es$2 = /*#__PURE__*/Object.freeze({
 
 var curriable = createCommonjsModule(function (module, exports) {
 (function (global, factory) {
-  factory(exports);
+   factory(exports) ;
 }(commonjsGlobal, function (exports) {
   /**
    * @constant __ placeholder used when parameters are skipped
@@ -2486,9 +2487,11 @@ var curriable = createCommonjsModule(function (module, exports) {
 
 unwrapExports(curriable);
 
+var require$$1 = getCjsExportFromNamespace(es);
+
 var unchanged = createCommonjsModule(function (module, exports) {
 (function (global, factory) {
-  factory(exports, curriable, es);
+   factory(exports, curriable, require$$1) ;
 }(commonjsGlobal, function (exports, curriable, pathington) {
   // external dependencies
   var O = Object;
@@ -3273,9 +3276,13 @@ var unchanged = createCommonjsModule(function (module, exports) {
 
 unwrapExports(unchanged);
 
+var require$$0 = getCjsExportFromNamespace(es$1);
+
+var require$$2 = getCjsExportFromNamespace(es$2);
+
 var selectorator = createCommonjsModule(function (module, exports) {
 (function (global, factory) {
-  factory(exports, es$1, fastEquals, es$2, unchanged);
+   factory(exports, require$$0, fastEquals, require$$2, unchanged) ;
 }(commonjsGlobal, function (exports, identitate, fastEquals, reselect, unchanged) {
   var INVALID_ARRAY_PATHS_MESSAGE = 'You have not provided any values for paths, so no values can be retrieved from state.';
   var INVALID_PATHS_MESSAGE = [
@@ -3536,7 +3543,7 @@ function createStore$1(reducer, preloadedState, enhancer) {
   var _ref2;
 
   if (typeof preloadedState === 'function' && typeof enhancer === 'function' || typeof enhancer === 'function' && typeof arguments[3] === 'function') {
-    throw new Error('It looks like you are passing several store enhancers to ' + 'createStore(). This is not supported. Instead, compose them ' + 'together to a single function');
+    throw new Error('It looks like you are passing several store enhancers to ' + 'createStore(). This is not supported. Instead, compose them ' + 'together to a single function.');
   }
 
   if (typeof preloadedState === 'function' && typeof enhancer === 'undefined') {
@@ -3561,6 +3568,13 @@ function createStore$1(reducer, preloadedState, enhancer) {
   var currentListeners = [];
   var nextListeners = currentListeners;
   var isDispatching = false;
+  /**
+   * This makes a shallow copy of currentListeners so we can use
+   * nextListeners as a temporary list while dispatching.
+   *
+   * This prevents any bugs around consumers calling
+   * subscribe/unsubscribe in the middle of a dispatch.
+   */
 
   function ensureCanMutateNextListeners() {
     if (nextListeners === currentListeners) {
@@ -3706,7 +3720,11 @@ function createStore$1(reducer, preloadedState, enhancer) {
       throw new Error('Expected the nextReducer to be a function.');
     }
 
-    currentReducer = nextReducer;
+    currentReducer = nextReducer; // This action has a similiar effect to ActionTypes.INIT.
+    // Any reducers that existed in both the new and old rootReducer
+    // will receive the previous state. This effectively populates
+    // the new state tree with any relevant data from the old one.
+
     dispatch({
       type: ActionTypes$1.REPLACE
     });
@@ -3822,7 +3840,7 @@ function combineReducers$1(reducers) {
     }
   }
 
-  var finalReducerKeys = Object.keys(finalReducers);
+  var finalReducerKeys = Object.keys(finalReducers); // This is used to make sure we don't warn about the same
 
   var shapeAssertionError;
 
@@ -3874,8 +3892,8 @@ function bindActionCreator(actionCreator, dispatch) {
  * may be invoked directly. This is just a convenience method, as you can call
  * `store.dispatch(MyActionCreators.doSomething())` yourself just fine.
  *
- * For convenience, you can also pass a single function as the first argument,
- * and get a function in return.
+ * For convenience, you can also pass an action creator as the first argument,
+ * and get a dispatch wrapped function in return.
  *
  * @param {Function|Object} actionCreators An object whose values are action
  * creator functions. One handy way to obtain it is to use ES6 `import * as`
@@ -3900,11 +3918,9 @@ function bindActionCreators(actionCreators, dispatch) {
     throw new Error("bindActionCreators expected an object or a function, instead received " + (actionCreators === null ? 'null' : typeof actionCreators) + ". " + "Did you write \"import ActionCreators from\" instead of \"import * as ActionCreators from\"?");
   }
 
-  var keys = Object.keys(actionCreators);
   var boundActionCreators = {};
 
-  for (var i = 0; i < keys.length; i++) {
-    var key = keys[i];
+  for (var key in actionCreators) {
     var actionCreator = actionCreators[key];
 
     if (typeof actionCreator === 'function') {
@@ -3930,20 +3946,34 @@ function _defineProperty$1(obj, key, value) {
   return obj;
 }
 
-function _objectSpread$1(target) {
+function ownKeys$1(object, enumerableOnly) {
+  var keys = Object.keys(object);
+
+  if (Object.getOwnPropertySymbols) {
+    keys.push.apply(keys, Object.getOwnPropertySymbols(object));
+  }
+
+  if (enumerableOnly) keys = keys.filter(function (sym) {
+    return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+  });
+  return keys;
+}
+
+function _objectSpread2(target) {
   for (var i = 1; i < arguments.length; i++) {
     var source = arguments[i] != null ? arguments[i] : {};
-    var ownKeys = Object.keys(source);
 
-    if (typeof Object.getOwnPropertySymbols === 'function') {
-      ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {
-        return Object.getOwnPropertyDescriptor(source, sym).enumerable;
-      }));
+    if (i % 2) {
+      ownKeys$1(source, true).forEach(function (key) {
+        _defineProperty$1(target, key, source[key]);
+      });
+    } else if (Object.getOwnPropertyDescriptors) {
+      Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+    } else {
+      ownKeys$1(source).forEach(function (key) {
+        Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+      });
     }
-
-    ownKeys.forEach(function (key) {
-      _defineProperty$1(target, key, source[key]);
-    });
   }
 
   return target;
@@ -4008,7 +4038,7 @@ function applyMiddleware$1() {
       var store = createStore.apply(void 0, arguments);
 
       var _dispatch = function dispatch() {
-        throw new Error("Dispatching while constructing your middleware is not allowed. " + "Other middleware would not be applied to this dispatch.");
+        throw new Error('Dispatching while constructing your middleware is not allowed. ' + 'Other middleware would not be applied to this dispatch.');
       };
 
       var middlewareAPI = {
@@ -4021,7 +4051,7 @@ function applyMiddleware$1() {
         return middleware(middlewareAPI);
       });
       _dispatch = compose$1.apply(void 0, chain)(store.dispatch);
-      return _objectSpread$1({}, store, {
+      return _objectSpread2({}, store, {
         dispatch: _dispatch
       });
     };
@@ -4029,17 +4059,20 @@ function applyMiddleware$1() {
 }
 
 var redux = /*#__PURE__*/Object.freeze({
-	createStore: createStore$1,
-	combineReducers: combineReducers$1,
-	bindActionCreators: bindActionCreators,
+	__proto__: null,
+	__DO_NOT_USE__ActionTypes: ActionTypes$1,
 	applyMiddleware: applyMiddleware$1,
+	bindActionCreators: bindActionCreators,
+	combineReducers: combineReducers$1,
 	compose: compose$1,
-	__DO_NOT_USE__ActionTypes: ActionTypes$1
+	createStore: createStore$1
 });
+
+var require$$0$1 = getCjsExportFromNamespace(redux);
 
 var reduxDevtoolsExtension = createCommonjsModule(function (module, exports) {
 
-var compose = redux.compose;
+var compose = require$$0$1.compose;
 
 exports.__esModule = true;
 exports.composeWithDevTools = (
@@ -4672,27 +4705,9 @@ function _defineProperty$3(obj, key, value) {
 
 var defineProperty$1 = _defineProperty$3;
 
-function _objectSpread$2(target) {
-  for (var i = 1; i < arguments.length; i++) {
-    var source = arguments[i] != null ? arguments[i] : {};
-    var ownKeys = Object.keys(source);
+function ownKeys$2(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
-    if (typeof Object.getOwnPropertySymbols === 'function') {
-      ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {
-        return Object.getOwnPropertyDescriptor(source, sym).enumerable;
-      }));
-    }
-
-    ownKeys.forEach(function (key) {
-      defineProperty$1(target, key, source[key]);
-    });
-  }
-
-  return target;
-}
-
-var objectSpread = _objectSpread$2;
-
+function _objectSpread$1(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$2(source, true).forEach(function (key) { defineProperty$1(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$2(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 /**
  * Devices action creators object
  * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
@@ -4724,9 +4739,9 @@ const pairingsState = createSlice({
       const hubPairingDevices = {};
       Object.entries(devices).forEach(entry => {
         const [id, device] = entry;
-        hubPairingDevices[id] = objectSpread({}, device);
+        hubPairingDevices[id] = _objectSpread$1({}, device);
       });
-      stateToSet[hubId] = objectSpread({}, hubPairingDevices);
+      stateToSet[hubId] = _objectSpread$1({}, hubPairingDevices);
     },
 
     /*
@@ -4744,7 +4759,7 @@ const pairingsState = createSlice({
       } = action.payload;
 
       if (stateToSet[hubId]) {
-        stateToSet[hubId][device.id] = objectSpread({}, device);
+        stateToSet[hubId][device.id] = _objectSpread$1({}, device);
       }
     },
 
@@ -4774,6 +4789,9 @@ const {
   reducer: reducer$1
 } = pairingsState;
 
+function ownKeys$3(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread$2(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$3(source, true).forEach(function (key) { defineProperty$1(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$3(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 /**
  * Devices action creators object
  * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
@@ -4805,9 +4823,9 @@ const devicesState = createSlice({
       const hubDevices = {};
       Object.entries(devices).forEach(entry => {
         const [id, device] = entry;
-        hubDevices[id] = objectSpread({}, device);
+        hubDevices[id] = _objectSpread$2({}, device);
       });
-      stateToSet[hubId] = objectSpread({}, hubDevices);
+      stateToSet[hubId] = _objectSpread$2({}, hubDevices);
     },
 
     /*
@@ -4825,7 +4843,7 @@ const devicesState = createSlice({
       } = action.payload;
 
       if (stateToSet[hubId]) {
-        stateToSet[hubId][device.id] = objectSpread({}, device);
+        stateToSet[hubId][device.id] = _objectSpread$2({}, device);
       }
     },
 
@@ -4865,6 +4883,9 @@ const {
   deleteDevice
 } = actions$2;
 
+function ownKeys$4(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread$3(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$4(source, true).forEach(function (key) { defineProperty$1(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$4(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 /**
  * Hubs action creators object
  * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
@@ -4891,7 +4912,7 @@ const hubsState = createSlice({
       console.log('updateHubs', hubs);
       Object.entries(hubs).forEach(entry => {
         const [id, hub] = entry;
-        stateToSet[id] = objectSpread({}, state[id], hub);
+        stateToSet[id] = _objectSpread$3({}, state[id], {}, hub);
       });
     },
 
@@ -5610,7 +5631,7 @@ var stubFalse_1 = stubFalse;
 
 var isBuffer_1 = createCommonjsModule(function (module, exports) {
 /** Detect free variable `exports`. */
-var freeExports = exports && !exports.nodeType && exports;
+var freeExports =  exports && !exports.nodeType && exports;
 
 /** Detect free variable `module`. */
 var freeModule = freeExports && 'object' == 'object' && module && !module.nodeType && module;
@@ -5720,7 +5741,7 @@ var _baseUnary = baseUnary;
 
 var _nodeUtil = createCommonjsModule(function (module, exports) {
 /** Detect free variable `exports`. */
-var freeExports = exports && !exports.nodeType && exports;
+var freeExports =  exports && !exports.nodeType && exports;
 
 /** Detect free variable `module`. */
 var freeModule = freeExports && 'object' == 'object' && module && !module.nodeType && module;
@@ -5970,12 +5991,6 @@ const userState = createSlice({
 
             break;
           }
-
-        default:
-          {
-            // statements;
-            break;
-          }
       }
     },
 
@@ -6037,6 +6052,9 @@ const {
   reducer: reducer$4
 } = userState;
 
+function ownKeys$5(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread$4(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$5(source, true).forEach(function (key) { defineProperty$1(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$5(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 /**
  * Rooms action creators object
  * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
@@ -6068,9 +6086,9 @@ const roomsState = createSlice({
       const hubRooms = {};
       Object.entries(rooms).forEach(entry => {
         const [id, room] = entry;
-        hubRooms[id] = objectSpread({}, room);
+        hubRooms[id] = _objectSpread$4({}, room);
       });
-      stateToSet[hubId] = objectSpread({}, hubRooms);
+      stateToSet[hubId] = _objectSpread$4({}, hubRooms);
     },
 
     /*
@@ -6088,7 +6106,7 @@ const roomsState = createSlice({
       } = action.payload;
 
       if (hubId && stateToSet[hubId]) {
-        stateToSet[hubId][room.id] = objectSpread({}, room);
+        stateToSet[hubId][room.id] = _objectSpread$4({}, room);
       }
     },
 
@@ -6126,7 +6144,7 @@ const roomsState = createSlice({
       } = action.payload;
 
       if (stateToSet[hubId]) {
-        stateToSet[hubId][room.id] = objectSpread({}, room);
+        stateToSet[hubId][room.id] = _objectSpread$4({}, room);
       }
     }
 
@@ -6445,7 +6463,9 @@ var WHITELIST = [
 	'EADDRINUSE',
 	'ESOCKETTIMEDOUT',
 	'ECONNREFUSED',
-	'EPIPE'
+	'EPIPE',
+	'EHOSTUNREACH',
+	'EAI_AGAIN'
 ];
 
 var BLACKLIST = [
@@ -8219,11 +8239,6 @@ function doPairingById(hubId, reset = false) {
               pairingDevicesDeltaHandler(hubId, doReset, delta.devices);
               break;
             }
-
-          default:
-            {
-              break;
-            }
         }
       }
 
@@ -8455,21 +8470,6 @@ function doPoll(hubId, reset = false) {
             case 'ROOM_DELTA':
               {
                 roomsDeltaHandler(hubId, doReset, delta.rooms);
-                break;
-              }
-
-            case 'ZONE_DELTA':
-              {
-                break;
-              }
-
-            case 'ALARM_DELTA':
-              {
-                break;
-              }
-
-            default:
-              {
                 break;
               }
           }
@@ -10165,56 +10165,5 @@ function setDeviceMeta(hubId, deviceId, name, rooms) {
   });
 }
 
-//
-
-exports.CLOUD_CONNECTION_STATES = CLOUD_CONNECTION_STATES;
-exports.HUB_CONNECTION_STATES = HUB_CONNECTION_STATES;
-exports.HUB_STATES = HUB_STATES;
-exports.LANGUAGES = LANGUAGES;
-exports.ROLES = ROLES;
-exports.USER_STATES = USER_STATES;
-exports.acceptEula = acceptEula;
-exports.addRoom = addRoom;
-exports.changeLanguage = changeLanguage;
-exports.connectHubByTokens = connectHubByTokens;
-exports.cozifyReducer = rootReducer;
-exports.deleteDevice = deleteDevice;
-exports.devicesState = devicesState;
-exports.doPoll = doPoll;
-exports.doPwLogin = doPwLogin;
-exports.editRoom = editRoom;
-exports.getCloudConnectionState = getCloudConnectionState;
-exports.getDevices = getDevices;
-exports.getHubConnectionState = getHubConnectionState;
-exports.getHubDevices = getHubDevices;
-exports.getHubPairingDevices = getHubPairingDevices;
-exports.getHubRooms = getHubRooms;
-exports.getHubs = getHubs;
-exports.getPairingDevices = getPairingDevices;
-exports.getRooms = getRooms;
-exports.getUserState = getUserState;
-exports.hubsState = hubsState;
-exports.identifyDevice = identifyDevice;
-exports.ignorePairingByIds = ignorePairingByIds;
-exports.removeRoom = removeRoom;
-exports.selectHubById = selectHubById;
-exports.sendDeviceCmd = sendDeviceCmd;
-exports.sendDeviceStateCmd = sendDeviceStateCmd;
-exports.setAuthenticated = setAuthenticated;
-exports.setDeviceMeta = setDeviceMeta;
-exports.setDevices = setDevices;
-exports.startDiscoveringHubs = startDiscoveringHubs;
-exports.startPairingById = startPairingById;
-exports.startPollingById = startPollingById;
-exports.stopDiscoveringHubs = stopDiscoveringHubs;
-exports.stopPairingById = stopPairingById;
-exports.stopPairings = stopPairings;
-exports.stopPollingById = stopPollingById;
-exports.store = store;
-exports.unSelectHubById = unSelectHubById;
-exports.unSelectHubs = unSelectHubs;
-exports.unpairDevice = unpairDevice;
-exports.updateHubs = updateHubs;
-exports.useTestcloud = useTestcloud;
-exports.watchChanges = watchChanges;
-//# sourceMappingURL=sdk-node.js.map
+export { CLOUD_CONNECTION_STATES, HUB_CONNECTION_STATES, HUB_STATES, LANGUAGES, ROLES, USER_STATES, acceptEula, addRoom, changeLanguage, connectHubByTokens, rootReducer as cozifyReducer, deleteDevice, devicesState, doPoll, doPwLogin, editRoom, getCloudConnectionState, getDevices, getHubConnectionState, getHubDevices, getHubPairingDevices, getHubRooms, getHubs, getPairingDevices, getRooms, getUserState, hubsState, identifyDevice, ignorePairingByIds, removeRoom, selectHubById, sendDeviceCmd, sendDeviceStateCmd, setAuthenticated, setDeviceMeta, setDevices, startDiscoveringHubs, startPairingById, startPollingById, stopDiscoveringHubs, stopPairingById, stopPairings, stopPollingById, store, unSelectHubById, unSelectHubs, unpairDevice, updateHubs, useTestcloud, watchChanges };
+//# sourceMappingURL=sdk.es.js.map

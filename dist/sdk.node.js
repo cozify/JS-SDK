@@ -1,4 +1,18 @@
-import axios from 'axios';
+'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
+
+var http = _interopDefault(require('http'));
+var https = _interopDefault(require('https'));
+var url = _interopDefault(require('url'));
+var assert = _interopDefault(require('assert'));
+var stream = _interopDefault(require('stream'));
+var tty = _interopDefault(require('tty'));
+var util = _interopDefault(require('util'));
+var os = _interopDefault(require('os'));
+var zlib = _interopDefault(require('zlib'));
 
 function symbolObservablePonyfill(root) {
 	var result;
@@ -1491,16 +1505,6 @@ var setUseProxies = immer.setUseProxies.bind(immer);
  */
 var applyPatches$1 = immer.applyPatches.bind(immer);
 
-var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
-
-function unwrapExports (x) {
-	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x.default : x;
-}
-
-function createCommonjsModule(fn, module) {
-	return module = { exports: {} }, fn(module, module.exports), module.exports;
-}
-
 /**
  * @constant {Object} CACHE
  *
@@ -1536,21 +1540,6 @@ var NUMBER = /^\d+$/i;
  */
 
 var QUOTED_KEY = /^"[^"]+"|`[^`]+`|'[^']+'$/;
-/**
- * @constant {Array<string>} VALID_QUOTES
- */
-
-var VALID_QUOTES = /^["'`]{1}$/;
-/**
- * @constant {RegExp} VALID_KEY
- */
-
-var VALID_KEY = /^\d+$|^[a-zA-Z_$][\w$]+$/;
-/**
- * @constant {RegExp} WHITE_SPACE
- */
-
-var WHITE_SPACE = /\s/;
 
 // constants
 /**
@@ -1601,48 +1590,6 @@ var map = function map(array, fn) {
   return mapped;
 };
 /**
- * @function shouldBeInBrackets
- *
- * @description
- * should the key passed be encased in brackets when in the path string
- *
- * @param {*} key the key that is being added to the path string
- * @returns {boolean} should the key be in brackets
- */
-
-var shouldBeInBrackets = function shouldBeInBrackets(key) {
-  return typeof key === 'number' || isNumericKey(key) || isQuotedKey(key);
-};
-/**
- * @function shouldBeInQuotes
- *
- * @description
- * should the key passed be encased in quotes when in the path string
- *
- * @param {*} key the key that is being added to the path string
- * @returns {boolean} should the key be in quotes
- */
-
-var shouldBeInQuotes = function shouldBeInQuotes(key) {
-  return WHITE_SPACE.test(key) || !VALID_KEY.test(key);
-};
-/**
- * @function createGetNormalizedCreateKey
- *
- * @description
- * get the normalized path string based on the quote and key passed
- *
- * @param {string} [quote="] the quote string to use
- * @returns {function(string, *): string}
- */
-
-var createGetNormalizedCreateKey = function createGetNormalizedCreateKey(quote) {
-  return function (existingString, key) {
-    var normalizedKey = shouldBeInQuotes(key) ? "" + quote + key + quote : key;
-    return existingString + (shouldBeInBrackets(normalizedKey) ? "[" + normalizedKey + "]" : "." + normalizedKey);
-  };
-};
-/**
  * @function getNormalizedParseKey
  *
  * @description
@@ -1683,33 +1630,6 @@ var parseStringPath = function parseStringPath(path) {
 // constants
 var isArray = Array.isArray;
 /**
- * @function create
- *
- * @description
- * create a new path string based on the path and quote passed
- *
- * @param {Array<number|string>} path the path to convert to a string
- * @param {string} [quote="] the quote string to use when quoting keys
- * @returns {string} the path string
- */
-
-var create = function create(path, quote) {
-  if (quote === void 0) {
-    quote = '"';
-  }
-
-  if (!isArray(path)) {
-    throw new ReferenceError('path passed must be an array');
-  }
-
-  if (!VALID_QUOTES.test(quote)) {
-    throw new SyntaxError("quote " + quote + " passed is invalid, must be \", `, or '.");
-  }
-
-  var pathString = path.reduce(createGetNormalizedCreateKey(quote), '');
-  return pathString[0] === '.' ? pathString.slice(1) : pathString;
-};
-/**
  * @function parse
  *
  * @description
@@ -1732,528 +1652,443 @@ var parse = function parse(path) {
   return [typeof normalizedParseKey === 'number' ? normalizedParseKey : "" + normalizedParseKey];
 };
 
-var es = /*#__PURE__*/Object.freeze({
-	create: create,
-	parse: parse
-});
-
 /**
- * @function getNestedProperty
+ * @constant {boolean} HAS_MAP_SUPPORT
+ */
+var HAS_MAP_SUPPORT = typeof Map === 'function';
+/**
+ * @constant {boolean} HAS_SET_SUPPORT
+ */
+
+var HAS_SET_SUPPORT = typeof Set === 'function';
+/**
+ * @constant {boolean} HAS_WEAKSET_SUPPORT
+ */
+
+var HAS_WEAKSET_SUPPORT = typeof WeakSet === 'function';
+
+// constants
+var keys = Object.keys;
+/**
+ * @function addObjectToCache
  *
  * @description
- * recursive function to get the nested property at path
+ * add object to cache if it is indeed an object
  *
- * @param {Array<number|string>} path the path to retrieve values from the object
- * @param {*} object the object to get values from
- * @returns {*} the retrieved values
+ * @param {any} object the object to potentially add to the cache
+ * @param {Object|WeakSet} cache the cache to add to
+ * @returns {void}
  */
-var getNestedProperty = function getNestedProperty(path, object) {
-  if (path.length === 1) {
-    return object ? object[path[0]] : void 0;
+
+var addObjectToCache = function addObjectToCache(object, cache) {
+  return object && typeof object === 'object' && cache.add(object);
+};
+/**
+ *
+ * @param {Array<Array<any>>} pairs the pairs to check in
+ * @param {Array<any>} pairToMatch the pair to check if exists
+ * @param {function} isEqual the equality comparator
+ * @param {any} meta the meta item to pass through
+ * @returns {boolean} does the pair exist in the pairs
+ */
+
+var hasPair = function hasPair(pairs, pairToMatch, isEqual, meta) {
+  var pair;
+
+  for (var index = 0; index < pairs.length; index++) {
+    pair = pairs[index];
+
+    if (isEqual(pair[0], pairToMatch[0], meta) && isEqual(pair[1], pairToMatch[1], meta)) {
+      return true;
+    }
   }
 
-  var property = path.shift();
-  return object && object.hasOwnProperty(property) ? getNestedProperty(path, object[property]) : void 0;
+  return false;
 };
-
-// external dependencies
 /**
- * @function createIdentity
+ * @function hasValue
  *
  * @description
- * create an identity method for a specific argument index
+ * does the values include the vakye passed
  *
- * @param {number} argIndex the index of the argument to get
- * @param {Array<number|string>|number|string} path the nested path to retrieve the value from
- * @returns {function(...Array<*>): *} the identity method for the given argument
+ * @param {Array<any>} values the values to check in
+ * @param {any} item the value to locate
+ * @param {function} isEqual the equality comparator
+ * @param {any} meta the meta item to pass through
+ * @returns {boolean} does the value exist in the values
  */
 
-var createIdentity = function createIdentity(argIndex, path) {
-  var shouldGetNestedValue = path !== void 0;
-  return function () {
-    // eslint-disable-next-line prefer-rest-params
-    var value = arguments[argIndex < 0 ? arguments.length + argIndex : argIndex];
-    return shouldGetNestedValue ? getNestedProperty(parse(path), value) : value;
-  };
+var hasValue = function hasValue(values, item, isEqual, meta) {
+  for (var index = 0; index < values.length; index++) {
+    if (isEqual(values[index], item, meta)) {
+      return true;
+    }
+  }
+
+  return false;
 };
-var identity = createIdentity(0);
-var identitySecond = createIdentity(1);
-var identityLast = createIdentity(-1);
-var identitySecondLast = createIdentity(-2);
+/**
+ * @function sameValueZeroEqual
+ *
+ * @description
+ * are the objects passed strictly equal or both NaN
+ *
+ * @param {any} objectA the object to compare against
+ * @param {any} objectB the object to test
+ * @returns {boolean} are the objects equal by the SameValueZero principle
+ */
 
-var es$1 = /*#__PURE__*/Object.freeze({
-	createIdentity: createIdentity,
-	identity: identity,
-	identitySecond: identitySecond,
-	identityLast: identityLast,
-	identitySecondLast: identitySecondLast
-});
+var sameValueZeroEqual = function sameValueZeroEqual(objectA, objectB) {
+  return objectA === objectB || objectA !== objectA && objectB !== objectB;
+};
+/**
+ * @function isPlainObject
+ *
+ * @description
+ * is the object a plain object
+ *
+ * @param {any} object the object to test
+ * @returns {boolean} is the object a plain object
+ */
 
-var fastEquals = createCommonjsModule(function (module, exports) {
-(function (global, factory) {
-  factory(exports);
-}(commonjsGlobal, function (exports) {
-  /**
-   * @constant {boolean} HAS_MAP_SUPPORT
-   */
-  var HAS_MAP_SUPPORT = typeof Map === 'function';
-  /**
-   * @constant {boolean} HAS_SET_SUPPORT
-   */
+var isPlainObject$1 = function isPlainObject(object) {
+  return object.constructor === Object;
+};
+/**
+ * @function isPromiseLike
+ *
+ * @description
+ * is the object promise-like (thenable)
+ *
+ * @param {any} object the object to test
+ * @returns {boolean} is the object promise-like
+ */
 
-  var HAS_SET_SUPPORT = typeof Set === 'function';
-  /**
-   * @constant {boolean} HAS_WEAKSET_SUPPORT
-   */
+var isPromiseLike = function isPromiseLike(object) {
+  return typeof object.then === 'function';
+};
+/**
+ * @function isReactElement
+ *
+ * @description
+ * is the object passed a react element
+ *
+ * @param {any} object the object to test
+ * @returns {boolean} is the object a react element
+ */
 
-  var HAS_WEAKSET_SUPPORT = typeof WeakSet === 'function';
+var isReactElement = function isReactElement(object) {
+  return !!(object.$$typeof && object._store);
+};
+/**
+ * @function getNewCache
+ *
+ * @description
+ * get a new cache object to prevent circular references
+ *
+ * @returns {Object|Weakset} the new cache object
+ */
 
-  // constants
-  var keys = Object.keys;
-  /**
-   * @function addObjectToCache
-   *
-   * @description
-   * add object to cache if it is indeed an object
-   *
-   * @param {any} object the object to potentially add to the cache
-   * @param {Object|WeakSet} cache the cache to add to
-   * @returns {void}
-   */
-
-  var addObjectToCache = function addObjectToCache(object, cache) {
-    return object && typeof object === 'object' && cache.add(object);
-  };
-  /**
-   *
-   * @param {Array<Array<any>>} pairs the pairs to check in
-   * @param {Array<any>} pairToMatch the pair to check if exists
-   * @param {function} isEqual the equality comparator
-   * @param {any} meta the meta item to pass through
-   * @returns {boolean} does the pair exist in the pairs
-   */
-
-  var hasPair = function hasPair(pairs, pairToMatch, isEqual, meta) {
-    var pair;
-
-    for (var index = 0; index < pairs.length; index++) {
-      pair = pairs[index];
-
-      if (isEqual(pair[0], pairToMatch[0], meta) && isEqual(pair[1], pairToMatch[1], meta)) {
-        return true;
-      }
+var getNewCache = function getNewCache() {
+  return HAS_WEAKSET_SUPPORT ? new WeakSet() : Object.create({
+    _values: [],
+    add: function add(value) {
+      this._values.push(value);
+    },
+    has: function has(value) {
+      return !!~this._values.indexOf(value);
     }
+  });
+};
+/**
+ * @function createCircularEqual
+ *
+ * @description
+ * create a custom isEqual handler specific to circular objects
+ *
+ * @param {funtion} [isEqual] the isEqual comparator to use instead of isDeepEqual
+ * @returns {function(any, any): boolean}
+ */
 
-    return false;
-  };
-  /**
-   * @function hasValue
-   *
-   * @description
-   * does the values include the vakye passed
-   *
-   * @param {Array<any>} values the values to check in
-   * @param {any} item the value to locate
-   * @param {function} isEqual the equality comparator
-   * @param {any} meta the meta item to pass through
-   * @returns {boolean} does the value exist in the values
-   */
-
-  var hasValue = function hasValue(values, item, isEqual, meta) {
-    for (var index = 0; index < values.length; index++) {
-      if (isEqual(values[index], item, meta)) {
-        return true;
+var createCircularEqual = function createCircularEqual(isEqual) {
+  return function (isDeepEqual) {
+    var comparator = isEqual || isDeepEqual;
+    return function (objectA, objectB, cache) {
+      if (cache === void 0) {
+        cache = getNewCache();
       }
-    }
 
-    return false;
-  };
-  /**
-   * @function sameValueZeroEqual
-   *
-   * @description
-   * are the objects passed strictly equal or both NaN
-   *
-   * @param {any} objectA the object to compare against
-   * @param {any} objectB the object to test
-   * @returns {boolean} are the objects equal by the SameValueZero principle
-   */
+      var cacheHasA = cache.has(objectA);
+      var cacheHasB = cache.has(objectB);
 
-  var sameValueZeroEqual = function sameValueZeroEqual(objectA, objectB) {
-    return objectA === objectB || objectA !== objectA && objectB !== objectB;
-  };
-  /**
-   * @function isPlainObject
-   *
-   * @description
-   * is the object a plain object
-   *
-   * @param {any} object the object to test
-   * @returns {boolean} is the object a plain object
-   */
-
-  var isPlainObject = function isPlainObject(object) {
-    return object.constructor === Object;
-  };
-  /**
-   * @function isPromiseLike
-   *
-   * @description
-   * is the object promise-like (thenable)
-   *
-   * @param {any} object the object to test
-   * @returns {boolean} is the object promise-like
-   */
-
-  var isPromiseLike = function isPromiseLike(object) {
-    return typeof object.then === 'function';
-  };
-  /**
-   * @function isReactElement
-   *
-   * @description
-   * is the object passed a react element
-   *
-   * @param {any} object the object to test
-   * @returns {boolean} is the object a react element
-   */
-
-  var isReactElement = function isReactElement(object) {
-    return !!(object.$$typeof && object._store);
-  };
-  /**
-   * @function getNewCache
-   *
-   * @description
-   * get a new cache object to prevent circular references
-   *
-   * @returns {Object|Weakset} the new cache object
-   */
-
-  var getNewCache = function getNewCache() {
-    return HAS_WEAKSET_SUPPORT ? new WeakSet() : Object.create({
-      _values: [],
-      add: function add(value) {
-        this._values.push(value);
-      },
-      has: function has(value) {
-        return !!~this._values.indexOf(value);
+      if (cacheHasA || cacheHasB) {
+        return cacheHasA && cacheHasB;
       }
-    });
-  };
-  /**
-   * @function createCircularEqual
-   *
-   * @description
-   * create a custom isEqual handler specific to circular objects
-   *
-   * @param {funtion} [isEqual] the isEqual comparator to use instead of isDeepEqual
-   * @returns {function(any, any): boolean}
-   */
 
-  var createCircularEqual = function createCircularEqual(isEqual) {
-    return function (isDeepEqual) {
-      var comparator = isEqual || isDeepEqual;
-      return function (objectA, objectB, cache) {
-        if (cache === void 0) {
-          cache = getNewCache();
-        }
-
-        var cacheHasA = cache.has(objectA);
-        var cacheHasB = cache.has(objectB);
-
-        if (cacheHasA || cacheHasB) {
-          return cacheHasA && cacheHasB;
-        }
-
-        addObjectToCache(objectA, cache);
-        addObjectToCache(objectB, cache);
-        return comparator(objectA, objectB, cache);
-      };
+      addObjectToCache(objectA, cache);
+      addObjectToCache(objectB, cache);
+      return comparator(objectA, objectB, cache);
     };
   };
-  /**
-   * @function toPairs
-   *
-   * @param {Map} map the map to convert to [key, value] pairs (entries)
-   * @returns {Array<Array<*>>} the [key, value] pairs
-   */
+};
+/**
+ * @function toPairs
+ *
+ * @param {Map} map the map to convert to [key, value] pairs (entries)
+ * @returns {Array<Array<*>>} the [key, value] pairs
+ */
 
-  var toPairs = function toPairs(map) {
-    var pairs = [];
-    map.forEach(function (value, key) {
-      return pairs.push([key, value]);
-    });
-    return pairs;
-  };
-  /**
-   * @function toValues
-   *
-   * @param {Set} set the set to convert to values
-   * @returns {Array<*>} the values
-   */
+var toPairs = function toPairs(map) {
+  var pairs = [];
+  map.forEach(function (value, key) {
+    return pairs.push([key, value]);
+  });
+  return pairs;
+};
+/**
+ * @function toValues
+ *
+ * @param {Set} set the set to convert to values
+ * @returns {Array<*>} the values
+ */
 
-  var toValues = function toValues(set) {
-    var values = [];
-    set.forEach(function (value) {
-      return values.push(value);
-    });
-    return values;
-  };
+var toValues = function toValues(set) {
+  var values = [];
+  set.forEach(function (value) {
+    return values.push(value);
+  });
+  return values;
+};
+/**
+ * @function areArraysEqual
+ *
+ * @description
+ * are the arrays equal in value
+ *
+ * @param {Array<any>} arrayA the array to test
+ * @param {Array<any>} arrayB the array to test against
+ * @param {function} isEqual the comparator to determine equality
+ * @param {any} meta the meta object to pass through
+ * @returns {boolean} are the arrays equal
+ */
+
+var areArraysEqual = function areArraysEqual(arrayA, arrayB, isEqual, meta) {
+  if (arrayA.length !== arrayB.length) {
+    return false;
+  }
+
+  for (var index = 0; index < arrayA.length; index++) {
+    if (!isEqual(arrayA[index], arrayB[index], meta)) {
+      return false;
+    }
+  }
+
+  return true;
+};
+/**
+ * @function areMapsEqual
+ *
+ * @description
+ * are the maps equal in value
+ *
+ * @param {Map} mapA the map to test
+ * @param {Map} mapB the map to test against
+ * @param {function} isEqual the comparator to determine equality
+ * @param {any} meta the meta map to pass through
+ * @returns {boolean} are the maps equal
+ */
+
+var areMapsEqual = function areMapsEqual(mapA, mapB, isEqual, meta) {
+  var pairsA = toPairs(mapA);
+  var pairsB = toPairs(mapB);
+
+  if (pairsA.length !== pairsB.length) {
+    return false;
+  }
+
+  for (var index = 0; index < pairsA.length; index++) {
+    if (!hasPair(pairsB, pairsA[index], isEqual, meta) || !hasPair(pairsA, pairsB[index], isEqual, meta)) {
+      return false;
+    }
+  }
+
+  return true;
+};
+/**
+ * @function areObjectsEqual
+ *
+ * @description
+ * are the objects equal in value
+ *
+ * @param {Object} objectA the object to test
+ * @param {Object} objectB the object to test against
+ * @param {function} isEqual the comparator to determine equality
+ * @param {any} meta the meta object to pass through
+ * @returns {boolean} are the objects equal
+ */
+
+var areObjectsEqual = function areObjectsEqual(objectA, objectB, isEqual, meta) {
+  var keysA = keys(objectA);
+  var keysB = keys(objectB);
+
+  if (keysA.length !== keysB.length) {
+    return false;
+  }
+
+  var key;
+
+  for (var index = 0; index < keysA.length; index++) {
+    key = keysA[index];
+
+    if (!hasValue(keysB, key, sameValueZeroEqual)) {
+      return false;
+    } // if a react element, ignore the "_owner" key because its not necessary for equality comparisons
+
+
+    if (key === '_owner' && isReactElement(objectA) && isReactElement(objectB)) {
+      continue;
+    }
+
+    if (!isEqual(objectA[key], objectB[key], meta)) {
+      return false;
+    }
+  }
+
+  return true;
+};
+/**
+ * @function areRegExpsEqual
+ *
+ * @description
+ * are the regExps equal in value
+ *
+ * @param {RegExp} regExpA the regExp to test
+ * @param {RegExp} regExpB the regExp to test agains
+ * @returns {boolean} are the regExps equal
+ */
+
+var areRegExpsEqual = function areRegExpsEqual(regExpA, regExpB) {
+  return regExpA.source === regExpB.source && regExpA.global === regExpB.global && regExpA.ignoreCase === regExpB.ignoreCase && regExpA.multiline === regExpB.multiline && regExpA.unicode === regExpB.unicode && regExpA.sticky === regExpB.sticky && regExpA.lastIndex === regExpB.lastIndex;
+};
+/**
+ * @function areSetsEqual
+ *
+ * @description
+ * are the sets equal in value
+ *
+ * @param {Set} setA the set to test
+ * @param {Set} setB the set to test against
+ * @param {function} isEqual the comparator to determine equality
+ * @param {any} meta the meta set to pass through
+ * @returns {boolean} are the sets equal
+ */
+
+var areSetsEqual = function areSetsEqual(setA, setB, isEqual, meta) {
+  var valuesA = toValues(setA);
+  var valuesB = toValues(setB);
+
+  if (valuesA.length !== valuesB.length) {
+    return false;
+  }
+
+  for (var index = 0; index < valuesA.length; index++) {
+    if (!hasValue(valuesB, valuesA[index], isEqual, meta) || !hasValue(valuesA, valuesB[index], isEqual, meta)) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
+// constants
+var isArray$1 = Array.isArray;
+
+var createComparator = function createComparator(createIsEqual) {
+  // eslint-disable-next-line no-use-before-define
+  var isEqual = typeof createIsEqual === 'function' ? createIsEqual(comparator) : comparator;
   /**
-   * @function areArraysEqual
+   * @function comparator
    *
    * @description
-   * are the arrays equal in value
+   * compare the value of the two objects and return true if they are equivalent in values
    *
-   * @param {Array<any>} arrayA the array to test
-   * @param {Array<any>} arrayB the array to test against
-   * @param {function} isEqual the comparator to determine equality
-   * @param {any} meta the meta object to pass through
-   * @returns {boolean} are the arrays equal
+   * @param {any} objectA the object to test against
+   * @param {any} objectB the object to test
+   * @param {any} [meta] an optional meta object that is passed through to all equality test calls
+   * @returns {boolean} are objectA and objectB equivalent in value
    */
 
-  var areArraysEqual = function areArraysEqual(arrayA, arrayB, isEqual, meta) {
-    if (arrayA.length !== arrayB.length) {
+  function comparator(objectA, objectB, meta) {
+    if (sameValueZeroEqual(objectA, objectB)) {
+      return true;
+    }
+
+    var typeOfA = typeof objectA;
+
+    if (typeOfA !== typeof objectB || typeOfA !== 'object' || !objectA || !objectB) {
       return false;
     }
 
-    for (var index = 0; index < arrayA.length; index++) {
-      if (!isEqual(arrayA[index], arrayB[index], meta)) {
-        return false;
-      }
-    }
-
-    return true;
-  };
-  /**
-   * @function areMapsEqual
-   *
-   * @description
-   * are the maps equal in value
-   *
-   * @param {Map} mapA the map to test
-   * @param {Map} mapB the map to test against
-   * @param {function} isEqual the comparator to determine equality
-   * @param {any} meta the meta map to pass through
-   * @returns {boolean} are the maps equal
-   */
-
-  var areMapsEqual = function areMapsEqual(mapA, mapB, isEqual, meta) {
-    var pairsA = toPairs(mapA);
-    var pairsB = toPairs(mapB);
-
-    if (pairsA.length !== pairsB.length) {
-      return false;
-    }
-
-    for (var index = 0; index < pairsA.length; index++) {
-      if (!hasPair(pairsB, pairsA[index], isEqual, meta) || !hasPair(pairsA, pairsB[index], isEqual, meta)) {
-        return false;
-      }
-    }
-
-    return true;
-  };
-  /**
-   * @function areObjectsEqual
-   *
-   * @description
-   * are the objects equal in value
-   *
-   * @param {Object} objectA the object to test
-   * @param {Object} objectB the object to test against
-   * @param {function} isEqual the comparator to determine equality
-   * @param {any} meta the meta object to pass through
-   * @returns {boolean} are the objects equal
-   */
-
-  var areObjectsEqual = function areObjectsEqual(objectA, objectB, isEqual, meta) {
-    var keysA = keys(objectA);
-    var keysB = keys(objectB);
-
-    if (keysA.length !== keysB.length) {
-      return false;
-    }
-
-    var key;
-
-    for (var index = 0; index < keysA.length; index++) {
-      key = keysA[index];
-
-      if (!hasValue(keysB, key, sameValueZeroEqual)) {
-        return false;
-      } // if a react element, ignore the "_owner" key because its not necessary for equality comparisons
-
-
-      if (key === '_owner' && isReactElement(objectA) && isReactElement(objectB)) {
-        continue;
-      }
-
-      if (!isEqual(objectA[key], objectB[key], meta)) {
-        return false;
-      }
-    }
-
-    return true;
-  };
-  /**
-   * @function areRegExpsEqual
-   *
-   * @description
-   * are the regExps equal in value
-   *
-   * @param {RegExp} regExpA the regExp to test
-   * @param {RegExp} regExpB the regExp to test agains
-   * @returns {boolean} are the regExps equal
-   */
-
-  var areRegExpsEqual = function areRegExpsEqual(regExpA, regExpB) {
-    return regExpA.source === regExpB.source && regExpA.global === regExpB.global && regExpA.ignoreCase === regExpB.ignoreCase && regExpA.multiline === regExpB.multiline && regExpA.unicode === regExpB.unicode && regExpA.sticky === regExpB.sticky && regExpA.lastIndex === regExpB.lastIndex;
-  };
-  /**
-   * @function areSetsEqual
-   *
-   * @description
-   * are the sets equal in value
-   *
-   * @param {Set} setA the set to test
-   * @param {Set} setB the set to test against
-   * @param {function} isEqual the comparator to determine equality
-   * @param {any} meta the meta set to pass through
-   * @returns {boolean} are the sets equal
-   */
-
-  var areSetsEqual = function areSetsEqual(setA, setB, isEqual, meta) {
-    var valuesA = toValues(setA);
-    var valuesB = toValues(setB);
-
-    if (valuesA.length !== valuesB.length) {
-      return false;
-    }
-
-    for (var index = 0; index < valuesA.length; index++) {
-      if (!hasValue(valuesB, valuesA[index], isEqual, meta) || !hasValue(valuesA, valuesB[index], isEqual, meta)) {
-        return false;
-      }
-    }
-
-    return true;
-  };
-
-  // constants
-  var isArray = Array.isArray;
-
-  var createComparator = function createComparator(createIsEqual) {
-    // eslint-disable-next-line no-use-before-define
-    var isEqual = typeof createIsEqual === 'function' ? createIsEqual(comparator) : comparator;
-    /**
-     * @function comparator
-     *
-     * @description
-     * compare the value of the two objects and return true if they are equivalent in values
-     *
-     * @param {any} objectA the object to test against
-     * @param {any} objectB the object to test
-     * @param {any} [meta] an optional meta object that is passed through to all equality test calls
-     * @returns {boolean} are objectA and objectB equivalent in value
-     */
-
-    function comparator(objectA, objectB, meta) {
-      if (sameValueZeroEqual(objectA, objectB)) {
-        return true;
-      }
-
-      var typeOfA = typeof objectA;
-
-      if (typeOfA !== typeof objectB || typeOfA !== 'object' || !objectA || !objectB) {
-        return false;
-      }
-
-      if (isPlainObject(objectA) && isPlainObject(objectB)) {
-        return areObjectsEqual(objectA, objectB, isEqual, meta);
-      }
-
-      var arrayA = isArray(objectA);
-      var arrayB = isArray(objectB);
-
-      if (arrayA || arrayB) {
-        return arrayA === arrayB && areArraysEqual(objectA, objectB, isEqual, meta);
-      }
-
-      var dateA = objectA instanceof Date;
-      var dateB = objectB instanceof Date;
-
-      if (dateA || dateB) {
-        return dateA === dateB && sameValueZeroEqual(objectA.getTime(), objectB.getTime());
-      }
-
-      var regexpA = objectA instanceof RegExp;
-      var regexpB = objectB instanceof RegExp;
-
-      if (regexpA || regexpB) {
-        return regexpA === regexpB && areRegExpsEqual(objectA, objectB);
-      }
-
-      if (isPromiseLike(objectA) || isPromiseLike(objectB)) {
-        return objectA === objectB;
-      }
-
-      if (HAS_MAP_SUPPORT) {
-        var mapA = objectA instanceof Map;
-        var mapB = objectB instanceof Map;
-
-        if (mapA || mapB) {
-          return mapA === mapB && areMapsEqual(objectA, objectB, isEqual, meta);
-        }
-      }
-
-      if (HAS_SET_SUPPORT) {
-        var setA = objectA instanceof Set;
-        var setB = objectB instanceof Set;
-
-        if (setA || setB) {
-          return setA === setB && areSetsEqual(objectA, objectB, isEqual, meta);
-        }
-      }
-
+    if (isPlainObject$1(objectA) && isPlainObject$1(objectB)) {
       return areObjectsEqual(objectA, objectB, isEqual, meta);
     }
 
-    return comparator;
-  };
+    var arrayA = isArray$1(objectA);
+    var arrayB = isArray$1(objectB);
 
-  // comparator
-  var circularDeepEqual = createComparator(createCircularEqual());
-  var circularShallowEqual = createComparator(createCircularEqual(sameValueZeroEqual));
-  var deepEqual = createComparator();
-  var shallowEqual = createComparator(function () {
-    return sameValueZeroEqual;
-  });
-  var index = {
-    circularDeep: circularDeepEqual,
-    circularShallow: circularShallowEqual,
-    createCustom: createComparator,
-    deep: deepEqual,
-    sameValueZero: sameValueZeroEqual,
-    shallow: shallowEqual
-  };
+    if (arrayA || arrayB) {
+      return arrayA === arrayB && areArraysEqual(objectA, objectB, isEqual, meta);
+    }
 
-  exports.createCustomEqual = createComparator;
-  exports.sameValueZeroEqual = sameValueZeroEqual;
-  exports.circularDeepEqual = circularDeepEqual;
-  exports.circularShallowEqual = circularShallowEqual;
-  exports.deepEqual = deepEqual;
-  exports.shallowEqual = shallowEqual;
-  exports.default = index;
+    var dateA = objectA instanceof Date;
+    var dateB = objectB instanceof Date;
 
-  Object.defineProperty(exports, '__esModule', { value: true });
+    if (dateA || dateB) {
+      return dateA === dateB && sameValueZeroEqual(objectA.getTime(), objectB.getTime());
+    }
 
-}));
+    var regexpA = objectA instanceof RegExp;
+    var regexpB = objectB instanceof RegExp;
 
+    if (regexpA || regexpB) {
+      return regexpA === regexpB && areRegExpsEqual(objectA, objectB);
+    }
+
+    if (isPromiseLike(objectA) || isPromiseLike(objectB)) {
+      return objectA === objectB;
+    }
+
+    if (HAS_MAP_SUPPORT) {
+      var mapA = objectA instanceof Map;
+      var mapB = objectB instanceof Map;
+
+      if (mapA || mapB) {
+        return mapA === mapB && areMapsEqual(objectA, objectB, isEqual, meta);
+      }
+    }
+
+    if (HAS_SET_SUPPORT) {
+      var setA = objectA instanceof Set;
+      var setB = objectB instanceof Set;
+
+      if (setA || setB) {
+        return setA === setB && areSetsEqual(objectA, objectB, isEqual, meta);
+      }
+    }
+
+    return areObjectsEqual(objectA, objectB, isEqual, meta);
+  }
+
+  return comparator;
+};
+
+// comparator
+var circularDeepEqual = createComparator(createCircularEqual());
+var circularShallowEqual = createComparator(createCircularEqual(sameValueZeroEqual));
+var deepEqual = createComparator();
+var shallowEqual = createComparator(function () {
+  return sameValueZeroEqual;
 });
-
-unwrapExports(fastEquals);
 
 function defaultEqualityCheck(a, b) {
   return a === b;
@@ -2355,1117 +2190,850 @@ function createSelectorCreator(memoize) {
 
 var createSelector = createSelectorCreator(defaultMemoize);
 
-function createStructuredSelector(selectors) {
-  var selectorCreator = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : createSelector;
+/**
+ * @constant __ placeholder used when parameters are skipped
+ */
+var __ = typeof Symbol === 'function' ? Symbol('curriable placeholder') : 0xedd1;
+/**
+ * @function recursiveCurry
+ *
+ * @description
+ * recursively curry over the arguments until all have been resolved
+ *
+ * @param fn the function to curry
+ * @param arity the length of the function to curry until
+ * @param args the existing arguments
+ * @returns the result of the function call
+ */
+var recursiveCurry = function (fn, arity, args) {
+    return function () {
+        var length = args.length;
+        var newArgs = arguments;
+        var newArgsLength = newArgs.length;
+        var combined = [];
+        var newArgsIndex = 0;
+        var remaining = arity;
+        var value;
+        if (length) {
+            for (var index = 0; index < length; index++) {
+                combined[index] = value =
+                    args[index] === __ && newArgsIndex < newArgsLength
+                        ? newArgs[newArgsIndex++]
+                        : args[index];
+                if (value !== __) {
+                    --remaining;
+                }
+            }
+        }
+        if (newArgsIndex < newArgsLength) {
+            for (; newArgsIndex < newArgsLength; newArgsIndex++) {
+                combined[combined.length] = value = newArgs[newArgsIndex];
+                if (value !== __ && newArgsIndex < arity) {
+                    --remaining;
+                }
+            }
+        }
+        return remaining > 0
+            ? recursiveCurry(fn, arity, combined)
+            : fn.apply(this, combined);
+    };
+};
 
-  if (typeof selectors !== 'object') {
-    throw new Error('createStructuredSelector expects first argument to be an object ' + ('where each property is a selector, instead received a ' + typeof selectors));
-  }
-  var objectKeys = Object.keys(selectors);
-  return selectorCreator(objectKeys.map(function (key) {
-    return selectors[key];
-  }), function () {
-    for (var _len3 = arguments.length, values = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-      values[_key3] = arguments[_key3];
+// utils
+/**
+ * @function curry
+ *
+ * @description
+ * get the method passed as a curriable method based on its parameters
+ *
+ * @param fn the method to make curriable
+ * @param arity the arity of the curried method
+ * @returns the fn passed as a curried function
+ */
+var curry = function (fn, arity) {
+    if (arity === void 0) { arity = fn.length; }
+    var curried = recursiveCurry(fn, arity, []);
+    curried.arity = arity;
+    curried.fn = fn;
+    return curried;
+};
+curry.__ = __;
+/**
+ * @function uncurry
+ *
+ * @description
+ * return a function that is the non-curried version of the fn passed
+ *
+ * @param curried the curried function to uncurry
+ * @returns the original fn
+ */
+var uncurry = function (curried) { return curried.fn; };
+curry.uncurry = uncurry;
+
+// external dependencies
+var O = Object;
+var create = O.create, getOwnPropertySymbols = O.getOwnPropertySymbols, getPrototypeOf = O.getPrototypeOf, keys$1 = O.keys, propertyIsEnumerable = O.propertyIsEnumerable;
+var toStringObject = O.prototype.toString;
+var toStringFunction = Function.prototype.toString;
+var isArray$2 = Array.isArray;
+/**
+ * @constant REACT_ELEMENT the symbol / number specific to react elements
+ */
+var REACT_ELEMENT = typeof Symbol === 'function' && typeof Symbol.for === 'function'
+    ? Symbol.for('react.element')
+    : 0xeac7;
+/**
+ * @function cloneArray
+ *
+ * @description
+ * clone an array to a new array
+ *
+ * @param array the array to clone
+ * @returns the cloned array
+ */
+var cloneArray = function (array) {
+    // @ts-ignore
+    var cloned = new array.constructor();
+    for (var index = 0; index < array.length; index++) {
+        cloned[index] = array[index];
     }
+    return cloned;
+};
+/**
+ * @function reduce
+ *
+ * @description
+ * a targeted reduce method faster than the native
+ *
+ * @param array the array to reduce
+ * @param fn the method to reduce each array value with
+ * @param initialValue the initial value of the reduction
+ * @returns the reduced value
+ */
+var reduce = function (array, fn, initialValue) {
+    var value = initialValue;
+    for (var index = 0; index < array.length; index++) {
+        value = fn(value, array[index]);
+    }
+    return value;
+};
+/**
+ * @function getOwnProperties
+ *
+ * @description
+ * get the all properties (keys and symbols) of the object passed
+ *
+ * @param object the object to get the properties of
+ * @returns the keys and symbols the object has
+ */
+var getOwnProperties = function (object) {
+    var ownSymbols = getOwnPropertySymbols(object);
+    if (!ownSymbols.length) {
+        return keys$1(object);
+    }
+    return keys$1(object).concat(reduce(ownSymbols, function (enumerableSymbols, symbol) {
+        if (propertyIsEnumerable.call(object, symbol)) {
+            enumerableSymbols.push(symbol);
+        }
+        return enumerableSymbols;
+    }, []));
+};
+/**
+ * @function assignFallback
+ *
+ * @description
+ * a targeted fallback if native Object.assign is unavailable
+ *
+ * @param target the object to shallowly merge into
+ * @param source the object to shallowly merge into target
+ * @returns the shallowly merged object
+ */
+var assignFallback = function (target, source) {
+    if (!source) {
+        return target;
+    }
+    return reduce(getOwnProperties(source), function (clonedObject, property) {
+        clonedObject[property] = source[property];
+        return clonedObject;
+    }, Object(target));
+};
+var assign$1 = typeof O.assign === 'function' ? O.assign : assignFallback;
+/**
+ * @function createWithProto
+ *
+ * @description
+ * create a new object with the prototype of the object passed
+ *
+ * @param object object whose prototype will be the new object's prototype
+ * @returns object with the prototype of the one passed
+ */
+var createWithProto = function (object) { return create(object.__proto__ || getPrototypeOf(object)); };
+/**
+ * @function isCloneable
+ *
+ * @description
+ * is the object passed considered cloneable
+ *
+ * @param object the object that is being checked for cloneability
+ * @returns whether the object can be cloned
+ */
+var isCloneable = function (object) {
+    if (!object ||
+        typeof object !== 'object' ||
+        object.$$typeof === REACT_ELEMENT) {
+        return false;
+    }
+    var type = toStringObject.call(object);
+    return type !== '[object Date]' && type !== '[object RegExp]';
+};
+/**
+ * @function isEmptyPath
+ *
+ * @description
+ * is the path passed an empty path
+ *
+ * @param path the path to check for emptiness
+ * @returns whether the path passed is considered empty
+ */
+var isEmptyPath = function (path) {
+    return path == null || (isArray$2(path) && !path.length);
+};
+/**
+ * @function isGlobalConstructor
+ *
+ * @description
+ * is the fn passed a global constructor
+ *
+ * @param fn the fn to check if a global constructor
+ * @returns whether the fn passed is a global constructor
+ */
+var isGlobalConstructor = function (fn) {
+    return typeof fn === 'function' &&
+        !!~toStringFunction.call(fn).indexOf('[native code]');
+};
+/**
+ * @function callIfFunction
+ *
+ * @description
+ * if the object passed is a function, call it and return its return, else return undefined
+ *
+ * @param object the object to call if a function
+ * @param context the context to call the function with
+ * @param parameters the parameters to call the function with
+ * @returns the result of the function call, or undefined
+ */
+var callIfFunction = function (object, context, parameters) {
+    return typeof object === 'function' ? object.apply(context, parameters) : void 0;
+};
+/**
+ * @function getNewEmptyChild
+ *
+ * @description
+ * get a new empty child object based on the key passed
+ *
+ * @param key the key to base the empty child on
+ * @returns the empty object the child is built from
+ */
+var getNewEmptyChild = function (key) {
+    return typeof key === 'number' ? [] : {};
+};
+/**
+ * @function getNewEmptyObject
+ *
+ * @description
+ * get a new empty object based on the object passed
+ *
+ * @param object the object to base the empty object on
+ * @returns an empty version of the object passed
+ */
+var getNewEmptyObject = function (object) { return (isArray$2(object) ? [] : {}); };
+/**
+ * @function getShallowClone
+ *
+ * @description
+ * create a shallow clone of the object passed, respecting its prototype
+ *
+ * @param object the object to clone
+ * @returns a shallow clone of the object passed
+ */
+var getShallowClone = function (object) {
+    if (object.constructor === O) {
+        return assign$1({}, object);
+    }
+    if (isArray$2(object)) {
+        return cloneArray(object);
+    }
+    return isGlobalConstructor(object.constructor)
+        ? {}
+        : assign$1(createWithProto(object), object);
+};
+/**
+ * @function isSameValueZero
+ *
+ * @description
+ * are the values equal based on SameValueZero
+ *
+ * @param value1 the first value to test
+ * @param value2 the second value to test
+ * @returns are the two values passed equal based on SameValueZero
+ */
+var isSameValueZero = function (value1, value2) {
+    return value1 === value2 || (value1 !== value1 && value2 !== value2);
+};
+/**
+ * @function cloneIfPossible
+ *
+ * @description
+ * clone the object if it can be cloned, otherwise return the object itself
+ *
+ * @param object the object to clone
+ * @returns a cloned version of the object, or the object itself if not cloneable
+ */
+var cloneIfPossible = function (object) {
+    return isCloneable(object) ? getShallowClone(object) : object;
+};
+/**
+ * @function getCloneOrEmptyObject
+ *
+ * @description
+ * if the object is cloneable, get a clone of the object, else get a new
+ * empty child object based on the key
+ *
+ * @param object the object to clone
+ * @param nextKey the key to base the empty child object on
+ * @returns a clone of the object, or an empty child object
+ */
+var getCloneOrEmptyObject = function (object, nextKey) {
+    return isCloneable(object) ? getShallowClone(object) : getNewEmptyChild(nextKey);
+};
+/**
+ * @function getCoalescedValue
+ *
+ * @description
+ * return the value if not undefined, otherwise return the fallback value
+ *
+ * @param value the value to coalesce if undefined
+ * @param fallbackValue the value to coalesce to
+ * @returns the coalesced value
+ */
+var getCoalescedValue = function (value, fallbackValue) { return (value === void 0 ? fallbackValue : value); };
+/**
+ * @function getParsedPath
+ *
+ * @description
+ * parse the path passed into an array path
+ *
+ * @param path the path to parse
+ * @returns the parsed path
+ */
+var getParsedPath = function (path) { return (isArray$2(path) ? path : parse(path)); };
+/**
+ * @function getCloneAtPath
+ *
+ * @description
+ * get a new object, cloned at the path specified while leveraging
+ * structural sharing for the rest of the properties
+ *
+ * @param path the path to clone at
+ * @param object the object with cloned children at path
+ * @param onMatch the method to call once the end of the path is reached
+ * @param index the path index
+ * @returns the object deeply cloned at the path specified
+ */
+var getCloneAtPath = function (path, object, onMatch, index) {
+    var key = path[index];
+    var nextIndex = index + 1;
+    if (nextIndex === path.length) {
+        onMatch(object, key);
+    }
+    else {
+        object[key] = getCloneAtPath(path, getCloneOrEmptyObject(object[key], path[nextIndex]), onMatch, nextIndex);
+    }
+    return object;
+};
+/**
+ * @function getDeepClone
+ *
+ * @description
+ * get a clone of the object at the path specified
+ *
+ * @param path the path to clone at
+ * @param object the object to clone at the path
+ * @param onMatch once a patch match is found, the callback to fire
+ * @returns the clone of the object at path specified
+ */
+var getDeepClone = function (path, object, onMatch) {
+    var parsedPath = getParsedPath(path);
+    var topLevelClone = getCloneOrEmptyObject(object, parsedPath[0]);
+    if (parsedPath.length === 1) {
+        onMatch(topLevelClone, parsedPath[0]);
+        return topLevelClone;
+    }
+    return getCloneAtPath(parsedPath, topLevelClone, onMatch, 0);
+};
+/**
+ * @function getMergedObject
+ *
+ * @description
+ * merge the source into the target, either deeply or shallowly
+ *
+ * @param target the object to merge into
+ * @param source the object being merged into the target
+ * @param isDeep is the merge a deep merge
+ * @returns the merged object
+ */
+var getMergedObject = function (target, source, isDeep) {
+    var isObject1Array = isArray$2(target);
+    if (isObject1Array !== isArray$2(source) || !isCloneable(target)) {
+        return cloneIfPossible(source);
+    }
+    if (isObject1Array) {
+        return target.concat(source);
+    }
+    var targetClone = target.constructor === O || isGlobalConstructor(target.constructor)
+        ? {}
+        : createWithProto(target);
+    return reduce(getOwnProperties(source), function (clone, key) {
+        clone[key] =
+            isDeep && isCloneable(source[key])
+                ? getMergedObject(target[key], source[key], isDeep)
+                : source[key];
+        return clone;
+    }, assign$1(targetClone, target));
+};
+/**
+ * @function getValueAtPath
+ *
+ * @description
+ * get the value at the nested property, or the fallback provided
+ *
+ * @param path the path to get the value from
+ * @param object the object to get the value from at path
+ * @param noMatchValue the value returned if no match is found
+ * @returns the matching value, or the fallback provided
+ */
+var getValueAtPath = function (path, object, noMatchValue) {
+    var parsedPath = getParsedPath(path);
+    if (parsedPath.length === 1) {
+        return object
+            ? getCoalescedValue(object[parsedPath[0]], noMatchValue)
+            : noMatchValue;
+    }
+    var ref = object;
+    var key = parsedPath[0];
+    for (var index = 0; index < parsedPath.length - 1; index++) {
+        if (!ref || !ref[key]) {
+            return noMatchValue;
+        }
+        ref = ref[key];
+        key = parsedPath[index + 1];
+    }
+    return ref ? getCoalescedValue(ref[key], noMatchValue) : noMatchValue;
+};
+/**
+ * @function getFullPath
+ *
+ * @description
+ * get the path to add to, based on the object and fn passed
+ *
+ * @param path the path to add to
+ * @param object the object traversed by the path
+ * @param fn the function to transform the retrieved value with
+ * @returns the full path to add to
+ */
+var getFullPath = function (path, object, fn) {
+    var isPathEmpty = isEmptyPath(path);
+    var valueAtPath = isPathEmpty
+        ? object
+        : fn
+            ? fn(getValueAtPath(path, object))
+            : getValueAtPath(path, object);
+    return isArray$2(valueAtPath)
+        ? isArray$2(path)
+            ? path.concat([valueAtPath.length])
+            : (isPathEmpty ? '' : path) + "[" + valueAtPath.length + "]"
+        : path;
+};
+/**
+ * @function splice
+ *
+ * @description
+ * a faster, more targeted version of the native splice
+ *
+ * @param array the array to remove the value from
+ * @param splicedIndex the index of the value to remove
+ */
+var splice = function (array, splicedIndex) {
+    if (array.length) {
+        var length_1 = array.length;
+        var index = splicedIndex;
+        while (index < length_1 - 1) {
+            array[index] = array[index + 1];
+            ++index;
+        }
+        --array.length;
+    }
+};
+/**
+ * @function throwInvalidFnError
+ *
+ * @description
+ * throw the TypeError based on the invalid handler
+ *
+ * @throws
+ */
+var throwInvalidFnError = function () {
+    throw new TypeError('handler passed is not of type "function".');
+};
 
-    return values.reduce(function (composition, value, index) {
-      composition[objectKeys[index]] = value;
-      return composition;
-    }, {});
-  });
+// utils
+var isArray$1$1 = Array.isArray;
+var slice = Array.prototype.slice;
+/**
+ * @function createCall
+ *
+ * @description
+ * create handlers for call / callWith
+ *
+ * @param isWithHandler is the method using a with handler
+ * @returns call / callWith
+ */
+var createCall = function (isWithHandler) {
+    if (isWithHandler) {
+        return function (fn, path, parameters, object, context) {
+            if (context === void 0) { context = object; }
+            if (typeof fn !== 'function') {
+                throwInvalidFnError();
+            }
+            var extraArgs = slice.call(arguments, 5);
+            if (isEmptyPath(path)) {
+                return callIfFunction(fn.apply(void 0, [object].concat(extraArgs)), context, parameters);
+            }
+            var value = getValueAtPath(path, object);
+            if (value === void 0) {
+                return;
+            }
+            var result = fn.apply(void 0, [value].concat(extraArgs));
+            return callIfFunction(result, context, parameters);
+        };
+    }
+    return function (path, parameters, object, context) {
+        if (context === void 0) { context = object; }
+        var callable = isEmptyPath(path)
+            ? object
+            : getValueAtPath(path, object);
+        return callIfFunction(callable, context, parameters);
+    };
+};
+/**
+ * @function createGet
+ *
+ * @description
+ * create handlers for get / getWith
+ *
+ * @param isWithHandler is the method using a with handler
+ * @returns get / getWith
+ */
+var createGet = function (isWithHandler) {
+    if (isWithHandler) {
+        return function (fn, path, object) {
+            if (typeof fn !== 'function') {
+                throwInvalidFnError();
+            }
+            var extraArgs = slice.call(arguments, 4);
+            if (isEmptyPath(path)) {
+                return fn.apply(void 0, [object].concat(extraArgs));
+            }
+            var value = getValueAtPath(path, object);
+            return value === void 0 ? value : fn.apply(void 0, [value].concat(extraArgs));
+        };
+    }
+    return function (path, object) {
+        return isEmptyPath(path) ? object : getValueAtPath(path, object);
+    };
+};
+/**
+ * @function createGetOr
+ *
+ * @description
+ * create handlers for getOr / getWithOr
+ *
+ * @param isWithHandler is the method using a with handler
+ * @returns getOr / getWithOr
+ */
+var createGetOr = function (isWithHandler) {
+    if (isWithHandler) {
+        return function (fn, noMatchValue, path, object) {
+            if (typeof fn !== 'function') {
+                throwInvalidFnError();
+            }
+            var extraArgs = slice.call(arguments, 4);
+            if (isEmptyPath(path)) {
+                return fn.apply(void 0, [object].concat(extraArgs));
+            }
+            var value = getValueAtPath(path, object);
+            return value === void 0 ? noMatchValue : fn.apply(void 0, [value].concat(extraArgs));
+        };
+    }
+    return function (noMatchValue, path, object) {
+        return isEmptyPath(path) ? object : getValueAtPath(path, object, noMatchValue);
+    };
+};
+/**
+ * @function createHas
+ *
+ * @description
+ * create handlers for has / hasWith
+ *
+ * @param isWithHandler is the method using a with handler
+ * @returns has / hasWith
+ */
+var createHas = function (isWithHandler) {
+    if (isWithHandler) {
+        return function (fn, path, object) {
+            if (typeof fn !== 'function') {
+                throwInvalidFnError();
+            }
+            var extraArgs = slice.call(arguments, 3);
+            if (isEmptyPath(path)) {
+                return !!fn.apply(void 0, [object].concat(extraArgs));
+            }
+            var value = getValueAtPath(path, object);
+            return value !== void 0 && !!fn.apply(void 0, [value].concat(extraArgs));
+        };
+    }
+    return function (path, object) {
+        return isEmptyPath(path)
+            ? object != null
+            : getValueAtPath(path, object) !== void 0;
+    };
+};
+/**
+ * @function createIs
+ *
+ * @description
+ * create handlers for is / isWith
+ *
+ * @param isWithHandler is the method using a with handler
+ * @returns is / isWith
+ */
+var createIs = function (isWithHandler) {
+    if (isWithHandler) {
+        return function (fn, path, value, object) {
+            if (typeof fn !== 'function') {
+                throwInvalidFnError();
+            }
+            var extraArgs = slice.call(arguments, 4);
+            if (isEmptyPath(path)) {
+                return isSameValueZero(fn.apply(void 0, [object].concat(extraArgs)), value);
+            }
+            return isSameValueZero(fn.apply(void 0, [getValueAtPath(path, object)].concat(extraArgs)), value);
+        };
+    }
+    return function (path, value, object) {
+        return isEmptyPath(path)
+            ? isSameValueZero(object, value)
+            : isSameValueZero(getValueAtPath(path, object), value);
+    };
+};
+/**
+ * @function createMerge
+ *
+ * @description
+ * create handlers for merge / mergeWith
+ *
+ * @param isWithHandler is the method using a with handler
+ * @param isDeep is the handler for a deep merge or shallow
+ * @returns merge / mergeWith
+ */
+var createMerge = function (isWithHandler, isDeep) {
+    if (isWithHandler) {
+        return function (fn, path, object) {
+            if (typeof fn !== 'function') {
+                throwInvalidFnError();
+            }
+            var extraArgs = slice.call(arguments, 3);
+            if (!isCloneable(object)) {
+                return fn.apply(void 0, [object].concat(extraArgs));
+            }
+            if (isEmptyPath(path)) {
+                var objectToMerge = fn.apply(void 0, [object].concat(extraArgs));
+                return objectToMerge
+                    ? getMergedObject(object, objectToMerge, isDeep)
+                    : object;
+            }
+            var hasChanged = false;
+            var result = getDeepClone(path, object, function (ref, key) {
+                var objectToMerge = fn.apply(void 0, [ref[key]].concat(extraArgs));
+                if (objectToMerge) {
+                    ref[key] = getMergedObject(ref[key], objectToMerge, isDeep);
+                    hasChanged = true;
+                }
+            });
+            return hasChanged ? result : object;
+        };
+    }
+    return function (path, objectToMerge, object) {
+        if (!isCloneable(object)) {
+            return objectToMerge;
+        }
+        return isEmptyPath(path)
+            ? getMergedObject(object, objectToMerge, true)
+            : getDeepClone(path, object, function (ref, key) {
+                ref[key] = getMergedObject(ref[key], objectToMerge, isDeep);
+            });
+    };
+};
+/**
+ * @function createNot
+ *
+ * @description
+ * create handlers for not / notWith
+ *
+ * @param isWithHandler not the method using a with handler
+ * @returns not / notWithHandler
+ */
+var createNot = function (isWithHandler) {
+    var is = createIs(isWithHandler);
+    return function () {
+        return !is.apply(this, arguments);
+    };
+};
+/**
+ * @function createRemove
+ *
+ * @description
+ * create handlers for remove / removeWith
+ *
+ * @param isWithHandler is the method using a with handler
+ * @returns remove / removeWith
+ */
+var createRemove = function (isWithHandler) {
+    if (isWithHandler) {
+        return function (fn, path, object) {
+            if (typeof fn !== 'function') {
+                throwInvalidFnError();
+            }
+            var extraArgs = slice.call(arguments, 3);
+            if (isEmptyPath(path)) {
+                var emptyObject = getNewEmptyObject(object);
+                return fn.apply(void 0, [emptyObject].concat(extraArgs)) ? emptyObject : object;
+            }
+            var value = getValueAtPath(path, object);
+            return value !== void 0 && fn.apply(void 0, [value].concat(extraArgs))
+                ? getDeepClone(path, object, function (ref, key) {
+                    if (isArray$1$1(ref)) {
+                        splice(ref, key);
+                    }
+                    else {
+                        delete ref[key];
+                    }
+                })
+                : object;
+        };
+    }
+    return function (path, object) {
+        if (isEmptyPath(path)) {
+            return getNewEmptyObject(object);
+        }
+        return getValueAtPath(path, object) !== void 0
+            ? getDeepClone(path, object, function (ref, key) {
+                if (isArray$1$1(ref)) {
+                    splice(ref, key);
+                }
+                else {
+                    delete ref[key];
+                }
+            })
+            : object;
+    };
+};
+/**
+ * @function createSet
+ *
+ * @description
+ * create handlers for set / setWith
+ *
+ * @param isWithHandler is the method using a with handler
+ * @returns set / setWith
+ */
+var createSet = function (isWithHandler) {
+    if (isWithHandler) {
+        return function (fn, path, object) {
+            if (typeof fn !== 'function') {
+                throwInvalidFnError();
+            }
+            var extraArgs = slice.call(arguments, 3);
+            return isEmptyPath(path)
+                ? fn.apply(void 0, [object].concat(extraArgs)) : getDeepClone(path, object, function (ref, key) {
+                ref[key] = fn.apply(void 0, [ref[key]].concat(extraArgs));
+            });
+        };
+    }
+    return function (path, value, object) {
+        return isEmptyPath(path)
+            ? value
+            : getDeepClone(path, object, function (ref, key) {
+                ref[key] = value;
+            });
+    };
+};
+/**
+ * @function createAdd
+ *
+ * @description
+ * create handlers for add / addWith
+ *
+ * @param isWithHandler is the method using a with handler
+ * @returns add / addWith
+ */
+var createAdd = function (isWithHandler) {
+    var add = createSet(isWithHandler);
+    if (isWithHandler) {
+        return function (fn, path, object) {
+            return add.apply(this, [fn, getFullPath(path, object, fn), object].concat(slice.call(arguments, 3)));
+        };
+    }
+    return function (path, value, object) { return add(getFullPath(path, object), value, object); };
+};
+
+// external dependencies
+var add = curry(createAdd(false), 3);
+var addWith = curry(createAdd(true), 3);
+var assign$1$1 = curry(createMerge(false, false), 3);
+var assignWith = curry(createMerge(true, false), 3);
+var call = curry(createCall(false), 3);
+var callWith = curry(createCall(true), 4);
+var get = curry(createGet(false), 2);
+var getOr = curry(createGetOr(false), 3);
+var getWith = curry(createGet(true), 3);
+var getWithOr = curry(createGetOr(true), 4);
+var has$1 = curry(createHas(false), 2);
+var hasWith = curry(createHas(true), 3);
+var is$1 = curry(createIs(false), 3);
+var isWith = curry(createIs(true), 4);
+var merge = curry(createMerge(false, true), 3);
+var mergeWith = curry(createMerge(true, true), 3);
+var not = curry(createNot(false), 3);
+var notWith = curry(createNot(true), 4);
+var remove = curry(createRemove(false), 2);
+var removeWith = curry(createRemove(true), 3);
+var set = curry(createSet(false), 3);
+var setWith = curry(createSet(true), 3);
+
+var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
+function unwrapExports (x) {
+	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
 }
 
-var es$2 = /*#__PURE__*/Object.freeze({
-	defaultMemoize: defaultMemoize,
-	createSelectorCreator: createSelectorCreator,
-	createSelector: createSelector,
-	createStructuredSelector: createStructuredSelector
-});
+function createCommonjsModule(fn, module) {
+	return module = { exports: {} }, fn(module, module.exports), module.exports;
+}
 
-var curriable = createCommonjsModule(function (module, exports) {
-(function (global, factory) {
-  factory(exports);
-}(commonjsGlobal, function (exports) {
-  /**
-   * @constant __ placeholder used when parameters are skipped
-   */
-  var __ = typeof Symbol === 'function' ? Symbol('curriable placeholder') : 0xedd1;
-  /**
-   * @function recursiveCurry
-   *
-   * @description
-   * recursively curry over the arguments until all have been resolved
-   *
-   * @param fn the function to curry
-   * @param arity the length of the function to curry until
-   * @param args the existing arguments
-   * @returns the result of the function call
-   */
-  var recursiveCurry = function (fn, arity, args) {
-      return function () {
-          var length = args.length;
-          var newArgs = arguments;
-          var newArgsLength = newArgs.length;
-          var combined = [];
-          var newArgsIndex = 0;
-          var remaining = arity;
-          var value;
-          if (length) {
-              for (var index = 0; index < length; index++) {
-                  combined[index] = value =
-                      args[index] === __ && newArgsIndex < newArgsLength
-                          ? newArgs[newArgsIndex++]
-                          : args[index];
-                  if (value !== __) {
-                      --remaining;
-                  }
-              }
-          }
-          if (newArgsIndex < newArgsLength) {
-              for (; newArgsIndex < newArgsLength; newArgsIndex++) {
-                  combined[combined.length] = value = newArgs[newArgsIndex];
-                  if (value !== __ && newArgsIndex < arity) {
-                      --remaining;
-                  }
-              }
-          }
-          return remaining > 0
-              ? recursiveCurry(fn, arity, combined)
-              : fn.apply(this, combined);
-      };
-  };
-
-  // utils
-  /**
-   * @function curry
-   *
-   * @description
-   * get the method passed as a curriable method based on its parameters
-   *
-   * @param fn the method to make curriable
-   * @param arity the arity of the curried method
-   * @returns the fn passed as a curried function
-   */
-  var curry = function (fn, arity) {
-      if (arity === void 0) { arity = fn.length; }
-      var curried = recursiveCurry(fn, arity, []);
-      curried.arity = arity;
-      curried.fn = fn;
-      return curried;
-  };
-  curry.__ = __;
-  /**
-   * @function uncurry
-   *
-   * @description
-   * return a function that is the non-curried version of the fn passed
-   *
-   * @param curried the curried function to uncurry
-   * @returns the original fn
-   */
-  var uncurry = function (curried) { return curried.fn; };
-  curry.uncurry = uncurry;
-
-  exports.__ = __;
-  exports.curry = curry;
-  exports.uncurry = uncurry;
-  exports.default = curry;
-
-  Object.defineProperty(exports, '__esModule', { value: true });
-
-}));
-
-});
-
-unwrapExports(curriable);
-
-var unchanged = createCommonjsModule(function (module, exports) {
-(function (global, factory) {
-  factory(exports, curriable, es);
-}(commonjsGlobal, function (exports, curriable, pathington) {
-  // external dependencies
-  var O = Object;
-  var create = O.create, getOwnPropertySymbols = O.getOwnPropertySymbols, getPrototypeOf = O.getPrototypeOf, keys = O.keys, propertyIsEnumerable = O.propertyIsEnumerable;
-  var toStringObject = O.prototype.toString;
-  var toStringFunction = Function.prototype.toString;
-  var isArray = Array.isArray;
-  /**
-   * @constant REACT_ELEMENT the symbol / number specific to react elements
-   */
-  var REACT_ELEMENT = typeof Symbol === 'function' && typeof Symbol.for === 'function'
-      ? Symbol.for('react.element')
-      : 0xeac7;
-  /**
-   * @function cloneArray
-   *
-   * @description
-   * clone an array to a new array
-   *
-   * @param array the array to clone
-   * @returns the cloned array
-   */
-  var cloneArray = function (array) {
-      // @ts-ignore
-      var cloned = new array.constructor();
-      for (var index = 0; index < array.length; index++) {
-          cloned[index] = array[index];
-      }
-      return cloned;
-  };
-  /**
-   * @function reduce
-   *
-   * @description
-   * a targeted reduce method faster than the native
-   *
-   * @param array the array to reduce
-   * @param fn the method to reduce each array value with
-   * @param initialValue the initial value of the reduction
-   * @returns the reduced value
-   */
-  var reduce = function (array, fn, initialValue) {
-      var value = initialValue;
-      for (var index = 0; index < array.length; index++) {
-          value = fn(value, array[index]);
-      }
-      return value;
-  };
-  /**
-   * @function getOwnProperties
-   *
-   * @description
-   * get the all properties (keys and symbols) of the object passed
-   *
-   * @param object the object to get the properties of
-   * @returns the keys and symbols the object has
-   */
-  var getOwnProperties = function (object) {
-      var ownSymbols = getOwnPropertySymbols(object);
-      if (!ownSymbols.length) {
-          return keys(object);
-      }
-      return keys(object).concat(reduce(ownSymbols, function (enumerableSymbols, symbol) {
-          if (propertyIsEnumerable.call(object, symbol)) {
-              enumerableSymbols.push(symbol);
-          }
-          return enumerableSymbols;
-      }, []));
-  };
-  /**
-   * @function assignFallback
-   *
-   * @description
-   * a targeted fallback if native Object.assign is unavailable
-   *
-   * @param target the object to shallowly merge into
-   * @param source the object to shallowly merge into target
-   * @returns the shallowly merged object
-   */
-  var assignFallback = function (target, source) {
-      if (!source) {
-          return target;
-      }
-      return reduce(getOwnProperties(source), function (clonedObject, property) {
-          clonedObject[property] = source[property];
-          return clonedObject;
-      }, Object(target));
-  };
-  var assign = typeof O.assign === 'function' ? O.assign : assignFallback;
-  /**
-   * @function createWithProto
-   *
-   * @description
-   * create a new object with the prototype of the object passed
-   *
-   * @param object object whose prototype will be the new object's prototype
-   * @returns object with the prototype of the one passed
-   */
-  var createWithProto = function (object) { return create(object.__proto__ || getPrototypeOf(object)); };
-  /**
-   * @function isCloneable
-   *
-   * @description
-   * is the object passed considered cloneable
-   *
-   * @param object the object that is being checked for cloneability
-   * @returns whether the object can be cloned
-   */
-  var isCloneable = function (object) {
-      if (!object ||
-          typeof object !== 'object' ||
-          object.$$typeof === REACT_ELEMENT) {
-          return false;
-      }
-      var type = toStringObject.call(object);
-      return type !== '[object Date]' && type !== '[object RegExp]';
-  };
-  /**
-   * @function isEmptyPath
-   *
-   * @description
-   * is the path passed an empty path
-   *
-   * @param path the path to check for emptiness
-   * @returns whether the path passed is considered empty
-   */
-  var isEmptyPath = function (path) {
-      return path == null || (isArray(path) && !path.length);
-  };
-  /**
-   * @function isGlobalConstructor
-   *
-   * @description
-   * is the fn passed a global constructor
-   *
-   * @param fn the fn to check if a global constructor
-   * @returns whether the fn passed is a global constructor
-   */
-  var isGlobalConstructor = function (fn) {
-      return typeof fn === 'function' &&
-          !!~toStringFunction.call(fn).indexOf('[native code]');
-  };
-  /**
-   * @function callIfFunction
-   *
-   * @description
-   * if the object passed is a function, call it and return its return, else return undefined
-   *
-   * @param object the object to call if a function
-   * @param context the context to call the function with
-   * @param parameters the parameters to call the function with
-   * @returns the result of the function call, or undefined
-   */
-  var callIfFunction = function (object, context, parameters) {
-      return typeof object === 'function' ? object.apply(context, parameters) : void 0;
-  };
-  /**
-   * @function getNewEmptyChild
-   *
-   * @description
-   * get a new empty child object based on the key passed
-   *
-   * @param key the key to base the empty child on
-   * @returns the empty object the child is built from
-   */
-  var getNewEmptyChild = function (key) {
-      return typeof key === 'number' ? [] : {};
-  };
-  /**
-   * @function getNewEmptyObject
-   *
-   * @description
-   * get a new empty object based on the object passed
-   *
-   * @param object the object to base the empty object on
-   * @returns an empty version of the object passed
-   */
-  var getNewEmptyObject = function (object) { return (isArray(object) ? [] : {}); };
-  /**
-   * @function getShallowClone
-   *
-   * @description
-   * create a shallow clone of the object passed, respecting its prototype
-   *
-   * @param object the object to clone
-   * @returns a shallow clone of the object passed
-   */
-  var getShallowClone = function (object) {
-      if (object.constructor === O) {
-          return assign({}, object);
-      }
-      if (isArray(object)) {
-          return cloneArray(object);
-      }
-      return isGlobalConstructor(object.constructor)
-          ? {}
-          : assign(createWithProto(object), object);
-  };
-  /**
-   * @function isSameValueZero
-   *
-   * @description
-   * are the values equal based on SameValueZero
-   *
-   * @param value1 the first value to test
-   * @param value2 the second value to test
-   * @returns are the two values passed equal based on SameValueZero
-   */
-  var isSameValueZero = function (value1, value2) {
-      return value1 === value2 || (value1 !== value1 && value2 !== value2);
-  };
-  /**
-   * @function cloneIfPossible
-   *
-   * @description
-   * clone the object if it can be cloned, otherwise return the object itself
-   *
-   * @param object the object to clone
-   * @returns a cloned version of the object, or the object itself if not cloneable
-   */
-  var cloneIfPossible = function (object) {
-      return isCloneable(object) ? getShallowClone(object) : object;
-  };
-  /**
-   * @function getCloneOrEmptyObject
-   *
-   * @description
-   * if the object is cloneable, get a clone of the object, else get a new
-   * empty child object based on the key
-   *
-   * @param object the object to clone
-   * @param nextKey the key to base the empty child object on
-   * @returns a clone of the object, or an empty child object
-   */
-  var getCloneOrEmptyObject = function (object, nextKey) {
-      return isCloneable(object) ? getShallowClone(object) : getNewEmptyChild(nextKey);
-  };
-  /**
-   * @function getCoalescedValue
-   *
-   * @description
-   * return the value if not undefined, otherwise return the fallback value
-   *
-   * @param value the value to coalesce if undefined
-   * @param fallbackValue the value to coalesce to
-   * @returns the coalesced value
-   */
-  var getCoalescedValue = function (value, fallbackValue) { return (value === void 0 ? fallbackValue : value); };
-  /**
-   * @function getParsedPath
-   *
-   * @description
-   * parse the path passed into an array path
-   *
-   * @param path the path to parse
-   * @returns the parsed path
-   */
-  var getParsedPath = function (path) { return (isArray(path) ? path : pathington.parse(path)); };
-  /**
-   * @function getCloneAtPath
-   *
-   * @description
-   * get a new object, cloned at the path specified while leveraging
-   * structural sharing for the rest of the properties
-   *
-   * @param path the path to clone at
-   * @param object the object with cloned children at path
-   * @param onMatch the method to call once the end of the path is reached
-   * @param index the path index
-   * @returns the object deeply cloned at the path specified
-   */
-  var getCloneAtPath = function (path, object, onMatch, index) {
-      var key = path[index];
-      var nextIndex = index + 1;
-      if (nextIndex === path.length) {
-          onMatch(object, key);
-      }
-      else {
-          object[key] = getCloneAtPath(path, getCloneOrEmptyObject(object[key], path[nextIndex]), onMatch, nextIndex);
-      }
-      return object;
-  };
-  /**
-   * @function getDeepClone
-   *
-   * @description
-   * get a clone of the object at the path specified
-   *
-   * @param path the path to clone at
-   * @param object the object to clone at the path
-   * @param onMatch once a patch match is found, the callback to fire
-   * @returns the clone of the object at path specified
-   */
-  var getDeepClone = function (path, object, onMatch) {
-      var parsedPath = getParsedPath(path);
-      var topLevelClone = getCloneOrEmptyObject(object, parsedPath[0]);
-      if (parsedPath.length === 1) {
-          onMatch(topLevelClone, parsedPath[0]);
-          return topLevelClone;
-      }
-      return getCloneAtPath(parsedPath, topLevelClone, onMatch, 0);
-  };
-  /**
-   * @function getMergedObject
-   *
-   * @description
-   * merge the source into the target, either deeply or shallowly
-   *
-   * @param target the object to merge into
-   * @param source the object being merged into the target
-   * @param isDeep is the merge a deep merge
-   * @returns the merged object
-   */
-  var getMergedObject = function (target, source, isDeep) {
-      var isObject1Array = isArray(target);
-      if (isObject1Array !== isArray(source) || !isCloneable(target)) {
-          return cloneIfPossible(source);
-      }
-      if (isObject1Array) {
-          return target.concat(source);
-      }
-      var targetClone = target.constructor === O || isGlobalConstructor(target.constructor)
-          ? {}
-          : createWithProto(target);
-      return reduce(getOwnProperties(source), function (clone, key) {
-          clone[key] =
-              isDeep && isCloneable(source[key])
-                  ? getMergedObject(target[key], source[key], isDeep)
-                  : source[key];
-          return clone;
-      }, assign(targetClone, target));
-  };
-  /**
-   * @function getValueAtPath
-   *
-   * @description
-   * get the value at the nested property, or the fallback provided
-   *
-   * @param path the path to get the value from
-   * @param object the object to get the value from at path
-   * @param noMatchValue the value returned if no match is found
-   * @returns the matching value, or the fallback provided
-   */
-  var getValueAtPath = function (path, object, noMatchValue) {
-      var parsedPath = getParsedPath(path);
-      if (parsedPath.length === 1) {
-          return object
-              ? getCoalescedValue(object[parsedPath[0]], noMatchValue)
-              : noMatchValue;
-      }
-      var ref = object;
-      var key = parsedPath[0];
-      for (var index = 0; index < parsedPath.length - 1; index++) {
-          if (!ref || !ref[key]) {
-              return noMatchValue;
-          }
-          ref = ref[key];
-          key = parsedPath[index + 1];
-      }
-      return ref ? getCoalescedValue(ref[key], noMatchValue) : noMatchValue;
-  };
-  /**
-   * @function getFullPath
-   *
-   * @description
-   * get the path to add to, based on the object and fn passed
-   *
-   * @param path the path to add to
-   * @param object the object traversed by the path
-   * @param fn the function to transform the retrieved value with
-   * @returns the full path to add to
-   */
-  var getFullPath = function (path, object, fn) {
-      var isPathEmpty = isEmptyPath(path);
-      var valueAtPath = isPathEmpty
-          ? object
-          : fn
-              ? fn(getValueAtPath(path, object))
-              : getValueAtPath(path, object);
-      return isArray(valueAtPath)
-          ? isArray(path)
-              ? path.concat([valueAtPath.length])
-              : (isPathEmpty ? '' : path) + "[" + valueAtPath.length + "]"
-          : path;
-  };
-  /**
-   * @function splice
-   *
-   * @description
-   * a faster, more targeted version of the native splice
-   *
-   * @param array the array to remove the value from
-   * @param splicedIndex the index of the value to remove
-   */
-  var splice = function (array, splicedIndex) {
-      if (array.length) {
-          var length_1 = array.length;
-          var index = splicedIndex;
-          while (index < length_1 - 1) {
-              array[index] = array[index + 1];
-              ++index;
-          }
-          --array.length;
-      }
-  };
-  /**
-   * @function throwInvalidFnError
-   *
-   * @description
-   * throw the TypeError based on the invalid handler
-   *
-   * @throws
-   */
-  var throwInvalidFnError = function () {
-      throw new TypeError('handler passed is not of type "function".');
-  };
-
-  // utils
-  var isArray$1 = Array.isArray;
-  var slice = Array.prototype.slice;
-  /**
-   * @function createCall
-   *
-   * @description
-   * create handlers for call / callWith
-   *
-   * @param isWithHandler is the method using a with handler
-   * @returns call / callWith
-   */
-  var createCall = function (isWithHandler) {
-      if (isWithHandler) {
-          return function (fn, path, parameters, object, context) {
-              if (context === void 0) { context = object; }
-              if (typeof fn !== 'function') {
-                  throwInvalidFnError();
-              }
-              var extraArgs = slice.call(arguments, 5);
-              if (isEmptyPath(path)) {
-                  return callIfFunction(fn.apply(void 0, [object].concat(extraArgs)), context, parameters);
-              }
-              var value = getValueAtPath(path, object);
-              if (value === void 0) {
-                  return;
-              }
-              var result = fn.apply(void 0, [value].concat(extraArgs));
-              return callIfFunction(result, context, parameters);
-          };
-      }
-      return function (path, parameters, object, context) {
-          if (context === void 0) { context = object; }
-          var callable = isEmptyPath(path)
-              ? object
-              : getValueAtPath(path, object);
-          return callIfFunction(callable, context, parameters);
-      };
-  };
-  /**
-   * @function createGet
-   *
-   * @description
-   * create handlers for get / getWith
-   *
-   * @param isWithHandler is the method using a with handler
-   * @returns get / getWith
-   */
-  var createGet = function (isWithHandler) {
-      if (isWithHandler) {
-          return function (fn, path, object) {
-              if (typeof fn !== 'function') {
-                  throwInvalidFnError();
-              }
-              var extraArgs = slice.call(arguments, 4);
-              if (isEmptyPath(path)) {
-                  return fn.apply(void 0, [object].concat(extraArgs));
-              }
-              var value = getValueAtPath(path, object);
-              return value === void 0 ? value : fn.apply(void 0, [value].concat(extraArgs));
-          };
-      }
-      return function (path, object) {
-          return isEmptyPath(path) ? object : getValueAtPath(path, object);
-      };
-  };
-  /**
-   * @function createGetOr
-   *
-   * @description
-   * create handlers for getOr / getWithOr
-   *
-   * @param isWithHandler is the method using a with handler
-   * @returns getOr / getWithOr
-   */
-  var createGetOr = function (isWithHandler) {
-      if (isWithHandler) {
-          return function (fn, noMatchValue, path, object) {
-              if (typeof fn !== 'function') {
-                  throwInvalidFnError();
-              }
-              var extraArgs = slice.call(arguments, 4);
-              if (isEmptyPath(path)) {
-                  return fn.apply(void 0, [object].concat(extraArgs));
-              }
-              var value = getValueAtPath(path, object);
-              return value === void 0 ? noMatchValue : fn.apply(void 0, [value].concat(extraArgs));
-          };
-      }
-      return function (noMatchValue, path, object) {
-          return isEmptyPath(path) ? object : getValueAtPath(path, object, noMatchValue);
-      };
-  };
-  /**
-   * @function createHas
-   *
-   * @description
-   * create handlers for has / hasWith
-   *
-   * @param isWithHandler is the method using a with handler
-   * @returns has / hasWith
-   */
-  var createHas = function (isWithHandler) {
-      if (isWithHandler) {
-          return function (fn, path, object) {
-              if (typeof fn !== 'function') {
-                  throwInvalidFnError();
-              }
-              var extraArgs = slice.call(arguments, 3);
-              if (isEmptyPath(path)) {
-                  return !!fn.apply(void 0, [object].concat(extraArgs));
-              }
-              var value = getValueAtPath(path, object);
-              return value !== void 0 && !!fn.apply(void 0, [value].concat(extraArgs));
-          };
-      }
-      return function (path, object) {
-          return isEmptyPath(path)
-              ? object != null
-              : getValueAtPath(path, object) !== void 0;
-      };
-  };
-  /**
-   * @function createIs
-   *
-   * @description
-   * create handlers for is / isWith
-   *
-   * @param isWithHandler is the method using a with handler
-   * @returns is / isWith
-   */
-  var createIs = function (isWithHandler) {
-      if (isWithHandler) {
-          return function (fn, path, value, object) {
-              if (typeof fn !== 'function') {
-                  throwInvalidFnError();
-              }
-              var extraArgs = slice.call(arguments, 4);
-              if (isEmptyPath(path)) {
-                  return isSameValueZero(fn.apply(void 0, [object].concat(extraArgs)), value);
-              }
-              return isSameValueZero(fn.apply(void 0, [getValueAtPath(path, object)].concat(extraArgs)), value);
-          };
-      }
-      return function (path, value, object) {
-          return isEmptyPath(path)
-              ? isSameValueZero(object, value)
-              : isSameValueZero(getValueAtPath(path, object), value);
-      };
-  };
-  /**
-   * @function createMerge
-   *
-   * @description
-   * create handlers for merge / mergeWith
-   *
-   * @param isWithHandler is the method using a with handler
-   * @param isDeep is the handler for a deep merge or shallow
-   * @returns merge / mergeWith
-   */
-  var createMerge = function (isWithHandler, isDeep) {
-      if (isWithHandler) {
-          return function (fn, path, object) {
-              if (typeof fn !== 'function') {
-                  throwInvalidFnError();
-              }
-              var extraArgs = slice.call(arguments, 3);
-              if (!isCloneable(object)) {
-                  return fn.apply(void 0, [object].concat(extraArgs));
-              }
-              if (isEmptyPath(path)) {
-                  var objectToMerge = fn.apply(void 0, [object].concat(extraArgs));
-                  return objectToMerge
-                      ? getMergedObject(object, objectToMerge, isDeep)
-                      : object;
-              }
-              var hasChanged = false;
-              var result = getDeepClone(path, object, function (ref, key) {
-                  var objectToMerge = fn.apply(void 0, [ref[key]].concat(extraArgs));
-                  if (objectToMerge) {
-                      ref[key] = getMergedObject(ref[key], objectToMerge, isDeep);
-                      hasChanged = true;
-                  }
-              });
-              return hasChanged ? result : object;
-          };
-      }
-      return function (path, objectToMerge, object) {
-          if (!isCloneable(object)) {
-              return objectToMerge;
-          }
-          return isEmptyPath(path)
-              ? getMergedObject(object, objectToMerge, true)
-              : getDeepClone(path, object, function (ref, key) {
-                  ref[key] = getMergedObject(ref[key], objectToMerge, isDeep);
-              });
-      };
-  };
-  /**
-   * @function createNot
-   *
-   * @description
-   * create handlers for not / notWith
-   *
-   * @param isWithHandler not the method using a with handler
-   * @returns not / notWithHandler
-   */
-  var createNot = function (isWithHandler) {
-      var is = createIs(isWithHandler);
-      return function () {
-          return !is.apply(this, arguments);
-      };
-  };
-  /**
-   * @function createRemove
-   *
-   * @description
-   * create handlers for remove / removeWith
-   *
-   * @param isWithHandler is the method using a with handler
-   * @returns remove / removeWith
-   */
-  var createRemove = function (isWithHandler) {
-      if (isWithHandler) {
-          return function (fn, path, object) {
-              if (typeof fn !== 'function') {
-                  throwInvalidFnError();
-              }
-              var extraArgs = slice.call(arguments, 3);
-              if (isEmptyPath(path)) {
-                  var emptyObject = getNewEmptyObject(object);
-                  return fn.apply(void 0, [emptyObject].concat(extraArgs)) ? emptyObject : object;
-              }
-              var value = getValueAtPath(path, object);
-              return value !== void 0 && fn.apply(void 0, [value].concat(extraArgs))
-                  ? getDeepClone(path, object, function (ref, key) {
-                      if (isArray$1(ref)) {
-                          splice(ref, key);
-                      }
-                      else {
-                          delete ref[key];
-                      }
-                  })
-                  : object;
-          };
-      }
-      return function (path, object) {
-          if (isEmptyPath(path)) {
-              return getNewEmptyObject(object);
-          }
-          return getValueAtPath(path, object) !== void 0
-              ? getDeepClone(path, object, function (ref, key) {
-                  if (isArray$1(ref)) {
-                      splice(ref, key);
-                  }
-                  else {
-                      delete ref[key];
-                  }
-              })
-              : object;
-      };
-  };
-  /**
-   * @function createSet
-   *
-   * @description
-   * create handlers for set / setWith
-   *
-   * @param isWithHandler is the method using a with handler
-   * @returns set / setWith
-   */
-  var createSet = function (isWithHandler) {
-      if (isWithHandler) {
-          return function (fn, path, object) {
-              if (typeof fn !== 'function') {
-                  throwInvalidFnError();
-              }
-              var extraArgs = slice.call(arguments, 3);
-              return isEmptyPath(path)
-                  ? fn.apply(void 0, [object].concat(extraArgs)) : getDeepClone(path, object, function (ref, key) {
-                  ref[key] = fn.apply(void 0, [ref[key]].concat(extraArgs));
-              });
-          };
-      }
-      return function (path, value, object) {
-          return isEmptyPath(path)
-              ? value
-              : getDeepClone(path, object, function (ref, key) {
-                  ref[key] = value;
-              });
-      };
-  };
-  /**
-   * @function createAdd
-   *
-   * @description
-   * create handlers for add / addWith
-   *
-   * @param isWithHandler is the method using a with handler
-   * @returns add / addWith
-   */
-  var createAdd = function (isWithHandler) {
-      var add = createSet(isWithHandler);
-      if (isWithHandler) {
-          return function (fn, path, object) {
-              return add.apply(this, [fn, getFullPath(path, object, fn), object].concat(slice.call(arguments, 3)));
-          };
-      }
-      return function (path, value, object) { return add(getFullPath(path, object), value, object); };
-  };
-
-  // external dependencies
-  var add = curriable.curry(createAdd(false), 3);
-  var addWith = curriable.curry(createAdd(true), 3);
-  var assign$1 = curriable.curry(createMerge(false, false), 3);
-  var assignWith = curriable.curry(createMerge(true, false), 3);
-  var call = curriable.curry(createCall(false), 3);
-  var callWith = curriable.curry(createCall(true), 4);
-  var get = curriable.curry(createGet(false), 2);
-  var getOr = curriable.curry(createGetOr(false), 3);
-  var getWith = curriable.curry(createGet(true), 3);
-  var getWithOr = curriable.curry(createGetOr(true), 4);
-  var has = curriable.curry(createHas(false), 2);
-  var hasWith = curriable.curry(createHas(true), 3);
-  var is = curriable.curry(createIs(false), 3);
-  var isWith = curriable.curry(createIs(true), 4);
-  var merge = curriable.curry(createMerge(false, true), 3);
-  var mergeWith = curriable.curry(createMerge(true, true), 3);
-  var not = curriable.curry(createNot(false), 3);
-  var notWith = curriable.curry(createNot(true), 4);
-  var remove = curriable.curry(createRemove(false), 2);
-  var removeWith = curriable.curry(createRemove(true), 3);
-  var set = curriable.curry(createSet(false), 3);
-  var setWith = curriable.curry(createSet(true), 3);
-
-  exports.__ = curriable.__;
-  exports.add = add;
-  exports.addWith = addWith;
-  exports.assign = assign$1;
-  exports.assignWith = assignWith;
-  exports.call = call;
-  exports.callWith = callWith;
-  exports.get = get;
-  exports.getOr = getOr;
-  exports.getWith = getWith;
-  exports.getWithOr = getWithOr;
-  exports.has = has;
-  exports.hasWith = hasWith;
-  exports.is = is;
-  exports.isWith = isWith;
-  exports.merge = merge;
-  exports.mergeWith = mergeWith;
-  exports.not = not;
-  exports.notWith = notWith;
-  exports.remove = remove;
-  exports.removeWith = removeWith;
-  exports.set = set;
-  exports.setWith = setWith;
-
-  Object.defineProperty(exports, '__esModule', { value: true });
-
-}));
-
-});
-
-unwrapExports(unchanged);
-
-var selectorator = createCommonjsModule(function (module, exports) {
-(function (global, factory) {
-  factory(exports, es$1, fastEquals, es$2, unchanged);
-}(commonjsGlobal, function (exports, identitate, fastEquals, reselect, unchanged) {
-  var INVALID_ARRAY_PATHS_MESSAGE = 'You have not provided any values for paths, so no values can be retrieved from state.';
-  var INVALID_PATHS_MESSAGE = [
-      'First parameter passed must be either an array or a plain object.',
-      'If you are creating a standard selector, pass an array of either',
-      'properties on the state to retrieve, or custom selector functions.',
-      'If creating a structured selector, pass a plain object with source',
-      'and destination properties, where source is an array of properties',
-      'or custom selector functions, and destination is an array of property',
-      'names to assign the values from source to.',
-  ].join(' ');
-  var INVALID_OBJECT_PATH_MESSAGE = "\nWhen providing an object path, you must provide the following properties:\n  * path: the path to retrieve, e.g. \"foo.bar\"\n  * argIndx: the index of the argument to retrieve the path from\n".trim();
-  var INVALID_PATH_MESSAGE = "\nPath provided is of invalid type. It can be any one of the following values:\n  * Dot-bracket notation, e.g. \"foo.bar\" or \"bar[0].baz\"\n  * Number index, e.g. 0\n  * Object {path, argIndex}, e.g. {path: \"foo.bar\", argIndex: 1}\n  * Selector function\n".trim();
-
-  // external dependencies
-  var hasOwnProperty = Object.prototype.hasOwnProperty;
-  /**
-   * @private
-   *
-   * @function isFunctionPath
-   *
-   * @description
-   * is the path a function
-   *
-   * @param path the path to test
-   * @param type the typeof value for the path
-   * @returns is the path a function
-   */
-  var isFunctionPath = function (path, type) { return type === 'function'; };
-  /**
-   * @private
-   *
-   * @function isObjectPath
-   *
-   * @description
-   * is the path an object
-   *
-   * @param path the path to test
-   * @param type the typeof value for the path
-   * @returns is the path an object
-   */
-  var isObjectPath = function (path, type) { return !!path && type === 'object'; };
-  /**
-   * @private
-   *
-   * @function isUnchangedPath
-   *
-   * @description
-   * is the path an unchanged path value
-   *
-   * @param path the path to test
-   * @param type the typeof value for the path
-   * @returns is the path an unchanged path value
-   */
-  var isUnchangedPath = function (path, type) {
-      return type === 'string' || type === 'number' || Array.isArray(path);
-  };
-  /**
-   * @private
-   *
-   * @function createIdentitySelector
-   *
-   * @description
-   * based on the path passed, create the identity function for it or return the function itself
-   *
-   * @param path nested path to retrieve from the state object
-   * @returns identity function to retrieve value from state for given property
-   */
-  var createIdentitySelector = function (path) {
-      var type = typeof path;
-      if (isFunctionPath(path, type)) {
-          return path;
-      }
-      if (isUnchangedPath(path, type)) {
-          return function (state) { return unchanged.get(path, state); };
-      }
-      if (isObjectPath(path, type)) {
-          if (hasOwnProperty.call(path, 'path') &&
-              hasOwnProperty.call(path, 'argIndex')) {
-              var selectorIdentity_1 = identitate.createIdentity(path.argIndex);
-              return function () {
-                  return unchanged.get(path.path, selectorIdentity_1.apply(null, arguments));
-              };
-          }
-          throw new ReferenceError(INVALID_OBJECT_PATH_MESSAGE);
-      }
-      throw new TypeError(INVALID_PATH_MESSAGE);
-  };
-  /**
-   * @private
-   *
-   * @function getSelectorCreator
-   *
-   * @description
-   * get the creator function to use when generating the selector
-   *
-   * @param deepEqual should the memoizer be based on strict equality
-   * @param isEqual the custom equality method to use when comparing values
-   * @param memoizer custom selector memoizer
-   * @param memoizerParams custom parameters to pass to the memoizer function
-   * @returns function to create selector with
-   */
-  var getSelectorCreator = function (_a) {
-      var _b = _a.deepEqual, deepEqual = _b === void 0 ? false : _b, _c = _a.isEqual, isEqual = _c === void 0 ? fastEquals.sameValueZeroEqual : _c, memoizer = _a.memoizer, _d = _a.memoizerParams, memoizerParams = _d === void 0 ? [] : _d;
-      var _e;
-      var memoizerFn = memoizer || reselect.defaultMemoize;
-      var equals = deepEqual ? fastEquals.deepEqual : isEqual;
-      return (_e = reselect.createSelectorCreator).call.apply(_e, [// fix strict mode error
-          null,
-          memoizerFn,
-          equals].concat(memoizerParams));
-  };
-  /**
-   * @private
-   *
-   * @function getStandardSelector
-   *
-   * @description
-   * get a standard selector based on the paths and getComputedValue provided
-   *
-   * @param paths paths to retrieve values from state from
-   * @param selectorCreator function to create selector with
-   * @param getComputedValue function to compute values with, receiving properties in state based
-   *   on paths and returning computed values from them (defaults to pass-through identity function)
-   * @returns selector to return computed value from state
-   */
-  var getStandardSelector = function (paths, selectorCreator, getComputedValue) {
-      return selectorCreator(paths.map(createIdentitySelector), getComputedValue);
-  };
-  /**
-   * @private
-   *
-   * @function getStructuredObject
-   *
-   * @description
-   * get the structured object based on the computed selector values
-   *
-   * @param properties properties to assign values from state to
-   * @returns object of property => selected value pairs
-   */
-  var getStructuredObject = function (properties) { return function () {
-      var values = [];
-      for (var _i = 0; _i < arguments.length; _i++) {
-          values[_i] = arguments[_i];
-      }
-      return properties.reduce(function (structuredObject, property, index) {
-          structuredObject[property] = values[index];
-          return structuredObject;
-      }, {});
-  }; };
-  /**
-   * @private
-   *
-   * @function getStructuredSelector
-   *
-   * @description
-   * get an object of property => selected value pairs bsaed on paths
-   *
-   * @param paths property => path pairs, where path is state value to retrieve and assign to property
-   * @param selectorCreator function to create selector with
-   * @returns selector to return structured values from state
-   */
-  var getStructuredSelector = function (paths, selectorCreator) {
-      var destinationKeys = Object.keys(paths);
-      var selectors = destinationKeys.map(function (key) { return createIdentitySelector(paths[key]); });
-      return selectorCreator(selectors, getStructuredObject(destinationKeys));
-  };
-
-  // external dependencies
-  function createSelector(// actual implementation - no changes
-  paths, getComputedValue, options) {
-      if (getComputedValue === void 0) { getComputedValue = identitate.identity; }
-      if (options === void 0) { options = {}; }
-      var selectorCreator = getSelectorCreator(options);
-      if (Array.isArray(paths)) {
-          if (!paths.length) {
-              throw new ReferenceError(INVALID_ARRAY_PATHS_MESSAGE);
-          }
-          return getStandardSelector(paths, selectorCreator, getComputedValue);
-      }
-      // added null check
-      if (paths && paths !== null && typeof paths === 'object') {
-          return getStructuredSelector(paths, selectorCreator);
-      }
-      throw new TypeError(INVALID_PATHS_MESSAGE);
-  }
-
-  exports.default = createSelector;
-
-  Object.defineProperty(exports, '__esModule', { value: true });
-
-}));
-
-});
-
-unwrapExports(selectorator);
+function getCjsExportFromNamespace (n) {
+	return n && n['default'] || n;
+}
 
 /**
  * These are private action types reserved by Redux.
@@ -3489,7 +3057,7 @@ var ActionTypes$1 = {
  * @param {any} obj The object to inspect.
  * @returns {boolean} True if the argument appears to be a plain object.
  */
-function isPlainObject$1(obj) {
+function isPlainObject$2(obj) {
   if (typeof obj !== 'object' || obj === null) return false;
   var proto = obj;
 
@@ -3530,7 +3098,7 @@ function createStore$1(reducer, preloadedState, enhancer) {
   var _ref2;
 
   if (typeof preloadedState === 'function' && typeof enhancer === 'function' || typeof enhancer === 'function' && typeof arguments[3] === 'function') {
-    throw new Error('It looks like you are passing several store enhancers to ' + 'createStore(). This is not supported. Instead, compose them ' + 'together to a single function');
+    throw new Error('It looks like you are passing several store enhancers to ' + 'createStore(). This is not supported. Instead, compose them ' + 'together to a single function.');
   }
 
   if (typeof preloadedState === 'function' && typeof enhancer === 'undefined') {
@@ -3555,6 +3123,13 @@ function createStore$1(reducer, preloadedState, enhancer) {
   var currentListeners = [];
   var nextListeners = currentListeners;
   var isDispatching = false;
+  /**
+   * This makes a shallow copy of currentListeners so we can use
+   * nextListeners as a temporary list while dispatching.
+   *
+   * This prevents any bugs around consumers calling
+   * subscribe/unsubscribe in the middle of a dispatch.
+   */
 
   function ensureCanMutateNextListeners() {
     if (nextListeners === currentListeners) {
@@ -3655,7 +3230,7 @@ function createStore$1(reducer, preloadedState, enhancer) {
 
 
   function dispatch(action) {
-    if (!isPlainObject$1(action)) {
+    if (!isPlainObject$2(action)) {
       throw new Error('Actions must be plain objects. ' + 'Use custom middleware for async actions.');
     }
 
@@ -3700,7 +3275,11 @@ function createStore$1(reducer, preloadedState, enhancer) {
       throw new Error('Expected the nextReducer to be a function.');
     }
 
-    currentReducer = nextReducer;
+    currentReducer = nextReducer; // This action has a similiar effect to ActionTypes.INIT.
+    // Any reducers that existed in both the new and old rootReducer
+    // will receive the previous state. This effectively populates
+    // the new state tree with any relevant data from the old one.
+
     dispatch({
       type: ActionTypes$1.REPLACE
     });
@@ -3816,7 +3395,7 @@ function combineReducers$1(reducers) {
     }
   }
 
-  var finalReducerKeys = Object.keys(finalReducers);
+  var finalReducerKeys = Object.keys(finalReducers); // This is used to make sure we don't warn about the same
 
   var shapeAssertionError;
 
@@ -3868,8 +3447,8 @@ function bindActionCreator(actionCreator, dispatch) {
  * may be invoked directly. This is just a convenience method, as you can call
  * `store.dispatch(MyActionCreators.doSomething())` yourself just fine.
  *
- * For convenience, you can also pass a single function as the first argument,
- * and get a function in return.
+ * For convenience, you can also pass an action creator as the first argument,
+ * and get a dispatch wrapped function in return.
  *
  * @param {Function|Object} actionCreators An object whose values are action
  * creator functions. One handy way to obtain it is to use ES6 `import * as`
@@ -3894,11 +3473,9 @@ function bindActionCreators(actionCreators, dispatch) {
     throw new Error("bindActionCreators expected an object or a function, instead received " + (actionCreators === null ? 'null' : typeof actionCreators) + ". " + "Did you write \"import ActionCreators from\" instead of \"import * as ActionCreators from\"?");
   }
 
-  var keys = Object.keys(actionCreators);
   var boundActionCreators = {};
 
-  for (var i = 0; i < keys.length; i++) {
-    var key = keys[i];
+  for (var key in actionCreators) {
     var actionCreator = actionCreators[key];
 
     if (typeof actionCreator === 'function') {
@@ -3924,20 +3501,34 @@ function _defineProperty$1(obj, key, value) {
   return obj;
 }
 
-function _objectSpread$1(target) {
+function ownKeys$1(object, enumerableOnly) {
+  var keys = Object.keys(object);
+
+  if (Object.getOwnPropertySymbols) {
+    keys.push.apply(keys, Object.getOwnPropertySymbols(object));
+  }
+
+  if (enumerableOnly) keys = keys.filter(function (sym) {
+    return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+  });
+  return keys;
+}
+
+function _objectSpread2(target) {
   for (var i = 1; i < arguments.length; i++) {
     var source = arguments[i] != null ? arguments[i] : {};
-    var ownKeys = Object.keys(source);
 
-    if (typeof Object.getOwnPropertySymbols === 'function') {
-      ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {
-        return Object.getOwnPropertyDescriptor(source, sym).enumerable;
-      }));
+    if (i % 2) {
+      ownKeys$1(source, true).forEach(function (key) {
+        _defineProperty$1(target, key, source[key]);
+      });
+    } else if (Object.getOwnPropertyDescriptors) {
+      Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+    } else {
+      ownKeys$1(source).forEach(function (key) {
+        Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+      });
     }
-
-    ownKeys.forEach(function (key) {
-      _defineProperty$1(target, key, source[key]);
-    });
   }
 
   return target;
@@ -4002,7 +3593,7 @@ function applyMiddleware$1() {
       var store = createStore.apply(void 0, arguments);
 
       var _dispatch = function dispatch() {
-        throw new Error("Dispatching while constructing your middleware is not allowed. " + "Other middleware would not be applied to this dispatch.");
+        throw new Error('Dispatching while constructing your middleware is not allowed. ' + 'Other middleware would not be applied to this dispatch.');
       };
 
       var middlewareAPI = {
@@ -4015,7 +3606,7 @@ function applyMiddleware$1() {
         return middleware(middlewareAPI);
       });
       _dispatch = compose$1.apply(void 0, chain)(store.dispatch);
-      return _objectSpread$1({}, store, {
+      return _objectSpread2({}, store, {
         dispatch: _dispatch
       });
     };
@@ -4023,12 +3614,13 @@ function applyMiddleware$1() {
 }
 
 var redux = /*#__PURE__*/Object.freeze({
-	createStore: createStore$1,
-	combineReducers: combineReducers$1,
-	bindActionCreators: bindActionCreators,
+	__proto__: null,
+	__DO_NOT_USE__ActionTypes: ActionTypes$1,
 	applyMiddleware: applyMiddleware$1,
+	bindActionCreators: bindActionCreators,
+	combineReducers: combineReducers$1,
 	compose: compose$1,
-	__DO_NOT_USE__ActionTypes: ActionTypes$1
+	createStore: createStore$1
 });
 
 var reduxDevtoolsExtension = createCommonjsModule(function (module, exports) {
@@ -4133,7 +3725,7 @@ function _nonIterableSpread() {
  * @param {any} value The value to inspect.
  * @returns {boolean} True if the argument appears to be a plain object.
  */
-function isPlainObject$2(value) {
+function isPlainObject$3(value) {
   if (_typeof$1(value) !== 'object' || value === null) return false;
   var proto = value;
 
@@ -4185,7 +3777,7 @@ function configureStore(options) {
 
   if (typeof reducer === 'function') {
     rootReducer = reducer;
-  } else if (isPlainObject$2(reducer)) {
+  } else if (isPlainObject$3(reducer)) {
     rootReducer = combineReducers(reducer);
   } else {
     throw new Error('Reducer argument must be a function or an object of functions that can be passed to combineReducers');
@@ -4346,6 +3938,624 @@ function createSlice(options) {
     selectors: selectors
   };
 }
+
+var fails = function (exec) {
+  try {
+    return !!exec();
+  } catch (error) {
+    return true;
+  }
+};
+
+// Thank's IE8 for his funny defineProperty
+var descriptors$1 = !fails(function () {
+  return Object.defineProperty({}, 'a', { get: function () { return 7; } }).a != 7;
+});
+
+var check = function (it) {
+  return it && it.Math == Math && it;
+};
+
+// https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
+var global_1 =
+  // eslint-disable-next-line no-undef
+  check(typeof globalThis == 'object' && globalThis) ||
+  check(typeof window == 'object' && window) ||
+  check(typeof self == 'object' && self) ||
+  check(typeof commonjsGlobal == 'object' && commonjsGlobal) ||
+  // eslint-disable-next-line no-new-func
+  Function('return this')();
+
+var isObject = function (it) {
+  return typeof it === 'object' ? it !== null : typeof it === 'function';
+};
+
+var document$1 = global_1.document;
+// typeof document.createElement is 'object' in old IE
+var EXISTS = isObject(document$1) && isObject(document$1.createElement);
+
+var documentCreateElement = function (it) {
+  return EXISTS ? document$1.createElement(it) : {};
+};
+
+// Thank's IE8 for his funny defineProperty
+var ie8DomDefine = !descriptors$1 && !fails(function () {
+  return Object.defineProperty(documentCreateElement('div'), 'a', {
+    get: function () { return 7; }
+  }).a != 7;
+});
+
+var anObject = function (it) {
+  if (!isObject(it)) {
+    throw TypeError(String(it) + ' is not an object');
+  } return it;
+};
+
+// `ToPrimitive` abstract operation
+// https://tc39.github.io/ecma262/#sec-toprimitive
+// instead of the ES6 spec version, we didn't implement @@toPrimitive case
+// and the second argument - flag - preferred type is a string
+var toPrimitive = function (input, PREFERRED_STRING) {
+  if (!isObject(input)) return input;
+  var fn, val;
+  if (PREFERRED_STRING && typeof (fn = input.toString) == 'function' && !isObject(val = fn.call(input))) return val;
+  if (typeof (fn = input.valueOf) == 'function' && !isObject(val = fn.call(input))) return val;
+  if (!PREFERRED_STRING && typeof (fn = input.toString) == 'function' && !isObject(val = fn.call(input))) return val;
+  throw TypeError("Can't convert object to primitive value");
+};
+
+var nativeDefineProperty = Object.defineProperty;
+
+// `Object.defineProperty` method
+// https://tc39.github.io/ecma262/#sec-object.defineproperty
+var f = descriptors$1 ? nativeDefineProperty : function defineProperty(O, P, Attributes) {
+  anObject(O);
+  P = toPrimitive(P, true);
+  anObject(Attributes);
+  if (ie8DomDefine) try {
+    return nativeDefineProperty(O, P, Attributes);
+  } catch (error) { /* empty */ }
+  if ('get' in Attributes || 'set' in Attributes) throw TypeError('Accessors not supported');
+  if ('value' in Attributes) O[P] = Attributes.value;
+  return O;
+};
+
+var objectDefineProperty = {
+	f: f
+};
+
+var createPropertyDescriptor = function (bitmap, value) {
+  return {
+    enumerable: !(bitmap & 1),
+    configurable: !(bitmap & 2),
+    writable: !(bitmap & 4),
+    value: value
+  };
+};
+
+var createNonEnumerableProperty = descriptors$1 ? function (object, key, value) {
+  return objectDefineProperty.f(object, key, createPropertyDescriptor(1, value));
+} : function (object, key, value) {
+  object[key] = value;
+  return object;
+};
+
+var setGlobal = function (key, value) {
+  try {
+    createNonEnumerableProperty(global_1, key, value);
+  } catch (error) {
+    global_1[key] = value;
+  } return value;
+};
+
+var SHARED = '__core-js_shared__';
+var store = global_1[SHARED] || setGlobal(SHARED, {});
+
+var sharedStore = store;
+
+var shared = createCommonjsModule(function (module) {
+(module.exports = function (key, value) {
+  return sharedStore[key] || (sharedStore[key] = value !== undefined ? value : {});
+})('versions', []).push({
+  version: '3.3.6',
+  mode:  'global',
+  copyright: '© 2019 Denis Pushkarev (zloirock.ru)'
+});
+});
+
+var hasOwnProperty = {}.hasOwnProperty;
+
+var has$2 = function (it, key) {
+  return hasOwnProperty.call(it, key);
+};
+
+var functionToString = shared('native-function-to-string', Function.toString);
+
+var WeakMap = global_1.WeakMap;
+
+var nativeWeakMap = typeof WeakMap === 'function' && /native code/.test(functionToString.call(WeakMap));
+
+var id = 0;
+var postfix = Math.random();
+
+var uid = function (key) {
+  return 'Symbol(' + String(key === undefined ? '' : key) + ')_' + (++id + postfix).toString(36);
+};
+
+var keys$2 = shared('keys');
+
+var sharedKey = function (key) {
+  return keys$2[key] || (keys$2[key] = uid(key));
+};
+
+var hiddenKeys = {};
+
+var WeakMap$1 = global_1.WeakMap;
+var set$2, get$2, has$3;
+
+var enforce = function (it) {
+  return has$3(it) ? get$2(it) : set$2(it, {});
+};
+
+var getterFor = function (TYPE) {
+  return function (it) {
+    var state;
+    if (!isObject(it) || (state = get$2(it)).type !== TYPE) {
+      throw TypeError('Incompatible receiver, ' + TYPE + ' required');
+    } return state;
+  };
+};
+
+if (nativeWeakMap) {
+  var store$1 = new WeakMap$1();
+  var wmget = store$1.get;
+  var wmhas = store$1.has;
+  var wmset = store$1.set;
+  set$2 = function (it, metadata) {
+    wmset.call(store$1, it, metadata);
+    return metadata;
+  };
+  get$2 = function (it) {
+    return wmget.call(store$1, it) || {};
+  };
+  has$3 = function (it) {
+    return wmhas.call(store$1, it);
+  };
+} else {
+  var STATE = sharedKey('state');
+  hiddenKeys[STATE] = true;
+  set$2 = function (it, metadata) {
+    createNonEnumerableProperty(it, STATE, metadata);
+    return metadata;
+  };
+  get$2 = function (it) {
+    return has$2(it, STATE) ? it[STATE] : {};
+  };
+  has$3 = function (it) {
+    return has$2(it, STATE);
+  };
+}
+
+var internalState = {
+  set: set$2,
+  get: get$2,
+  has: has$3,
+  enforce: enforce,
+  getterFor: getterFor
+};
+
+var redefine = createCommonjsModule(function (module) {
+var getInternalState = internalState.get;
+var enforceInternalState = internalState.enforce;
+var TEMPLATE = String(functionToString).split('toString');
+
+shared('inspectSource', function (it) {
+  return functionToString.call(it);
+});
+
+(module.exports = function (O, key, value, options) {
+  var unsafe = options ? !!options.unsafe : false;
+  var simple = options ? !!options.enumerable : false;
+  var noTargetGet = options ? !!options.noTargetGet : false;
+  if (typeof value == 'function') {
+    if (typeof key == 'string' && !has$2(value, 'name')) createNonEnumerableProperty(value, 'name', key);
+    enforceInternalState(value).source = TEMPLATE.join(typeof key == 'string' ? key : '');
+  }
+  if (O === global_1) {
+    if (simple) O[key] = value;
+    else setGlobal(key, value);
+    return;
+  } else if (!unsafe) {
+    delete O[key];
+  } else if (!noTargetGet && O[key]) {
+    simple = true;
+  }
+  if (simple) O[key] = value;
+  else createNonEnumerableProperty(O, key, value);
+// add fake Function#toString for correct work wrapped methods / constructors with methods like LoDash isNative
+})(Function.prototype, 'toString', function toString() {
+  return typeof this == 'function' && getInternalState(this).source || functionToString.call(this);
+});
+});
+
+var nativeSymbol = !!Object.getOwnPropertySymbols && !fails(function () {
+  // Chrome 38 Symbol has incorrect toString conversion
+  // eslint-disable-next-line no-undef
+  return !String(Symbol());
+});
+
+var Symbol$1 = global_1.Symbol;
+var store$2 = shared('wks');
+
+var wellKnownSymbol = function (name) {
+  return store$2[name] || (store$2[name] = nativeSymbol && Symbol$1[name]
+    || (nativeSymbol ? Symbol$1 : uid)('Symbol.' + name));
+};
+
+// `RegExp.prototype.flags` getter implementation
+// https://tc39.github.io/ecma262/#sec-get-regexp.prototype.flags
+var regexpFlags = function () {
+  var that = anObject(this);
+  var result = '';
+  if (that.global) result += 'g';
+  if (that.ignoreCase) result += 'i';
+  if (that.multiline) result += 'm';
+  if (that.dotAll) result += 's';
+  if (that.unicode) result += 'u';
+  if (that.sticky) result += 'y';
+  return result;
+};
+
+var nativeExec = RegExp.prototype.exec;
+// This always refers to the native implementation, because the
+// String#replace polyfill uses ./fix-regexp-well-known-symbol-logic.js,
+// which loads this file before patching the method.
+var nativeReplace = String.prototype.replace;
+
+var patchedExec = nativeExec;
+
+var UPDATES_LAST_INDEX_WRONG = (function () {
+  var re1 = /a/;
+  var re2 = /b*/g;
+  nativeExec.call(re1, 'a');
+  nativeExec.call(re2, 'a');
+  return re1.lastIndex !== 0 || re2.lastIndex !== 0;
+})();
+
+// nonparticipating capturing group, copied from es5-shim's String#split patch.
+var NPCG_INCLUDED = /()??/.exec('')[1] !== undefined;
+
+var PATCH = UPDATES_LAST_INDEX_WRONG || NPCG_INCLUDED;
+
+if (PATCH) {
+  patchedExec = function exec(str) {
+    var re = this;
+    var lastIndex, reCopy, match, i;
+
+    if (NPCG_INCLUDED) {
+      reCopy = new RegExp('^' + re.source + '$(?!\\s)', regexpFlags.call(re));
+    }
+    if (UPDATES_LAST_INDEX_WRONG) lastIndex = re.lastIndex;
+
+    match = nativeExec.call(re, str);
+
+    if (UPDATES_LAST_INDEX_WRONG && match) {
+      re.lastIndex = re.global ? match.index + match[0].length : lastIndex;
+    }
+    if (NPCG_INCLUDED && match && match.length > 1) {
+      // Fix browsers whose `exec` methods don't consistently return `undefined`
+      // for NPCG, like IE8. NOTE: This doesn' work for /(.?)?/
+      nativeReplace.call(match[0], reCopy, function () {
+        for (i = 1; i < arguments.length - 2; i++) {
+          if (arguments[i] === undefined) match[i] = undefined;
+        }
+      });
+    }
+
+    return match;
+  };
+}
+
+var regexpExec = patchedExec;
+
+var SPECIES = wellKnownSymbol('species');
+
+var REPLACE_SUPPORTS_NAMED_GROUPS = !fails(function () {
+  // #replace needs built-in support for named groups.
+  // #match works fine because it just return the exec results, even if it has
+  // a "grops" property.
+  var re = /./;
+  re.exec = function () {
+    var result = [];
+    result.groups = { a: '7' };
+    return result;
+  };
+  return ''.replace(re, '$<a>') !== '7';
+});
+
+// Chrome 51 has a buggy "split" implementation when RegExp#exec !== nativeExec
+// Weex JS has frozen built-in prototypes, so use try / catch wrapper
+var SPLIT_WORKS_WITH_OVERWRITTEN_EXEC = !fails(function () {
+  var re = /(?:)/;
+  var originalExec = re.exec;
+  re.exec = function () { return originalExec.apply(this, arguments); };
+  var result = 'ab'.split(re);
+  return result.length !== 2 || result[0] !== 'a' || result[1] !== 'b';
+});
+
+var fixRegexpWellKnownSymbolLogic = function (KEY, length, exec, sham) {
+  var SYMBOL = wellKnownSymbol(KEY);
+
+  var DELEGATES_TO_SYMBOL = !fails(function () {
+    // String methods call symbol-named RegEp methods
+    var O = {};
+    O[SYMBOL] = function () { return 7; };
+    return ''[KEY](O) != 7;
+  });
+
+  var DELEGATES_TO_EXEC = DELEGATES_TO_SYMBOL && !fails(function () {
+    // Symbol-named RegExp methods call .exec
+    var execCalled = false;
+    var re = /a/;
+
+    if (KEY === 'split') {
+      // We can't use real regex here since it causes deoptimization
+      // and serious performance degradation in V8
+      // https://github.com/zloirock/core-js/issues/306
+      re = {};
+      // RegExp[@@split] doesn't call the regex's exec method, but first creates
+      // a new one. We need to return the patched regex when creating the new one.
+      re.constructor = {};
+      re.constructor[SPECIES] = function () { return re; };
+      re.flags = '';
+      re[SYMBOL] = /./[SYMBOL];
+    }
+
+    re.exec = function () { execCalled = true; return null; };
+
+    re[SYMBOL]('');
+    return !execCalled;
+  });
+
+  if (
+    !DELEGATES_TO_SYMBOL ||
+    !DELEGATES_TO_EXEC ||
+    (KEY === 'replace' && !REPLACE_SUPPORTS_NAMED_GROUPS) ||
+    (KEY === 'split' && !SPLIT_WORKS_WITH_OVERWRITTEN_EXEC)
+  ) {
+    var nativeRegExpMethod = /./[SYMBOL];
+    var methods = exec(SYMBOL, ''[KEY], function (nativeMethod, regexp, str, arg2, forceStringMethod) {
+      if (regexp.exec === regexpExec) {
+        if (DELEGATES_TO_SYMBOL && !forceStringMethod) {
+          // The native String method already delegates to @@method (this
+          // polyfilled function), leasing to infinite recursion.
+          // We avoid it by directly calling the native @@method method.
+          return { done: true, value: nativeRegExpMethod.call(regexp, str, arg2) };
+        }
+        return { done: true, value: nativeMethod.call(str, regexp, arg2) };
+      }
+      return { done: false };
+    });
+    var stringMethod = methods[0];
+    var regexMethod = methods[1];
+
+    redefine(String.prototype, KEY, stringMethod);
+    redefine(RegExp.prototype, SYMBOL, length == 2
+      // 21.2.5.8 RegExp.prototype[@@replace](string, replaceValue)
+      // 21.2.5.11 RegExp.prototype[@@split](string, limit)
+      ? function (string, arg) { return regexMethod.call(string, this, arg); }
+      // 21.2.5.6 RegExp.prototype[@@match](string)
+      // 21.2.5.9 RegExp.prototype[@@search](string)
+      : function (string) { return regexMethod.call(string, this); }
+    );
+    if (sham) createNonEnumerableProperty(RegExp.prototype[SYMBOL], 'sham', true);
+  }
+};
+
+// `RequireObjectCoercible` abstract operation
+// https://tc39.github.io/ecma262/#sec-requireobjectcoercible
+var requireObjectCoercible = function (it) {
+  if (it == undefined) throw TypeError("Can't call method on " + it);
+  return it;
+};
+
+// `ToObject` abstract operation
+// https://tc39.github.io/ecma262/#sec-toobject
+var toObject = function (argument) {
+  return Object(requireObjectCoercible(argument));
+};
+
+var ceil = Math.ceil;
+var floor = Math.floor;
+
+// `ToInteger` abstract operation
+// https://tc39.github.io/ecma262/#sec-tointeger
+var toInteger = function (argument) {
+  return isNaN(argument = +argument) ? 0 : (argument > 0 ? floor : ceil)(argument);
+};
+
+var min = Math.min;
+
+// `ToLength` abstract operation
+// https://tc39.github.io/ecma262/#sec-tolength
+var toLength = function (argument) {
+  return argument > 0 ? min(toInteger(argument), 0x1FFFFFFFFFFFFF) : 0; // 2 ** 53 - 1 == 9007199254740991
+};
+
+// `String.prototype.{ codePointAt, at }` methods implementation
+var createMethod = function (CONVERT_TO_STRING) {
+  return function ($this, pos) {
+    var S = String(requireObjectCoercible($this));
+    var position = toInteger(pos);
+    var size = S.length;
+    var first, second;
+    if (position < 0 || position >= size) return CONVERT_TO_STRING ? '' : undefined;
+    first = S.charCodeAt(position);
+    return first < 0xD800 || first > 0xDBFF || position + 1 === size
+      || (second = S.charCodeAt(position + 1)) < 0xDC00 || second > 0xDFFF
+        ? CONVERT_TO_STRING ? S.charAt(position) : first
+        : CONVERT_TO_STRING ? S.slice(position, position + 2) : (first - 0xD800 << 10) + (second - 0xDC00) + 0x10000;
+  };
+};
+
+var stringMultibyte = {
+  // `String.prototype.codePointAt` method
+  // https://tc39.github.io/ecma262/#sec-string.prototype.codepointat
+  codeAt: createMethod(false),
+  // `String.prototype.at` method
+  // https://github.com/mathiasbynens/String.prototype.at
+  charAt: createMethod(true)
+};
+
+var charAt = stringMultibyte.charAt;
+
+// `AdvanceStringIndex` abstract operation
+// https://tc39.github.io/ecma262/#sec-advancestringindex
+var advanceStringIndex = function (S, index, unicode) {
+  return index + (unicode ? charAt(S, index).length : 1);
+};
+
+var toString = {}.toString;
+
+var classofRaw = function (it) {
+  return toString.call(it).slice(8, -1);
+};
+
+// `RegExpExec` abstract operation
+// https://tc39.github.io/ecma262/#sec-regexpexec
+var regexpExecAbstract = function (R, S) {
+  var exec = R.exec;
+  if (typeof exec === 'function') {
+    var result = exec.call(R, S);
+    if (typeof result !== 'object') {
+      throw TypeError('RegExp exec method returned something other than an Object or null');
+    }
+    return result;
+  }
+
+  if (classofRaw(R) !== 'RegExp') {
+    throw TypeError('RegExp#exec called on incompatible receiver');
+  }
+
+  return regexpExec.call(R, S);
+};
+
+var max = Math.max;
+var min$1 = Math.min;
+var floor$1 = Math.floor;
+var SUBSTITUTION_SYMBOLS = /\$([$&'`]|\d\d?|<[^>]*>)/g;
+var SUBSTITUTION_SYMBOLS_NO_NAMED = /\$([$&'`]|\d\d?)/g;
+
+var maybeToString = function (it) {
+  return it === undefined ? it : String(it);
+};
+
+// @@replace logic
+fixRegexpWellKnownSymbolLogic('replace', 2, function (REPLACE, nativeReplace, maybeCallNative) {
+  return [
+    // `String.prototype.replace` method
+    // https://tc39.github.io/ecma262/#sec-string.prototype.replace
+    function replace(searchValue, replaceValue) {
+      var O = requireObjectCoercible(this);
+      var replacer = searchValue == undefined ? undefined : searchValue[REPLACE];
+      return replacer !== undefined
+        ? replacer.call(searchValue, O, replaceValue)
+        : nativeReplace.call(String(O), searchValue, replaceValue);
+    },
+    // `RegExp.prototype[@@replace]` method
+    // https://tc39.github.io/ecma262/#sec-regexp.prototype-@@replace
+    function (regexp, replaceValue) {
+      var res = maybeCallNative(nativeReplace, regexp, this, replaceValue);
+      if (res.done) return res.value;
+
+      var rx = anObject(regexp);
+      var S = String(this);
+
+      var functionalReplace = typeof replaceValue === 'function';
+      if (!functionalReplace) replaceValue = String(replaceValue);
+
+      var global = rx.global;
+      if (global) {
+        var fullUnicode = rx.unicode;
+        rx.lastIndex = 0;
+      }
+      var results = [];
+      while (true) {
+        var result = regexpExecAbstract(rx, S);
+        if (result === null) break;
+
+        results.push(result);
+        if (!global) break;
+
+        var matchStr = String(result[0]);
+        if (matchStr === '') rx.lastIndex = advanceStringIndex(S, toLength(rx.lastIndex), fullUnicode);
+      }
+
+      var accumulatedResult = '';
+      var nextSourcePosition = 0;
+      for (var i = 0; i < results.length; i++) {
+        result = results[i];
+
+        var matched = String(result[0]);
+        var position = max(min$1(toInteger(result.index), S.length), 0);
+        var captures = [];
+        // NOTE: This is equivalent to
+        //   captures = result.slice(1).map(maybeToString)
+        // but for some reason `nativeSlice.call(result, 1, result.length)` (called in
+        // the slice polyfill when slicing native arrays) "doesn't work" in safari 9 and
+        // causes a crash (https://pastebin.com/N21QzeQA) when trying to debug it.
+        for (var j = 1; j < result.length; j++) captures.push(maybeToString(result[j]));
+        var namedCaptures = result.groups;
+        if (functionalReplace) {
+          var replacerArgs = [matched].concat(captures, position, S);
+          if (namedCaptures !== undefined) replacerArgs.push(namedCaptures);
+          var replacement = String(replaceValue.apply(undefined, replacerArgs));
+        } else {
+          replacement = getSubstitution(matched, S, position, captures, namedCaptures, replaceValue);
+        }
+        if (position >= nextSourcePosition) {
+          accumulatedResult += S.slice(nextSourcePosition, position) + replacement;
+          nextSourcePosition = position + matched.length;
+        }
+      }
+      return accumulatedResult + S.slice(nextSourcePosition);
+    }
+  ];
+
+  // https://tc39.github.io/ecma262/#sec-getsubstitution
+  function getSubstitution(matched, str, position, captures, namedCaptures, replacement) {
+    var tailPos = position + matched.length;
+    var m = captures.length;
+    var symbols = SUBSTITUTION_SYMBOLS_NO_NAMED;
+    if (namedCaptures !== undefined) {
+      namedCaptures = toObject(namedCaptures);
+      symbols = SUBSTITUTION_SYMBOLS;
+    }
+    return nativeReplace.call(replacement, symbols, function (match, ch) {
+      var capture;
+      switch (ch.charAt(0)) {
+        case '$': return '$';
+        case '&': return matched;
+        case '`': return str.slice(0, position);
+        case "'": return str.slice(tailPos);
+        case '<':
+          capture = namedCaptures[ch.slice(1, -1)];
+          break;
+        default: // \d\d?
+          var n = +ch;
+          if (n === 0) return match;
+          if (n > m) {
+            var f = floor$1(n / 10);
+            if (f === 0) return match;
+            if (f <= m) return captures[f - 1] === undefined ? ch.charAt(1) : captures[f - 1] + ch.charAt(1);
+            return match;
+          }
+          capture = captures[n - 1];
+      }
+      return capture === undefined ? '' : capture;
+    });
+  }
+});
 
 //      
 
@@ -4649,43 +4859,554 @@ const {
   reducer
 } = connectionsState;
 
-function _defineProperty$3(obj, key, value) {
-  if (key in obj) {
-    Object.defineProperty(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
+var split = ''.split;
+
+// fallback for non-array-like ES3 and non-enumerable old V8 strings
+var indexedObject = fails(function () {
+  // throws an error in rhino, see https://github.com/mozilla/rhino/issues/346
+  // eslint-disable-next-line no-prototype-builtins
+  return !Object('z').propertyIsEnumerable(0);
+}) ? function (it) {
+  return classofRaw(it) == 'String' ? split.call(it, '') : Object(it);
+} : Object;
+
+// toObject with fallback for non-array-like ES3 strings
+
+
+
+var toIndexedObject = function (it) {
+  return indexedObject(requireObjectCoercible(it));
+};
+
+var max$1 = Math.max;
+var min$2 = Math.min;
+
+// Helper for a popular repeating case of the spec:
+// Let integer be ? ToInteger(index).
+// If integer < 0, let result be max((length + integer), 0); else let result be min(length, length).
+var toAbsoluteIndex = function (index, length) {
+  var integer = toInteger(index);
+  return integer < 0 ? max$1(integer + length, 0) : min$2(integer, length);
+};
+
+// `Array.prototype.{ indexOf, includes }` methods implementation
+var createMethod$1 = function (IS_INCLUDES) {
+  return function ($this, el, fromIndex) {
+    var O = toIndexedObject($this);
+    var length = toLength(O.length);
+    var index = toAbsoluteIndex(fromIndex, length);
+    var value;
+    // Array#includes uses SameValueZero equality algorithm
+    // eslint-disable-next-line no-self-compare
+    if (IS_INCLUDES && el != el) while (length > index) {
+      value = O[index++];
+      // eslint-disable-next-line no-self-compare
+      if (value != value) return true;
+    // Array#indexOf ignores holes, Array#includes - not
+    } else for (;length > index; index++) {
+      if ((IS_INCLUDES || index in O) && O[index] === el) return IS_INCLUDES || index || 0;
+    } return !IS_INCLUDES && -1;
+  };
+};
+
+var arrayIncludes = {
+  // `Array.prototype.includes` method
+  // https://tc39.github.io/ecma262/#sec-array.prototype.includes
+  includes: createMethod$1(true),
+  // `Array.prototype.indexOf` method
+  // https://tc39.github.io/ecma262/#sec-array.prototype.indexof
+  indexOf: createMethod$1(false)
+};
+
+var indexOf = arrayIncludes.indexOf;
+
+
+var objectKeysInternal = function (object, names) {
+  var O = toIndexedObject(object);
+  var i = 0;
+  var result = [];
+  var key;
+  for (key in O) !has$2(hiddenKeys, key) && has$2(O, key) && result.push(key);
+  // Don't enum bug & hidden keys
+  while (names.length > i) if (has$2(O, key = names[i++])) {
+    ~indexOf(result, key) || result.push(key);
+  }
+  return result;
+};
+
+// IE8- don't enum bug keys
+var enumBugKeys = [
+  'constructor',
+  'hasOwnProperty',
+  'isPrototypeOf',
+  'propertyIsEnumerable',
+  'toLocaleString',
+  'toString',
+  'valueOf'
+];
+
+// `Object.keys` method
+// https://tc39.github.io/ecma262/#sec-object.keys
+var objectKeys = Object.keys || function keys(O) {
+  return objectKeysInternal(O, enumBugKeys);
+};
+
+// `Object.defineProperties` method
+// https://tc39.github.io/ecma262/#sec-object.defineproperties
+var objectDefineProperties = descriptors$1 ? Object.defineProperties : function defineProperties(O, Properties) {
+  anObject(O);
+  var keys = objectKeys(Properties);
+  var length = keys.length;
+  var index = 0;
+  var key;
+  while (length > index) objectDefineProperty.f(O, key = keys[index++], Properties[key]);
+  return O;
+};
+
+var path = global_1;
+
+var aFunction = function (variable) {
+  return typeof variable == 'function' ? variable : undefined;
+};
+
+var getBuiltIn = function (namespace, method) {
+  return arguments.length < 2 ? aFunction(path[namespace]) || aFunction(global_1[namespace])
+    : path[namespace] && path[namespace][method] || global_1[namespace] && global_1[namespace][method];
+};
+
+var html = getBuiltIn('document', 'documentElement');
+
+var IE_PROTO = sharedKey('IE_PROTO');
+
+var PROTOTYPE = 'prototype';
+var Empty = function () { /* empty */ };
+
+// Create object with fake `null` prototype: use iframe Object with cleared prototype
+var createDict = function () {
+  // Thrash, waste and sodomy: IE GC bug
+  var iframe = documentCreateElement('iframe');
+  var length = enumBugKeys.length;
+  var lt = '<';
+  var script = 'script';
+  var gt = '>';
+  var js = 'java' + script + ':';
+  var iframeDocument;
+  iframe.style.display = 'none';
+  html.appendChild(iframe);
+  iframe.src = String(js);
+  iframeDocument = iframe.contentWindow.document;
+  iframeDocument.open();
+  iframeDocument.write(lt + script + gt + 'document.F=Object' + lt + '/' + script + gt);
+  iframeDocument.close();
+  createDict = iframeDocument.F;
+  while (length--) delete createDict[PROTOTYPE][enumBugKeys[length]];
+  return createDict();
+};
+
+// `Object.create` method
+// https://tc39.github.io/ecma262/#sec-object.create
+var objectCreate = Object.create || function create(O, Properties) {
+  var result;
+  if (O !== null) {
+    Empty[PROTOTYPE] = anObject(O);
+    result = new Empty();
+    Empty[PROTOTYPE] = null;
+    // add "__proto__" for Object.getPrototypeOf polyfill
+    result[IE_PROTO] = O;
+  } else result = createDict();
+  return Properties === undefined ? result : objectDefineProperties(result, Properties);
+};
+
+hiddenKeys[IE_PROTO] = true;
+
+var UNSCOPABLES = wellKnownSymbol('unscopables');
+var ArrayPrototype = Array.prototype;
+
+// Array.prototype[@@unscopables]
+// https://tc39.github.io/ecma262/#sec-array.prototype-@@unscopables
+if (ArrayPrototype[UNSCOPABLES] == undefined) {
+  createNonEnumerableProperty(ArrayPrototype, UNSCOPABLES, objectCreate(null));
+}
+
+// add a key to Array.prototype[@@unscopables]
+var addToUnscopables = function (key) {
+  ArrayPrototype[UNSCOPABLES][key] = true;
+};
+
+var iterators = {};
+
+var nativePropertyIsEnumerable = {}.propertyIsEnumerable;
+var getOwnPropertyDescriptor$1 = Object.getOwnPropertyDescriptor;
+
+// Nashorn ~ JDK8 bug
+var NASHORN_BUG = getOwnPropertyDescriptor$1 && !nativePropertyIsEnumerable.call({ 1: 2 }, 1);
+
+// `Object.prototype.propertyIsEnumerable` method implementation
+// https://tc39.github.io/ecma262/#sec-object.prototype.propertyisenumerable
+var f$1 = NASHORN_BUG ? function propertyIsEnumerable(V) {
+  var descriptor = getOwnPropertyDescriptor$1(this, V);
+  return !!descriptor && descriptor.enumerable;
+} : nativePropertyIsEnumerable;
+
+var objectPropertyIsEnumerable = {
+	f: f$1
+};
+
+var nativeGetOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
+
+// `Object.getOwnPropertyDescriptor` method
+// https://tc39.github.io/ecma262/#sec-object.getownpropertydescriptor
+var f$2 = descriptors$1 ? nativeGetOwnPropertyDescriptor : function getOwnPropertyDescriptor(O, P) {
+  O = toIndexedObject(O);
+  P = toPrimitive(P, true);
+  if (ie8DomDefine) try {
+    return nativeGetOwnPropertyDescriptor(O, P);
+  } catch (error) { /* empty */ }
+  if (has$2(O, P)) return createPropertyDescriptor(!objectPropertyIsEnumerable.f.call(O, P), O[P]);
+};
+
+var objectGetOwnPropertyDescriptor = {
+	f: f$2
+};
+
+var hiddenKeys$1 = enumBugKeys.concat('length', 'prototype');
+
+// `Object.getOwnPropertyNames` method
+// https://tc39.github.io/ecma262/#sec-object.getownpropertynames
+var f$3 = Object.getOwnPropertyNames || function getOwnPropertyNames(O) {
+  return objectKeysInternal(O, hiddenKeys$1);
+};
+
+var objectGetOwnPropertyNames = {
+	f: f$3
+};
+
+var f$4 = Object.getOwnPropertySymbols;
+
+var objectGetOwnPropertySymbols = {
+	f: f$4
+};
+
+// all object keys, includes non-enumerable and symbols
+var ownKeys$2 = getBuiltIn('Reflect', 'ownKeys') || function ownKeys(it) {
+  var keys = objectGetOwnPropertyNames.f(anObject(it));
+  var getOwnPropertySymbols = objectGetOwnPropertySymbols.f;
+  return getOwnPropertySymbols ? keys.concat(getOwnPropertySymbols(it)) : keys;
+};
+
+var copyConstructorProperties = function (target, source) {
+  var keys = ownKeys$2(source);
+  var defineProperty = objectDefineProperty.f;
+  var getOwnPropertyDescriptor = objectGetOwnPropertyDescriptor.f;
+  for (var i = 0; i < keys.length; i++) {
+    var key = keys[i];
+    if (!has$2(target, key)) defineProperty(target, key, getOwnPropertyDescriptor(source, key));
+  }
+};
+
+var replacement = /#|\.prototype\./;
+
+var isForced = function (feature, detection) {
+  var value = data[normalize(feature)];
+  return value == POLYFILL ? true
+    : value == NATIVE ? false
+    : typeof detection == 'function' ? fails(detection)
+    : !!detection;
+};
+
+var normalize = isForced.normalize = function (string) {
+  return String(string).replace(replacement, '.').toLowerCase();
+};
+
+var data = isForced.data = {};
+var NATIVE = isForced.NATIVE = 'N';
+var POLYFILL = isForced.POLYFILL = 'P';
+
+var isForced_1 = isForced;
+
+var getOwnPropertyDescriptor$2 = objectGetOwnPropertyDescriptor.f;
+
+
+
+
+
+
+/*
+  options.target      - name of the target object
+  options.global      - target is the global object
+  options.stat        - export as static methods of target
+  options.proto       - export as prototype methods of target
+  options.real        - real prototype method for the `pure` version
+  options.forced      - export even if the native feature is available
+  options.bind        - bind methods to the target, required for the `pure` version
+  options.wrap        - wrap constructors to preventing global pollution, required for the `pure` version
+  options.unsafe      - use the simple assignment of property instead of delete + defineProperty
+  options.sham        - add a flag to not completely full polyfills
+  options.enumerable  - export as enumerable property
+  options.noTargetGet - prevent calling a getter on target
+*/
+var _export = function (options, source) {
+  var TARGET = options.target;
+  var GLOBAL = options.global;
+  var STATIC = options.stat;
+  var FORCED, target, key, targetProperty, sourceProperty, descriptor;
+  if (GLOBAL) {
+    target = global_1;
+  } else if (STATIC) {
+    target = global_1[TARGET] || setGlobal(TARGET, {});
   } else {
-    obj[key] = value;
+    target = (global_1[TARGET] || {}).prototype;
   }
-
-  return obj;
-}
-
-var defineProperty$1 = _defineProperty$3;
-
-function _objectSpread$2(target) {
-  for (var i = 1; i < arguments.length; i++) {
-    var source = arguments[i] != null ? arguments[i] : {};
-    var ownKeys = Object.keys(source);
-
-    if (typeof Object.getOwnPropertySymbols === 'function') {
-      ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {
-        return Object.getOwnPropertyDescriptor(source, sym).enumerable;
-      }));
+  if (target) for (key in source) {
+    sourceProperty = source[key];
+    if (options.noTargetGet) {
+      descriptor = getOwnPropertyDescriptor$2(target, key);
+      targetProperty = descriptor && descriptor.value;
+    } else targetProperty = target[key];
+    FORCED = isForced_1(GLOBAL ? key : TARGET + (STATIC ? '.' : '#') + key, options.forced);
+    // contained in target
+    if (!FORCED && targetProperty !== undefined) {
+      if (typeof sourceProperty === typeof targetProperty) continue;
+      copyConstructorProperties(sourceProperty, targetProperty);
     }
-
-    ownKeys.forEach(function (key) {
-      defineProperty$1(target, key, source[key]);
-    });
+    // add a flag to not completely full polyfills
+    if (options.sham || (targetProperty && targetProperty.sham)) {
+      createNonEnumerableProperty(sourceProperty, 'sham', true);
+    }
+    // extend global
+    redefine(target, key, sourceProperty, options);
   }
+};
 
-  return target;
+var correctPrototypeGetter = !fails(function () {
+  function F() { /* empty */ }
+  F.prototype.constructor = null;
+  return Object.getPrototypeOf(new F()) !== F.prototype;
+});
+
+var IE_PROTO$1 = sharedKey('IE_PROTO');
+var ObjectPrototype = Object.prototype;
+
+// `Object.getPrototypeOf` method
+// https://tc39.github.io/ecma262/#sec-object.getprototypeof
+var objectGetPrototypeOf = correctPrototypeGetter ? Object.getPrototypeOf : function (O) {
+  O = toObject(O);
+  if (has$2(O, IE_PROTO$1)) return O[IE_PROTO$1];
+  if (typeof O.constructor == 'function' && O instanceof O.constructor) {
+    return O.constructor.prototype;
+  } return O instanceof Object ? ObjectPrototype : null;
+};
+
+var ITERATOR = wellKnownSymbol('iterator');
+var BUGGY_SAFARI_ITERATORS = false;
+
+var returnThis = function () { return this; };
+
+// `%IteratorPrototype%` object
+// https://tc39.github.io/ecma262/#sec-%iteratorprototype%-object
+var IteratorPrototype, PrototypeOfArrayIteratorPrototype, arrayIterator;
+
+if ([].keys) {
+  arrayIterator = [].keys();
+  // Safari 8 has buggy iterators w/o `next`
+  if (!('next' in arrayIterator)) BUGGY_SAFARI_ITERATORS = true;
+  else {
+    PrototypeOfArrayIteratorPrototype = objectGetPrototypeOf(objectGetPrototypeOf(arrayIterator));
+    if (PrototypeOfArrayIteratorPrototype !== Object.prototype) IteratorPrototype = PrototypeOfArrayIteratorPrototype;
+  }
 }
 
-var objectSpread = _objectSpread$2;
+if (IteratorPrototype == undefined) IteratorPrototype = {};
+
+// 25.1.2.1.1 %IteratorPrototype%[@@iterator]()
+if ( !has$2(IteratorPrototype, ITERATOR)) {
+  createNonEnumerableProperty(IteratorPrototype, ITERATOR, returnThis);
+}
+
+var iteratorsCore = {
+  IteratorPrototype: IteratorPrototype,
+  BUGGY_SAFARI_ITERATORS: BUGGY_SAFARI_ITERATORS
+};
+
+var defineProperty$1 = objectDefineProperty.f;
+
+
+
+var TO_STRING_TAG = wellKnownSymbol('toStringTag');
+
+var setToStringTag = function (it, TAG, STATIC) {
+  if (it && !has$2(it = STATIC ? it : it.prototype, TO_STRING_TAG)) {
+    defineProperty$1(it, TO_STRING_TAG, { configurable: true, value: TAG });
+  }
+};
+
+var IteratorPrototype$1 = iteratorsCore.IteratorPrototype;
+
+
+
+
+
+var returnThis$1 = function () { return this; };
+
+var createIteratorConstructor = function (IteratorConstructor, NAME, next) {
+  var TO_STRING_TAG = NAME + ' Iterator';
+  IteratorConstructor.prototype = objectCreate(IteratorPrototype$1, { next: createPropertyDescriptor(1, next) });
+  setToStringTag(IteratorConstructor, TO_STRING_TAG, false);
+  iterators[TO_STRING_TAG] = returnThis$1;
+  return IteratorConstructor;
+};
+
+var aPossiblePrototype = function (it) {
+  if (!isObject(it) && it !== null) {
+    throw TypeError("Can't set " + String(it) + ' as a prototype');
+  } return it;
+};
+
+// `Object.setPrototypeOf` method
+// https://tc39.github.io/ecma262/#sec-object.setprototypeof
+// Works with __proto__ only. Old v8 can't work with null proto objects.
+/* eslint-disable no-proto */
+var objectSetPrototypeOf = Object.setPrototypeOf || ('__proto__' in {} ? function () {
+  var CORRECT_SETTER = false;
+  var test = {};
+  var setter;
+  try {
+    setter = Object.getOwnPropertyDescriptor(Object.prototype, '__proto__').set;
+    setter.call(test, []);
+    CORRECT_SETTER = test instanceof Array;
+  } catch (error) { /* empty */ }
+  return function setPrototypeOf(O, proto) {
+    anObject(O);
+    aPossiblePrototype(proto);
+    if (CORRECT_SETTER) setter.call(O, proto);
+    else O.__proto__ = proto;
+    return O;
+  };
+}() : undefined);
+
+var IteratorPrototype$2 = iteratorsCore.IteratorPrototype;
+var BUGGY_SAFARI_ITERATORS$1 = iteratorsCore.BUGGY_SAFARI_ITERATORS;
+var ITERATOR$1 = wellKnownSymbol('iterator');
+var KEYS = 'keys';
+var VALUES = 'values';
+var ENTRIES = 'entries';
+
+var returnThis$2 = function () { return this; };
+
+var defineIterator = function (Iterable, NAME, IteratorConstructor, next, DEFAULT, IS_SET, FORCED) {
+  createIteratorConstructor(IteratorConstructor, NAME, next);
+
+  var getIterationMethod = function (KIND) {
+    if (KIND === DEFAULT && defaultIterator) return defaultIterator;
+    if (!BUGGY_SAFARI_ITERATORS$1 && KIND in IterablePrototype) return IterablePrototype[KIND];
+    switch (KIND) {
+      case KEYS: return function keys() { return new IteratorConstructor(this, KIND); };
+      case VALUES: return function values() { return new IteratorConstructor(this, KIND); };
+      case ENTRIES: return function entries() { return new IteratorConstructor(this, KIND); };
+    } return function () { return new IteratorConstructor(this); };
+  };
+
+  var TO_STRING_TAG = NAME + ' Iterator';
+  var INCORRECT_VALUES_NAME = false;
+  var IterablePrototype = Iterable.prototype;
+  var nativeIterator = IterablePrototype[ITERATOR$1]
+    || IterablePrototype['@@iterator']
+    || DEFAULT && IterablePrototype[DEFAULT];
+  var defaultIterator = !BUGGY_SAFARI_ITERATORS$1 && nativeIterator || getIterationMethod(DEFAULT);
+  var anyNativeIterator = NAME == 'Array' ? IterablePrototype.entries || nativeIterator : nativeIterator;
+  var CurrentIteratorPrototype, methods, KEY;
+
+  // fix native
+  if (anyNativeIterator) {
+    CurrentIteratorPrototype = objectGetPrototypeOf(anyNativeIterator.call(new Iterable()));
+    if (IteratorPrototype$2 !== Object.prototype && CurrentIteratorPrototype.next) {
+      if ( objectGetPrototypeOf(CurrentIteratorPrototype) !== IteratorPrototype$2) {
+        if (objectSetPrototypeOf) {
+          objectSetPrototypeOf(CurrentIteratorPrototype, IteratorPrototype$2);
+        } else if (typeof CurrentIteratorPrototype[ITERATOR$1] != 'function') {
+          createNonEnumerableProperty(CurrentIteratorPrototype, ITERATOR$1, returnThis$2);
+        }
+      }
+      // Set @@toStringTag to native iterators
+      setToStringTag(CurrentIteratorPrototype, TO_STRING_TAG, true);
+    }
+  }
+
+  // fix Array#{values, @@iterator}.name in V8 / FF
+  if (DEFAULT == VALUES && nativeIterator && nativeIterator.name !== VALUES) {
+    INCORRECT_VALUES_NAME = true;
+    defaultIterator = function values() { return nativeIterator.call(this); };
+  }
+
+  // define iterator
+  if ( IterablePrototype[ITERATOR$1] !== defaultIterator) {
+    createNonEnumerableProperty(IterablePrototype, ITERATOR$1, defaultIterator);
+  }
+  iterators[NAME] = defaultIterator;
+
+  // export additional methods
+  if (DEFAULT) {
+    methods = {
+      values: getIterationMethod(VALUES),
+      keys: IS_SET ? defaultIterator : getIterationMethod(KEYS),
+      entries: getIterationMethod(ENTRIES)
+    };
+    if (FORCED) for (KEY in methods) {
+      if (BUGGY_SAFARI_ITERATORS$1 || INCORRECT_VALUES_NAME || !(KEY in IterablePrototype)) {
+        redefine(IterablePrototype, KEY, methods[KEY]);
+      }
+    } else _export({ target: NAME, proto: true, forced: BUGGY_SAFARI_ITERATORS$1 || INCORRECT_VALUES_NAME }, methods);
+  }
+
+  return methods;
+};
+
+var ARRAY_ITERATOR = 'Array Iterator';
+var setInternalState = internalState.set;
+var getInternalState = internalState.getterFor(ARRAY_ITERATOR);
+
+// `Array.prototype.entries` method
+// https://tc39.github.io/ecma262/#sec-array.prototype.entries
+// `Array.prototype.keys` method
+// https://tc39.github.io/ecma262/#sec-array.prototype.keys
+// `Array.prototype.values` method
+// https://tc39.github.io/ecma262/#sec-array.prototype.values
+// `Array.prototype[@@iterator]` method
+// https://tc39.github.io/ecma262/#sec-array.prototype-@@iterator
+// `CreateArrayIterator` internal method
+// https://tc39.github.io/ecma262/#sec-createarrayiterator
+var es_array_iterator = defineIterator(Array, 'Array', function (iterated, kind) {
+  setInternalState(this, {
+    type: ARRAY_ITERATOR,
+    target: toIndexedObject(iterated), // target
+    index: 0,                          // next index
+    kind: kind                         // kind
+  });
+// `%ArrayIteratorPrototype%.next` method
+// https://tc39.github.io/ecma262/#sec-%arrayiteratorprototype%.next
+}, function () {
+  var state = getInternalState(this);
+  var target = state.target;
+  var kind = state.kind;
+  var index = state.index++;
+  if (!target || index >= target.length) {
+    state.target = undefined;
+    return { value: undefined, done: true };
+  }
+  if (kind == 'keys') return { value: index, done: false };
+  if (kind == 'values') return { value: target[index], done: false };
+  return { value: [index, target[index]], done: false };
+}, 'values');
+
+// argumentsList[@@iterator] is %ArrayProto_values%
+// https://tc39.github.io/ecma262/#sec-createunmappedargumentsobject
+// https://tc39.github.io/ecma262/#sec-createmappedargumentsobject
+iterators.Arguments = iterators.Array;
+
+// https://tc39.github.io/ecma262/#sec-array.prototype-@@unscopables
+addToUnscopables('keys');
+addToUnscopables('values');
+addToUnscopables('entries');
 
 /**
  * Devices action creators object
@@ -4718,9 +5439,11 @@ const pairingsState = createSlice({
       const hubPairingDevices = {};
       Object.entries(devices).forEach(entry => {
         const [id, device] = entry;
-        hubPairingDevices[id] = objectSpread({}, device);
+        hubPairingDevices[id] = { ...device
+        };
       });
-      stateToSet[hubId] = objectSpread({}, hubPairingDevices);
+      stateToSet[hubId] = { ...hubPairingDevices
+      };
     },
 
     /*
@@ -4738,7 +5461,8 @@ const pairingsState = createSlice({
       } = action.payload;
 
       if (stateToSet[hubId]) {
-        stateToSet[hubId][device.id] = objectSpread({}, device);
+        stateToSet[hubId][device.id] = { ...device
+        };
       }
     },
 
@@ -4799,9 +5523,11 @@ const devicesState = createSlice({
       const hubDevices = {};
       Object.entries(devices).forEach(entry => {
         const [id, device] = entry;
-        hubDevices[id] = objectSpread({}, device);
+        hubDevices[id] = { ...device
+        };
       });
-      stateToSet[hubId] = objectSpread({}, hubDevices);
+      stateToSet[hubId] = { ...hubDevices
+      };
     },
 
     /*
@@ -4819,7 +5545,8 @@ const devicesState = createSlice({
       } = action.payload;
 
       if (stateToSet[hubId]) {
-        stateToSet[hubId][device.id] = objectSpread({}, device);
+        stateToSet[hubId][device.id] = { ...device
+        };
       }
     },
 
@@ -4885,7 +5612,9 @@ const hubsState = createSlice({
       console.log('updateHubs', hubs);
       Object.entries(hubs).forEach(entry => {
         const [id, hub] = entry;
-        stateToSet[id] = objectSpread({}, state[id], hub);
+        stateToSet[id] = { ...state[id],
+          ...hub
+        };
       });
     },
 
@@ -5008,7 +5737,7 @@ var _nativeKeys = nativeKeys;
 var objectProto$1 = Object.prototype;
 
 /** Used to check objects for own properties. */
-var hasOwnProperty = objectProto$1.hasOwnProperty;
+var hasOwnProperty$1 = objectProto$1.hasOwnProperty;
 
 /**
  * The base implementation of `_.keys` which doesn't treat sparse arrays as dense.
@@ -5023,7 +5752,7 @@ function baseKeys(object) {
   }
   var result = [];
   for (var key in Object(object)) {
-    if (hasOwnProperty.call(object, key) && key != 'constructor') {
+    if (hasOwnProperty$1.call(object, key) && key != 'constructor') {
       result.push(key);
     }
   }
@@ -5046,15 +5775,15 @@ var root$1 = _freeGlobal || freeSelf || Function('return this')();
 var _root = root$1;
 
 /** Built-in value references. */
-var Symbol$1 = _root.Symbol;
+var Symbol$2 = _root.Symbol;
 
-var _Symbol = Symbol$1;
+var _Symbol = Symbol$2;
 
 /** Used for built-in method references. */
 var objectProto$2 = Object.prototype;
 
 /** Used to check objects for own properties. */
-var hasOwnProperty$1 = objectProto$2.hasOwnProperty;
+var hasOwnProperty$2 = objectProto$2.hasOwnProperty;
 
 /**
  * Used to resolve the
@@ -5074,7 +5803,7 @@ var symToStringTag = _Symbol ? _Symbol.toStringTag : undefined;
  * @returns {string} Returns the raw `toStringTag`.
  */
 function getRawTag(value) {
-  var isOwn = hasOwnProperty$1.call(value, symToStringTag),
+  var isOwn = hasOwnProperty$2.call(value, symToStringTag),
       tag = value[symToStringTag];
 
   try {
@@ -5168,12 +5897,12 @@ var _baseGetTag = baseGetTag;
  * _.isObject(null);
  * // => false
  */
-function isObject(value) {
+function isObject$1(value) {
   var type = typeof value;
   return value != null && (type == 'object' || type == 'function');
 }
 
-var isObject_1 = isObject;
+var isObject_1 = isObject$1;
 
 /** `Object#toString` result references. */
 var asyncTag = '[object AsyncFunction]',
@@ -5278,11 +6007,11 @@ var funcProto$1 = Function.prototype,
 var funcToString$1 = funcProto$1.toString;
 
 /** Used to check objects for own properties. */
-var hasOwnProperty$2 = objectProto$4.hasOwnProperty;
+var hasOwnProperty$3 = objectProto$4.hasOwnProperty;
 
 /** Used to detect if a method is native. */
 var reIsNative = RegExp('^' +
-  funcToString$1.call(hasOwnProperty$2).replace(reRegExpChar, '\\$&')
+  funcToString$1.call(hasOwnProperty$3).replace(reRegExpChar, '\\$&')
   .replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$'
 );
 
@@ -5354,9 +6083,9 @@ var Set$1 = _getNative(_root, 'Set');
 var _Set = Set$1;
 
 /* Built-in method references that are verified to be native. */
-var WeakMap = _getNative(_root, 'WeakMap');
+var WeakMap$2 = _getNative(_root, 'WeakMap');
 
-var _WeakMap = WeakMap;
+var _WeakMap = WeakMap$2;
 
 /** `Object#toString` result references. */
 var mapTag = '[object Map]',
@@ -5459,10 +6188,10 @@ var _baseIsArguments = baseIsArguments;
 var objectProto$5 = Object.prototype;
 
 /** Used to check objects for own properties. */
-var hasOwnProperty$3 = objectProto$5.hasOwnProperty;
+var hasOwnProperty$4 = objectProto$5.hasOwnProperty;
 
 /** Built-in value references. */
-var propertyIsEnumerable = objectProto$5.propertyIsEnumerable;
+var propertyIsEnumerable$1 = objectProto$5.propertyIsEnumerable;
 
 /**
  * Checks if `value` is likely an `arguments` object.
@@ -5483,8 +6212,8 @@ var propertyIsEnumerable = objectProto$5.propertyIsEnumerable;
  * // => false
  */
 var isArguments = _baseIsArguments(function() { return arguments; }()) ? _baseIsArguments : function(value) {
-  return isObjectLike_1(value) && hasOwnProperty$3.call(value, 'callee') &&
-    !propertyIsEnumerable.call(value, 'callee');
+  return isObjectLike_1(value) && hasOwnProperty$4.call(value, 'callee') &&
+    !propertyIsEnumerable$1.call(value, 'callee');
 };
 
 var isArguments_1 = isArguments;
@@ -5512,9 +6241,9 @@ var isArguments_1 = isArguments;
  * _.isArray(_.noop);
  * // => false
  */
-var isArray$1 = Array.isArray;
+var isArray$3 = Array.isArray;
 
-var isArray_1 = isArray$1;
+var isArray_1 = isArray$3;
 
 /** Used as references for various `Number` constants. */
 var MAX_SAFE_INTEGER = 9007199254740991;
@@ -5604,7 +6333,7 @@ var stubFalse_1 = stubFalse;
 
 var isBuffer_1 = createCommonjsModule(function (module, exports) {
 /** Detect free variable `exports`. */
-var freeExports = exports && !exports.nodeType && exports;
+var freeExports =  exports && !exports.nodeType && exports;
 
 /** Detect free variable `module`. */
 var freeModule = freeExports && 'object' == 'object' && module && !module.nodeType && module;
@@ -5714,7 +6443,7 @@ var _baseUnary = baseUnary;
 
 var _nodeUtil = createCommonjsModule(function (module, exports) {
 /** Detect free variable `exports`. */
-var freeExports = exports && !exports.nodeType && exports;
+var freeExports =  exports && !exports.nodeType && exports;
 
 /** Detect free variable `module`. */
 var freeModule = freeExports && 'object' == 'object' && module && !module.nodeType && module;
@@ -5775,7 +6504,7 @@ var mapTag$2 = '[object Map]',
 var objectProto$6 = Object.prototype;
 
 /** Used to check objects for own properties. */
-var hasOwnProperty$4 = objectProto$6.hasOwnProperty;
+var hasOwnProperty$5 = objectProto$6.hasOwnProperty;
 
 /**
  * Checks if `value` is an empty object, collection, map, or set.
@@ -5827,7 +6556,7 @@ function isEmpty(value) {
     return !_baseKeys(value).length;
   }
   for (var key in value) {
-    if (hasOwnProperty$4.call(value, key)) {
+    if (hasOwnProperty$5.call(value, key)) {
       return false;
     }
   }
@@ -5964,12 +6693,6 @@ const userState = createSlice({
 
             break;
           }
-
-        default:
-          {
-            // statements;
-            break;
-          }
       }
     },
 
@@ -6062,9 +6785,11 @@ const roomsState = createSlice({
       const hubRooms = {};
       Object.entries(rooms).forEach(entry => {
         const [id, room] = entry;
-        hubRooms[id] = objectSpread({}, room);
+        hubRooms[id] = { ...room
+        };
       });
-      stateToSet[hubId] = objectSpread({}, hubRooms);
+      stateToSet[hubId] = { ...hubRooms
+      };
     },
 
     /*
@@ -6082,7 +6807,8 @@ const roomsState = createSlice({
       } = action.payload;
 
       if (hubId && stateToSet[hubId]) {
-        stateToSet[hubId][room.id] = objectSpread({}, room);
+        stateToSet[hubId][room.id] = { ...room
+        };
       }
     },
 
@@ -6120,7 +6846,8 @@ const roomsState = createSlice({
       } = action.payload;
 
       if (stateToSet[hubId]) {
-        stateToSet[hubId][room.id] = objectSpread({}, room);
+        stateToSet[hubId][room.id] = { ...room
+        };
       }
     }
 
@@ -6199,7 +6926,7 @@ var getValue$1 = function(target, path, options) {
     return isValid(path, target, options) ? target[path] : options.default;
   }
 
-  let segs = isArray ? path : split(path, splitChar, options);
+  let segs = isArray ? path : split$1(path, splitChar, options);
   let len = segs.length;
   let idx = 0;
 
@@ -6257,7 +6984,7 @@ function join(segs, joinChar, options) {
   return segs[0] + joinChar + segs[1];
 }
 
-function split(path, splitChar, options) {
+function split$1(path, splitChar, options) {
   if (typeof options.split === 'function') {
     return options.split(path);
   }
@@ -6280,14 +7007,14 @@ function isValidObject(val) {
  * @type {Object}
  */
 
-const store = configureStore({
+const store$3 = configureStore({
   reducer: rootReducer // middleware: [...getDefaultMiddleware(), logger]
   // default true like: devTools: 'production' !== 'production'
   // preloadedState
   // enhancers: [reduxBatch]
 
 });
-console.log('Store Initial State: ', store.getState());
+console.log('Store Initial State: ', store$3.getState());
 
 function watchState(getState, objectPath) {
   let currentValue = getValue$1(getState(), objectPath);
@@ -6312,7 +7039,7 @@ function watchState(getState, objectPath) {
 
 
 function watchChanges(path, changed, optionalStore) {
-  const selectedStore = optionalStore || store;
+  const selectedStore = optionalStore || store$3;
   const watchFn = watchState(selectedStore.getState, path);
   selectedStore.subscribe(watchFn(changed));
 }
@@ -6360,7 +7087,7 @@ const HUB_PORT = '8893';
  */
 
 function setCloudConnectionState(state) {
-  store.dispatch(connectionsState.actions.setCloudConnectionState(state));
+  store$3.dispatch(connectionsState.actions.setCloudConnectionState(state));
 }
 /**
  * Get Cloud connection state
@@ -6368,7 +7095,7 @@ function setCloudConnectionState(state) {
  */
 
 function getCloudConnectionState() {
-  const stateNow = store.getState();
+  const stateNow = store$3.getState();
   return connectionsState.selectors.getConnections(stateNow).cloudState;
 }
 /**
@@ -6377,7 +7104,7 @@ function getCloudConnectionState() {
  */
 
 function setHubConnectionState$1(paramHubAndState) {
-  const stateNow = store.getState();
+  const stateNow = store$3.getState();
   const storedHubs = hubsState.selectors.getHubs(stateNow);
   const hubAndState = paramHubAndState;
   /* If hub is unconnected, lets try remote */
@@ -6388,7 +7115,7 @@ function setHubConnectionState$1(paramHubAndState) {
     }
   }
 
-  store.dispatch(hubsState.actions.setHubConnectionState(hubAndState));
+  store$3.dispatch(hubsState.actions.setHubConnectionState(hubAndState));
 }
 /**
  * Get hub connection state by hub id
@@ -6397,7 +7124,7 @@ function setHubConnectionState$1(paramHubAndState) {
  */
 
 function getHubConnectionState(hubId) {
-  const stateNow = store.getState();
+  const stateNow = store$3.getState();
 
   if (hubsState.selectors.getHubs(stateNow)[hubId]) {
     return hubsState.selectors.getHubs(stateNow)[hubId].connectionState;
@@ -6405,6 +7132,792 @@ function getHubConnectionState(hubId) {
 
   return HUB_CONNECTION_STATES.UNCONNECTED;
 }
+
+var nativePromiseConstructor = global_1.Promise;
+
+var redefineAll = function (target, src, options) {
+  for (var key in src) redefine(target, key, src[key], options);
+  return target;
+};
+
+var SPECIES$1 = wellKnownSymbol('species');
+
+var setSpecies = function (CONSTRUCTOR_NAME) {
+  var Constructor = getBuiltIn(CONSTRUCTOR_NAME);
+  var defineProperty = objectDefineProperty.f;
+
+  if (descriptors$1 && Constructor && !Constructor[SPECIES$1]) {
+    defineProperty(Constructor, SPECIES$1, {
+      configurable: true,
+      get: function () { return this; }
+    });
+  }
+};
+
+var aFunction$1 = function (it) {
+  if (typeof it != 'function') {
+    throw TypeError(String(it) + ' is not a function');
+  } return it;
+};
+
+var anInstance = function (it, Constructor, name) {
+  if (!(it instanceof Constructor)) {
+    throw TypeError('Incorrect ' + (name ? name + ' ' : '') + 'invocation');
+  } return it;
+};
+
+var ITERATOR$2 = wellKnownSymbol('iterator');
+var ArrayPrototype$1 = Array.prototype;
+
+// check on default Array iterator
+var isArrayIteratorMethod = function (it) {
+  return it !== undefined && (iterators.Array === it || ArrayPrototype$1[ITERATOR$2] === it);
+};
+
+// optional / simple context binding
+var bindContext = function (fn, that, length) {
+  aFunction$1(fn);
+  if (that === undefined) return fn;
+  switch (length) {
+    case 0: return function () {
+      return fn.call(that);
+    };
+    case 1: return function (a) {
+      return fn.call(that, a);
+    };
+    case 2: return function (a, b) {
+      return fn.call(that, a, b);
+    };
+    case 3: return function (a, b, c) {
+      return fn.call(that, a, b, c);
+    };
+  }
+  return function (/* ...args */) {
+    return fn.apply(that, arguments);
+  };
+};
+
+var TO_STRING_TAG$1 = wellKnownSymbol('toStringTag');
+// ES3 wrong here
+var CORRECT_ARGUMENTS = classofRaw(function () { return arguments; }()) == 'Arguments';
+
+// fallback for IE11 Script Access Denied error
+var tryGet = function (it, key) {
+  try {
+    return it[key];
+  } catch (error) { /* empty */ }
+};
+
+// getting tag from ES6+ `Object.prototype.toString`
+var classof = function (it) {
+  var O, tag, result;
+  return it === undefined ? 'Undefined' : it === null ? 'Null'
+    // @@toStringTag case
+    : typeof (tag = tryGet(O = Object(it), TO_STRING_TAG$1)) == 'string' ? tag
+    // builtinTag case
+    : CORRECT_ARGUMENTS ? classofRaw(O)
+    // ES3 arguments fallback
+    : (result = classofRaw(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : result;
+};
+
+var ITERATOR$3 = wellKnownSymbol('iterator');
+
+var getIteratorMethod = function (it) {
+  if (it != undefined) return it[ITERATOR$3]
+    || it['@@iterator']
+    || iterators[classof(it)];
+};
+
+// call something on iterator step with safe closing on error
+var callWithSafeIterationClosing = function (iterator, fn, value, ENTRIES) {
+  try {
+    return ENTRIES ? fn(anObject(value)[0], value[1]) : fn(value);
+  // 7.4.6 IteratorClose(iterator, completion)
+  } catch (error) {
+    var returnMethod = iterator['return'];
+    if (returnMethod !== undefined) anObject(returnMethod.call(iterator));
+    throw error;
+  }
+};
+
+var iterate_1 = createCommonjsModule(function (module) {
+var Result = function (stopped, result) {
+  this.stopped = stopped;
+  this.result = result;
+};
+
+var iterate = module.exports = function (iterable, fn, that, AS_ENTRIES, IS_ITERATOR) {
+  var boundFunction = bindContext(fn, that, AS_ENTRIES ? 2 : 1);
+  var iterator, iterFn, index, length, result, next, step;
+
+  if (IS_ITERATOR) {
+    iterator = iterable;
+  } else {
+    iterFn = getIteratorMethod(iterable);
+    if (typeof iterFn != 'function') throw TypeError('Target is not iterable');
+    // optimisation for array iterators
+    if (isArrayIteratorMethod(iterFn)) {
+      for (index = 0, length = toLength(iterable.length); length > index; index++) {
+        result = AS_ENTRIES
+          ? boundFunction(anObject(step = iterable[index])[0], step[1])
+          : boundFunction(iterable[index]);
+        if (result && result instanceof Result) return result;
+      } return new Result(false);
+    }
+    iterator = iterFn.call(iterable);
+  }
+
+  next = iterator.next;
+  while (!(step = next.call(iterator)).done) {
+    result = callWithSafeIterationClosing(iterator, boundFunction, step.value, AS_ENTRIES);
+    if (typeof result == 'object' && result && result instanceof Result) return result;
+  } return new Result(false);
+};
+
+iterate.stop = function (result) {
+  return new Result(true, result);
+};
+});
+
+var ITERATOR$4 = wellKnownSymbol('iterator');
+var SAFE_CLOSING = false;
+
+try {
+  var called = 0;
+  var iteratorWithReturn = {
+    next: function () {
+      return { done: !!called++ };
+    },
+    'return': function () {
+      SAFE_CLOSING = true;
+    }
+  };
+  iteratorWithReturn[ITERATOR$4] = function () {
+    return this;
+  };
+  // eslint-disable-next-line no-throw-literal
+  Array.from(iteratorWithReturn, function () { throw 2; });
+} catch (error) { /* empty */ }
+
+var checkCorrectnessOfIteration = function (exec, SKIP_CLOSING) {
+  if (!SKIP_CLOSING && !SAFE_CLOSING) return false;
+  var ITERATION_SUPPORT = false;
+  try {
+    var object = {};
+    object[ITERATOR$4] = function () {
+      return {
+        next: function () {
+          return { done: ITERATION_SUPPORT = true };
+        }
+      };
+    };
+    exec(object);
+  } catch (error) { /* empty */ }
+  return ITERATION_SUPPORT;
+};
+
+var SPECIES$2 = wellKnownSymbol('species');
+
+// `SpeciesConstructor` abstract operation
+// https://tc39.github.io/ecma262/#sec-speciesconstructor
+var speciesConstructor = function (O, defaultConstructor) {
+  var C = anObject(O).constructor;
+  var S;
+  return C === undefined || (S = anObject(C)[SPECIES$2]) == undefined ? defaultConstructor : aFunction$1(S);
+};
+
+var userAgent = getBuiltIn('navigator', 'userAgent') || '';
+
+var location = global_1.location;
+var set$3 = global_1.setImmediate;
+var clear = global_1.clearImmediate;
+var process$1 = global_1.process;
+var MessageChannel = global_1.MessageChannel;
+var Dispatch = global_1.Dispatch;
+var counter = 0;
+var queue = {};
+var ONREADYSTATECHANGE = 'onreadystatechange';
+var defer, channel, port;
+
+var run = function (id) {
+  // eslint-disable-next-line no-prototype-builtins
+  if (queue.hasOwnProperty(id)) {
+    var fn = queue[id];
+    delete queue[id];
+    fn();
+  }
+};
+
+var runner = function (id) {
+  return function () {
+    run(id);
+  };
+};
+
+var listener = function (event) {
+  run(event.data);
+};
+
+var post = function (id) {
+  // old engines have not location.origin
+  global_1.postMessage(id + '', location.protocol + '//' + location.host);
+};
+
+// Node.js 0.9+ & IE10+ has setImmediate, otherwise:
+if (!set$3 || !clear) {
+  set$3 = function setImmediate(fn) {
+    var args = [];
+    var i = 1;
+    while (arguments.length > i) args.push(arguments[i++]);
+    queue[++counter] = function () {
+      // eslint-disable-next-line no-new-func
+      (typeof fn == 'function' ? fn : Function(fn)).apply(undefined, args);
+    };
+    defer(counter);
+    return counter;
+  };
+  clear = function clearImmediate(id) {
+    delete queue[id];
+  };
+  // Node.js 0.8-
+  if (classofRaw(process$1) == 'process') {
+    defer = function (id) {
+      process$1.nextTick(runner(id));
+    };
+  // Sphere (JS game engine) Dispatch API
+  } else if (Dispatch && Dispatch.now) {
+    defer = function (id) {
+      Dispatch.now(runner(id));
+    };
+  // Browsers with MessageChannel, includes WebWorkers
+  // except iOS - https://github.com/zloirock/core-js/issues/624
+  } else if (MessageChannel && !/(iphone|ipod|ipad).*applewebkit/i.test(userAgent)) {
+    channel = new MessageChannel();
+    port = channel.port2;
+    channel.port1.onmessage = listener;
+    defer = bindContext(port.postMessage, port, 1);
+  // Browsers with postMessage, skip WebWorkers
+  // IE8 has postMessage, but it's sync & typeof its postMessage is 'object'
+  } else if (global_1.addEventListener && typeof postMessage == 'function' && !global_1.importScripts && !fails(post)) {
+    defer = post;
+    global_1.addEventListener('message', listener, false);
+  // IE8-
+  } else if (ONREADYSTATECHANGE in documentCreateElement('script')) {
+    defer = function (id) {
+      html.appendChild(documentCreateElement('script'))[ONREADYSTATECHANGE] = function () {
+        html.removeChild(this);
+        run(id);
+      };
+    };
+  // Rest old browsers
+  } else {
+    defer = function (id) {
+      setTimeout(runner(id), 0);
+    };
+  }
+}
+
+var task = {
+  set: set$3,
+  clear: clear
+};
+
+var getOwnPropertyDescriptor$3 = objectGetOwnPropertyDescriptor.f;
+
+var macrotask = task.set;
+
+
+var MutationObserver = global_1.MutationObserver || global_1.WebKitMutationObserver;
+var process$2 = global_1.process;
+var Promise$2 = global_1.Promise;
+var IS_NODE = classofRaw(process$2) == 'process';
+// Node.js 11 shows ExperimentalWarning on getting `queueMicrotask`
+var queueMicrotaskDescriptor = getOwnPropertyDescriptor$3(global_1, 'queueMicrotask');
+var queueMicrotask = queueMicrotaskDescriptor && queueMicrotaskDescriptor.value;
+
+var flush, head, last, notify, toggle, node, promise, then;
+
+// modern engines have queueMicrotask method
+if (!queueMicrotask) {
+  flush = function () {
+    var parent, fn;
+    if (IS_NODE && (parent = process$2.domain)) parent.exit();
+    while (head) {
+      fn = head.fn;
+      head = head.next;
+      try {
+        fn();
+      } catch (error) {
+        if (head) notify();
+        else last = undefined;
+        throw error;
+      }
+    } last = undefined;
+    if (parent) parent.enter();
+  };
+
+  // Node.js
+  if (IS_NODE) {
+    notify = function () {
+      process$2.nextTick(flush);
+    };
+  // browsers with MutationObserver, except iOS - https://github.com/zloirock/core-js/issues/339
+  } else if (MutationObserver && !/(iphone|ipod|ipad).*applewebkit/i.test(userAgent)) {
+    toggle = true;
+    node = document.createTextNode('');
+    new MutationObserver(flush).observe(node, { characterData: true });
+    notify = function () {
+      node.data = toggle = !toggle;
+    };
+  // environments with maybe non-completely correct, but existent Promise
+  } else if (Promise$2 && Promise$2.resolve) {
+    // Promise.resolve without an argument throws an error in LG WebOS 2
+    promise = Promise$2.resolve(undefined);
+    then = promise.then;
+    notify = function () {
+      then.call(promise, flush);
+    };
+  // for other environments - macrotask based on:
+  // - setImmediate
+  // - MessageChannel
+  // - window.postMessag
+  // - onreadystatechange
+  // - setTimeout
+  } else {
+    notify = function () {
+      // strange IE + webpack dev server bug - use .call(global)
+      macrotask.call(global_1, flush);
+    };
+  }
+}
+
+var microtask = queueMicrotask || function (fn) {
+  var task = { fn: fn, next: undefined };
+  if (last) last.next = task;
+  if (!head) {
+    head = task;
+    notify();
+  } last = task;
+};
+
+var PromiseCapability = function (C) {
+  var resolve, reject;
+  this.promise = new C(function ($$resolve, $$reject) {
+    if (resolve !== undefined || reject !== undefined) throw TypeError('Bad Promise constructor');
+    resolve = $$resolve;
+    reject = $$reject;
+  });
+  this.resolve = aFunction$1(resolve);
+  this.reject = aFunction$1(reject);
+};
+
+// 25.4.1.5 NewPromiseCapability(C)
+var f$5 = function (C) {
+  return new PromiseCapability(C);
+};
+
+var newPromiseCapability = {
+	f: f$5
+};
+
+var promiseResolve = function (C, x) {
+  anObject(C);
+  if (isObject(x) && x.constructor === C) return x;
+  var promiseCapability = newPromiseCapability.f(C);
+  var resolve = promiseCapability.resolve;
+  resolve(x);
+  return promiseCapability.promise;
+};
+
+var hostReportErrors = function (a, b) {
+  var console = global_1.console;
+  if (console && console.error) {
+    arguments.length === 1 ? console.error(a) : console.error(a, b);
+  }
+};
+
+var perform = function (exec) {
+  try {
+    return { error: false, value: exec() };
+  } catch (error) {
+    return { error: true, value: error };
+  }
+};
+
+var process$3 = global_1.process;
+var versions = process$3 && process$3.versions;
+var v8 = versions && versions.v8;
+var match, version;
+
+if (v8) {
+  match = v8.split('.');
+  version = match[0] + match[1];
+} else if (userAgent) {
+  match = userAgent.match(/Edge\/(\d+)/);
+  if (!match || match[1] >= 74) {
+    match = userAgent.match(/Chrome\/(\d+)/);
+    if (match) version = match[1];
+  }
+}
+
+var v8Version = version && +version;
+
+var task$1 = task.set;
+
+
+
+
+
+
+
+
+
+
+var SPECIES$3 = wellKnownSymbol('species');
+var PROMISE = 'Promise';
+var getInternalState$1 = internalState.get;
+var setInternalState$1 = internalState.set;
+var getInternalPromiseState = internalState.getterFor(PROMISE);
+var PromiseConstructor = nativePromiseConstructor;
+var TypeError$1 = global_1.TypeError;
+var document$2 = global_1.document;
+var process$4 = global_1.process;
+var $fetch = getBuiltIn('fetch');
+var newPromiseCapability$1 = newPromiseCapability.f;
+var newGenericPromiseCapability = newPromiseCapability$1;
+var IS_NODE$1 = classofRaw(process$4) == 'process';
+var DISPATCH_EVENT = !!(document$2 && document$2.createEvent && global_1.dispatchEvent);
+var UNHANDLED_REJECTION = 'unhandledrejection';
+var REJECTION_HANDLED = 'rejectionhandled';
+var PENDING = 0;
+var FULFILLED = 1;
+var REJECTED = 2;
+var HANDLED = 1;
+var UNHANDLED = 2;
+var Internal, OwnPromiseCapability, PromiseWrapper, nativeThen;
+
+var FORCED = isForced_1(PROMISE, function () {
+  // V8 6.6 (Node 10 and Chrome 66) have a bug with resolving custom thenables
+  // https://bugs.chromium.org/p/chromium/issues/detail?id=830565
+  // We can't detect it synchronously, so just check versions
+  if (v8Version === 66) return true;
+  // Unhandled rejections tracking support, NodeJS Promise without it fails @@species test
+  if (!IS_NODE$1 && typeof PromiseRejectionEvent != 'function') return true;
+  // We can't use @@species feature detection in V8 since it causes
+  // deoptimization and performance degradation
+  // https://github.com/zloirock/core-js/issues/679
+  if (v8Version >= 51 && /native code/.test(PromiseConstructor)) return false;
+  // Detect correctness of subclassing with @@species support
+  var promise = PromiseConstructor.resolve(1);
+  var FakePromise = function (exec) {
+    exec(function () { /* empty */ }, function () { /* empty */ });
+  };
+  var constructor = promise.constructor = {};
+  constructor[SPECIES$3] = FakePromise;
+  return !(promise.then(function () { /* empty */ }) instanceof FakePromise);
+});
+
+var INCORRECT_ITERATION = FORCED || !checkCorrectnessOfIteration(function (iterable) {
+  PromiseConstructor.all(iterable)['catch'](function () { /* empty */ });
+});
+
+// helpers
+var isThenable = function (it) {
+  var then;
+  return isObject(it) && typeof (then = it.then) == 'function' ? then : false;
+};
+
+var notify$1 = function (promise, state, isReject) {
+  if (state.notified) return;
+  state.notified = true;
+  var chain = state.reactions;
+  microtask(function () {
+    var value = state.value;
+    var ok = state.state == FULFILLED;
+    var index = 0;
+    // variable length - can't use forEach
+    while (chain.length > index) {
+      var reaction = chain[index++];
+      var handler = ok ? reaction.ok : reaction.fail;
+      var resolve = reaction.resolve;
+      var reject = reaction.reject;
+      var domain = reaction.domain;
+      var result, then, exited;
+      try {
+        if (handler) {
+          if (!ok) {
+            if (state.rejection === UNHANDLED) onHandleUnhandled(promise, state);
+            state.rejection = HANDLED;
+          }
+          if (handler === true) result = value;
+          else {
+            if (domain) domain.enter();
+            result = handler(value); // can throw
+            if (domain) {
+              domain.exit();
+              exited = true;
+            }
+          }
+          if (result === reaction.promise) {
+            reject(TypeError$1('Promise-chain cycle'));
+          } else if (then = isThenable(result)) {
+            then.call(result, resolve, reject);
+          } else resolve(result);
+        } else reject(value);
+      } catch (error) {
+        if (domain && !exited) domain.exit();
+        reject(error);
+      }
+    }
+    state.reactions = [];
+    state.notified = false;
+    if (isReject && !state.rejection) onUnhandled(promise, state);
+  });
+};
+
+var dispatchEvent = function (name, promise, reason) {
+  var event, handler;
+  if (DISPATCH_EVENT) {
+    event = document$2.createEvent('Event');
+    event.promise = promise;
+    event.reason = reason;
+    event.initEvent(name, false, true);
+    global_1.dispatchEvent(event);
+  } else event = { promise: promise, reason: reason };
+  if (handler = global_1['on' + name]) handler(event);
+  else if (name === UNHANDLED_REJECTION) hostReportErrors('Unhandled promise rejection', reason);
+};
+
+var onUnhandled = function (promise, state) {
+  task$1.call(global_1, function () {
+    var value = state.value;
+    var IS_UNHANDLED = isUnhandled(state);
+    var result;
+    if (IS_UNHANDLED) {
+      result = perform(function () {
+        if (IS_NODE$1) {
+          process$4.emit('unhandledRejection', value, promise);
+        } else dispatchEvent(UNHANDLED_REJECTION, promise, value);
+      });
+      // Browsers should not trigger `rejectionHandled` event if it was handled here, NodeJS - should
+      state.rejection = IS_NODE$1 || isUnhandled(state) ? UNHANDLED : HANDLED;
+      if (result.error) throw result.value;
+    }
+  });
+};
+
+var isUnhandled = function (state) {
+  return state.rejection !== HANDLED && !state.parent;
+};
+
+var onHandleUnhandled = function (promise, state) {
+  task$1.call(global_1, function () {
+    if (IS_NODE$1) {
+      process$4.emit('rejectionHandled', promise);
+    } else dispatchEvent(REJECTION_HANDLED, promise, state.value);
+  });
+};
+
+var bind = function (fn, promise, state, unwrap) {
+  return function (value) {
+    fn(promise, state, value, unwrap);
+  };
+};
+
+var internalReject = function (promise, state, value, unwrap) {
+  if (state.done) return;
+  state.done = true;
+  if (unwrap) state = unwrap;
+  state.value = value;
+  state.state = REJECTED;
+  notify$1(promise, state, true);
+};
+
+var internalResolve = function (promise, state, value, unwrap) {
+  if (state.done) return;
+  state.done = true;
+  if (unwrap) state = unwrap;
+  try {
+    if (promise === value) throw TypeError$1("Promise can't be resolved itself");
+    var then = isThenable(value);
+    if (then) {
+      microtask(function () {
+        var wrapper = { done: false };
+        try {
+          then.call(value,
+            bind(internalResolve, promise, wrapper, state),
+            bind(internalReject, promise, wrapper, state)
+          );
+        } catch (error) {
+          internalReject(promise, wrapper, error, state);
+        }
+      });
+    } else {
+      state.value = value;
+      state.state = FULFILLED;
+      notify$1(promise, state, false);
+    }
+  } catch (error) {
+    internalReject(promise, { done: false }, error, state);
+  }
+};
+
+// constructor polyfill
+if (FORCED) {
+  // 25.4.3.1 Promise(executor)
+  PromiseConstructor = function Promise(executor) {
+    anInstance(this, PromiseConstructor, PROMISE);
+    aFunction$1(executor);
+    Internal.call(this);
+    var state = getInternalState$1(this);
+    try {
+      executor(bind(internalResolve, this, state), bind(internalReject, this, state));
+    } catch (error) {
+      internalReject(this, state, error);
+    }
+  };
+  // eslint-disable-next-line no-unused-vars
+  Internal = function Promise(executor) {
+    setInternalState$1(this, {
+      type: PROMISE,
+      done: false,
+      notified: false,
+      parent: false,
+      reactions: [],
+      rejection: false,
+      state: PENDING,
+      value: undefined
+    });
+  };
+  Internal.prototype = redefineAll(PromiseConstructor.prototype, {
+    // `Promise.prototype.then` method
+    // https://tc39.github.io/ecma262/#sec-promise.prototype.then
+    then: function then(onFulfilled, onRejected) {
+      var state = getInternalPromiseState(this);
+      var reaction = newPromiseCapability$1(speciesConstructor(this, PromiseConstructor));
+      reaction.ok = typeof onFulfilled == 'function' ? onFulfilled : true;
+      reaction.fail = typeof onRejected == 'function' && onRejected;
+      reaction.domain = IS_NODE$1 ? process$4.domain : undefined;
+      state.parent = true;
+      state.reactions.push(reaction);
+      if (state.state != PENDING) notify$1(this, state, false);
+      return reaction.promise;
+    },
+    // `Promise.prototype.catch` method
+    // https://tc39.github.io/ecma262/#sec-promise.prototype.catch
+    'catch': function (onRejected) {
+      return this.then(undefined, onRejected);
+    }
+  });
+  OwnPromiseCapability = function () {
+    var promise = new Internal();
+    var state = getInternalState$1(promise);
+    this.promise = promise;
+    this.resolve = bind(internalResolve, promise, state);
+    this.reject = bind(internalReject, promise, state);
+  };
+  newPromiseCapability.f = newPromiseCapability$1 = function (C) {
+    return C === PromiseConstructor || C === PromiseWrapper
+      ? new OwnPromiseCapability(C)
+      : newGenericPromiseCapability(C);
+  };
+
+  if ( typeof nativePromiseConstructor == 'function') {
+    nativeThen = nativePromiseConstructor.prototype.then;
+
+    // wrap native Promise#then for native async functions
+    redefine(nativePromiseConstructor.prototype, 'then', function then(onFulfilled, onRejected) {
+      var that = this;
+      return new PromiseConstructor(function (resolve, reject) {
+        nativeThen.call(that, resolve, reject);
+      }).then(onFulfilled, onRejected);
+    // https://github.com/zloirock/core-js/issues/640
+    }, { unsafe: true });
+
+    // wrap fetch result
+    if (typeof $fetch == 'function') _export({ global: true, enumerable: true, forced: true }, {
+      // eslint-disable-next-line no-unused-vars
+      fetch: function fetch(input /* , init */) {
+        return promiseResolve(PromiseConstructor, $fetch.apply(global_1, arguments));
+      }
+    });
+  }
+}
+
+_export({ global: true, wrap: true, forced: FORCED }, {
+  Promise: PromiseConstructor
+});
+
+setToStringTag(PromiseConstructor, PROMISE, false);
+setSpecies(PROMISE);
+
+PromiseWrapper = getBuiltIn(PROMISE);
+
+// statics
+_export({ target: PROMISE, stat: true, forced: FORCED }, {
+  // `Promise.reject` method
+  // https://tc39.github.io/ecma262/#sec-promise.reject
+  reject: function reject(r) {
+    var capability = newPromiseCapability$1(this);
+    capability.reject.call(undefined, r);
+    return capability.promise;
+  }
+});
+
+_export({ target: PROMISE, stat: true, forced:  FORCED }, {
+  // `Promise.resolve` method
+  // https://tc39.github.io/ecma262/#sec-promise.resolve
+  resolve: function resolve(x) {
+    return promiseResolve( this, x);
+  }
+});
+
+_export({ target: PROMISE, stat: true, forced: INCORRECT_ITERATION }, {
+  // `Promise.all` method
+  // https://tc39.github.io/ecma262/#sec-promise.all
+  all: function all(iterable) {
+    var C = this;
+    var capability = newPromiseCapability$1(C);
+    var resolve = capability.resolve;
+    var reject = capability.reject;
+    var result = perform(function () {
+      var $promiseResolve = aFunction$1(C.resolve);
+      var values = [];
+      var counter = 0;
+      var remaining = 1;
+      iterate_1(iterable, function (promise) {
+        var index = counter++;
+        var alreadyCalled = false;
+        values.push(undefined);
+        remaining++;
+        $promiseResolve.call(C, promise).then(function (value) {
+          if (alreadyCalled) return;
+          alreadyCalled = true;
+          values[index] = value;
+          --remaining || resolve(values);
+        }, reject);
+      });
+      --remaining || resolve(values);
+    });
+    if (result.error) reject(result.value);
+    return capability.promise;
+  },
+  // `Promise.race` method
+  // https://tc39.github.io/ecma262/#sec-promise.race
+  race: function race(iterable) {
+    var C = this;
+    var capability = newPromiseCapability$1(C);
+    var reject = capability.reject;
+    var result = perform(function () {
+      var $promiseResolve = aFunction$1(C.resolve);
+      iterate_1(iterable, function (promise) {
+        $promiseResolve.call(C, promise).then(capability.resolve, reject);
+      });
+    });
+    if (result.error) reject(result.value);
+    return capability.promise;
+  }
+});
 
 /** `Object#toString` result references. */
 var stringTag$1 = '[object String]';
@@ -6433,13 +7946,2941 @@ function isString(value) {
 
 var isString_1 = isString;
 
+var bind$1 = function bind(fn, thisArg) {
+  return function wrap() {
+    var args = new Array(arguments.length);
+    for (var i = 0; i < args.length; i++) {
+      args[i] = arguments[i];
+    }
+    return fn.apply(thisArg, args);
+  };
+};
+
+/*!
+ * Determine if an object is a Buffer
+ *
+ * @author   Feross Aboukhadijeh <https://feross.org>
+ * @license  MIT
+ */
+
+var isBuffer = function isBuffer (obj) {
+  return obj != null && obj.constructor != null &&
+    typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj)
+};
+
+/*global toString:true*/
+
+// utils is a library of generic helper functions non-specific to axios
+
+var toString$1 = Object.prototype.toString;
+
+/**
+ * Determine if a value is an Array
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an Array, otherwise false
+ */
+function isArray$4(val) {
+  return toString$1.call(val) === '[object Array]';
+}
+
+/**
+ * Determine if a value is an ArrayBuffer
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an ArrayBuffer, otherwise false
+ */
+function isArrayBuffer(val) {
+  return toString$1.call(val) === '[object ArrayBuffer]';
+}
+
+/**
+ * Determine if a value is a FormData
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an FormData, otherwise false
+ */
+function isFormData(val) {
+  return (typeof FormData !== 'undefined') && (val instanceof FormData);
+}
+
+/**
+ * Determine if a value is a view on an ArrayBuffer
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a view on an ArrayBuffer, otherwise false
+ */
+function isArrayBufferView(val) {
+  var result;
+  if ((typeof ArrayBuffer !== 'undefined') && (ArrayBuffer.isView)) {
+    result = ArrayBuffer.isView(val);
+  } else {
+    result = (val) && (val.buffer) && (val.buffer instanceof ArrayBuffer);
+  }
+  return result;
+}
+
+/**
+ * Determine if a value is a String
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a String, otherwise false
+ */
+function isString$1(val) {
+  return typeof val === 'string';
+}
+
+/**
+ * Determine if a value is a Number
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Number, otherwise false
+ */
+function isNumber(val) {
+  return typeof val === 'number';
+}
+
+/**
+ * Determine if a value is undefined
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if the value is undefined, otherwise false
+ */
+function isUndefined(val) {
+  return typeof val === 'undefined';
+}
+
+/**
+ * Determine if a value is an Object
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an Object, otherwise false
+ */
+function isObject$2(val) {
+  return val !== null && typeof val === 'object';
+}
+
+/**
+ * Determine if a value is a Date
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Date, otherwise false
+ */
+function isDate(val) {
+  return toString$1.call(val) === '[object Date]';
+}
+
+/**
+ * Determine if a value is a File
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a File, otherwise false
+ */
+function isFile(val) {
+  return toString$1.call(val) === '[object File]';
+}
+
+/**
+ * Determine if a value is a Blob
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Blob, otherwise false
+ */
+function isBlob(val) {
+  return toString$1.call(val) === '[object Blob]';
+}
+
+/**
+ * Determine if a value is a Function
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Function, otherwise false
+ */
+function isFunction$1(val) {
+  return toString$1.call(val) === '[object Function]';
+}
+
+/**
+ * Determine if a value is a Stream
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Stream, otherwise false
+ */
+function isStream(val) {
+  return isObject$2(val) && isFunction$1(val.pipe);
+}
+
+/**
+ * Determine if a value is a URLSearchParams object
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a URLSearchParams object, otherwise false
+ */
+function isURLSearchParams(val) {
+  return typeof URLSearchParams !== 'undefined' && val instanceof URLSearchParams;
+}
+
+/**
+ * Trim excess whitespace off the beginning and end of a string
+ *
+ * @param {String} str The String to trim
+ * @returns {String} The String freed of excess whitespace
+ */
+function trim(str) {
+  return str.replace(/^\s*/, '').replace(/\s*$/, '');
+}
+
+/**
+ * Determine if we're running in a standard browser environment
+ *
+ * This allows axios to run in a web worker, and react-native.
+ * Both environments support XMLHttpRequest, but not fully standard globals.
+ *
+ * web workers:
+ *  typeof window -> undefined
+ *  typeof document -> undefined
+ *
+ * react-native:
+ *  navigator.product -> 'ReactNative'
+ */
+function isStandardBrowserEnv() {
+  if (typeof navigator !== 'undefined' && navigator.product === 'ReactNative') {
+    return false;
+  }
+  return (
+    typeof window !== 'undefined' &&
+    typeof document !== 'undefined'
+  );
+}
+
+/**
+ * Iterate over an Array or an Object invoking a function for each item.
+ *
+ * If `obj` is an Array callback will be called passing
+ * the value, index, and complete array for each item.
+ *
+ * If 'obj' is an Object callback will be called passing
+ * the value, key, and complete object for each property.
+ *
+ * @param {Object|Array} obj The object to iterate
+ * @param {Function} fn The callback to invoke for each item
+ */
+function forEach(obj, fn) {
+  // Don't bother if no value provided
+  if (obj === null || typeof obj === 'undefined') {
+    return;
+  }
+
+  // Force an array if not already something iterable
+  if (typeof obj !== 'object') {
+    /*eslint no-param-reassign:0*/
+    obj = [obj];
+  }
+
+  if (isArray$4(obj)) {
+    // Iterate over array values
+    for (var i = 0, l = obj.length; i < l; i++) {
+      fn.call(null, obj[i], i, obj);
+    }
+  } else {
+    // Iterate over object keys
+    for (var key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        fn.call(null, obj[key], key, obj);
+      }
+    }
+  }
+}
+
+/**
+ * Accepts varargs expecting each argument to be an object, then
+ * immutably merges the properties of each object and returns result.
+ *
+ * When multiple objects contain the same key the later object in
+ * the arguments list will take precedence.
+ *
+ * Example:
+ *
+ * ```js
+ * var result = merge({foo: 123}, {foo: 456});
+ * console.log(result.foo); // outputs 456
+ * ```
+ *
+ * @param {Object} obj1 Object to merge
+ * @returns {Object} Result of all merge properties
+ */
+function merge$1(/* obj1, obj2, obj3, ... */) {
+  var result = {};
+  function assignValue(val, key) {
+    if (typeof result[key] === 'object' && typeof val === 'object') {
+      result[key] = merge$1(result[key], val);
+    } else {
+      result[key] = val;
+    }
+  }
+
+  for (var i = 0, l = arguments.length; i < l; i++) {
+    forEach(arguments[i], assignValue);
+  }
+  return result;
+}
+
+/**
+ * Extends object a by mutably adding to it the properties of object b.
+ *
+ * @param {Object} a The object to be extended
+ * @param {Object} b The object to copy properties from
+ * @param {Object} thisArg The object to bind function to
+ * @return {Object} The resulting value of object a
+ */
+function extend(a, b, thisArg) {
+  forEach(b, function assignValue(val, key) {
+    if (thisArg && typeof val === 'function') {
+      a[key] = bind$1(val, thisArg);
+    } else {
+      a[key] = val;
+    }
+  });
+  return a;
+}
+
+var utils = {
+  isArray: isArray$4,
+  isArrayBuffer: isArrayBuffer,
+  isBuffer: isBuffer,
+  isFormData: isFormData,
+  isArrayBufferView: isArrayBufferView,
+  isString: isString$1,
+  isNumber: isNumber,
+  isObject: isObject$2,
+  isUndefined: isUndefined,
+  isDate: isDate,
+  isFile: isFile,
+  isBlob: isBlob,
+  isFunction: isFunction$1,
+  isStream: isStream,
+  isURLSearchParams: isURLSearchParams,
+  isStandardBrowserEnv: isStandardBrowserEnv,
+  forEach: forEach,
+  merge: merge$1,
+  extend: extend,
+  trim: trim
+};
+
+var normalizeHeaderName = function normalizeHeaderName(headers, normalizedName) {
+  utils.forEach(headers, function processHeader(value, name) {
+    if (name !== normalizedName && name.toUpperCase() === normalizedName.toUpperCase()) {
+      headers[normalizedName] = value;
+      delete headers[name];
+    }
+  });
+};
+
+/**
+ * Update an Error with the specified config, error code, and response.
+ *
+ * @param {Error} error The error to update.
+ * @param {Object} config The config.
+ * @param {string} [code] The error code (for example, 'ECONNABORTED').
+ * @param {Object} [request] The request.
+ * @param {Object} [response] The response.
+ * @returns {Error} The error.
+ */
+var enhanceError = function enhanceError(error, config, code, request, response) {
+  error.config = config;
+  if (code) {
+    error.code = code;
+  }
+  error.request = request;
+  error.response = response;
+  return error;
+};
+
+/**
+ * Create an Error with the specified message, config, error code, request and response.
+ *
+ * @param {string} message The error message.
+ * @param {Object} config The config.
+ * @param {string} [code] The error code (for example, 'ECONNABORTED').
+ * @param {Object} [request] The request.
+ * @param {Object} [response] The response.
+ * @returns {Error} The created error.
+ */
+var createError = function createError(message, config, code, request, response) {
+  var error = new Error(message);
+  return enhanceError(error, config, code, request, response);
+};
+
+/**
+ * Resolve or reject a Promise based on response status.
+ *
+ * @param {Function} resolve A function that resolves the promise.
+ * @param {Function} reject A function that rejects the promise.
+ * @param {object} response The response.
+ */
+var settle = function settle(resolve, reject, response) {
+  var validateStatus = response.config.validateStatus;
+  // Note: status is not exposed by XDomainRequest
+  if (!response.status || !validateStatus || validateStatus(response.status)) {
+    resolve(response);
+  } else {
+    reject(createError(
+      'Request failed with status code ' + response.status,
+      response.config,
+      null,
+      response.request,
+      response
+    ));
+  }
+};
+
+function encode(val) {
+  return encodeURIComponent(val).
+    replace(/%40/gi, '@').
+    replace(/%3A/gi, ':').
+    replace(/%24/g, '$').
+    replace(/%2C/gi, ',').
+    replace(/%20/g, '+').
+    replace(/%5B/gi, '[').
+    replace(/%5D/gi, ']');
+}
+
+/**
+ * Build a URL by appending params to the end
+ *
+ * @param {string} url The base of the url (e.g., http://www.google.com)
+ * @param {object} [params] The params to be appended
+ * @returns {string} The formatted url
+ */
+var buildURL = function buildURL(url, params, paramsSerializer) {
+  /*eslint no-param-reassign:0*/
+  if (!params) {
+    return url;
+  }
+
+  var serializedParams;
+  if (paramsSerializer) {
+    serializedParams = paramsSerializer(params);
+  } else if (utils.isURLSearchParams(params)) {
+    serializedParams = params.toString();
+  } else {
+    var parts = [];
+
+    utils.forEach(params, function serialize(val, key) {
+      if (val === null || typeof val === 'undefined') {
+        return;
+      }
+
+      if (utils.isArray(val)) {
+        key = key + '[]';
+      } else {
+        val = [val];
+      }
+
+      utils.forEach(val, function parseValue(v) {
+        if (utils.isDate(v)) {
+          v = v.toISOString();
+        } else if (utils.isObject(v)) {
+          v = JSON.stringify(v);
+        }
+        parts.push(encode(key) + '=' + encode(v));
+      });
+    });
+
+    serializedParams = parts.join('&');
+  }
+
+  if (serializedParams) {
+    url += (url.indexOf('?') === -1 ? '?' : '&') + serializedParams;
+  }
+
+  return url;
+};
+
+// Headers whose duplicates are ignored by node
+// c.f. https://nodejs.org/api/http.html#http_message_headers
+var ignoreDuplicateOf = [
+  'age', 'authorization', 'content-length', 'content-type', 'etag',
+  'expires', 'from', 'host', 'if-modified-since', 'if-unmodified-since',
+  'last-modified', 'location', 'max-forwards', 'proxy-authorization',
+  'referer', 'retry-after', 'user-agent'
+];
+
+/**
+ * Parse headers into an object
+ *
+ * ```
+ * Date: Wed, 27 Aug 2014 08:58:49 GMT
+ * Content-Type: application/json
+ * Connection: keep-alive
+ * Transfer-Encoding: chunked
+ * ```
+ *
+ * @param {String} headers Headers needing to be parsed
+ * @returns {Object} Headers parsed into an object
+ */
+var parseHeaders = function parseHeaders(headers) {
+  var parsed = {};
+  var key;
+  var val;
+  var i;
+
+  if (!headers) { return parsed; }
+
+  utils.forEach(headers.split('\n'), function parser(line) {
+    i = line.indexOf(':');
+    key = utils.trim(line.substr(0, i)).toLowerCase();
+    val = utils.trim(line.substr(i + 1));
+
+    if (key) {
+      if (parsed[key] && ignoreDuplicateOf.indexOf(key) >= 0) {
+        return;
+      }
+      if (key === 'set-cookie') {
+        parsed[key] = (parsed[key] ? parsed[key] : []).concat([val]);
+      } else {
+        parsed[key] = parsed[key] ? parsed[key] + ', ' + val : val;
+      }
+    }
+  });
+
+  return parsed;
+};
+
+var isURLSameOrigin = (
+  utils.isStandardBrowserEnv() ?
+
+  // Standard browser envs have full support of the APIs needed to test
+  // whether the request URL is of the same origin as current location.
+  (function standardBrowserEnv() {
+    var msie = /(msie|trident)/i.test(navigator.userAgent);
+    var urlParsingNode = document.createElement('a');
+    var originURL;
+
+    /**
+    * Parse a URL to discover it's components
+    *
+    * @param {String} url The URL to be parsed
+    * @returns {Object}
+    */
+    function resolveURL(url) {
+      var href = url;
+
+      if (msie) {
+        // IE needs attribute set twice to normalize properties
+        urlParsingNode.setAttribute('href', href);
+        href = urlParsingNode.href;
+      }
+
+      urlParsingNode.setAttribute('href', href);
+
+      // urlParsingNode provides the UrlUtils interface - http://url.spec.whatwg.org/#urlutils
+      return {
+        href: urlParsingNode.href,
+        protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, '') : '',
+        host: urlParsingNode.host,
+        search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, '') : '',
+        hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, '') : '',
+        hostname: urlParsingNode.hostname,
+        port: urlParsingNode.port,
+        pathname: (urlParsingNode.pathname.charAt(0) === '/') ?
+                  urlParsingNode.pathname :
+                  '/' + urlParsingNode.pathname
+      };
+    }
+
+    originURL = resolveURL(window.location.href);
+
+    /**
+    * Determine if a URL shares the same origin as the current location
+    *
+    * @param {String} requestURL The URL to test
+    * @returns {boolean} True if URL shares the same origin, otherwise false
+    */
+    return function isURLSameOrigin(requestURL) {
+      var parsed = (utils.isString(requestURL)) ? resolveURL(requestURL) : requestURL;
+      return (parsed.protocol === originURL.protocol &&
+            parsed.host === originURL.host);
+    };
+  })() :
+
+  // Non standard browser envs (web workers, react-native) lack needed support.
+  (function nonStandardBrowserEnv() {
+    return function isURLSameOrigin() {
+      return true;
+    };
+  })()
+);
+
+var cookies = (
+  utils.isStandardBrowserEnv() ?
+
+  // Standard browser envs support document.cookie
+  (function standardBrowserEnv() {
+    return {
+      write: function write(name, value, expires, path, domain, secure) {
+        var cookie = [];
+        cookie.push(name + '=' + encodeURIComponent(value));
+
+        if (utils.isNumber(expires)) {
+          cookie.push('expires=' + new Date(expires).toGMTString());
+        }
+
+        if (utils.isString(path)) {
+          cookie.push('path=' + path);
+        }
+
+        if (utils.isString(domain)) {
+          cookie.push('domain=' + domain);
+        }
+
+        if (secure === true) {
+          cookie.push('secure');
+        }
+
+        document.cookie = cookie.join('; ');
+      },
+
+      read: function read(name) {
+        var match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
+        return (match ? decodeURIComponent(match[3]) : null);
+      },
+
+      remove: function remove(name) {
+        this.write(name, '', Date.now() - 86400000);
+      }
+    };
+  })() :
+
+  // Non standard browser env (web workers, react-native) lack needed support.
+  (function nonStandardBrowserEnv() {
+    return {
+      write: function write() {},
+      read: function read() { return null; },
+      remove: function remove() {}
+    };
+  })()
+);
+
+var xhr = function xhrAdapter(config) {
+  return new Promise(function dispatchXhrRequest(resolve, reject) {
+    var requestData = config.data;
+    var requestHeaders = config.headers;
+
+    if (utils.isFormData(requestData)) {
+      delete requestHeaders['Content-Type']; // Let the browser set it
+    }
+
+    var request = new XMLHttpRequest();
+
+    // HTTP basic authentication
+    if (config.auth) {
+      var username = config.auth.username || '';
+      var password = config.auth.password || '';
+      requestHeaders.Authorization = 'Basic ' + btoa(username + ':' + password);
+    }
+
+    request.open(config.method.toUpperCase(), buildURL(config.url, config.params, config.paramsSerializer), true);
+
+    // Set the request timeout in MS
+    request.timeout = config.timeout;
+
+    // Listen for ready state
+    request.onreadystatechange = function handleLoad() {
+      if (!request || request.readyState !== 4) {
+        return;
+      }
+
+      // The request errored out and we didn't get a response, this will be
+      // handled by onerror instead
+      // With one exception: request that using file: protocol, most browsers
+      // will return status as 0 even though it's a successful request
+      if (request.status === 0 && !(request.responseURL && request.responseURL.indexOf('file:') === 0)) {
+        return;
+      }
+
+      // Prepare the response
+      var responseHeaders = 'getAllResponseHeaders' in request ? parseHeaders(request.getAllResponseHeaders()) : null;
+      var responseData = !config.responseType || config.responseType === 'text' ? request.responseText : request.response;
+      var response = {
+        data: responseData,
+        status: request.status,
+        statusText: request.statusText,
+        headers: responseHeaders,
+        config: config,
+        request: request
+      };
+
+      settle(resolve, reject, response);
+
+      // Clean up request
+      request = null;
+    };
+
+    // Handle low level network errors
+    request.onerror = function handleError() {
+      // Real errors are hidden from us by the browser
+      // onerror should only fire if it's a network error
+      reject(createError('Network Error', config, null, request));
+
+      // Clean up request
+      request = null;
+    };
+
+    // Handle timeout
+    request.ontimeout = function handleTimeout() {
+      reject(createError('timeout of ' + config.timeout + 'ms exceeded', config, 'ECONNABORTED',
+        request));
+
+      // Clean up request
+      request = null;
+    };
+
+    // Add xsrf header
+    // This is only done if running in a standard browser environment.
+    // Specifically not if we're in a web worker, or react-native.
+    if (utils.isStandardBrowserEnv()) {
+      var cookies$1 = cookies;
+
+      // Add xsrf header
+      var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
+          cookies$1.read(config.xsrfCookieName) :
+          undefined;
+
+      if (xsrfValue) {
+        requestHeaders[config.xsrfHeaderName] = xsrfValue;
+      }
+    }
+
+    // Add headers to the request
+    if ('setRequestHeader' in request) {
+      utils.forEach(requestHeaders, function setRequestHeader(val, key) {
+        if (typeof requestData === 'undefined' && key.toLowerCase() === 'content-type') {
+          // Remove Content-Type if data is undefined
+          delete requestHeaders[key];
+        } else {
+          // Otherwise add header to the request
+          request.setRequestHeader(key, val);
+        }
+      });
+    }
+
+    // Add withCredentials to request if needed
+    if (config.withCredentials) {
+      request.withCredentials = true;
+    }
+
+    // Add responseType to request if needed
+    if (config.responseType) {
+      try {
+        request.responseType = config.responseType;
+      } catch (e) {
+        // Expected DOMException thrown by browsers not compatible XMLHttpRequest Level 2.
+        // But, this can be suppressed for 'json' type as it can be parsed by default 'transformResponse' function.
+        if (config.responseType !== 'json') {
+          throw e;
+        }
+      }
+    }
+
+    // Handle progress if needed
+    if (typeof config.onDownloadProgress === 'function') {
+      request.addEventListener('progress', config.onDownloadProgress);
+    }
+
+    // Not all browsers support upload events
+    if (typeof config.onUploadProgress === 'function' && request.upload) {
+      request.upload.addEventListener('progress', config.onUploadProgress);
+    }
+
+    if (config.cancelToken) {
+      // Handle cancellation
+      config.cancelToken.promise.then(function onCanceled(cancel) {
+        if (!request) {
+          return;
+        }
+
+        request.abort();
+        reject(cancel);
+        // Clean up request
+        request = null;
+      });
+    }
+
+    if (requestData === undefined) {
+      requestData = null;
+    }
+
+    // Send the request
+    request.send(requestData);
+  });
+};
+
+/**
+ * Helpers.
+ */
+
+var s = 1000;
+var m = s * 60;
+var h = m * 60;
+var d = h * 24;
+var y = d * 365.25;
+
+/**
+ * Parse or format the given `val`.
+ *
+ * Options:
+ *
+ *  - `long` verbose formatting [false]
+ *
+ * @param {String|Number} val
+ * @param {Object} [options]
+ * @throws {Error} throw an error if val is not a non-empty string or a number
+ * @return {String|Number}
+ * @api public
+ */
+
+var ms = function(val, options) {
+  options = options || {};
+  var type = typeof val;
+  if (type === 'string' && val.length > 0) {
+    return parse$1(val);
+  } else if (type === 'number' && isNaN(val) === false) {
+    return options.long ? fmtLong(val) : fmtShort(val);
+  }
+  throw new Error(
+    'val is not a non-empty string or a valid number. val=' +
+      JSON.stringify(val)
+  );
+};
+
+/**
+ * Parse the given `str` and return milliseconds.
+ *
+ * @param {String} str
+ * @return {Number}
+ * @api private
+ */
+
+function parse$1(str) {
+  str = String(str);
+  if (str.length > 100) {
+    return;
+  }
+  var match = /^((?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|years?|yrs?|y)?$/i.exec(
+    str
+  );
+  if (!match) {
+    return;
+  }
+  var n = parseFloat(match[1]);
+  var type = (match[2] || 'ms').toLowerCase();
+  switch (type) {
+    case 'years':
+    case 'year':
+    case 'yrs':
+    case 'yr':
+    case 'y':
+      return n * y;
+    case 'days':
+    case 'day':
+    case 'd':
+      return n * d;
+    case 'hours':
+    case 'hour':
+    case 'hrs':
+    case 'hr':
+    case 'h':
+      return n * h;
+    case 'minutes':
+    case 'minute':
+    case 'mins':
+    case 'min':
+    case 'm':
+      return n * m;
+    case 'seconds':
+    case 'second':
+    case 'secs':
+    case 'sec':
+    case 's':
+      return n * s;
+    case 'milliseconds':
+    case 'millisecond':
+    case 'msecs':
+    case 'msec':
+    case 'ms':
+      return n;
+    default:
+      return undefined;
+  }
+}
+
+/**
+ * Short format for `ms`.
+ *
+ * @param {Number} ms
+ * @return {String}
+ * @api private
+ */
+
+function fmtShort(ms) {
+  if (ms >= d) {
+    return Math.round(ms / d) + 'd';
+  }
+  if (ms >= h) {
+    return Math.round(ms / h) + 'h';
+  }
+  if (ms >= m) {
+    return Math.round(ms / m) + 'm';
+  }
+  if (ms >= s) {
+    return Math.round(ms / s) + 's';
+  }
+  return ms + 'ms';
+}
+
+/**
+ * Long format for `ms`.
+ *
+ * @param {Number} ms
+ * @return {String}
+ * @api private
+ */
+
+function fmtLong(ms) {
+  return plural(ms, d, 'day') ||
+    plural(ms, h, 'hour') ||
+    plural(ms, m, 'minute') ||
+    plural(ms, s, 'second') ||
+    ms + ' ms';
+}
+
+/**
+ * Pluralization helper.
+ */
+
+function plural(ms, n, name) {
+  if (ms < n) {
+    return;
+  }
+  if (ms < n * 1.5) {
+    return Math.floor(ms / n) + ' ' + name;
+  }
+  return Math.ceil(ms / n) + ' ' + name + 's';
+}
+
+var debug = createCommonjsModule(function (module, exports) {
+/**
+ * This is the common logic for both the Node.js and web browser
+ * implementations of `debug()`.
+ *
+ * Expose `debug()` as the module.
+ */
+
+exports = module.exports = createDebug.debug = createDebug['default'] = createDebug;
+exports.coerce = coerce;
+exports.disable = disable;
+exports.enable = enable;
+exports.enabled = enabled;
+exports.humanize = ms;
+
+/**
+ * Active `debug` instances.
+ */
+exports.instances = [];
+
+/**
+ * The currently active debug mode names, and names to skip.
+ */
+
+exports.names = [];
+exports.skips = [];
+
+/**
+ * Map of special "%n" handling functions, for the debug "format" argument.
+ *
+ * Valid key names are a single, lower or upper-case letter, i.e. "n" and "N".
+ */
+
+exports.formatters = {};
+
+/**
+ * Select a color.
+ * @param {String} namespace
+ * @return {Number}
+ * @api private
+ */
+
+function selectColor(namespace) {
+  var hash = 0, i;
+
+  for (i in namespace) {
+    hash  = ((hash << 5) - hash) + namespace.charCodeAt(i);
+    hash |= 0; // Convert to 32bit integer
+  }
+
+  return exports.colors[Math.abs(hash) % exports.colors.length];
+}
+
+/**
+ * Create a debugger with the given `namespace`.
+ *
+ * @param {String} namespace
+ * @return {Function}
+ * @api public
+ */
+
+function createDebug(namespace) {
+
+  var prevTime;
+
+  function debug() {
+    // disabled?
+    if (!debug.enabled) return;
+
+    var self = debug;
+
+    // set `diff` timestamp
+    var curr = +new Date();
+    var ms = curr - (prevTime || curr);
+    self.diff = ms;
+    self.prev = prevTime;
+    self.curr = curr;
+    prevTime = curr;
+
+    // turn the `arguments` into a proper Array
+    var args = new Array(arguments.length);
+    for (var i = 0; i < args.length; i++) {
+      args[i] = arguments[i];
+    }
+
+    args[0] = exports.coerce(args[0]);
+
+    if ('string' !== typeof args[0]) {
+      // anything else let's inspect with %O
+      args.unshift('%O');
+    }
+
+    // apply any `formatters` transformations
+    var index = 0;
+    args[0] = args[0].replace(/%([a-zA-Z%])/g, function(match, format) {
+      // if we encounter an escaped % then don't increase the array index
+      if (match === '%%') return match;
+      index++;
+      var formatter = exports.formatters[format];
+      if ('function' === typeof formatter) {
+        var val = args[index];
+        match = formatter.call(self, val);
+
+        // now we need to remove `args[index]` since it's inlined in the `format`
+        args.splice(index, 1);
+        index--;
+      }
+      return match;
+    });
+
+    // apply env-specific formatting (colors, etc.)
+    exports.formatArgs.call(self, args);
+
+    var logFn = debug.log || exports.log || console.log.bind(console);
+    logFn.apply(self, args);
+  }
+
+  debug.namespace = namespace;
+  debug.enabled = exports.enabled(namespace);
+  debug.useColors = exports.useColors();
+  debug.color = selectColor(namespace);
+  debug.destroy = destroy;
+
+  // env-specific initialization logic for debug instances
+  if ('function' === typeof exports.init) {
+    exports.init(debug);
+  }
+
+  exports.instances.push(debug);
+
+  return debug;
+}
+
+function destroy () {
+  var index = exports.instances.indexOf(this);
+  if (index !== -1) {
+    exports.instances.splice(index, 1);
+    return true;
+  } else {
+    return false;
+  }
+}
+
+/**
+ * Enables a debug mode by namespaces. This can include modes
+ * separated by a colon and wildcards.
+ *
+ * @param {String} namespaces
+ * @api public
+ */
+
+function enable(namespaces) {
+  exports.save(namespaces);
+
+  exports.names = [];
+  exports.skips = [];
+
+  var i;
+  var split = (typeof namespaces === 'string' ? namespaces : '').split(/[\s,]+/);
+  var len = split.length;
+
+  for (i = 0; i < len; i++) {
+    if (!split[i]) continue; // ignore empty strings
+    namespaces = split[i].replace(/\*/g, '.*?');
+    if (namespaces[0] === '-') {
+      exports.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
+    } else {
+      exports.names.push(new RegExp('^' + namespaces + '$'));
+    }
+  }
+
+  for (i = 0; i < exports.instances.length; i++) {
+    var instance = exports.instances[i];
+    instance.enabled = exports.enabled(instance.namespace);
+  }
+}
+
+/**
+ * Disable debug output.
+ *
+ * @api public
+ */
+
+function disable() {
+  exports.enable('');
+}
+
+/**
+ * Returns true if the given mode name is enabled, false otherwise.
+ *
+ * @param {String} name
+ * @return {Boolean}
+ * @api public
+ */
+
+function enabled(name) {
+  if (name[name.length - 1] === '*') {
+    return true;
+  }
+  var i, len;
+  for (i = 0, len = exports.skips.length; i < len; i++) {
+    if (exports.skips[i].test(name)) {
+      return false;
+    }
+  }
+  for (i = 0, len = exports.names.length; i < len; i++) {
+    if (exports.names[i].test(name)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Coerce `val`.
+ *
+ * @param {Mixed} val
+ * @return {Mixed}
+ * @api private
+ */
+
+function coerce(val) {
+  if (val instanceof Error) return val.stack || val.message;
+  return val;
+}
+});
+var debug_1 = debug.coerce;
+var debug_2 = debug.disable;
+var debug_3 = debug.enable;
+var debug_4 = debug.enabled;
+var debug_5 = debug.humanize;
+var debug_6 = debug.instances;
+var debug_7 = debug.names;
+var debug_8 = debug.skips;
+var debug_9 = debug.formatters;
+
+var browser = createCommonjsModule(function (module, exports) {
+/**
+ * This is the web browser implementation of `debug()`.
+ *
+ * Expose `debug()` as the module.
+ */
+
+exports = module.exports = debug;
+exports.log = log;
+exports.formatArgs = formatArgs;
+exports.save = save;
+exports.load = load;
+exports.useColors = useColors;
+exports.storage = 'undefined' != typeof chrome
+               && 'undefined' != typeof chrome.storage
+                  ? chrome.storage.local
+                  : localstorage();
+
+/**
+ * Colors.
+ */
+
+exports.colors = [
+  '#0000CC', '#0000FF', '#0033CC', '#0033FF', '#0066CC', '#0066FF', '#0099CC',
+  '#0099FF', '#00CC00', '#00CC33', '#00CC66', '#00CC99', '#00CCCC', '#00CCFF',
+  '#3300CC', '#3300FF', '#3333CC', '#3333FF', '#3366CC', '#3366FF', '#3399CC',
+  '#3399FF', '#33CC00', '#33CC33', '#33CC66', '#33CC99', '#33CCCC', '#33CCFF',
+  '#6600CC', '#6600FF', '#6633CC', '#6633FF', '#66CC00', '#66CC33', '#9900CC',
+  '#9900FF', '#9933CC', '#9933FF', '#99CC00', '#99CC33', '#CC0000', '#CC0033',
+  '#CC0066', '#CC0099', '#CC00CC', '#CC00FF', '#CC3300', '#CC3333', '#CC3366',
+  '#CC3399', '#CC33CC', '#CC33FF', '#CC6600', '#CC6633', '#CC9900', '#CC9933',
+  '#CCCC00', '#CCCC33', '#FF0000', '#FF0033', '#FF0066', '#FF0099', '#FF00CC',
+  '#FF00FF', '#FF3300', '#FF3333', '#FF3366', '#FF3399', '#FF33CC', '#FF33FF',
+  '#FF6600', '#FF6633', '#FF9900', '#FF9933', '#FFCC00', '#FFCC33'
+];
+
+/**
+ * Currently only WebKit-based Web Inspectors, Firefox >= v31,
+ * and the Firebug extension (any Firefox version) are known
+ * to support "%c" CSS customizations.
+ *
+ * TODO: add a `localStorage` variable to explicitly enable/disable colors
+ */
+
+function useColors() {
+  // NB: In an Electron preload script, document will be defined but not fully
+  // initialized. Since we know we're in Chrome, we'll just detect this case
+  // explicitly
+  if (typeof window !== 'undefined' && window.process && window.process.type === 'renderer') {
+    return true;
+  }
+
+  // Internet Explorer and Edge do not support colors.
+  if (typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/(edge|trident)\/(\d+)/)) {
+    return false;
+  }
+
+  // is webkit? http://stackoverflow.com/a/16459606/376773
+  // document is undefined in react-native: https://github.com/facebook/react-native/pull/1632
+  return (typeof document !== 'undefined' && document.documentElement && document.documentElement.style && document.documentElement.style.WebkitAppearance) ||
+    // is firebug? http://stackoverflow.com/a/398120/376773
+    (typeof window !== 'undefined' && window.console && (window.console.firebug || (window.console.exception && window.console.table))) ||
+    // is firefox >= v31?
+    // https://developer.mozilla.org/en-US/docs/Tools/Web_Console#Styling_messages
+    (typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/) && parseInt(RegExp.$1, 10) >= 31) ||
+    // double check webkit in userAgent just in case we are in a worker
+    (typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/applewebkit\/(\d+)/));
+}
+
+/**
+ * Map %j to `JSON.stringify()`, since no Web Inspectors do that by default.
+ */
+
+exports.formatters.j = function(v) {
+  try {
+    return JSON.stringify(v);
+  } catch (err) {
+    return '[UnexpectedJSONParseError]: ' + err.message;
+  }
+};
+
+
+/**
+ * Colorize log arguments if enabled.
+ *
+ * @api public
+ */
+
+function formatArgs(args) {
+  var useColors = this.useColors;
+
+  args[0] = (useColors ? '%c' : '')
+    + this.namespace
+    + (useColors ? ' %c' : ' ')
+    + args[0]
+    + (useColors ? '%c ' : ' ')
+    + '+' + exports.humanize(this.diff);
+
+  if (!useColors) return;
+
+  var c = 'color: ' + this.color;
+  args.splice(1, 0, c, 'color: inherit');
+
+  // the final "%c" is somewhat tricky, because there could be other
+  // arguments passed either before or after the %c, so we need to
+  // figure out the correct index to insert the CSS into
+  var index = 0;
+  var lastC = 0;
+  args[0].replace(/%[a-zA-Z%]/g, function(match) {
+    if ('%%' === match) return;
+    index++;
+    if ('%c' === match) {
+      // we only are interested in the *last* %c
+      // (the user may have provided their own)
+      lastC = index;
+    }
+  });
+
+  args.splice(lastC, 0, c);
+}
+
+/**
+ * Invokes `console.log()` when available.
+ * No-op when `console.log` is not a "function".
+ *
+ * @api public
+ */
+
+function log() {
+  // this hackery is required for IE8/9, where
+  // the `console.log` function doesn't have 'apply'
+  return 'object' === typeof console
+    && console.log
+    && Function.prototype.apply.call(console.log, console, arguments);
+}
+
+/**
+ * Save `namespaces`.
+ *
+ * @param {String} namespaces
+ * @api private
+ */
+
+function save(namespaces) {
+  try {
+    if (null == namespaces) {
+      exports.storage.removeItem('debug');
+    } else {
+      exports.storage.debug = namespaces;
+    }
+  } catch(e) {}
+}
+
+/**
+ * Load `namespaces`.
+ *
+ * @return {String} returns the previously persisted debug modes
+ * @api private
+ */
+
+function load() {
+  var r;
+  try {
+    r = exports.storage.debug;
+  } catch(e) {}
+
+  // If debug isn't set in LS, and we're in Electron, try to load $DEBUG
+  if (!r && typeof process !== 'undefined' && 'env' in process) {
+    r = process.env.DEBUG;
+  }
+
+  return r;
+}
+
+/**
+ * Enable namespaces listed in `localStorage.debug` initially.
+ */
+
+exports.enable(load());
+
+/**
+ * Localstorage attempts to return the localstorage.
+ *
+ * This is necessary because safari throws
+ * when a user disables cookies/localstorage
+ * and you attempt to access it.
+ *
+ * @return {LocalStorage}
+ * @api private
+ */
+
+function localstorage() {
+  try {
+    return window.localStorage;
+  } catch (e) {}
+}
+});
+var browser_1 = browser.log;
+var browser_2 = browser.formatArgs;
+var browser_3 = browser.save;
+var browser_4 = browser.load;
+var browser_5 = browser.useColors;
+var browser_6 = browser.storage;
+var browser_7 = browser.colors;
+
+var hasFlag = (flag, argv) => {
+	argv = argv || process.argv;
+	const prefix = flag.startsWith('-') ? '' : (flag.length === 1 ? '-' : '--');
+	const pos = argv.indexOf(prefix + flag);
+	const terminatorPos = argv.indexOf('--');
+	return pos !== -1 && (terminatorPos === -1 ? true : pos < terminatorPos);
+};
+
+const env = process.env;
+
+let forceColor;
+if (hasFlag('no-color') ||
+	hasFlag('no-colors') ||
+	hasFlag('color=false')) {
+	forceColor = false;
+} else if (hasFlag('color') ||
+	hasFlag('colors') ||
+	hasFlag('color=true') ||
+	hasFlag('color=always')) {
+	forceColor = true;
+}
+if ('FORCE_COLOR' in env) {
+	forceColor = env.FORCE_COLOR.length === 0 || parseInt(env.FORCE_COLOR, 10) !== 0;
+}
+
+function translateLevel(level) {
+	if (level === 0) {
+		return false;
+	}
+
+	return {
+		level,
+		hasBasic: true,
+		has256: level >= 2,
+		has16m: level >= 3
+	};
+}
+
+function supportsColor(stream) {
+	if (forceColor === false) {
+		return 0;
+	}
+
+	if (hasFlag('color=16m') ||
+		hasFlag('color=full') ||
+		hasFlag('color=truecolor')) {
+		return 3;
+	}
+
+	if (hasFlag('color=256')) {
+		return 2;
+	}
+
+	if (stream && !stream.isTTY && forceColor !== true) {
+		return 0;
+	}
+
+	const min = forceColor ? 1 : 0;
+
+	if (process.platform === 'win32') {
+		// Node.js 7.5.0 is the first version of Node.js to include a patch to
+		// libuv that enables 256 color output on Windows. Anything earlier and it
+		// won't work. However, here we target Node.js 8 at minimum as it is an LTS
+		// release, and Node.js 7 is not. Windows 10 build 10586 is the first Windows
+		// release that supports 256 colors. Windows 10 build 14931 is the first release
+		// that supports 16m/TrueColor.
+		const osRelease = os.release().split('.');
+		if (
+			Number(process.versions.node.split('.')[0]) >= 8 &&
+			Number(osRelease[0]) >= 10 &&
+			Number(osRelease[2]) >= 10586
+		) {
+			return Number(osRelease[2]) >= 14931 ? 3 : 2;
+		}
+
+		return 1;
+	}
+
+	if ('CI' in env) {
+		if (['TRAVIS', 'CIRCLECI', 'APPVEYOR', 'GITLAB_CI'].some(sign => sign in env) || env.CI_NAME === 'codeship') {
+			return 1;
+		}
+
+		return min;
+	}
+
+	if ('TEAMCITY_VERSION' in env) {
+		return /^(9\.(0*[1-9]\d*)\.|\d{2,}\.)/.test(env.TEAMCITY_VERSION) ? 1 : 0;
+	}
+
+	if (env.COLORTERM === 'truecolor') {
+		return 3;
+	}
+
+	if ('TERM_PROGRAM' in env) {
+		const version = parseInt((env.TERM_PROGRAM_VERSION || '').split('.')[0], 10);
+
+		switch (env.TERM_PROGRAM) {
+			case 'iTerm.app':
+				return version >= 3 ? 3 : 2;
+			case 'Apple_Terminal':
+				return 2;
+			// No default
+		}
+	}
+
+	if (/-256(color)?$/i.test(env.TERM)) {
+		return 2;
+	}
+
+	if (/^screen|^xterm|^vt100|^vt220|^rxvt|color|ansi|cygwin|linux/i.test(env.TERM)) {
+		return 1;
+	}
+
+	if ('COLORTERM' in env) {
+		return 1;
+	}
+
+	if (env.TERM === 'dumb') {
+		return min;
+	}
+
+	return min;
+}
+
+function getSupportLevel(stream) {
+	const level = supportsColor(stream);
+	return translateLevel(level);
+}
+
+var supportsColor_1 = {
+	supportsColor: getSupportLevel,
+	stdout: getSupportLevel(process.stdout),
+	stderr: getSupportLevel(process.stderr)
+};
+
+var node$1 = createCommonjsModule(function (module, exports) {
+/**
+ * Module dependencies.
+ */
+
+
+
+
+/**
+ * This is the Node.js implementation of `debug()`.
+ *
+ * Expose `debug()` as the module.
+ */
+
+exports = module.exports = debug;
+exports.init = init;
+exports.log = log;
+exports.formatArgs = formatArgs;
+exports.save = save;
+exports.load = load;
+exports.useColors = useColors;
+
+/**
+ * Colors.
+ */
+
+exports.colors = [ 6, 2, 3, 4, 5, 1 ];
+
+try {
+  var supportsColor = supportsColor_1;
+  if (supportsColor && supportsColor.level >= 2) {
+    exports.colors = [
+      20, 21, 26, 27, 32, 33, 38, 39, 40, 41, 42, 43, 44, 45, 56, 57, 62, 63, 68,
+      69, 74, 75, 76, 77, 78, 79, 80, 81, 92, 93, 98, 99, 112, 113, 128, 129, 134,
+      135, 148, 149, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171,
+      172, 173, 178, 179, 184, 185, 196, 197, 198, 199, 200, 201, 202, 203, 204,
+      205, 206, 207, 208, 209, 214, 215, 220, 221
+    ];
+  }
+} catch (err) {
+  // swallow - we only care if `supports-color` is available; it doesn't have to be.
+}
+
+/**
+ * Build up the default `inspectOpts` object from the environment variables.
+ *
+ *   $ DEBUG_COLORS=no DEBUG_DEPTH=10 DEBUG_SHOW_HIDDEN=enabled node script.js
+ */
+
+exports.inspectOpts = Object.keys(process.env).filter(function (key) {
+  return /^debug_/i.test(key);
+}).reduce(function (obj, key) {
+  // camel-case
+  var prop = key
+    .substring(6)
+    .toLowerCase()
+    .replace(/_([a-z])/g, function (_, k) { return k.toUpperCase() });
+
+  // coerce string value into JS value
+  var val = process.env[key];
+  if (/^(yes|on|true|enabled)$/i.test(val)) val = true;
+  else if (/^(no|off|false|disabled)$/i.test(val)) val = false;
+  else if (val === 'null') val = null;
+  else val = Number(val);
+
+  obj[prop] = val;
+  return obj;
+}, {});
+
+/**
+ * Is stdout a TTY? Colored output is enabled when `true`.
+ */
+
+function useColors() {
+  return 'colors' in exports.inspectOpts
+    ? Boolean(exports.inspectOpts.colors)
+    : tty.isatty(process.stderr.fd);
+}
+
+/**
+ * Map %o to `util.inspect()`, all on a single line.
+ */
+
+exports.formatters.o = function(v) {
+  this.inspectOpts.colors = this.useColors;
+  return util.inspect(v, this.inspectOpts)
+    .split('\n').map(function(str) {
+      return str.trim()
+    }).join(' ');
+};
+
+/**
+ * Map %o to `util.inspect()`, allowing multiple lines if needed.
+ */
+
+exports.formatters.O = function(v) {
+  this.inspectOpts.colors = this.useColors;
+  return util.inspect(v, this.inspectOpts);
+};
+
+/**
+ * Adds ANSI color escape codes if enabled.
+ *
+ * @api public
+ */
+
+function formatArgs(args) {
+  var name = this.namespace;
+  var useColors = this.useColors;
+
+  if (useColors) {
+    var c = this.color;
+    var colorCode = '\u001b[3' + (c < 8 ? c : '8;5;' + c);
+    var prefix = '  ' + colorCode + ';1m' + name + ' ' + '\u001b[0m';
+
+    args[0] = prefix + args[0].split('\n').join('\n' + prefix);
+    args.push(colorCode + 'm+' + exports.humanize(this.diff) + '\u001b[0m');
+  } else {
+    args[0] = getDate() + name + ' ' + args[0];
+  }
+}
+
+function getDate() {
+  if (exports.inspectOpts.hideDate) {
+    return '';
+  } else {
+    return new Date().toISOString() + ' ';
+  }
+}
+
+/**
+ * Invokes `util.format()` with the specified arguments and writes to stderr.
+ */
+
+function log() {
+  return process.stderr.write(util.format.apply(util, arguments) + '\n');
+}
+
+/**
+ * Save `namespaces`.
+ *
+ * @param {String} namespaces
+ * @api private
+ */
+
+function save(namespaces) {
+  if (null == namespaces) {
+    // If you set a process.env field to null or undefined, it gets cast to the
+    // string 'null' or 'undefined'. Just delete instead.
+    delete process.env.DEBUG;
+  } else {
+    process.env.DEBUG = namespaces;
+  }
+}
+
+/**
+ * Load `namespaces`.
+ *
+ * @return {String} returns the previously persisted debug modes
+ * @api private
+ */
+
+function load() {
+  return process.env.DEBUG;
+}
+
+/**
+ * Init logic for `debug` instances.
+ *
+ * Create a new `inspectOpts` object in case `useColors` is set
+ * differently for a particular `debug` instance.
+ */
+
+function init (debug) {
+  debug.inspectOpts = {};
+
+  var keys = Object.keys(exports.inspectOpts);
+  for (var i = 0; i < keys.length; i++) {
+    debug.inspectOpts[keys[i]] = exports.inspectOpts[keys[i]];
+  }
+}
+
+/**
+ * Enable namespaces listed in `process.env.DEBUG` initially.
+ */
+
+exports.enable(load());
+});
+var node_1 = node$1.init;
+var node_2 = node$1.log;
+var node_3 = node$1.formatArgs;
+var node_4 = node$1.save;
+var node_5 = node$1.load;
+var node_6 = node$1.useColors;
+var node_7 = node$1.colors;
+var node_8 = node$1.inspectOpts;
+
+var src = createCommonjsModule(function (module) {
+/**
+ * Detect Electron renderer process, which is node, but we should
+ * treat as a browser.
+ */
+
+if (typeof process === 'undefined' || process.type === 'renderer') {
+  module.exports = browser;
+} else {
+  module.exports = node$1;
+}
+});
+
+var Writable = stream.Writable;
+var debug$1 = src("follow-redirects");
+
+// RFC7231§4.2.1: Of the request methods defined by this specification,
+// the GET, HEAD, OPTIONS, and TRACE methods are defined to be safe.
+var SAFE_METHODS = { GET: true, HEAD: true, OPTIONS: true, TRACE: true };
+
+// Create handlers that pass events from native requests
+var eventHandlers = Object.create(null);
+["abort", "aborted", "error", "socket", "timeout"].forEach(function (event) {
+  eventHandlers[event] = function (arg) {
+    this._redirectable.emit(event, arg);
+  };
+});
+
+// An HTTP(S) request that can be redirected
+function RedirectableRequest(options, responseCallback) {
+  // Initialize the request
+  Writable.call(this);
+  options.headers = options.headers || {};
+  this._options = options;
+  this._redirectCount = 0;
+  this._redirects = [];
+  this._requestBodyLength = 0;
+  this._requestBodyBuffers = [];
+
+  // Since http.request treats host as an alias of hostname,
+  // but the url module interprets host as hostname plus port,
+  // eliminate the host property to avoid confusion.
+  if (options.host) {
+    // Use hostname if set, because it has precedence
+    if (!options.hostname) {
+      options.hostname = options.host;
+    }
+    delete options.host;
+  }
+
+  // Attach a callback if passed
+  if (responseCallback) {
+    this.on("response", responseCallback);
+  }
+
+  // React to responses of native requests
+  var self = this;
+  this._onNativeResponse = function (response) {
+    self._processResponse(response);
+  };
+
+  // Complete the URL object when necessary
+  if (!options.pathname && options.path) {
+    var searchPos = options.path.indexOf("?");
+    if (searchPos < 0) {
+      options.pathname = options.path;
+    }
+    else {
+      options.pathname = options.path.substring(0, searchPos);
+      options.search = options.path.substring(searchPos);
+    }
+  }
+
+  // Perform the first request
+  this._performRequest();
+}
+RedirectableRequest.prototype = Object.create(Writable.prototype);
+
+// Writes buffered data to the current native request
+RedirectableRequest.prototype.write = function (data, encoding, callback) {
+  // Validate input and shift parameters if necessary
+  if (!(typeof data === "string" || typeof data === "object" && ("length" in data))) {
+    throw new Error("data should be a string, Buffer or Uint8Array");
+  }
+  if (typeof encoding === "function") {
+    callback = encoding;
+    encoding = null;
+  }
+
+  // Ignore empty buffers, since writing them doesn't invoke the callback
+  // https://github.com/nodejs/node/issues/22066
+  if (data.length === 0) {
+    if (callback) {
+      callback();
+    }
+    return;
+  }
+  // Only write when we don't exceed the maximum body length
+  if (this._requestBodyLength + data.length <= this._options.maxBodyLength) {
+    this._requestBodyLength += data.length;
+    this._requestBodyBuffers.push({ data: data, encoding: encoding });
+    this._currentRequest.write(data, encoding, callback);
+  }
+  // Error when we exceed the maximum body length
+  else {
+    this.emit("error", new Error("Request body larger than maxBodyLength limit"));
+    this.abort();
+  }
+};
+
+// Ends the current native request
+RedirectableRequest.prototype.end = function (data, encoding, callback) {
+  // Shift parameters if necessary
+  if (typeof data === "function") {
+    callback = data;
+    data = encoding = null;
+  }
+  else if (typeof encoding === "function") {
+    callback = encoding;
+    encoding = null;
+  }
+
+  // Write data and end
+  var currentRequest = this._currentRequest;
+  this.write(data || "", encoding, function () {
+    currentRequest.end(null, null, callback);
+  });
+};
+
+// Sets a header value on the current native request
+RedirectableRequest.prototype.setHeader = function (name, value) {
+  this._options.headers[name] = value;
+  this._currentRequest.setHeader(name, value);
+};
+
+// Clears a header value on the current native request
+RedirectableRequest.prototype.removeHeader = function (name) {
+  delete this._options.headers[name];
+  this._currentRequest.removeHeader(name);
+};
+
+// Proxy all other public ClientRequest methods
+[
+  "abort", "flushHeaders", "getHeader",
+  "setNoDelay", "setSocketKeepAlive", "setTimeout",
+].forEach(function (method) {
+  RedirectableRequest.prototype[method] = function (a, b) {
+    return this._currentRequest[method](a, b);
+  };
+});
+
+// Proxy all public ClientRequest properties
+["aborted", "connection", "socket"].forEach(function (property) {
+  Object.defineProperty(RedirectableRequest.prototype, property, {
+    get: function () { return this._currentRequest[property]; },
+  });
+});
+
+// Executes the next native request (initial or redirect)
+RedirectableRequest.prototype._performRequest = function () {
+  // Load the native protocol
+  var protocol = this._options.protocol;
+  var nativeProtocol = this._options.nativeProtocols[protocol];
+  if (!nativeProtocol) {
+    this.emit("error", new Error("Unsupported protocol " + protocol));
+    return;
+  }
+
+  // If specified, use the agent corresponding to the protocol
+  // (HTTP and HTTPS use different types of agents)
+  if (this._options.agents) {
+    var scheme = protocol.substr(0, protocol.length - 1);
+    this._options.agent = this._options.agents[scheme];
+  }
+
+  // Create the native request
+  var request = this._currentRequest =
+        nativeProtocol.request(this._options, this._onNativeResponse);
+  this._currentUrl = url.format(this._options);
+
+  // Set up event handlers
+  request._redirectable = this;
+  for (var event in eventHandlers) {
+    /* istanbul ignore else */
+    if (event) {
+      request.on(event, eventHandlers[event]);
+    }
+  }
+
+  // End a redirected request
+  // (The first request must be ended explicitly with RedirectableRequest#end)
+  if (this._isRedirect) {
+    // Write the request entity and end.
+    var i = 0;
+    var buffers = this._requestBodyBuffers;
+    (function writeNext() {
+      if (i < buffers.length) {
+        var buffer = buffers[i++];
+        request.write(buffer.data, buffer.encoding, writeNext);
+      }
+      else {
+        request.end();
+      }
+    }());
+  }
+};
+
+// Processes a response from the current native request
+RedirectableRequest.prototype._processResponse = function (response) {
+  // Store the redirected response
+  if (this._options.trackRedirects) {
+    this._redirects.push({
+      url: this._currentUrl,
+      headers: response.headers,
+      statusCode: response.statusCode,
+    });
+  }
+
+  // RFC7231§6.4: The 3xx (Redirection) class of status code indicates
+  // that further action needs to be taken by the user agent in order to
+  // fulfill the request. If a Location header field is provided,
+  // the user agent MAY automatically redirect its request to the URI
+  // referenced by the Location field value,
+  // even if the specific status code is not understood.
+  var location = response.headers.location;
+  if (location && this._options.followRedirects !== false &&
+      response.statusCode >= 300 && response.statusCode < 400) {
+    // RFC7231§6.4: A client SHOULD detect and intervene
+    // in cyclical redirections (i.e., "infinite" redirection loops).
+    if (++this._redirectCount > this._options.maxRedirects) {
+      this.emit("error", new Error("Max redirects exceeded."));
+      return;
+    }
+
+    // RFC7231§6.4: Automatic redirection needs to done with
+    // care for methods not known to be safe […],
+    // since the user might not wish to redirect an unsafe request.
+    // RFC7231§6.4.7: The 307 (Temporary Redirect) status code indicates
+    // that the target resource resides temporarily under a different URI
+    // and the user agent MUST NOT change the request method
+    // if it performs an automatic redirection to that URI.
+    var header;
+    var headers = this._options.headers;
+    if (response.statusCode !== 307 && !(this._options.method in SAFE_METHODS)) {
+      this._options.method = "GET";
+      // Drop a possible entity and headers related to it
+      this._requestBodyBuffers = [];
+      for (header in headers) {
+        if (/^content-/i.test(header)) {
+          delete headers[header];
+        }
+      }
+    }
+
+    // Drop the Host header, as the redirect might lead to a different host
+    if (!this._isRedirect) {
+      for (header in headers) {
+        if (/^host$/i.test(header)) {
+          delete headers[header];
+        }
+      }
+    }
+
+    // Perform the redirected request
+    var redirectUrl = url.resolve(this._currentUrl, location);
+    debug$1("redirecting to", redirectUrl);
+    Object.assign(this._options, url.parse(redirectUrl));
+    this._isRedirect = true;
+    this._performRequest();
+
+    // Discard the remainder of the response to avoid waiting for data
+    response.destroy();
+  }
+  else {
+    // The response is not a redirect; return it as-is
+    response.responseUrl = this._currentUrl;
+    response.redirects = this._redirects;
+    this.emit("response", response);
+
+    // Clean up
+    this._requestBodyBuffers = [];
+  }
+};
+
+// Wraps the key/value object of protocols with redirect functionality
+function wrap(protocols) {
+  // Default settings
+  var exports = {
+    maxRedirects: 21,
+    maxBodyLength: 10 * 1024 * 1024,
+  };
+
+  // Wrap each protocol
+  var nativeProtocols = {};
+  Object.keys(protocols).forEach(function (scheme) {
+    var protocol = scheme + ":";
+    var nativeProtocol = nativeProtocols[protocol] = protocols[scheme];
+    var wrappedProtocol = exports[scheme] = Object.create(nativeProtocol);
+
+    // Executes a request, following redirects
+    wrappedProtocol.request = function (options, callback) {
+      if (typeof options === "string") {
+        options = url.parse(options);
+        options.maxRedirects = exports.maxRedirects;
+      }
+      else {
+        options = Object.assign({
+          protocol: protocol,
+          maxRedirects: exports.maxRedirects,
+          maxBodyLength: exports.maxBodyLength,
+        }, options);
+      }
+      options.nativeProtocols = nativeProtocols;
+      assert.equal(options.protocol, protocol, "protocol mismatch");
+      debug$1("options", options);
+      return new RedirectableRequest(options, callback);
+    };
+
+    // Executes a GET request, following redirects
+    wrappedProtocol.get = function (options, callback) {
+      var request = wrappedProtocol.request(options, callback);
+      request.end();
+      return request;
+    };
+  });
+  return exports;
+}
+
+// Exports
+var followRedirects = wrap({ http: http, https: https });
+var wrap_1 = wrap;
+followRedirects.wrap = wrap_1;
+
+var _from = "axios@0.18.1";
+var _id = "axios@0.18.1";
+var _inBundle = false;
+var _integrity = "sha512-0BfJq4NSfQXd+SkFdrvFbG7addhYSBA2mQwISr46pD6E5iqkWg02RAs8vyTT/j0RTnoYmeXauBuSv1qKwR179g==";
+var _location = "/axios";
+var _phantomChildren = {
+};
+var _requested = {
+	type: "version",
+	registry: true,
+	raw: "axios@0.18.1",
+	name: "axios",
+	escapedName: "axios",
+	rawSpec: "0.18.1",
+	saveSpec: null,
+	fetchSpec: "0.18.1"
+};
+var _requiredBy = [
+	"#USER",
+	"/"
+];
+var _resolved = "https://registry.npmjs.org/axios/-/axios-0.18.1.tgz";
+var _shasum = "ff3f0de2e7b5d180e757ad98000f1081b87bcea3";
+var _spec = "axios@0.18.1";
+var _where = "/Users/vesa/code/JS-SDK";
+var author = {
+	name: "Matt Zabriskie"
+};
+var browser$1 = {
+	"./lib/adapters/http.js": "./lib/adapters/xhr.js"
+};
+var bugs = {
+	url: "https://github.com/axios/axios/issues"
+};
+var bundleDependencies = false;
+var bundlesize = [
+	{
+		path: "./dist/axios.min.js",
+		threshold: "5kB"
+	}
+];
+var dependencies = {
+	"follow-redirects": "1.5.10",
+	"is-buffer": "^2.0.2"
+};
+var deprecated = false;
+var description = "Promise based HTTP client for the browser and node.js";
+var devDependencies = {
+	bundlesize: "^0.5.7",
+	coveralls: "^2.11.9",
+	"es6-promise": "^4.0.5",
+	grunt: "^1.0.1",
+	"grunt-banner": "^0.6.0",
+	"grunt-cli": "^1.2.0",
+	"grunt-contrib-clean": "^1.0.0",
+	"grunt-contrib-nodeunit": "^1.0.0",
+	"grunt-contrib-watch": "^1.0.0",
+	"grunt-eslint": "^19.0.0",
+	"grunt-karma": "^2.0.0",
+	"grunt-ts": "^6.0.0-beta.3",
+	"grunt-webpack": "^1.0.18",
+	"istanbul-instrumenter-loader": "^1.0.0",
+	"jasmine-core": "^2.4.1",
+	karma: "^1.3.0",
+	"karma-chrome-launcher": "^2.0.0",
+	"karma-coverage": "^1.0.0",
+	"karma-firefox-launcher": "^1.0.0",
+	"karma-jasmine": "^1.0.2",
+	"karma-jasmine-ajax": "^0.1.13",
+	"karma-opera-launcher": "^1.0.0",
+	"karma-safari-launcher": "^1.0.0",
+	"karma-sauce-launcher": "^1.1.0",
+	"karma-sinon": "^1.0.5",
+	"karma-sourcemap-loader": "^0.3.7",
+	"karma-webpack": "^1.7.0",
+	"load-grunt-tasks": "^3.5.2",
+	minimist: "^1.2.0",
+	sinon: "^1.17.4",
+	typescript: "^2.0.3",
+	"url-search-params": "^0.6.1",
+	webpack: "^1.13.1",
+	"webpack-dev-server": "^1.14.1"
+};
+var homepage = "https://github.com/axios/axios";
+var keywords = [
+	"xhr",
+	"http",
+	"ajax",
+	"promise",
+	"node"
+];
+var license = "MIT";
+var main = "index.js";
+var name = "axios";
+var repository = {
+	type: "git",
+	url: "git+https://github.com/axios/axios.git"
+};
+var scripts = {
+	build: "NODE_ENV=production grunt build",
+	coveralls: "cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
+	examples: "node ./examples/server.js",
+	postversion: "git push && git push --tags",
+	preversion: "npm test",
+	start: "node ./sandbox/server.js",
+	test: "grunt test && bundlesize",
+	version: "npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json"
+};
+var typings = "./index.d.ts";
+var version$1 = "0.18.1";
+var _package = {
+	_from: _from,
+	_id: _id,
+	_inBundle: _inBundle,
+	_integrity: _integrity,
+	_location: _location,
+	_phantomChildren: _phantomChildren,
+	_requested: _requested,
+	_requiredBy: _requiredBy,
+	_resolved: _resolved,
+	_shasum: _shasum,
+	_spec: _spec,
+	_where: _where,
+	author: author,
+	browser: browser$1,
+	bugs: bugs,
+	bundleDependencies: bundleDependencies,
+	bundlesize: bundlesize,
+	dependencies: dependencies,
+	deprecated: deprecated,
+	description: description,
+	devDependencies: devDependencies,
+	homepage: homepage,
+	keywords: keywords,
+	license: license,
+	main: main,
+	name: name,
+	repository: repository,
+	scripts: scripts,
+	typings: typings,
+	version: version$1
+};
+
+var _package$1 = /*#__PURE__*/Object.freeze({
+	__proto__: null,
+	_from: _from,
+	_id: _id,
+	_inBundle: _inBundle,
+	_integrity: _integrity,
+	_location: _location,
+	_phantomChildren: _phantomChildren,
+	_requested: _requested,
+	_requiredBy: _requiredBy,
+	_resolved: _resolved,
+	_shasum: _shasum,
+	_spec: _spec,
+	_where: _where,
+	author: author,
+	browser: browser$1,
+	bugs: bugs,
+	bundleDependencies: bundleDependencies,
+	bundlesize: bundlesize,
+	dependencies: dependencies,
+	deprecated: deprecated,
+	description: description,
+	devDependencies: devDependencies,
+	homepage: homepage,
+	keywords: keywords,
+	license: license,
+	main: main,
+	name: name,
+	repository: repository,
+	scripts: scripts,
+	typings: typings,
+	version: version$1,
+	'default': _package
+});
+
+var pkg = getCjsExportFromNamespace(_package$1);
+
+var httpFollow = followRedirects.http;
+var httpsFollow = followRedirects.https;
+
+
+
+
+
+
+/*eslint consistent-return:0*/
+var http_1 = function httpAdapter(config) {
+  return new Promise(function dispatchHttpRequest(resolve, reject) {
+    var data = config.data;
+    var headers = config.headers;
+    var timer;
+
+    // Set User-Agent (required by some servers)
+    // Only set header if it hasn't been set in config
+    // See https://github.com/axios/axios/issues/69
+    if (!headers['User-Agent'] && !headers['user-agent']) {
+      headers['User-Agent'] = 'axios/' + pkg.version;
+    }
+
+    if (data && !utils.isStream(data)) {
+      if (Buffer.isBuffer(data)) ; else if (utils.isArrayBuffer(data)) {
+        data = new Buffer(new Uint8Array(data));
+      } else if (utils.isString(data)) {
+        data = new Buffer(data, 'utf-8');
+      } else {
+        return reject(createError(
+          'Data after transformation must be a string, an ArrayBuffer, a Buffer, or a Stream',
+          config
+        ));
+      }
+
+      // Add Content-Length header if data exists
+      headers['Content-Length'] = data.length;
+    }
+
+    // HTTP basic authentication
+    var auth = undefined;
+    if (config.auth) {
+      var username = config.auth.username || '';
+      var password = config.auth.password || '';
+      auth = username + ':' + password;
+    }
+
+    // Parse url
+    var parsed = url.parse(config.url);
+    var protocol = parsed.protocol || 'http:';
+
+    if (!auth && parsed.auth) {
+      var urlAuth = parsed.auth.split(':');
+      var urlUsername = urlAuth[0] || '';
+      var urlPassword = urlAuth[1] || '';
+      auth = urlUsername + ':' + urlPassword;
+    }
+
+    if (auth) {
+      delete headers.Authorization;
+    }
+
+    var isHttps = protocol === 'https:';
+    var agent = isHttps ? config.httpsAgent : config.httpAgent;
+
+    var options = {
+      path: buildURL(parsed.path, config.params, config.paramsSerializer).replace(/^\?/, ''),
+      method: config.method,
+      headers: headers,
+      agent: agent,
+      auth: auth
+    };
+
+    if (config.socketPath) {
+      options.socketPath = config.socketPath;
+    } else {
+      options.hostname = parsed.hostname;
+      options.port = parsed.port;
+    }
+
+    var proxy = config.proxy;
+    if (!proxy && proxy !== false) {
+      var proxyEnv = protocol.slice(0, -1) + '_proxy';
+      var proxyUrl = process.env[proxyEnv] || process.env[proxyEnv.toUpperCase()];
+      if (proxyUrl) {
+        var parsedProxyUrl = url.parse(proxyUrl);
+        proxy = {
+          host: parsedProxyUrl.hostname,
+          port: parsedProxyUrl.port
+        };
+
+        if (parsedProxyUrl.auth) {
+          var proxyUrlAuth = parsedProxyUrl.auth.split(':');
+          proxy.auth = {
+            username: proxyUrlAuth[0],
+            password: proxyUrlAuth[1]
+          };
+        }
+      }
+    }
+
+    if (proxy) {
+      options.hostname = proxy.host;
+      options.host = proxy.host;
+      options.headers.host = parsed.hostname + (parsed.port ? ':' + parsed.port : '');
+      options.port = proxy.port;
+      options.path = protocol + '//' + parsed.hostname + (parsed.port ? ':' + parsed.port : '') + options.path;
+
+      // Basic proxy authorization
+      if (proxy.auth) {
+        var base64 = new Buffer(proxy.auth.username + ':' + proxy.auth.password, 'utf8').toString('base64');
+        options.headers['Proxy-Authorization'] = 'Basic ' + base64;
+      }
+    }
+
+    var transport;
+    if (config.transport) {
+      transport = config.transport;
+    } else if (config.maxRedirects === 0) {
+      transport = isHttps ? https : http;
+    } else {
+      if (config.maxRedirects) {
+        options.maxRedirects = config.maxRedirects;
+      }
+      transport = isHttps ? httpsFollow : httpFollow;
+    }
+
+    if (config.maxContentLength && config.maxContentLength > -1) {
+      options.maxBodyLength = config.maxContentLength;
+    }
+
+    // Create the request
+    var req = transport.request(options, function handleResponse(res) {
+      if (req.aborted) return;
+
+      // Response has been received so kill timer that handles request timeout
+      clearTimeout(timer);
+      timer = null;
+
+      // uncompress the response body transparently if required
+      var stream = res;
+      switch (res.headers['content-encoding']) {
+      /*eslint default-case:0*/
+      case 'gzip':
+      case 'compress':
+      case 'deflate':
+        // add the unzipper to the body stream processing pipeline
+        stream = stream.pipe(zlib.createUnzip());
+
+        // remove the content-encoding in order to not confuse downstream operations
+        delete res.headers['content-encoding'];
+        break;
+      }
+
+      // return the last request in case of redirects
+      var lastRequest = res.req || req;
+
+      var response = {
+        status: res.statusCode,
+        statusText: res.statusMessage,
+        headers: res.headers,
+        config: config,
+        request: lastRequest
+      };
+
+      if (config.responseType === 'stream') {
+        response.data = stream;
+        settle(resolve, reject, response);
+      } else {
+        var responseBuffer = [];
+        stream.on('data', function handleStreamData(chunk) {
+          responseBuffer.push(chunk);
+
+          // make sure the content length is not over the maxContentLength if specified
+          if (config.maxContentLength > -1 && Buffer.concat(responseBuffer).length > config.maxContentLength) {
+            stream.destroy();
+            reject(createError('maxContentLength size of ' + config.maxContentLength + ' exceeded',
+              config, null, lastRequest));
+          }
+        });
+
+        stream.on('error', function handleStreamError(err) {
+          if (req.aborted) return;
+          reject(enhanceError(err, config, null, lastRequest));
+        });
+
+        stream.on('end', function handleStreamEnd() {
+          var responseData = Buffer.concat(responseBuffer);
+          if (config.responseType !== 'arraybuffer') {
+            responseData = responseData.toString('utf8');
+          }
+
+          response.data = responseData;
+          settle(resolve, reject, response);
+        });
+      }
+    });
+
+    // Handle errors
+    req.on('error', function handleRequestError(err) {
+      if (req.aborted) return;
+      reject(enhanceError(err, config, null, req));
+    });
+
+    // Handle request timeout
+    if (config.timeout && !timer) {
+      timer = setTimeout(function handleRequestTimeout() {
+        req.abort();
+        reject(createError('timeout of ' + config.timeout + 'ms exceeded', config, 'ECONNABORTED', req));
+      }, config.timeout);
+    }
+
+    if (config.cancelToken) {
+      // Handle cancellation
+      config.cancelToken.promise.then(function onCanceled(cancel) {
+        if (req.aborted) return;
+
+        req.abort();
+        reject(cancel);
+      });
+    }
+
+    // Send the request
+    if (utils.isStream(data)) {
+      data.pipe(req);
+    } else {
+      req.end(data);
+    }
+  });
+};
+
+var DEFAULT_CONTENT_TYPE = {
+  'Content-Type': 'application/x-www-form-urlencoded'
+};
+
+function setContentTypeIfUnset(headers, value) {
+  if (!utils.isUndefined(headers) && utils.isUndefined(headers['Content-Type'])) {
+    headers['Content-Type'] = value;
+  }
+}
+
+function getDefaultAdapter() {
+  var adapter;
+  if (typeof XMLHttpRequest !== 'undefined') {
+    // For browsers use XHR adapter
+    adapter = xhr;
+  } else if (typeof process !== 'undefined') {
+    // For node use HTTP adapter
+    adapter = http_1;
+  }
+  return adapter;
+}
+
+var defaults = {
+  adapter: getDefaultAdapter(),
+
+  transformRequest: [function transformRequest(data, headers) {
+    normalizeHeaderName(headers, 'Content-Type');
+    if (utils.isFormData(data) ||
+      utils.isArrayBuffer(data) ||
+      utils.isBuffer(data) ||
+      utils.isStream(data) ||
+      utils.isFile(data) ||
+      utils.isBlob(data)
+    ) {
+      return data;
+    }
+    if (utils.isArrayBufferView(data)) {
+      return data.buffer;
+    }
+    if (utils.isURLSearchParams(data)) {
+      setContentTypeIfUnset(headers, 'application/x-www-form-urlencoded;charset=utf-8');
+      return data.toString();
+    }
+    if (utils.isObject(data)) {
+      setContentTypeIfUnset(headers, 'application/json;charset=utf-8');
+      return JSON.stringify(data);
+    }
+    return data;
+  }],
+
+  transformResponse: [function transformResponse(data) {
+    /*eslint no-param-reassign:0*/
+    if (typeof data === 'string') {
+      try {
+        data = JSON.parse(data);
+      } catch (e) { /* Ignore */ }
+    }
+    return data;
+  }],
+
+  /**
+   * A timeout in milliseconds to abort a request. If set to 0 (default) a
+   * timeout is not created.
+   */
+  timeout: 0,
+
+  xsrfCookieName: 'XSRF-TOKEN',
+  xsrfHeaderName: 'X-XSRF-TOKEN',
+
+  maxContentLength: -1,
+
+  validateStatus: function validateStatus(status) {
+    return status >= 200 && status < 300;
+  }
+};
+
+defaults.headers = {
+  common: {
+    'Accept': 'application/json, text/plain, */*'
+  }
+};
+
+utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
+  defaults.headers[method] = {};
+});
+
+utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
+  defaults.headers[method] = utils.merge(DEFAULT_CONTENT_TYPE);
+});
+
+var defaults_1 = defaults;
+
+function InterceptorManager() {
+  this.handlers = [];
+}
+
+/**
+ * Add a new interceptor to the stack
+ *
+ * @param {Function} fulfilled The function to handle `then` for a `Promise`
+ * @param {Function} rejected The function to handle `reject` for a `Promise`
+ *
+ * @return {Number} An ID used to remove interceptor later
+ */
+InterceptorManager.prototype.use = function use(fulfilled, rejected) {
+  this.handlers.push({
+    fulfilled: fulfilled,
+    rejected: rejected
+  });
+  return this.handlers.length - 1;
+};
+
+/**
+ * Remove an interceptor from the stack
+ *
+ * @param {Number} id The ID that was returned by `use`
+ */
+InterceptorManager.prototype.eject = function eject(id) {
+  if (this.handlers[id]) {
+    this.handlers[id] = null;
+  }
+};
+
+/**
+ * Iterate over all the registered interceptors
+ *
+ * This method is particularly useful for skipping over any
+ * interceptors that may have become `null` calling `eject`.
+ *
+ * @param {Function} fn The function to call for each interceptor
+ */
+InterceptorManager.prototype.forEach = function forEach(fn) {
+  utils.forEach(this.handlers, function forEachHandler(h) {
+    if (h !== null) {
+      fn(h);
+    }
+  });
+};
+
+var InterceptorManager_1 = InterceptorManager;
+
+/**
+ * Transform the data for a request or a response
+ *
+ * @param {Object|String} data The data to be transformed
+ * @param {Array} headers The headers for the request or response
+ * @param {Array|Function} fns A single function or Array of functions
+ * @returns {*} The resulting transformed data
+ */
+var transformData = function transformData(data, headers, fns) {
+  /*eslint no-param-reassign:0*/
+  utils.forEach(fns, function transform(fn) {
+    data = fn(data, headers);
+  });
+
+  return data;
+};
+
+var isCancel = function isCancel(value) {
+  return !!(value && value.__CANCEL__);
+};
+
+/**
+ * Determines whether the specified URL is absolute
+ *
+ * @param {string} url The URL to test
+ * @returns {boolean} True if the specified URL is absolute, otherwise false
+ */
+var isAbsoluteURL = function isAbsoluteURL(url) {
+  // A URL is considered absolute if it begins with "<scheme>://" or "//" (protocol-relative URL).
+  // RFC 3986 defines scheme name as a sequence of characters beginning with a letter and followed
+  // by any combination of letters, digits, plus, period, or hyphen.
+  return /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url);
+};
+
+/**
+ * Creates a new URL by combining the specified URLs
+ *
+ * @param {string} baseURL The base URL
+ * @param {string} relativeURL The relative URL
+ * @returns {string} The combined URL
+ */
+var combineURLs = function combineURLs(baseURL, relativeURL) {
+  return relativeURL
+    ? baseURL.replace(/\/+$/, '') + '/' + relativeURL.replace(/^\/+/, '')
+    : baseURL;
+};
+
+/**
+ * Throws a `Cancel` if cancellation has been requested.
+ */
+function throwIfCancellationRequested(config) {
+  if (config.cancelToken) {
+    config.cancelToken.throwIfRequested();
+  }
+}
+
+/**
+ * Dispatch a request to the server using the configured adapter.
+ *
+ * @param {object} config The config that is to be used for the request
+ * @returns {Promise} The Promise to be fulfilled
+ */
+var dispatchRequest = function dispatchRequest(config) {
+  throwIfCancellationRequested(config);
+
+  // Support baseURL config
+  if (config.baseURL && !isAbsoluteURL(config.url)) {
+    config.url = combineURLs(config.baseURL, config.url);
+  }
+
+  // Ensure headers exist
+  config.headers = config.headers || {};
+
+  // Transform request data
+  config.data = transformData(
+    config.data,
+    config.headers,
+    config.transformRequest
+  );
+
+  // Flatten headers
+  config.headers = utils.merge(
+    config.headers.common || {},
+    config.headers[config.method] || {},
+    config.headers || {}
+  );
+
+  utils.forEach(
+    ['delete', 'get', 'head', 'post', 'put', 'patch', 'common'],
+    function cleanHeaderConfig(method) {
+      delete config.headers[method];
+    }
+  );
+
+  var adapter = config.adapter || defaults_1.adapter;
+
+  return adapter(config).then(function onAdapterResolution(response) {
+    throwIfCancellationRequested(config);
+
+    // Transform response data
+    response.data = transformData(
+      response.data,
+      response.headers,
+      config.transformResponse
+    );
+
+    return response;
+  }, function onAdapterRejection(reason) {
+    if (!isCancel(reason)) {
+      throwIfCancellationRequested(config);
+
+      // Transform response data
+      if (reason && reason.response) {
+        reason.response.data = transformData(
+          reason.response.data,
+          reason.response.headers,
+          config.transformResponse
+        );
+      }
+    }
+
+    return Promise.reject(reason);
+  });
+};
+
+/**
+ * Create a new instance of Axios
+ *
+ * @param {Object} instanceConfig The default config for the instance
+ */
+function Axios(instanceConfig) {
+  this.defaults = instanceConfig;
+  this.interceptors = {
+    request: new InterceptorManager_1(),
+    response: new InterceptorManager_1()
+  };
+}
+
+/**
+ * Dispatch a request
+ *
+ * @param {Object} config The config specific for this request (merged with this.defaults)
+ */
+Axios.prototype.request = function request(config) {
+  /*eslint no-param-reassign:0*/
+  // Allow for axios('example/url'[, config]) a la fetch API
+  if (typeof config === 'string') {
+    config = utils.merge({
+      url: arguments[0]
+    }, arguments[1]);
+  }
+
+  config = utils.merge(defaults_1, {method: 'get'}, this.defaults, config);
+  config.method = config.method.toLowerCase();
+
+  // Hook up interceptors middleware
+  var chain = [dispatchRequest, undefined];
+  var promise = Promise.resolve(config);
+
+  this.interceptors.request.forEach(function unshiftRequestInterceptors(interceptor) {
+    chain.unshift(interceptor.fulfilled, interceptor.rejected);
+  });
+
+  this.interceptors.response.forEach(function pushResponseInterceptors(interceptor) {
+    chain.push(interceptor.fulfilled, interceptor.rejected);
+  });
+
+  while (chain.length) {
+    promise = promise.then(chain.shift(), chain.shift());
+  }
+
+  return promise;
+};
+
+// Provide aliases for supported request methods
+utils.forEach(['delete', 'get', 'head', 'options'], function forEachMethodNoData(method) {
+  /*eslint func-names:0*/
+  Axios.prototype[method] = function(url, config) {
+    return this.request(utils.merge(config || {}, {
+      method: method,
+      url: url
+    }));
+  };
+});
+
+utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
+  /*eslint func-names:0*/
+  Axios.prototype[method] = function(url, data, config) {
+    return this.request(utils.merge(config || {}, {
+      method: method,
+      url: url,
+      data: data
+    }));
+  };
+});
+
+var Axios_1 = Axios;
+
+/**
+ * A `Cancel` is an object that is thrown when an operation is canceled.
+ *
+ * @class
+ * @param {string=} message The message.
+ */
+function Cancel(message) {
+  this.message = message;
+}
+
+Cancel.prototype.toString = function toString() {
+  return 'Cancel' + (this.message ? ': ' + this.message : '');
+};
+
+Cancel.prototype.__CANCEL__ = true;
+
+var Cancel_1 = Cancel;
+
+/**
+ * A `CancelToken` is an object that can be used to request cancellation of an operation.
+ *
+ * @class
+ * @param {Function} executor The executor function.
+ */
+function CancelToken(executor) {
+  if (typeof executor !== 'function') {
+    throw new TypeError('executor must be a function.');
+  }
+
+  var resolvePromise;
+  this.promise = new Promise(function promiseExecutor(resolve) {
+    resolvePromise = resolve;
+  });
+
+  var token = this;
+  executor(function cancel(message) {
+    if (token.reason) {
+      // Cancellation has already been requested
+      return;
+    }
+
+    token.reason = new Cancel_1(message);
+    resolvePromise(token.reason);
+  });
+}
+
+/**
+ * Throws a `Cancel` if cancellation has been requested.
+ */
+CancelToken.prototype.throwIfRequested = function throwIfRequested() {
+  if (this.reason) {
+    throw this.reason;
+  }
+};
+
+/**
+ * Returns an object that contains a new `CancelToken` and a function that, when called,
+ * cancels the `CancelToken`.
+ */
+CancelToken.source = function source() {
+  var cancel;
+  var token = new CancelToken(function executor(c) {
+    cancel = c;
+  });
+  return {
+    token: token,
+    cancel: cancel
+  };
+};
+
+var CancelToken_1 = CancelToken;
+
+/**
+ * Syntactic sugar for invoking a function and expanding an array for arguments.
+ *
+ * Common use case would be to use `Function.prototype.apply`.
+ *
+ *  ```js
+ *  function f(x, y, z) {}
+ *  var args = [1, 2, 3];
+ *  f.apply(null, args);
+ *  ```
+ *
+ * With `spread` this example can be re-written.
+ *
+ *  ```js
+ *  spread(function(x, y, z) {})([1, 2, 3]);
+ *  ```
+ *
+ * @param {Function} callback
+ * @returns {Function}
+ */
+var spread = function spread(callback) {
+  return function wrap(arr) {
+    return callback.apply(null, arr);
+  };
+};
+
+/**
+ * Create an instance of Axios
+ *
+ * @param {Object} defaultConfig The default config for the instance
+ * @return {Axios} A new instance of Axios
+ */
+function createInstance(defaultConfig) {
+  var context = new Axios_1(defaultConfig);
+  var instance = bind$1(Axios_1.prototype.request, context);
+
+  // Copy axios.prototype to instance
+  utils.extend(instance, Axios_1.prototype, context);
+
+  // Copy context to instance
+  utils.extend(instance, context);
+
+  return instance;
+}
+
+// Create the default instance to be exported
+var axios = createInstance(defaults_1);
+
+// Expose Axios class to allow class inheritance
+axios.Axios = Axios_1;
+
+// Factory for creating new instances
+axios.create = function create(instanceConfig) {
+  return createInstance(utils.merge(defaults_1, instanceConfig));
+};
+
+// Expose Cancel & CancelToken
+axios.Cancel = Cancel_1;
+axios.CancelToken = CancelToken_1;
+axios.isCancel = isCancel;
+
+// Expose all/spread
+axios.all = function all(promises) {
+  return Promise.all(promises);
+};
+axios.spread = spread;
+
+var axios_1 = axios;
+
+// Allow use of default import syntax in TypeScript
+var default_1 = axios;
+axios_1.default = default_1;
+
+var axios$1 = axios_1;
+
 var WHITELIST = [
 	'ETIMEDOUT',
 	'ECONNRESET',
 	'EADDRINUSE',
 	'ESOCKETTIMEDOUT',
 	'ECONNREFUSED',
-	'EPIPE'
+	'EPIPE',
+	'EHOSTUNREACH',
+	'EAI_AGAIN'
 ];
 
 var BLACKLIST = [
@@ -6755,7 +11196,6 @@ var lib_6 = lib.exponentialDelay;
 
 var axiosRetry = lib.default;
 
-//      
 const SSL_CHECK_INTERVALL = 1000 * 60 * 60; // One hour
 
 /*
@@ -7007,7 +11447,6 @@ function isNetworkOrIdempotentRequestError(error) {
 }
  */
 
-//      
 let refreshingToken = false;
 /* eslint no-use-before-define: ["error", { "functions": false }] */
 
@@ -7027,7 +11466,7 @@ function refreshAuthKey(authKey) {
       }, 1000 * 60 * 10); // 10min
 
       if (response.length > 10) {
-        store.dispatch(userState.actions.setAuthKey(response));
+        store$3.dispatch(userState.actions.setAuthKey(response));
       }
     }).catch(() => {
       refreshingToken = false;
@@ -7087,7 +11526,7 @@ function sendAll(requests) {
     });
   });
 }
-axiosRetry(axios, {
+axiosRetry(axios$1, {
   // retries: 1, DOESN'T WORK, see send_retry.js
   retryCondition,
   shouldResetTimeout: true,
@@ -7162,7 +11601,7 @@ function send({
   let remoteConnection = false; // Flag to indicate are we sending hub command meaning using commandAPI (vrs. some cloud/videocloud command like login, log etc)
 
   const hubCommand = !isEmpty_1(hubId);
-  const stateNow = store.getState();
+  const stateNow = store$3.getState();
   const user = userState.selectors.getUser(stateNow); // const { storedAuthKey } = user;
 
   if (typeof command !== 'undefined' && command) {
@@ -7283,7 +11722,7 @@ function send({
   Object.assign(reqConf, sendConfig);
   return new Promise((resolve, reject) => {
     if (command || sendUrl) {
-      axios.interceptors.response.use(response => {
+      axios$1.interceptors.response.use(response => {
         if (response.headers['content-type'].includes('application/json') || response.headers['content-type'].includes('application/binary')) {
           resetRetry(sendUrl);
           return response;
@@ -7323,7 +11762,7 @@ function send({
           // See options: https://github.com/axios/axios#request-config
 
 
-          axios(reqConf).then(response => {
+          axios$1(reqConf).then(response => {
             // console.error("send: response ", response);
             if (remoteConnection) {
               setCloudConnectionState(CLOUD_CONNECTION_STATES.CONNECTED);
@@ -7429,14 +11868,13 @@ function send({
   });
 }
 
-//      
 /*
  * Helper to get user
  * @return {Object} user
  */
 
 function storedUser() {
-  return userState.selectors.getUser(store.getState());
+  return userState.selectors.getUser(store$3.getState());
 }
 /**
  * User action to change current language
@@ -7449,11 +11887,11 @@ function changeLanguage(newLanguage) {
   let retVel = false;
 
   if (Object.values(LANGUAGES).indexOf(newLanguage) > -1) {
-    store.dispatch(userState.actions.setLanguage(newLanguage));
+    store$3.dispatch(userState.actions.setLanguage(newLanguage));
     retVel = true;
 
     if (storedUser().state === USER_STATES.WAITING_LANGUAGE) {
-      store.dispatch(userState.actions.changeState(USER_STATES.LANGUAGE_SET));
+      store$3.dispatch(userState.actions.changeState(USER_STATES.LANGUAGE_SET));
     }
   }
 
@@ -7465,10 +11903,10 @@ function changeLanguage(newLanguage) {
  */
 
 function acceptEula() {
-  store.dispatch(userState.actions.setEula(true));
+  store$3.dispatch(userState.actions.setEula(true));
 
   if (storedUser().state === USER_STATES.WAITING_EULA) {
-    store.dispatch(userState.actions.changeState(USER_STATES.EULA_ACCEPTED));
+    store$3.dispatch(userState.actions.changeState(USER_STATES.EULA_ACCEPTED));
   }
 
   return true;
@@ -7490,10 +11928,10 @@ function doPwLogin(email, password) {
       }
     }).then(response => {
       if (response && isString_1(response)) {
-        store.dispatch(userState.actions.setAuthKey(response));
+        store$3.dispatch(userState.actions.setAuthKey(response));
 
         if (storedUser().state === USER_STATES.WAITING_LOGIN) {
-          store.dispatch(userState.actions.changeState(USER_STATES.LOGIN_DONE));
+          store$3.dispatch(userState.actions.changeState(USER_STATES.LOGIN_DONE));
         }
       }
 
@@ -7511,7 +11949,7 @@ function doPwLogin(email, password) {
  */
 
 function setAuthenticated(userToken) {
-  store.dispatch(userState.actions.setAuthenticated(userToken));
+  store$3.dispatch(userState.actions.setAuthenticated(userToken));
   return storedUser();
 }
 /**
@@ -7523,14 +11961,35 @@ function getUserState() {
   return storedUser().state;
 }
 
-//      
+// `Promise.prototype.finally` method
+// https://tc39.github.io/ecma262/#sec-promise.prototype.finally
+_export({ target: 'Promise', proto: true, real: true }, {
+  'finally': function (onFinally) {
+    var C = speciesConstructor(this, getBuiltIn('Promise'));
+    var isFunction = typeof onFinally == 'function';
+    return this.then(
+      isFunction ? function (x) {
+        return promiseResolve(C, onFinally()).then(function () { return x; });
+      } : onFinally,
+      isFunction ? function (e) {
+        return promiseResolve(C, onFinally()).then(function () { throw e; });
+      } : onFinally
+    );
+  }
+});
+
+// patch native Promise.prototype for native async functions
+if ( typeof nativePromiseConstructor == 'function' && !nativePromiseConstructor.prototype['finally']) {
+  redefine(nativePromiseConstructor.prototype, 'finally', getBuiltIn('Promise').prototype['finally']);
+}
+
 /**
  * Get devices of all selected hubs
  * @return {HUB_DEVICES_MAP_TYPE}
  */
 
 function getDevices() {
-  const stateNow = store.getState();
+  const stateNow = store$3.getState();
   return devicesState.selectors.getDevices(stateNow);
 }
 /**
@@ -7539,7 +11998,7 @@ function getDevices() {
  */
 
 function getPairingDevices() {
-  const stateNow = store.getState();
+  const stateNow = store$3.getState();
   return pairingsState.selectors.getPairings(stateNow);
 }
 /**
@@ -7595,7 +12054,7 @@ function devicesDeltaHandler(hubId, reset, devices) {
       hubId,
       devices
     };
-    store.dispatch(devicesState.actions.setDevices(stateDevices));
+    store$3.dispatch(devicesState.actions.setDevices(stateDevices));
   } else {
     // Loop devices to check could it be added or should be removed
     Object.entries(devices).forEach(([key, device]) => {
@@ -7605,9 +12064,9 @@ function devicesDeltaHandler(hubId, reset, devices) {
       };
 
       if (key && device) {
-        store.dispatch(devicesState.actions.setDevice(stateDevice));
+        store$3.dispatch(devicesState.actions.setDevice(stateDevice));
       } else if (key && oldHubDevices[key]) {
-        store.dispatch(devicesState.actions.deleteDevice(key));
+        store$3.dispatch(devicesState.actions.deleteDevice(key));
       }
     });
   }
@@ -7639,7 +12098,7 @@ function pairingDevicesDeltaHandler(hubId, reset, pairingDevices) {
 
   if (reset) {
     // If reset then set  devices as they are received
-    store.dispatch(pairingsState.actions.setPairingDevices(statePairingDevices));
+    store$3.dispatch(pairingsState.actions.setPairingDevices(statePairingDevices));
   } else {
     // Loop devices to check could it be added or should be removed
     Object.entries(statePairingDevices.devices).forEach(([key, device]) => {
@@ -7655,15 +12114,13 @@ function pairingDevicesDeltaHandler(hubId, reset, pairingDevices) {
       */
 
       if (key && device) {
-        store.dispatch(pairingsState.actions.setPairingDevice(statePairingDevice));
+        store$3.dispatch(pairingsState.actions.setPairingDevice(statePairingDevice));
       } else if (key && oldPairingDevices[key]) {
-        store.dispatch(pairingsState.actions.deletePairingDevice(key));
+        store$3.dispatch(pairingsState.actions.deletePairingDevice(key));
       }
     });
   }
 }
-
-//      
 
 /**
  * Get rooms of all selected hubs
@@ -7671,7 +12128,7 @@ function pairingDevicesDeltaHandler(hubId, reset, pairingDevices) {
  */
 
 function getRooms() {
-  const stateNow = store.getState();
+  const stateNow = store$3.getState();
   return roomsState.selectors.getRooms(stateNow);
 }
 /**
@@ -7692,7 +12149,7 @@ function getHubRooms(hubId) {
 }
 function sendRoomCmd(hubId, commandType, data) {
   return new Promise((resolve, reject) => {
-    const stateNow = store.getState();
+    const stateNow = store$3.getState();
     const user = userState.selectors.getUser(stateNow);
 
     if (!user || !user.authKey) {
@@ -7747,7 +12204,7 @@ function sendRoomCmd(hubId, commandType, data) {
           hubKey
         }).then(rooms => {
           console.debug('SDK sendRoomCmd refresh rooms ok', rooms);
-          store.dispatch(roomsState.actions.setRooms({
+          store$3.dispatch(roomsState.actions.setRooms({
             hubId,
             rooms
           }));
@@ -7843,7 +12300,7 @@ function roomsDeltaHandler(hubId, reset, rooms) {
       hubId,
       rooms
     };
-    store.dispatch(roomsState.actions.setRooms(stateRooms));
+    store$3.dispatch(roomsState.actions.setRooms(stateRooms));
   } else {
     // Loop rooms to check could it be added or should be removed
     Object.entries(rooms).forEach(([key, room]) => {
@@ -7853,15 +12310,14 @@ function roomsDeltaHandler(hubId, reset, rooms) {
       };
 
       if (key && room) {
-        store.dispatch(roomsState.actions.setRoom(stateRoom));
+        store$3.dispatch(roomsState.actions.setRoom(stateRoom));
       } else if (key && oldHubRooms[key]) {
-        store.dispatch(roomsState.actions.removeRoom(key));
+        store$3.dispatch(roomsState.actions.removeRoom(key));
       }
     });
   }
 }
 
-//      
 let hubsMap = {};
 /*
  * Helper method to extract hub info from JWT based hub keys
@@ -7985,7 +12441,7 @@ function doLocalIdQuery(ip) {
 
 
 function getHubs() {
-  return hubsState.selectors.getHubs(store.getState());
+  return hubsState.selectors.getHubs(store$3.getState());
 }
 /*
  * Check hubs that are currently selected and mark them selected also in map of given hubs
@@ -8024,12 +12480,12 @@ function doCloudDiscovery() {
       sendAll(queries).finally(() => {
         // mark selected hubs to be selected after
         setSelectedHubs(hubsMap);
-        store.dispatch(hubsState.actions.updateHubs(hubsMap));
+        store$3.dispatch(hubsState.actions.updateHubs(hubsMap));
         resolve('ok');
       });
     }).catch(error => {
       console.error('doCloudDiscovery error: ', error.message);
-      store.dispatch(hubsState.actions.updateHubs(hubsMap));
+      store$3.dispatch(hubsState.actions.updateHubs(hubsMap));
       resolve('error');
     });
   });
@@ -8062,7 +12518,7 @@ function fetchCloudMetaData(hubs, authKey) {
 
 
 function storedUser$1() {
-  return userState.selectors.getUser(store.getState());
+  return userState.selectors.getUser(store$3.getState());
 }
 /*
  * Make hubsMap by fetching hub meta data from cloud and local
@@ -8075,10 +12531,10 @@ function makeHubsMap(tokens, sync = false) {
   } = storedUser$1();
   return new Promise(resolve => {
     hubsMap = extractHubInfo(tokens);
-    store.dispatch(hubsState.actions.updateHubs(hubsMap));
+    store$3.dispatch(hubsState.actions.updateHubs(hubsMap));
     fetchCloudMetaData(hubsMap, authKey).finally(() => {
       // Hubs map may be changed during fetching cloud metadata
-      store.dispatch(hubsState.actions.updateHubs(hubsMap));
+      store$3.dispatch(hubsState.actions.updateHubs(hubsMap));
 
       if (sync) {
         doCloudDiscovery().then(() => resolve(getHubs())).catch(() => resolve(getHubs()));
@@ -8211,11 +12667,6 @@ function doPairingById(hubId, reset = false) {
           case 'SCAN_DELTA':
             {
               pairingDevicesDeltaHandler(hubId, doReset, delta.devices);
-              break;
-            }
-
-          default:
-            {
               break;
             }
         }
@@ -8451,21 +12902,6 @@ function doPoll(hubId, reset = false) {
                 roomsDeltaHandler(hubId, doReset, delta.rooms);
                 break;
               }
-
-            case 'ZONE_DELTA':
-              {
-                break;
-              }
-
-            case 'ALARM_DELTA':
-              {
-                break;
-              }
-
-            default:
-              {
-                break;
-              }
           }
         });
       }
@@ -8526,7 +12962,7 @@ function selectHubById(hubId, poll = false) {
       let error = null;
       Object.values(hubs).every(hub => {
         if (hubId === hub.id) {
-          store.dispatch(hubsState.actions.selectHub({
+          store$3.dispatch(hubsState.actions.selectHub({
             hubId: hub.id
           }));
 
@@ -8577,7 +13013,7 @@ function unSelectHubById(hubId) {
   const hubs = getHubs();
   Object.values(hubs).forEach(hub => {
     if (hubId === hub.id) {
-      store.dispatch(hubsState.actions.unSelectHub({
+      store$3.dispatch(hubsState.actions.unSelectHub({
         hubId: hub.id
       }));
       stopPollingById(hub.id);
@@ -8592,7 +13028,7 @@ function unSelectHubById(hubId) {
 function unSelectHubs() {
   const hubs = getHubs();
   Object.values(hubs).forEach(hub => {
-    store.dispatch(hubsState.actions.unSelectHub({
+    store$3.dispatch(hubsState.actions.unSelectHub({
       hubId: hub.id
     }));
     stopPollingById(hub.id);
@@ -8733,7 +13169,7 @@ var HASH_UNDEFINED = '__lodash_hash_undefined__';
 var objectProto$7 = Object.prototype;
 
 /** Used to check objects for own properties. */
-var hasOwnProperty$5 = objectProto$7.hasOwnProperty;
+var hasOwnProperty$6 = objectProto$7.hasOwnProperty;
 
 /**
  * Gets the hash value for `key`.
@@ -8750,7 +13186,7 @@ function hashGet(key) {
     var result = data[key];
     return result === HASH_UNDEFINED ? undefined : result;
   }
-  return hasOwnProperty$5.call(data, key) ? data[key] : undefined;
+  return hasOwnProperty$6.call(data, key) ? data[key] : undefined;
 }
 
 var _hashGet = hashGet;
@@ -8759,7 +13195,7 @@ var _hashGet = hashGet;
 var objectProto$8 = Object.prototype;
 
 /** Used to check objects for own properties. */
-var hasOwnProperty$6 = objectProto$8.hasOwnProperty;
+var hasOwnProperty$7 = objectProto$8.hasOwnProperty;
 
 /**
  * Checks if a hash value for `key` exists.
@@ -8772,7 +13208,7 @@ var hasOwnProperty$6 = objectProto$8.hasOwnProperty;
  */
 function hashHas(key) {
   var data = this.__data__;
-  return _nativeCreate ? (data[key] !== undefined) : hasOwnProperty$6.call(data, key);
+  return _nativeCreate ? (data[key] !== undefined) : hasOwnProperty$7.call(data, key);
 }
 
 var _hashHas = hashHas;
@@ -8902,7 +13338,7 @@ var _assocIndexOf = assocIndexOf;
 var arrayProto = Array.prototype;
 
 /** Built-in value references. */
-var splice = arrayProto.splice;
+var splice$1 = arrayProto.splice;
 
 /**
  * Removes `key` and its value from the list cache.
@@ -8924,7 +13360,7 @@ function listCacheDelete(key) {
   if (index == lastIndex) {
     data.pop();
   } else {
-    splice.call(data, index, 1);
+    splice$1.call(data, index, 1);
   }
   --this.size;
   return true;
@@ -9362,11 +13798,11 @@ var _baseToString = baseToString;
  * _.toString([1, 2, 3]);
  * // => '1,2,3'
  */
-function toString(value) {
+function toString$2(value) {
   return value == null ? '' : _baseToString(value);
 }
 
-var toString_1 = toString;
+var toString_1 = toString$2;
 
 /**
  * Casts `value` to a path array if it's not one.
@@ -9435,7 +13871,7 @@ var defineProperty$2 = (function() {
   } catch (e) {}
 }());
 
-var _defineProperty$4 = defineProperty$2;
+var _defineProperty$3 = defineProperty$2;
 
 /**
  * The base implementation of `assignValue` and `assignMergeValue` without
@@ -9447,8 +13883,8 @@ var _defineProperty$4 = defineProperty$2;
  * @param {*} value The value to assign.
  */
 function baseAssignValue(object, key, value) {
-  if (key == '__proto__' && _defineProperty$4) {
-    _defineProperty$4(object, key, {
+  if (key == '__proto__' && _defineProperty$3) {
+    _defineProperty$3(object, key, {
       'configurable': true,
       'enumerable': true,
       'value': value,
@@ -9465,7 +13901,7 @@ var _baseAssignValue = baseAssignValue;
 var objectProto$9 = Object.prototype;
 
 /** Used to check objects for own properties. */
-var hasOwnProperty$7 = objectProto$9.hasOwnProperty;
+var hasOwnProperty$8 = objectProto$9.hasOwnProperty;
 
 /**
  * Assigns `value` to `key` of `object` if the existing value is not equivalent
@@ -9479,7 +13915,7 @@ var hasOwnProperty$7 = objectProto$9.hasOwnProperty;
  */
 function assignValue(object, key, value) {
   var objValue = object[key];
-  if (!(hasOwnProperty$7.call(object, key) && eq_1(objValue, value)) ||
+  if (!(hasOwnProperty$8.call(object, key) && eq_1(objValue, value)) ||
       (value === undefined && !(key in object))) {
     _baseAssignValue(object, key, value);
   }
@@ -9873,11 +14309,11 @@ var constant_1 = constant;
  * console.log(_.identity(object) === object);
  * // => true
  */
-function identity$1(value) {
+function identity(value) {
   return value;
 }
 
-var identity_1 = identity$1;
+var identity_1 = identity;
 
 /**
  * The base implementation of `setToString` without support for hot loop shorting.
@@ -9887,8 +14323,8 @@ var identity_1 = identity$1;
  * @param {Function} string The `toString` result.
  * @returns {Function} Returns `func`.
  */
-var baseSetToString = !_defineProperty$4 ? identity_1 : function(func, string) {
-  return _defineProperty$4(func, 'toString', {
+var baseSetToString = !_defineProperty$3 ? identity_1 : function(func, string) {
+  return _defineProperty$3(func, 'toString', {
     'configurable': true,
     'enumerable': false,
     'value': constant_1(string),
@@ -9984,8 +14420,6 @@ var pick = _flatRest(function(object, paths) {
 
 var pick_1 = pick;
 
-//      
-
 /**
  * Device state command to be sent
  * @param  {string} hubId
@@ -9997,7 +14431,7 @@ var pick_1 = pick;
 
 function sendDeviceStateCmd(hubId, deviceId, state, properties) {
   return new Promise((resolve, reject) => {
-    const stateNow = store.getState();
+    const stateNow = store$3.getState();
     const user = userState.selectors.getUser(stateNow);
 
     if (!user || !user.authKey) {
@@ -10056,7 +14490,7 @@ function sendDeviceStateCmd(hubId, deviceId, state, properties) {
 
 function sendDeviceCmd(hubId, deviceId, commandType, data, properties) {
   return new Promise((resolve, reject) => {
-    const stateNow = store.getState();
+    const stateNow = store$3.getState();
     const user = userState.selectors.getUser(stateNow);
 
     if (!user || !user.authKey) {
@@ -10159,7 +14593,53 @@ function setDeviceMeta(hubId, deviceId, name, rooms) {
   });
 }
 
-//
-
-export { CLOUD_CONNECTION_STATES, HUB_CONNECTION_STATES, HUB_STATES, LANGUAGES, ROLES, USER_STATES, acceptEula, addRoom, changeLanguage, connectHubByTokens, rootReducer as cozifyReducer, deleteDevice, devicesState, doPoll, doPwLogin, editRoom, getCloudConnectionState, getDevices, getHubConnectionState, getHubDevices, getHubPairingDevices, getHubRooms, getHubs, getPairingDevices, getRooms, getUserState, hubsState, identifyDevice, ignorePairingByIds, removeRoom, selectHubById, sendDeviceCmd, sendDeviceStateCmd, setAuthenticated, setDeviceMeta, setDevices, startDiscoveringHubs, startPairingById, startPollingById, stopDiscoveringHubs, stopPairingById, stopPairings, stopPollingById, store, unSelectHubById, unSelectHubs, unpairDevice, updateHubs, useTestcloud, watchChanges };
-//# sourceMappingURL=index.es.js.map
+exports.CLOUD_CONNECTION_STATES = CLOUD_CONNECTION_STATES;
+exports.HUB_CONNECTION_STATES = HUB_CONNECTION_STATES;
+exports.HUB_STATES = HUB_STATES;
+exports.LANGUAGES = LANGUAGES;
+exports.ROLES = ROLES;
+exports.USER_STATES = USER_STATES;
+exports.acceptEula = acceptEula;
+exports.addRoom = addRoom;
+exports.changeLanguage = changeLanguage;
+exports.connectHubByTokens = connectHubByTokens;
+exports.cozifyReducer = rootReducer;
+exports.deleteDevice = deleteDevice;
+exports.devicesState = devicesState;
+exports.doPoll = doPoll;
+exports.doPwLogin = doPwLogin;
+exports.editRoom = editRoom;
+exports.getCloudConnectionState = getCloudConnectionState;
+exports.getDevices = getDevices;
+exports.getHubConnectionState = getHubConnectionState;
+exports.getHubDevices = getHubDevices;
+exports.getHubPairingDevices = getHubPairingDevices;
+exports.getHubRooms = getHubRooms;
+exports.getHubs = getHubs;
+exports.getPairingDevices = getPairingDevices;
+exports.getRooms = getRooms;
+exports.getUserState = getUserState;
+exports.hubsState = hubsState;
+exports.identifyDevice = identifyDevice;
+exports.ignorePairingByIds = ignorePairingByIds;
+exports.removeRoom = removeRoom;
+exports.selectHubById = selectHubById;
+exports.sendDeviceCmd = sendDeviceCmd;
+exports.sendDeviceStateCmd = sendDeviceStateCmd;
+exports.setAuthenticated = setAuthenticated;
+exports.setDeviceMeta = setDeviceMeta;
+exports.setDevices = setDevices;
+exports.startDiscoveringHubs = startDiscoveringHubs;
+exports.startPairingById = startPairingById;
+exports.startPollingById = startPollingById;
+exports.stopDiscoveringHubs = stopDiscoveringHubs;
+exports.stopPairingById = stopPairingById;
+exports.stopPairings = stopPairings;
+exports.stopPollingById = stopPollingById;
+exports.store = store$3;
+exports.unSelectHubById = unSelectHubById;
+exports.unSelectHubs = unSelectHubs;
+exports.unpairDevice = unpairDevice;
+exports.updateHubs = updateHubs;
+exports.useTestcloud = useTestcloud;
+exports.watchChanges = watchChanges;

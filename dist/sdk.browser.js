@@ -1,5 +1,8 @@
-var CozifySDK = (function (exports, axios) {
-	'use strict';
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('axios')) :
+	typeof define === 'function' && define.amd ? define(['exports', 'axios'], factory) :
+	(global = global || self, factory(global.CozifySDK = {}, global.axios));
+}(this, (function (exports, axios) { 'use strict';
 
 	axios = axios && axios.hasOwnProperty('default') ? axios['default'] : axios;
 
@@ -1494,16 +1497,6 @@ var CozifySDK = (function (exports, axios) {
 	 */
 	var applyPatches$1 = immer.applyPatches.bind(immer);
 
-	var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
-
-	function unwrapExports (x) {
-		return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x.default : x;
-	}
-
-	function createCommonjsModule(fn, module) {
-		return module = { exports: {} }, fn(module, module.exports), module.exports;
-	}
-
 	/**
 	 * @constant {Object} CACHE
 	 *
@@ -1539,21 +1532,6 @@ var CozifySDK = (function (exports, axios) {
 	 */
 
 	var QUOTED_KEY = /^"[^"]+"|`[^`]+`|'[^']+'$/;
-	/**
-	 * @constant {Array<string>} VALID_QUOTES
-	 */
-
-	var VALID_QUOTES = /^["'`]{1}$/;
-	/**
-	 * @constant {RegExp} VALID_KEY
-	 */
-
-	var VALID_KEY = /^\d+$|^[a-zA-Z_$][\w$]+$/;
-	/**
-	 * @constant {RegExp} WHITE_SPACE
-	 */
-
-	var WHITE_SPACE = /\s/;
 
 	// constants
 	/**
@@ -1604,48 +1582,6 @@ var CozifySDK = (function (exports, axios) {
 	  return mapped;
 	};
 	/**
-	 * @function shouldBeInBrackets
-	 *
-	 * @description
-	 * should the key passed be encased in brackets when in the path string
-	 *
-	 * @param {*} key the key that is being added to the path string
-	 * @returns {boolean} should the key be in brackets
-	 */
-
-	var shouldBeInBrackets = function shouldBeInBrackets(key) {
-	  return typeof key === 'number' || isNumericKey(key) || isQuotedKey(key);
-	};
-	/**
-	 * @function shouldBeInQuotes
-	 *
-	 * @description
-	 * should the key passed be encased in quotes when in the path string
-	 *
-	 * @param {*} key the key that is being added to the path string
-	 * @returns {boolean} should the key be in quotes
-	 */
-
-	var shouldBeInQuotes = function shouldBeInQuotes(key) {
-	  return WHITE_SPACE.test(key) || !VALID_KEY.test(key);
-	};
-	/**
-	 * @function createGetNormalizedCreateKey
-	 *
-	 * @description
-	 * get the normalized path string based on the quote and key passed
-	 *
-	 * @param {string} [quote="] the quote string to use
-	 * @returns {function(string, *): string}
-	 */
-
-	var createGetNormalizedCreateKey = function createGetNormalizedCreateKey(quote) {
-	  return function (existingString, key) {
-	    var normalizedKey = shouldBeInQuotes(key) ? "" + quote + key + quote : key;
-	    return existingString + (shouldBeInBrackets(normalizedKey) ? "[" + normalizedKey + "]" : "." + normalizedKey);
-	  };
-	};
-	/**
 	 * @function getNormalizedParseKey
 	 *
 	 * @description
@@ -1686,33 +1622,6 @@ var CozifySDK = (function (exports, axios) {
 	// constants
 	var isArray = Array.isArray;
 	/**
-	 * @function create
-	 *
-	 * @description
-	 * create a new path string based on the path and quote passed
-	 *
-	 * @param {Array<number|string>} path the path to convert to a string
-	 * @param {string} [quote="] the quote string to use when quoting keys
-	 * @returns {string} the path string
-	 */
-
-	var create = function create(path, quote) {
-	  if (quote === void 0) {
-	    quote = '"';
-	  }
-
-	  if (!isArray(path)) {
-	    throw new ReferenceError('path passed must be an array');
-	  }
-
-	  if (!VALID_QUOTES.test(quote)) {
-	    throw new SyntaxError("quote " + quote + " passed is invalid, must be \", `, or '.");
-	  }
-
-	  var pathString = path.reduce(createGetNormalizedCreateKey(quote), '');
-	  return pathString[0] === '.' ? pathString.slice(1) : pathString;
-	};
-	/**
 	 * @function parse
 	 *
 	 * @description
@@ -1735,528 +1644,443 @@ var CozifySDK = (function (exports, axios) {
 	  return [typeof normalizedParseKey === 'number' ? normalizedParseKey : "" + normalizedParseKey];
 	};
 
-	var es = /*#__PURE__*/Object.freeze({
-		create: create,
-		parse: parse
-	});
-
 	/**
-	 * @function getNestedProperty
+	 * @constant {boolean} HAS_MAP_SUPPORT
+	 */
+	var HAS_MAP_SUPPORT = typeof Map === 'function';
+	/**
+	 * @constant {boolean} HAS_SET_SUPPORT
+	 */
+
+	var HAS_SET_SUPPORT = typeof Set === 'function';
+	/**
+	 * @constant {boolean} HAS_WEAKSET_SUPPORT
+	 */
+
+	var HAS_WEAKSET_SUPPORT = typeof WeakSet === 'function';
+
+	// constants
+	var keys = Object.keys;
+	/**
+	 * @function addObjectToCache
 	 *
 	 * @description
-	 * recursive function to get the nested property at path
+	 * add object to cache if it is indeed an object
 	 *
-	 * @param {Array<number|string>} path the path to retrieve values from the object
-	 * @param {*} object the object to get values from
-	 * @returns {*} the retrieved values
+	 * @param {any} object the object to potentially add to the cache
+	 * @param {Object|WeakSet} cache the cache to add to
+	 * @returns {void}
 	 */
-	var getNestedProperty = function getNestedProperty(path, object) {
-	  if (path.length === 1) {
-	    return object ? object[path[0]] : void 0;
+
+	var addObjectToCache = function addObjectToCache(object, cache) {
+	  return object && typeof object === 'object' && cache.add(object);
+	};
+	/**
+	 *
+	 * @param {Array<Array<any>>} pairs the pairs to check in
+	 * @param {Array<any>} pairToMatch the pair to check if exists
+	 * @param {function} isEqual the equality comparator
+	 * @param {any} meta the meta item to pass through
+	 * @returns {boolean} does the pair exist in the pairs
+	 */
+
+	var hasPair = function hasPair(pairs, pairToMatch, isEqual, meta) {
+	  var pair;
+
+	  for (var index = 0; index < pairs.length; index++) {
+	    pair = pairs[index];
+
+	    if (isEqual(pair[0], pairToMatch[0], meta) && isEqual(pair[1], pairToMatch[1], meta)) {
+	      return true;
+	    }
 	  }
 
-	  var property = path.shift();
-	  return object && object.hasOwnProperty(property) ? getNestedProperty(path, object[property]) : void 0;
+	  return false;
 	};
-
-	// external dependencies
 	/**
-	 * @function createIdentity
+	 * @function hasValue
 	 *
 	 * @description
-	 * create an identity method for a specific argument index
+	 * does the values include the vakye passed
 	 *
-	 * @param {number} argIndex the index of the argument to get
-	 * @param {Array<number|string>|number|string} path the nested path to retrieve the value from
-	 * @returns {function(...Array<*>): *} the identity method for the given argument
+	 * @param {Array<any>} values the values to check in
+	 * @param {any} item the value to locate
+	 * @param {function} isEqual the equality comparator
+	 * @param {any} meta the meta item to pass through
+	 * @returns {boolean} does the value exist in the values
 	 */
 
-	var createIdentity = function createIdentity(argIndex, path) {
-	  var shouldGetNestedValue = path !== void 0;
-	  return function () {
-	    // eslint-disable-next-line prefer-rest-params
-	    var value = arguments[argIndex < 0 ? arguments.length + argIndex : argIndex];
-	    return shouldGetNestedValue ? getNestedProperty(parse(path), value) : value;
-	  };
+	var hasValue = function hasValue(values, item, isEqual, meta) {
+	  for (var index = 0; index < values.length; index++) {
+	    if (isEqual(values[index], item, meta)) {
+	      return true;
+	    }
+	  }
+
+	  return false;
 	};
-	var identity = createIdentity(0);
-	var identitySecond = createIdentity(1);
-	var identityLast = createIdentity(-1);
-	var identitySecondLast = createIdentity(-2);
+	/**
+	 * @function sameValueZeroEqual
+	 *
+	 * @description
+	 * are the objects passed strictly equal or both NaN
+	 *
+	 * @param {any} objectA the object to compare against
+	 * @param {any} objectB the object to test
+	 * @returns {boolean} are the objects equal by the SameValueZero principle
+	 */
 
-	var es$1 = /*#__PURE__*/Object.freeze({
-		createIdentity: createIdentity,
-		identity: identity,
-		identitySecond: identitySecond,
-		identityLast: identityLast,
-		identitySecondLast: identitySecondLast
-	});
+	var sameValueZeroEqual = function sameValueZeroEqual(objectA, objectB) {
+	  return objectA === objectB || objectA !== objectA && objectB !== objectB;
+	};
+	/**
+	 * @function isPlainObject
+	 *
+	 * @description
+	 * is the object a plain object
+	 *
+	 * @param {any} object the object to test
+	 * @returns {boolean} is the object a plain object
+	 */
 
-	var fastEquals = createCommonjsModule(function (module, exports) {
-	(function (global, factory) {
-	  factory(exports);
-	}(commonjsGlobal, function (exports) {
-	  /**
-	   * @constant {boolean} HAS_MAP_SUPPORT
-	   */
-	  var HAS_MAP_SUPPORT = typeof Map === 'function';
-	  /**
-	   * @constant {boolean} HAS_SET_SUPPORT
-	   */
+	var isPlainObject$1 = function isPlainObject(object) {
+	  return object.constructor === Object;
+	};
+	/**
+	 * @function isPromiseLike
+	 *
+	 * @description
+	 * is the object promise-like (thenable)
+	 *
+	 * @param {any} object the object to test
+	 * @returns {boolean} is the object promise-like
+	 */
 
-	  var HAS_SET_SUPPORT = typeof Set === 'function';
-	  /**
-	   * @constant {boolean} HAS_WEAKSET_SUPPORT
-	   */
+	var isPromiseLike = function isPromiseLike(object) {
+	  return typeof object.then === 'function';
+	};
+	/**
+	 * @function isReactElement
+	 *
+	 * @description
+	 * is the object passed a react element
+	 *
+	 * @param {any} object the object to test
+	 * @returns {boolean} is the object a react element
+	 */
 
-	  var HAS_WEAKSET_SUPPORT = typeof WeakSet === 'function';
+	var isReactElement = function isReactElement(object) {
+	  return !!(object.$$typeof && object._store);
+	};
+	/**
+	 * @function getNewCache
+	 *
+	 * @description
+	 * get a new cache object to prevent circular references
+	 *
+	 * @returns {Object|Weakset} the new cache object
+	 */
 
-	  // constants
-	  var keys = Object.keys;
-	  /**
-	   * @function addObjectToCache
-	   *
-	   * @description
-	   * add object to cache if it is indeed an object
-	   *
-	   * @param {any} object the object to potentially add to the cache
-	   * @param {Object|WeakSet} cache the cache to add to
-	   * @returns {void}
-	   */
-
-	  var addObjectToCache = function addObjectToCache(object, cache) {
-	    return object && typeof object === 'object' && cache.add(object);
-	  };
-	  /**
-	   *
-	   * @param {Array<Array<any>>} pairs the pairs to check in
-	   * @param {Array<any>} pairToMatch the pair to check if exists
-	   * @param {function} isEqual the equality comparator
-	   * @param {any} meta the meta item to pass through
-	   * @returns {boolean} does the pair exist in the pairs
-	   */
-
-	  var hasPair = function hasPair(pairs, pairToMatch, isEqual, meta) {
-	    var pair;
-
-	    for (var index = 0; index < pairs.length; index++) {
-	      pair = pairs[index];
-
-	      if (isEqual(pair[0], pairToMatch[0], meta) && isEqual(pair[1], pairToMatch[1], meta)) {
-	        return true;
-	      }
+	var getNewCache = function getNewCache() {
+	  return HAS_WEAKSET_SUPPORT ? new WeakSet() : Object.create({
+	    _values: [],
+	    add: function add(value) {
+	      this._values.push(value);
+	    },
+	    has: function has(value) {
+	      return !!~this._values.indexOf(value);
 	    }
+	  });
+	};
+	/**
+	 * @function createCircularEqual
+	 *
+	 * @description
+	 * create a custom isEqual handler specific to circular objects
+	 *
+	 * @param {funtion} [isEqual] the isEqual comparator to use instead of isDeepEqual
+	 * @returns {function(any, any): boolean}
+	 */
 
-	    return false;
-	  };
-	  /**
-	   * @function hasValue
-	   *
-	   * @description
-	   * does the values include the vakye passed
-	   *
-	   * @param {Array<any>} values the values to check in
-	   * @param {any} item the value to locate
-	   * @param {function} isEqual the equality comparator
-	   * @param {any} meta the meta item to pass through
-	   * @returns {boolean} does the value exist in the values
-	   */
-
-	  var hasValue = function hasValue(values, item, isEqual, meta) {
-	    for (var index = 0; index < values.length; index++) {
-	      if (isEqual(values[index], item, meta)) {
-	        return true;
+	var createCircularEqual = function createCircularEqual(isEqual) {
+	  return function (isDeepEqual) {
+	    var comparator = isEqual || isDeepEqual;
+	    return function (objectA, objectB, cache) {
+	      if (cache === void 0) {
+	        cache = getNewCache();
 	      }
-	    }
 
-	    return false;
-	  };
-	  /**
-	   * @function sameValueZeroEqual
-	   *
-	   * @description
-	   * are the objects passed strictly equal or both NaN
-	   *
-	   * @param {any} objectA the object to compare against
-	   * @param {any} objectB the object to test
-	   * @returns {boolean} are the objects equal by the SameValueZero principle
-	   */
+	      var cacheHasA = cache.has(objectA);
+	      var cacheHasB = cache.has(objectB);
 
-	  var sameValueZeroEqual = function sameValueZeroEqual(objectA, objectB) {
-	    return objectA === objectB || objectA !== objectA && objectB !== objectB;
-	  };
-	  /**
-	   * @function isPlainObject
-	   *
-	   * @description
-	   * is the object a plain object
-	   *
-	   * @param {any} object the object to test
-	   * @returns {boolean} is the object a plain object
-	   */
-
-	  var isPlainObject = function isPlainObject(object) {
-	    return object.constructor === Object;
-	  };
-	  /**
-	   * @function isPromiseLike
-	   *
-	   * @description
-	   * is the object promise-like (thenable)
-	   *
-	   * @param {any} object the object to test
-	   * @returns {boolean} is the object promise-like
-	   */
-
-	  var isPromiseLike = function isPromiseLike(object) {
-	    return typeof object.then === 'function';
-	  };
-	  /**
-	   * @function isReactElement
-	   *
-	   * @description
-	   * is the object passed a react element
-	   *
-	   * @param {any} object the object to test
-	   * @returns {boolean} is the object a react element
-	   */
-
-	  var isReactElement = function isReactElement(object) {
-	    return !!(object.$$typeof && object._store);
-	  };
-	  /**
-	   * @function getNewCache
-	   *
-	   * @description
-	   * get a new cache object to prevent circular references
-	   *
-	   * @returns {Object|Weakset} the new cache object
-	   */
-
-	  var getNewCache = function getNewCache() {
-	    return HAS_WEAKSET_SUPPORT ? new WeakSet() : Object.create({
-	      _values: [],
-	      add: function add(value) {
-	        this._values.push(value);
-	      },
-	      has: function has(value) {
-	        return !!~this._values.indexOf(value);
+	      if (cacheHasA || cacheHasB) {
+	        return cacheHasA && cacheHasB;
 	      }
-	    });
-	  };
-	  /**
-	   * @function createCircularEqual
-	   *
-	   * @description
-	   * create a custom isEqual handler specific to circular objects
-	   *
-	   * @param {funtion} [isEqual] the isEqual comparator to use instead of isDeepEqual
-	   * @returns {function(any, any): boolean}
-	   */
 
-	  var createCircularEqual = function createCircularEqual(isEqual) {
-	    return function (isDeepEqual) {
-	      var comparator = isEqual || isDeepEqual;
-	      return function (objectA, objectB, cache) {
-	        if (cache === void 0) {
-	          cache = getNewCache();
-	        }
-
-	        var cacheHasA = cache.has(objectA);
-	        var cacheHasB = cache.has(objectB);
-
-	        if (cacheHasA || cacheHasB) {
-	          return cacheHasA && cacheHasB;
-	        }
-
-	        addObjectToCache(objectA, cache);
-	        addObjectToCache(objectB, cache);
-	        return comparator(objectA, objectB, cache);
-	      };
+	      addObjectToCache(objectA, cache);
+	      addObjectToCache(objectB, cache);
+	      return comparator(objectA, objectB, cache);
 	    };
 	  };
-	  /**
-	   * @function toPairs
-	   *
-	   * @param {Map} map the map to convert to [key, value] pairs (entries)
-	   * @returns {Array<Array<*>>} the [key, value] pairs
-	   */
+	};
+	/**
+	 * @function toPairs
+	 *
+	 * @param {Map} map the map to convert to [key, value] pairs (entries)
+	 * @returns {Array<Array<*>>} the [key, value] pairs
+	 */
 
-	  var toPairs = function toPairs(map) {
-	    var pairs = [];
-	    map.forEach(function (value, key) {
-	      return pairs.push([key, value]);
-	    });
-	    return pairs;
-	  };
-	  /**
-	   * @function toValues
-	   *
-	   * @param {Set} set the set to convert to values
-	   * @returns {Array<*>} the values
-	   */
+	var toPairs = function toPairs(map) {
+	  var pairs = [];
+	  map.forEach(function (value, key) {
+	    return pairs.push([key, value]);
+	  });
+	  return pairs;
+	};
+	/**
+	 * @function toValues
+	 *
+	 * @param {Set} set the set to convert to values
+	 * @returns {Array<*>} the values
+	 */
 
-	  var toValues = function toValues(set) {
-	    var values = [];
-	    set.forEach(function (value) {
-	      return values.push(value);
-	    });
-	    return values;
-	  };
+	var toValues = function toValues(set) {
+	  var values = [];
+	  set.forEach(function (value) {
+	    return values.push(value);
+	  });
+	  return values;
+	};
+	/**
+	 * @function areArraysEqual
+	 *
+	 * @description
+	 * are the arrays equal in value
+	 *
+	 * @param {Array<any>} arrayA the array to test
+	 * @param {Array<any>} arrayB the array to test against
+	 * @param {function} isEqual the comparator to determine equality
+	 * @param {any} meta the meta object to pass through
+	 * @returns {boolean} are the arrays equal
+	 */
+
+	var areArraysEqual = function areArraysEqual(arrayA, arrayB, isEqual, meta) {
+	  if (arrayA.length !== arrayB.length) {
+	    return false;
+	  }
+
+	  for (var index = 0; index < arrayA.length; index++) {
+	    if (!isEqual(arrayA[index], arrayB[index], meta)) {
+	      return false;
+	    }
+	  }
+
+	  return true;
+	};
+	/**
+	 * @function areMapsEqual
+	 *
+	 * @description
+	 * are the maps equal in value
+	 *
+	 * @param {Map} mapA the map to test
+	 * @param {Map} mapB the map to test against
+	 * @param {function} isEqual the comparator to determine equality
+	 * @param {any} meta the meta map to pass through
+	 * @returns {boolean} are the maps equal
+	 */
+
+	var areMapsEqual = function areMapsEqual(mapA, mapB, isEqual, meta) {
+	  var pairsA = toPairs(mapA);
+	  var pairsB = toPairs(mapB);
+
+	  if (pairsA.length !== pairsB.length) {
+	    return false;
+	  }
+
+	  for (var index = 0; index < pairsA.length; index++) {
+	    if (!hasPair(pairsB, pairsA[index], isEqual, meta) || !hasPair(pairsA, pairsB[index], isEqual, meta)) {
+	      return false;
+	    }
+	  }
+
+	  return true;
+	};
+	/**
+	 * @function areObjectsEqual
+	 *
+	 * @description
+	 * are the objects equal in value
+	 *
+	 * @param {Object} objectA the object to test
+	 * @param {Object} objectB the object to test against
+	 * @param {function} isEqual the comparator to determine equality
+	 * @param {any} meta the meta object to pass through
+	 * @returns {boolean} are the objects equal
+	 */
+
+	var areObjectsEqual = function areObjectsEqual(objectA, objectB, isEqual, meta) {
+	  var keysA = keys(objectA);
+	  var keysB = keys(objectB);
+
+	  if (keysA.length !== keysB.length) {
+	    return false;
+	  }
+
+	  var key;
+
+	  for (var index = 0; index < keysA.length; index++) {
+	    key = keysA[index];
+
+	    if (!hasValue(keysB, key, sameValueZeroEqual)) {
+	      return false;
+	    } // if a react element, ignore the "_owner" key because its not necessary for equality comparisons
+
+
+	    if (key === '_owner' && isReactElement(objectA) && isReactElement(objectB)) {
+	      continue;
+	    }
+
+	    if (!isEqual(objectA[key], objectB[key], meta)) {
+	      return false;
+	    }
+	  }
+
+	  return true;
+	};
+	/**
+	 * @function areRegExpsEqual
+	 *
+	 * @description
+	 * are the regExps equal in value
+	 *
+	 * @param {RegExp} regExpA the regExp to test
+	 * @param {RegExp} regExpB the regExp to test agains
+	 * @returns {boolean} are the regExps equal
+	 */
+
+	var areRegExpsEqual = function areRegExpsEqual(regExpA, regExpB) {
+	  return regExpA.source === regExpB.source && regExpA.global === regExpB.global && regExpA.ignoreCase === regExpB.ignoreCase && regExpA.multiline === regExpB.multiline && regExpA.unicode === regExpB.unicode && regExpA.sticky === regExpB.sticky && regExpA.lastIndex === regExpB.lastIndex;
+	};
+	/**
+	 * @function areSetsEqual
+	 *
+	 * @description
+	 * are the sets equal in value
+	 *
+	 * @param {Set} setA the set to test
+	 * @param {Set} setB the set to test against
+	 * @param {function} isEqual the comparator to determine equality
+	 * @param {any} meta the meta set to pass through
+	 * @returns {boolean} are the sets equal
+	 */
+
+	var areSetsEqual = function areSetsEqual(setA, setB, isEqual, meta) {
+	  var valuesA = toValues(setA);
+	  var valuesB = toValues(setB);
+
+	  if (valuesA.length !== valuesB.length) {
+	    return false;
+	  }
+
+	  for (var index = 0; index < valuesA.length; index++) {
+	    if (!hasValue(valuesB, valuesA[index], isEqual, meta) || !hasValue(valuesA, valuesB[index], isEqual, meta)) {
+	      return false;
+	    }
+	  }
+
+	  return true;
+	};
+
+	// constants
+	var isArray$1 = Array.isArray;
+
+	var createComparator = function createComparator(createIsEqual) {
+	  // eslint-disable-next-line no-use-before-define
+	  var isEqual = typeof createIsEqual === 'function' ? createIsEqual(comparator) : comparator;
 	  /**
-	   * @function areArraysEqual
+	   * @function comparator
 	   *
 	   * @description
-	   * are the arrays equal in value
+	   * compare the value of the two objects and return true if they are equivalent in values
 	   *
-	   * @param {Array<any>} arrayA the array to test
-	   * @param {Array<any>} arrayB the array to test against
-	   * @param {function} isEqual the comparator to determine equality
-	   * @param {any} meta the meta object to pass through
-	   * @returns {boolean} are the arrays equal
+	   * @param {any} objectA the object to test against
+	   * @param {any} objectB the object to test
+	   * @param {any} [meta] an optional meta object that is passed through to all equality test calls
+	   * @returns {boolean} are objectA and objectB equivalent in value
 	   */
 
-	  var areArraysEqual = function areArraysEqual(arrayA, arrayB, isEqual, meta) {
-	    if (arrayA.length !== arrayB.length) {
+	  function comparator(objectA, objectB, meta) {
+	    if (sameValueZeroEqual(objectA, objectB)) {
+	      return true;
+	    }
+
+	    var typeOfA = typeof objectA;
+
+	    if (typeOfA !== typeof objectB || typeOfA !== 'object' || !objectA || !objectB) {
 	      return false;
 	    }
 
-	    for (var index = 0; index < arrayA.length; index++) {
-	      if (!isEqual(arrayA[index], arrayB[index], meta)) {
-	        return false;
-	      }
-	    }
-
-	    return true;
-	  };
-	  /**
-	   * @function areMapsEqual
-	   *
-	   * @description
-	   * are the maps equal in value
-	   *
-	   * @param {Map} mapA the map to test
-	   * @param {Map} mapB the map to test against
-	   * @param {function} isEqual the comparator to determine equality
-	   * @param {any} meta the meta map to pass through
-	   * @returns {boolean} are the maps equal
-	   */
-
-	  var areMapsEqual = function areMapsEqual(mapA, mapB, isEqual, meta) {
-	    var pairsA = toPairs(mapA);
-	    var pairsB = toPairs(mapB);
-
-	    if (pairsA.length !== pairsB.length) {
-	      return false;
-	    }
-
-	    for (var index = 0; index < pairsA.length; index++) {
-	      if (!hasPair(pairsB, pairsA[index], isEqual, meta) || !hasPair(pairsA, pairsB[index], isEqual, meta)) {
-	        return false;
-	      }
-	    }
-
-	    return true;
-	  };
-	  /**
-	   * @function areObjectsEqual
-	   *
-	   * @description
-	   * are the objects equal in value
-	   *
-	   * @param {Object} objectA the object to test
-	   * @param {Object} objectB the object to test against
-	   * @param {function} isEqual the comparator to determine equality
-	   * @param {any} meta the meta object to pass through
-	   * @returns {boolean} are the objects equal
-	   */
-
-	  var areObjectsEqual = function areObjectsEqual(objectA, objectB, isEqual, meta) {
-	    var keysA = keys(objectA);
-	    var keysB = keys(objectB);
-
-	    if (keysA.length !== keysB.length) {
-	      return false;
-	    }
-
-	    var key;
-
-	    for (var index = 0; index < keysA.length; index++) {
-	      key = keysA[index];
-
-	      if (!hasValue(keysB, key, sameValueZeroEqual)) {
-	        return false;
-	      } // if a react element, ignore the "_owner" key because its not necessary for equality comparisons
-
-
-	      if (key === '_owner' && isReactElement(objectA) && isReactElement(objectB)) {
-	        continue;
-	      }
-
-	      if (!isEqual(objectA[key], objectB[key], meta)) {
-	        return false;
-	      }
-	    }
-
-	    return true;
-	  };
-	  /**
-	   * @function areRegExpsEqual
-	   *
-	   * @description
-	   * are the regExps equal in value
-	   *
-	   * @param {RegExp} regExpA the regExp to test
-	   * @param {RegExp} regExpB the regExp to test agains
-	   * @returns {boolean} are the regExps equal
-	   */
-
-	  var areRegExpsEqual = function areRegExpsEqual(regExpA, regExpB) {
-	    return regExpA.source === regExpB.source && regExpA.global === regExpB.global && regExpA.ignoreCase === regExpB.ignoreCase && regExpA.multiline === regExpB.multiline && regExpA.unicode === regExpB.unicode && regExpA.sticky === regExpB.sticky && regExpA.lastIndex === regExpB.lastIndex;
-	  };
-	  /**
-	   * @function areSetsEqual
-	   *
-	   * @description
-	   * are the sets equal in value
-	   *
-	   * @param {Set} setA the set to test
-	   * @param {Set} setB the set to test against
-	   * @param {function} isEqual the comparator to determine equality
-	   * @param {any} meta the meta set to pass through
-	   * @returns {boolean} are the sets equal
-	   */
-
-	  var areSetsEqual = function areSetsEqual(setA, setB, isEqual, meta) {
-	    var valuesA = toValues(setA);
-	    var valuesB = toValues(setB);
-
-	    if (valuesA.length !== valuesB.length) {
-	      return false;
-	    }
-
-	    for (var index = 0; index < valuesA.length; index++) {
-	      if (!hasValue(valuesB, valuesA[index], isEqual, meta) || !hasValue(valuesA, valuesB[index], isEqual, meta)) {
-	        return false;
-	      }
-	    }
-
-	    return true;
-	  };
-
-	  // constants
-	  var isArray = Array.isArray;
-
-	  var createComparator = function createComparator(createIsEqual) {
-	    // eslint-disable-next-line no-use-before-define
-	    var isEqual = typeof createIsEqual === 'function' ? createIsEqual(comparator) : comparator;
-	    /**
-	     * @function comparator
-	     *
-	     * @description
-	     * compare the value of the two objects and return true if they are equivalent in values
-	     *
-	     * @param {any} objectA the object to test against
-	     * @param {any} objectB the object to test
-	     * @param {any} [meta] an optional meta object that is passed through to all equality test calls
-	     * @returns {boolean} are objectA and objectB equivalent in value
-	     */
-
-	    function comparator(objectA, objectB, meta) {
-	      if (sameValueZeroEqual(objectA, objectB)) {
-	        return true;
-	      }
-
-	      var typeOfA = typeof objectA;
-
-	      if (typeOfA !== typeof objectB || typeOfA !== 'object' || !objectA || !objectB) {
-	        return false;
-	      }
-
-	      if (isPlainObject(objectA) && isPlainObject(objectB)) {
-	        return areObjectsEqual(objectA, objectB, isEqual, meta);
-	      }
-
-	      var arrayA = isArray(objectA);
-	      var arrayB = isArray(objectB);
-
-	      if (arrayA || arrayB) {
-	        return arrayA === arrayB && areArraysEqual(objectA, objectB, isEqual, meta);
-	      }
-
-	      var dateA = objectA instanceof Date;
-	      var dateB = objectB instanceof Date;
-
-	      if (dateA || dateB) {
-	        return dateA === dateB && sameValueZeroEqual(objectA.getTime(), objectB.getTime());
-	      }
-
-	      var regexpA = objectA instanceof RegExp;
-	      var regexpB = objectB instanceof RegExp;
-
-	      if (regexpA || regexpB) {
-	        return regexpA === regexpB && areRegExpsEqual(objectA, objectB);
-	      }
-
-	      if (isPromiseLike(objectA) || isPromiseLike(objectB)) {
-	        return objectA === objectB;
-	      }
-
-	      if (HAS_MAP_SUPPORT) {
-	        var mapA = objectA instanceof Map;
-	        var mapB = objectB instanceof Map;
-
-	        if (mapA || mapB) {
-	          return mapA === mapB && areMapsEqual(objectA, objectB, isEqual, meta);
-	        }
-	      }
-
-	      if (HAS_SET_SUPPORT) {
-	        var setA = objectA instanceof Set;
-	        var setB = objectB instanceof Set;
-
-	        if (setA || setB) {
-	          return setA === setB && areSetsEqual(objectA, objectB, isEqual, meta);
-	        }
-	      }
-
+	    if (isPlainObject$1(objectA) && isPlainObject$1(objectB)) {
 	      return areObjectsEqual(objectA, objectB, isEqual, meta);
 	    }
 
-	    return comparator;
-	  };
+	    var arrayA = isArray$1(objectA);
+	    var arrayB = isArray$1(objectB);
 
-	  // comparator
-	  var circularDeepEqual = createComparator(createCircularEqual());
-	  var circularShallowEqual = createComparator(createCircularEqual(sameValueZeroEqual));
-	  var deepEqual = createComparator();
-	  var shallowEqual = createComparator(function () {
-	    return sameValueZeroEqual;
-	  });
-	  var index = {
-	    circularDeep: circularDeepEqual,
-	    circularShallow: circularShallowEqual,
-	    createCustom: createComparator,
-	    deep: deepEqual,
-	    sameValueZero: sameValueZeroEqual,
-	    shallow: shallowEqual
-	  };
+	    if (arrayA || arrayB) {
+	      return arrayA === arrayB && areArraysEqual(objectA, objectB, isEqual, meta);
+	    }
 
-	  exports.createCustomEqual = createComparator;
-	  exports.sameValueZeroEqual = sameValueZeroEqual;
-	  exports.circularDeepEqual = circularDeepEqual;
-	  exports.circularShallowEqual = circularShallowEqual;
-	  exports.deepEqual = deepEqual;
-	  exports.shallowEqual = shallowEqual;
-	  exports.default = index;
+	    var dateA = objectA instanceof Date;
+	    var dateB = objectB instanceof Date;
 
-	  Object.defineProperty(exports, '__esModule', { value: true });
+	    if (dateA || dateB) {
+	      return dateA === dateB && sameValueZeroEqual(objectA.getTime(), objectB.getTime());
+	    }
 
-	}));
+	    var regexpA = objectA instanceof RegExp;
+	    var regexpB = objectB instanceof RegExp;
 
+	    if (regexpA || regexpB) {
+	      return regexpA === regexpB && areRegExpsEqual(objectA, objectB);
+	    }
+
+	    if (isPromiseLike(objectA) || isPromiseLike(objectB)) {
+	      return objectA === objectB;
+	    }
+
+	    if (HAS_MAP_SUPPORT) {
+	      var mapA = objectA instanceof Map;
+	      var mapB = objectB instanceof Map;
+
+	      if (mapA || mapB) {
+	        return mapA === mapB && areMapsEqual(objectA, objectB, isEqual, meta);
+	      }
+	    }
+
+	    if (HAS_SET_SUPPORT) {
+	      var setA = objectA instanceof Set;
+	      var setB = objectB instanceof Set;
+
+	      if (setA || setB) {
+	        return setA === setB && areSetsEqual(objectA, objectB, isEqual, meta);
+	      }
+	    }
+
+	    return areObjectsEqual(objectA, objectB, isEqual, meta);
+	  }
+
+	  return comparator;
+	};
+
+	// comparator
+	var circularDeepEqual = createComparator(createCircularEqual());
+	var circularShallowEqual = createComparator(createCircularEqual(sameValueZeroEqual));
+	var deepEqual = createComparator();
+	var shallowEqual = createComparator(function () {
+	  return sameValueZeroEqual;
 	});
-
-	unwrapExports(fastEquals);
 
 	function defaultEqualityCheck(a, b) {
 	  return a === b;
@@ -2358,1117 +2182,850 @@ var CozifySDK = (function (exports, axios) {
 
 	var createSelector = createSelectorCreator(defaultMemoize);
 
-	function createStructuredSelector(selectors) {
-	  var selectorCreator = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : createSelector;
+	/**
+	 * @constant __ placeholder used when parameters are skipped
+	 */
+	var __ = typeof Symbol === 'function' ? Symbol('curriable placeholder') : 0xedd1;
+	/**
+	 * @function recursiveCurry
+	 *
+	 * @description
+	 * recursively curry over the arguments until all have been resolved
+	 *
+	 * @param fn the function to curry
+	 * @param arity the length of the function to curry until
+	 * @param args the existing arguments
+	 * @returns the result of the function call
+	 */
+	var recursiveCurry = function (fn, arity, args) {
+	    return function () {
+	        var length = args.length;
+	        var newArgs = arguments;
+	        var newArgsLength = newArgs.length;
+	        var combined = [];
+	        var newArgsIndex = 0;
+	        var remaining = arity;
+	        var value;
+	        if (length) {
+	            for (var index = 0; index < length; index++) {
+	                combined[index] = value =
+	                    args[index] === __ && newArgsIndex < newArgsLength
+	                        ? newArgs[newArgsIndex++]
+	                        : args[index];
+	                if (value !== __) {
+	                    --remaining;
+	                }
+	            }
+	        }
+	        if (newArgsIndex < newArgsLength) {
+	            for (; newArgsIndex < newArgsLength; newArgsIndex++) {
+	                combined[combined.length] = value = newArgs[newArgsIndex];
+	                if (value !== __ && newArgsIndex < arity) {
+	                    --remaining;
+	                }
+	            }
+	        }
+	        return remaining > 0
+	            ? recursiveCurry(fn, arity, combined)
+	            : fn.apply(this, combined);
+	    };
+	};
 
-	  if (typeof selectors !== 'object') {
-	    throw new Error('createStructuredSelector expects first argument to be an object ' + ('where each property is a selector, instead received a ' + typeof selectors));
-	  }
-	  var objectKeys = Object.keys(selectors);
-	  return selectorCreator(objectKeys.map(function (key) {
-	    return selectors[key];
-	  }), function () {
-	    for (var _len3 = arguments.length, values = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-	      values[_key3] = arguments[_key3];
+	// utils
+	/**
+	 * @function curry
+	 *
+	 * @description
+	 * get the method passed as a curriable method based on its parameters
+	 *
+	 * @param fn the method to make curriable
+	 * @param arity the arity of the curried method
+	 * @returns the fn passed as a curried function
+	 */
+	var curry = function (fn, arity) {
+	    if (arity === void 0) { arity = fn.length; }
+	    var curried = recursiveCurry(fn, arity, []);
+	    curried.arity = arity;
+	    curried.fn = fn;
+	    return curried;
+	};
+	curry.__ = __;
+	/**
+	 * @function uncurry
+	 *
+	 * @description
+	 * return a function that is the non-curried version of the fn passed
+	 *
+	 * @param curried the curried function to uncurry
+	 * @returns the original fn
+	 */
+	var uncurry = function (curried) { return curried.fn; };
+	curry.uncurry = uncurry;
+
+	// external dependencies
+	var O = Object;
+	var create = O.create, getOwnPropertySymbols = O.getOwnPropertySymbols, getPrototypeOf = O.getPrototypeOf, keys$1 = O.keys, propertyIsEnumerable = O.propertyIsEnumerable;
+	var toStringObject = O.prototype.toString;
+	var toStringFunction = Function.prototype.toString;
+	var isArray$2 = Array.isArray;
+	/**
+	 * @constant REACT_ELEMENT the symbol / number specific to react elements
+	 */
+	var REACT_ELEMENT = typeof Symbol === 'function' && typeof Symbol.for === 'function'
+	    ? Symbol.for('react.element')
+	    : 0xeac7;
+	/**
+	 * @function cloneArray
+	 *
+	 * @description
+	 * clone an array to a new array
+	 *
+	 * @param array the array to clone
+	 * @returns the cloned array
+	 */
+	var cloneArray = function (array) {
+	    // @ts-ignore
+	    var cloned = new array.constructor();
+	    for (var index = 0; index < array.length; index++) {
+	        cloned[index] = array[index];
 	    }
+	    return cloned;
+	};
+	/**
+	 * @function reduce
+	 *
+	 * @description
+	 * a targeted reduce method faster than the native
+	 *
+	 * @param array the array to reduce
+	 * @param fn the method to reduce each array value with
+	 * @param initialValue the initial value of the reduction
+	 * @returns the reduced value
+	 */
+	var reduce = function (array, fn, initialValue) {
+	    var value = initialValue;
+	    for (var index = 0; index < array.length; index++) {
+	        value = fn(value, array[index]);
+	    }
+	    return value;
+	};
+	/**
+	 * @function getOwnProperties
+	 *
+	 * @description
+	 * get the all properties (keys and symbols) of the object passed
+	 *
+	 * @param object the object to get the properties of
+	 * @returns the keys and symbols the object has
+	 */
+	var getOwnProperties = function (object) {
+	    var ownSymbols = getOwnPropertySymbols(object);
+	    if (!ownSymbols.length) {
+	        return keys$1(object);
+	    }
+	    return keys$1(object).concat(reduce(ownSymbols, function (enumerableSymbols, symbol) {
+	        if (propertyIsEnumerable.call(object, symbol)) {
+	            enumerableSymbols.push(symbol);
+	        }
+	        return enumerableSymbols;
+	    }, []));
+	};
+	/**
+	 * @function assignFallback
+	 *
+	 * @description
+	 * a targeted fallback if native Object.assign is unavailable
+	 *
+	 * @param target the object to shallowly merge into
+	 * @param source the object to shallowly merge into target
+	 * @returns the shallowly merged object
+	 */
+	var assignFallback = function (target, source) {
+	    if (!source) {
+	        return target;
+	    }
+	    return reduce(getOwnProperties(source), function (clonedObject, property) {
+	        clonedObject[property] = source[property];
+	        return clonedObject;
+	    }, Object(target));
+	};
+	var assign$1 = typeof O.assign === 'function' ? O.assign : assignFallback;
+	/**
+	 * @function createWithProto
+	 *
+	 * @description
+	 * create a new object with the prototype of the object passed
+	 *
+	 * @param object object whose prototype will be the new object's prototype
+	 * @returns object with the prototype of the one passed
+	 */
+	var createWithProto = function (object) { return create(object.__proto__ || getPrototypeOf(object)); };
+	/**
+	 * @function isCloneable
+	 *
+	 * @description
+	 * is the object passed considered cloneable
+	 *
+	 * @param object the object that is being checked for cloneability
+	 * @returns whether the object can be cloned
+	 */
+	var isCloneable = function (object) {
+	    if (!object ||
+	        typeof object !== 'object' ||
+	        object.$$typeof === REACT_ELEMENT) {
+	        return false;
+	    }
+	    var type = toStringObject.call(object);
+	    return type !== '[object Date]' && type !== '[object RegExp]';
+	};
+	/**
+	 * @function isEmptyPath
+	 *
+	 * @description
+	 * is the path passed an empty path
+	 *
+	 * @param path the path to check for emptiness
+	 * @returns whether the path passed is considered empty
+	 */
+	var isEmptyPath = function (path) {
+	    return path == null || (isArray$2(path) && !path.length);
+	};
+	/**
+	 * @function isGlobalConstructor
+	 *
+	 * @description
+	 * is the fn passed a global constructor
+	 *
+	 * @param fn the fn to check if a global constructor
+	 * @returns whether the fn passed is a global constructor
+	 */
+	var isGlobalConstructor = function (fn) {
+	    return typeof fn === 'function' &&
+	        !!~toStringFunction.call(fn).indexOf('[native code]');
+	};
+	/**
+	 * @function callIfFunction
+	 *
+	 * @description
+	 * if the object passed is a function, call it and return its return, else return undefined
+	 *
+	 * @param object the object to call if a function
+	 * @param context the context to call the function with
+	 * @param parameters the parameters to call the function with
+	 * @returns the result of the function call, or undefined
+	 */
+	var callIfFunction = function (object, context, parameters) {
+	    return typeof object === 'function' ? object.apply(context, parameters) : void 0;
+	};
+	/**
+	 * @function getNewEmptyChild
+	 *
+	 * @description
+	 * get a new empty child object based on the key passed
+	 *
+	 * @param key the key to base the empty child on
+	 * @returns the empty object the child is built from
+	 */
+	var getNewEmptyChild = function (key) {
+	    return typeof key === 'number' ? [] : {};
+	};
+	/**
+	 * @function getNewEmptyObject
+	 *
+	 * @description
+	 * get a new empty object based on the object passed
+	 *
+	 * @param object the object to base the empty object on
+	 * @returns an empty version of the object passed
+	 */
+	var getNewEmptyObject = function (object) { return (isArray$2(object) ? [] : {}); };
+	/**
+	 * @function getShallowClone
+	 *
+	 * @description
+	 * create a shallow clone of the object passed, respecting its prototype
+	 *
+	 * @param object the object to clone
+	 * @returns a shallow clone of the object passed
+	 */
+	var getShallowClone = function (object) {
+	    if (object.constructor === O) {
+	        return assign$1({}, object);
+	    }
+	    if (isArray$2(object)) {
+	        return cloneArray(object);
+	    }
+	    return isGlobalConstructor(object.constructor)
+	        ? {}
+	        : assign$1(createWithProto(object), object);
+	};
+	/**
+	 * @function isSameValueZero
+	 *
+	 * @description
+	 * are the values equal based on SameValueZero
+	 *
+	 * @param value1 the first value to test
+	 * @param value2 the second value to test
+	 * @returns are the two values passed equal based on SameValueZero
+	 */
+	var isSameValueZero = function (value1, value2) {
+	    return value1 === value2 || (value1 !== value1 && value2 !== value2);
+	};
+	/**
+	 * @function cloneIfPossible
+	 *
+	 * @description
+	 * clone the object if it can be cloned, otherwise return the object itself
+	 *
+	 * @param object the object to clone
+	 * @returns a cloned version of the object, or the object itself if not cloneable
+	 */
+	var cloneIfPossible = function (object) {
+	    return isCloneable(object) ? getShallowClone(object) : object;
+	};
+	/**
+	 * @function getCloneOrEmptyObject
+	 *
+	 * @description
+	 * if the object is cloneable, get a clone of the object, else get a new
+	 * empty child object based on the key
+	 *
+	 * @param object the object to clone
+	 * @param nextKey the key to base the empty child object on
+	 * @returns a clone of the object, or an empty child object
+	 */
+	var getCloneOrEmptyObject = function (object, nextKey) {
+	    return isCloneable(object) ? getShallowClone(object) : getNewEmptyChild(nextKey);
+	};
+	/**
+	 * @function getCoalescedValue
+	 *
+	 * @description
+	 * return the value if not undefined, otherwise return the fallback value
+	 *
+	 * @param value the value to coalesce if undefined
+	 * @param fallbackValue the value to coalesce to
+	 * @returns the coalesced value
+	 */
+	var getCoalescedValue = function (value, fallbackValue) { return (value === void 0 ? fallbackValue : value); };
+	/**
+	 * @function getParsedPath
+	 *
+	 * @description
+	 * parse the path passed into an array path
+	 *
+	 * @param path the path to parse
+	 * @returns the parsed path
+	 */
+	var getParsedPath = function (path) { return (isArray$2(path) ? path : parse(path)); };
+	/**
+	 * @function getCloneAtPath
+	 *
+	 * @description
+	 * get a new object, cloned at the path specified while leveraging
+	 * structural sharing for the rest of the properties
+	 *
+	 * @param path the path to clone at
+	 * @param object the object with cloned children at path
+	 * @param onMatch the method to call once the end of the path is reached
+	 * @param index the path index
+	 * @returns the object deeply cloned at the path specified
+	 */
+	var getCloneAtPath = function (path, object, onMatch, index) {
+	    var key = path[index];
+	    var nextIndex = index + 1;
+	    if (nextIndex === path.length) {
+	        onMatch(object, key);
+	    }
+	    else {
+	        object[key] = getCloneAtPath(path, getCloneOrEmptyObject(object[key], path[nextIndex]), onMatch, nextIndex);
+	    }
+	    return object;
+	};
+	/**
+	 * @function getDeepClone
+	 *
+	 * @description
+	 * get a clone of the object at the path specified
+	 *
+	 * @param path the path to clone at
+	 * @param object the object to clone at the path
+	 * @param onMatch once a patch match is found, the callback to fire
+	 * @returns the clone of the object at path specified
+	 */
+	var getDeepClone = function (path, object, onMatch) {
+	    var parsedPath = getParsedPath(path);
+	    var topLevelClone = getCloneOrEmptyObject(object, parsedPath[0]);
+	    if (parsedPath.length === 1) {
+	        onMatch(topLevelClone, parsedPath[0]);
+	        return topLevelClone;
+	    }
+	    return getCloneAtPath(parsedPath, topLevelClone, onMatch, 0);
+	};
+	/**
+	 * @function getMergedObject
+	 *
+	 * @description
+	 * merge the source into the target, either deeply or shallowly
+	 *
+	 * @param target the object to merge into
+	 * @param source the object being merged into the target
+	 * @param isDeep is the merge a deep merge
+	 * @returns the merged object
+	 */
+	var getMergedObject = function (target, source, isDeep) {
+	    var isObject1Array = isArray$2(target);
+	    if (isObject1Array !== isArray$2(source) || !isCloneable(target)) {
+	        return cloneIfPossible(source);
+	    }
+	    if (isObject1Array) {
+	        return target.concat(source);
+	    }
+	    var targetClone = target.constructor === O || isGlobalConstructor(target.constructor)
+	        ? {}
+	        : createWithProto(target);
+	    return reduce(getOwnProperties(source), function (clone, key) {
+	        clone[key] =
+	            isDeep && isCloneable(source[key])
+	                ? getMergedObject(target[key], source[key], isDeep)
+	                : source[key];
+	        return clone;
+	    }, assign$1(targetClone, target));
+	};
+	/**
+	 * @function getValueAtPath
+	 *
+	 * @description
+	 * get the value at the nested property, or the fallback provided
+	 *
+	 * @param path the path to get the value from
+	 * @param object the object to get the value from at path
+	 * @param noMatchValue the value returned if no match is found
+	 * @returns the matching value, or the fallback provided
+	 */
+	var getValueAtPath = function (path, object, noMatchValue) {
+	    var parsedPath = getParsedPath(path);
+	    if (parsedPath.length === 1) {
+	        return object
+	            ? getCoalescedValue(object[parsedPath[0]], noMatchValue)
+	            : noMatchValue;
+	    }
+	    var ref = object;
+	    var key = parsedPath[0];
+	    for (var index = 0; index < parsedPath.length - 1; index++) {
+	        if (!ref || !ref[key]) {
+	            return noMatchValue;
+	        }
+	        ref = ref[key];
+	        key = parsedPath[index + 1];
+	    }
+	    return ref ? getCoalescedValue(ref[key], noMatchValue) : noMatchValue;
+	};
+	/**
+	 * @function getFullPath
+	 *
+	 * @description
+	 * get the path to add to, based on the object and fn passed
+	 *
+	 * @param path the path to add to
+	 * @param object the object traversed by the path
+	 * @param fn the function to transform the retrieved value with
+	 * @returns the full path to add to
+	 */
+	var getFullPath = function (path, object, fn) {
+	    var isPathEmpty = isEmptyPath(path);
+	    var valueAtPath = isPathEmpty
+	        ? object
+	        : fn
+	            ? fn(getValueAtPath(path, object))
+	            : getValueAtPath(path, object);
+	    return isArray$2(valueAtPath)
+	        ? isArray$2(path)
+	            ? path.concat([valueAtPath.length])
+	            : (isPathEmpty ? '' : path) + "[" + valueAtPath.length + "]"
+	        : path;
+	};
+	/**
+	 * @function splice
+	 *
+	 * @description
+	 * a faster, more targeted version of the native splice
+	 *
+	 * @param array the array to remove the value from
+	 * @param splicedIndex the index of the value to remove
+	 */
+	var splice = function (array, splicedIndex) {
+	    if (array.length) {
+	        var length_1 = array.length;
+	        var index = splicedIndex;
+	        while (index < length_1 - 1) {
+	            array[index] = array[index + 1];
+	            ++index;
+	        }
+	        --array.length;
+	    }
+	};
+	/**
+	 * @function throwInvalidFnError
+	 *
+	 * @description
+	 * throw the TypeError based on the invalid handler
+	 *
+	 * @throws
+	 */
+	var throwInvalidFnError = function () {
+	    throw new TypeError('handler passed is not of type "function".');
+	};
 
-	    return values.reduce(function (composition, value, index) {
-	      composition[objectKeys[index]] = value;
-	      return composition;
-	    }, {});
-	  });
+	// utils
+	var isArray$1$1 = Array.isArray;
+	var slice = Array.prototype.slice;
+	/**
+	 * @function createCall
+	 *
+	 * @description
+	 * create handlers for call / callWith
+	 *
+	 * @param isWithHandler is the method using a with handler
+	 * @returns call / callWith
+	 */
+	var createCall = function (isWithHandler) {
+	    if (isWithHandler) {
+	        return function (fn, path, parameters, object, context) {
+	            if (context === void 0) { context = object; }
+	            if (typeof fn !== 'function') {
+	                throwInvalidFnError();
+	            }
+	            var extraArgs = slice.call(arguments, 5);
+	            if (isEmptyPath(path)) {
+	                return callIfFunction(fn.apply(void 0, [object].concat(extraArgs)), context, parameters);
+	            }
+	            var value = getValueAtPath(path, object);
+	            if (value === void 0) {
+	                return;
+	            }
+	            var result = fn.apply(void 0, [value].concat(extraArgs));
+	            return callIfFunction(result, context, parameters);
+	        };
+	    }
+	    return function (path, parameters, object, context) {
+	        if (context === void 0) { context = object; }
+	        var callable = isEmptyPath(path)
+	            ? object
+	            : getValueAtPath(path, object);
+	        return callIfFunction(callable, context, parameters);
+	    };
+	};
+	/**
+	 * @function createGet
+	 *
+	 * @description
+	 * create handlers for get / getWith
+	 *
+	 * @param isWithHandler is the method using a with handler
+	 * @returns get / getWith
+	 */
+	var createGet = function (isWithHandler) {
+	    if (isWithHandler) {
+	        return function (fn, path, object) {
+	            if (typeof fn !== 'function') {
+	                throwInvalidFnError();
+	            }
+	            var extraArgs = slice.call(arguments, 4);
+	            if (isEmptyPath(path)) {
+	                return fn.apply(void 0, [object].concat(extraArgs));
+	            }
+	            var value = getValueAtPath(path, object);
+	            return value === void 0 ? value : fn.apply(void 0, [value].concat(extraArgs));
+	        };
+	    }
+	    return function (path, object) {
+	        return isEmptyPath(path) ? object : getValueAtPath(path, object);
+	    };
+	};
+	/**
+	 * @function createGetOr
+	 *
+	 * @description
+	 * create handlers for getOr / getWithOr
+	 *
+	 * @param isWithHandler is the method using a with handler
+	 * @returns getOr / getWithOr
+	 */
+	var createGetOr = function (isWithHandler) {
+	    if (isWithHandler) {
+	        return function (fn, noMatchValue, path, object) {
+	            if (typeof fn !== 'function') {
+	                throwInvalidFnError();
+	            }
+	            var extraArgs = slice.call(arguments, 4);
+	            if (isEmptyPath(path)) {
+	                return fn.apply(void 0, [object].concat(extraArgs));
+	            }
+	            var value = getValueAtPath(path, object);
+	            return value === void 0 ? noMatchValue : fn.apply(void 0, [value].concat(extraArgs));
+	        };
+	    }
+	    return function (noMatchValue, path, object) {
+	        return isEmptyPath(path) ? object : getValueAtPath(path, object, noMatchValue);
+	    };
+	};
+	/**
+	 * @function createHas
+	 *
+	 * @description
+	 * create handlers for has / hasWith
+	 *
+	 * @param isWithHandler is the method using a with handler
+	 * @returns has / hasWith
+	 */
+	var createHas = function (isWithHandler) {
+	    if (isWithHandler) {
+	        return function (fn, path, object) {
+	            if (typeof fn !== 'function') {
+	                throwInvalidFnError();
+	            }
+	            var extraArgs = slice.call(arguments, 3);
+	            if (isEmptyPath(path)) {
+	                return !!fn.apply(void 0, [object].concat(extraArgs));
+	            }
+	            var value = getValueAtPath(path, object);
+	            return value !== void 0 && !!fn.apply(void 0, [value].concat(extraArgs));
+	        };
+	    }
+	    return function (path, object) {
+	        return isEmptyPath(path)
+	            ? object != null
+	            : getValueAtPath(path, object) !== void 0;
+	    };
+	};
+	/**
+	 * @function createIs
+	 *
+	 * @description
+	 * create handlers for is / isWith
+	 *
+	 * @param isWithHandler is the method using a with handler
+	 * @returns is / isWith
+	 */
+	var createIs = function (isWithHandler) {
+	    if (isWithHandler) {
+	        return function (fn, path, value, object) {
+	            if (typeof fn !== 'function') {
+	                throwInvalidFnError();
+	            }
+	            var extraArgs = slice.call(arguments, 4);
+	            if (isEmptyPath(path)) {
+	                return isSameValueZero(fn.apply(void 0, [object].concat(extraArgs)), value);
+	            }
+	            return isSameValueZero(fn.apply(void 0, [getValueAtPath(path, object)].concat(extraArgs)), value);
+	        };
+	    }
+	    return function (path, value, object) {
+	        return isEmptyPath(path)
+	            ? isSameValueZero(object, value)
+	            : isSameValueZero(getValueAtPath(path, object), value);
+	    };
+	};
+	/**
+	 * @function createMerge
+	 *
+	 * @description
+	 * create handlers for merge / mergeWith
+	 *
+	 * @param isWithHandler is the method using a with handler
+	 * @param isDeep is the handler for a deep merge or shallow
+	 * @returns merge / mergeWith
+	 */
+	var createMerge = function (isWithHandler, isDeep) {
+	    if (isWithHandler) {
+	        return function (fn, path, object) {
+	            if (typeof fn !== 'function') {
+	                throwInvalidFnError();
+	            }
+	            var extraArgs = slice.call(arguments, 3);
+	            if (!isCloneable(object)) {
+	                return fn.apply(void 0, [object].concat(extraArgs));
+	            }
+	            if (isEmptyPath(path)) {
+	                var objectToMerge = fn.apply(void 0, [object].concat(extraArgs));
+	                return objectToMerge
+	                    ? getMergedObject(object, objectToMerge, isDeep)
+	                    : object;
+	            }
+	            var hasChanged = false;
+	            var result = getDeepClone(path, object, function (ref, key) {
+	                var objectToMerge = fn.apply(void 0, [ref[key]].concat(extraArgs));
+	                if (objectToMerge) {
+	                    ref[key] = getMergedObject(ref[key], objectToMerge, isDeep);
+	                    hasChanged = true;
+	                }
+	            });
+	            return hasChanged ? result : object;
+	        };
+	    }
+	    return function (path, objectToMerge, object) {
+	        if (!isCloneable(object)) {
+	            return objectToMerge;
+	        }
+	        return isEmptyPath(path)
+	            ? getMergedObject(object, objectToMerge, true)
+	            : getDeepClone(path, object, function (ref, key) {
+	                ref[key] = getMergedObject(ref[key], objectToMerge, isDeep);
+	            });
+	    };
+	};
+	/**
+	 * @function createNot
+	 *
+	 * @description
+	 * create handlers for not / notWith
+	 *
+	 * @param isWithHandler not the method using a with handler
+	 * @returns not / notWithHandler
+	 */
+	var createNot = function (isWithHandler) {
+	    var is = createIs(isWithHandler);
+	    return function () {
+	        return !is.apply(this, arguments);
+	    };
+	};
+	/**
+	 * @function createRemove
+	 *
+	 * @description
+	 * create handlers for remove / removeWith
+	 *
+	 * @param isWithHandler is the method using a with handler
+	 * @returns remove / removeWith
+	 */
+	var createRemove = function (isWithHandler) {
+	    if (isWithHandler) {
+	        return function (fn, path, object) {
+	            if (typeof fn !== 'function') {
+	                throwInvalidFnError();
+	            }
+	            var extraArgs = slice.call(arguments, 3);
+	            if (isEmptyPath(path)) {
+	                var emptyObject = getNewEmptyObject(object);
+	                return fn.apply(void 0, [emptyObject].concat(extraArgs)) ? emptyObject : object;
+	            }
+	            var value = getValueAtPath(path, object);
+	            return value !== void 0 && fn.apply(void 0, [value].concat(extraArgs))
+	                ? getDeepClone(path, object, function (ref, key) {
+	                    if (isArray$1$1(ref)) {
+	                        splice(ref, key);
+	                    }
+	                    else {
+	                        delete ref[key];
+	                    }
+	                })
+	                : object;
+	        };
+	    }
+	    return function (path, object) {
+	        if (isEmptyPath(path)) {
+	            return getNewEmptyObject(object);
+	        }
+	        return getValueAtPath(path, object) !== void 0
+	            ? getDeepClone(path, object, function (ref, key) {
+	                if (isArray$1$1(ref)) {
+	                    splice(ref, key);
+	                }
+	                else {
+	                    delete ref[key];
+	                }
+	            })
+	            : object;
+	    };
+	};
+	/**
+	 * @function createSet
+	 *
+	 * @description
+	 * create handlers for set / setWith
+	 *
+	 * @param isWithHandler is the method using a with handler
+	 * @returns set / setWith
+	 */
+	var createSet = function (isWithHandler) {
+	    if (isWithHandler) {
+	        return function (fn, path, object) {
+	            if (typeof fn !== 'function') {
+	                throwInvalidFnError();
+	            }
+	            var extraArgs = slice.call(arguments, 3);
+	            return isEmptyPath(path)
+	                ? fn.apply(void 0, [object].concat(extraArgs)) : getDeepClone(path, object, function (ref, key) {
+	                ref[key] = fn.apply(void 0, [ref[key]].concat(extraArgs));
+	            });
+	        };
+	    }
+	    return function (path, value, object) {
+	        return isEmptyPath(path)
+	            ? value
+	            : getDeepClone(path, object, function (ref, key) {
+	                ref[key] = value;
+	            });
+	    };
+	};
+	/**
+	 * @function createAdd
+	 *
+	 * @description
+	 * create handlers for add / addWith
+	 *
+	 * @param isWithHandler is the method using a with handler
+	 * @returns add / addWith
+	 */
+	var createAdd = function (isWithHandler) {
+	    var add = createSet(isWithHandler);
+	    if (isWithHandler) {
+	        return function (fn, path, object) {
+	            return add.apply(this, [fn, getFullPath(path, object, fn), object].concat(slice.call(arguments, 3)));
+	        };
+	    }
+	    return function (path, value, object) { return add(getFullPath(path, object), value, object); };
+	};
+
+	// external dependencies
+	var add = curry(createAdd(false), 3);
+	var addWith = curry(createAdd(true), 3);
+	var assign$1$1 = curry(createMerge(false, false), 3);
+	var assignWith = curry(createMerge(true, false), 3);
+	var call = curry(createCall(false), 3);
+	var callWith = curry(createCall(true), 4);
+	var get = curry(createGet(false), 2);
+	var getOr = curry(createGetOr(false), 3);
+	var getWith = curry(createGet(true), 3);
+	var getWithOr = curry(createGetOr(true), 4);
+	var has$1 = curry(createHas(false), 2);
+	var hasWith = curry(createHas(true), 3);
+	var is$1 = curry(createIs(false), 3);
+	var isWith = curry(createIs(true), 4);
+	var merge = curry(createMerge(false, true), 3);
+	var mergeWith = curry(createMerge(true, true), 3);
+	var not = curry(createNot(false), 3);
+	var notWith = curry(createNot(true), 4);
+	var remove = curry(createRemove(false), 2);
+	var removeWith = curry(createRemove(true), 3);
+	var set = curry(createSet(false), 3);
+	var setWith = curry(createSet(true), 3);
+
+	var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
+	function unwrapExports (x) {
+		return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
 	}
 
-	var es$2 = /*#__PURE__*/Object.freeze({
-		defaultMemoize: defaultMemoize,
-		createSelectorCreator: createSelectorCreator,
-		createSelector: createSelector,
-		createStructuredSelector: createStructuredSelector
-	});
+	function createCommonjsModule(fn, module) {
+		return module = { exports: {} }, fn(module, module.exports), module.exports;
+	}
 
-	var curriable = createCommonjsModule(function (module, exports) {
-	(function (global, factory) {
-	  factory(exports);
-	}(commonjsGlobal, function (exports) {
-	  /**
-	   * @constant __ placeholder used when parameters are skipped
-	   */
-	  var __ = typeof Symbol === 'function' ? Symbol('curriable placeholder') : 0xedd1;
-	  /**
-	   * @function recursiveCurry
-	   *
-	   * @description
-	   * recursively curry over the arguments until all have been resolved
-	   *
-	   * @param fn the function to curry
-	   * @param arity the length of the function to curry until
-	   * @param args the existing arguments
-	   * @returns the result of the function call
-	   */
-	  var recursiveCurry = function (fn, arity, args) {
-	      return function () {
-	          var length = args.length;
-	          var newArgs = arguments;
-	          var newArgsLength = newArgs.length;
-	          var combined = [];
-	          var newArgsIndex = 0;
-	          var remaining = arity;
-	          var value;
-	          if (length) {
-	              for (var index = 0; index < length; index++) {
-	                  combined[index] = value =
-	                      args[index] === __ && newArgsIndex < newArgsLength
-	                          ? newArgs[newArgsIndex++]
-	                          : args[index];
-	                  if (value !== __) {
-	                      --remaining;
-	                  }
-	              }
-	          }
-	          if (newArgsIndex < newArgsLength) {
-	              for (; newArgsIndex < newArgsLength; newArgsIndex++) {
-	                  combined[combined.length] = value = newArgs[newArgsIndex];
-	                  if (value !== __ && newArgsIndex < arity) {
-	                      --remaining;
-	                  }
-	              }
-	          }
-	          return remaining > 0
-	              ? recursiveCurry(fn, arity, combined)
-	              : fn.apply(this, combined);
-	      };
-	  };
-
-	  // utils
-	  /**
-	   * @function curry
-	   *
-	   * @description
-	   * get the method passed as a curriable method based on its parameters
-	   *
-	   * @param fn the method to make curriable
-	   * @param arity the arity of the curried method
-	   * @returns the fn passed as a curried function
-	   */
-	  var curry = function (fn, arity) {
-	      if (arity === void 0) { arity = fn.length; }
-	      var curried = recursiveCurry(fn, arity, []);
-	      curried.arity = arity;
-	      curried.fn = fn;
-	      return curried;
-	  };
-	  curry.__ = __;
-	  /**
-	   * @function uncurry
-	   *
-	   * @description
-	   * return a function that is the non-curried version of the fn passed
-	   *
-	   * @param curried the curried function to uncurry
-	   * @returns the original fn
-	   */
-	  var uncurry = function (curried) { return curried.fn; };
-	  curry.uncurry = uncurry;
-
-	  exports.__ = __;
-	  exports.curry = curry;
-	  exports.uncurry = uncurry;
-	  exports.default = curry;
-
-	  Object.defineProperty(exports, '__esModule', { value: true });
-
-	}));
-
-	});
-
-	unwrapExports(curriable);
-
-	var unchanged = createCommonjsModule(function (module, exports) {
-	(function (global, factory) {
-	  factory(exports, curriable, es);
-	}(commonjsGlobal, function (exports, curriable, pathington) {
-	  // external dependencies
-	  var O = Object;
-	  var create = O.create, getOwnPropertySymbols = O.getOwnPropertySymbols, getPrototypeOf = O.getPrototypeOf, keys = O.keys, propertyIsEnumerable = O.propertyIsEnumerable;
-	  var toStringObject = O.prototype.toString;
-	  var toStringFunction = Function.prototype.toString;
-	  var isArray = Array.isArray;
-	  /**
-	   * @constant REACT_ELEMENT the symbol / number specific to react elements
-	   */
-	  var REACT_ELEMENT = typeof Symbol === 'function' && typeof Symbol.for === 'function'
-	      ? Symbol.for('react.element')
-	      : 0xeac7;
-	  /**
-	   * @function cloneArray
-	   *
-	   * @description
-	   * clone an array to a new array
-	   *
-	   * @param array the array to clone
-	   * @returns the cloned array
-	   */
-	  var cloneArray = function (array) {
-	      // @ts-ignore
-	      var cloned = new array.constructor();
-	      for (var index = 0; index < array.length; index++) {
-	          cloned[index] = array[index];
-	      }
-	      return cloned;
-	  };
-	  /**
-	   * @function reduce
-	   *
-	   * @description
-	   * a targeted reduce method faster than the native
-	   *
-	   * @param array the array to reduce
-	   * @param fn the method to reduce each array value with
-	   * @param initialValue the initial value of the reduction
-	   * @returns the reduced value
-	   */
-	  var reduce = function (array, fn, initialValue) {
-	      var value = initialValue;
-	      for (var index = 0; index < array.length; index++) {
-	          value = fn(value, array[index]);
-	      }
-	      return value;
-	  };
-	  /**
-	   * @function getOwnProperties
-	   *
-	   * @description
-	   * get the all properties (keys and symbols) of the object passed
-	   *
-	   * @param object the object to get the properties of
-	   * @returns the keys and symbols the object has
-	   */
-	  var getOwnProperties = function (object) {
-	      var ownSymbols = getOwnPropertySymbols(object);
-	      if (!ownSymbols.length) {
-	          return keys(object);
-	      }
-	      return keys(object).concat(reduce(ownSymbols, function (enumerableSymbols, symbol) {
-	          if (propertyIsEnumerable.call(object, symbol)) {
-	              enumerableSymbols.push(symbol);
-	          }
-	          return enumerableSymbols;
-	      }, []));
-	  };
-	  /**
-	   * @function assignFallback
-	   *
-	   * @description
-	   * a targeted fallback if native Object.assign is unavailable
-	   *
-	   * @param target the object to shallowly merge into
-	   * @param source the object to shallowly merge into target
-	   * @returns the shallowly merged object
-	   */
-	  var assignFallback = function (target, source) {
-	      if (!source) {
-	          return target;
-	      }
-	      return reduce(getOwnProperties(source), function (clonedObject, property) {
-	          clonedObject[property] = source[property];
-	          return clonedObject;
-	      }, Object(target));
-	  };
-	  var assign = typeof O.assign === 'function' ? O.assign : assignFallback;
-	  /**
-	   * @function createWithProto
-	   *
-	   * @description
-	   * create a new object with the prototype of the object passed
-	   *
-	   * @param object object whose prototype will be the new object's prototype
-	   * @returns object with the prototype of the one passed
-	   */
-	  var createWithProto = function (object) { return create(object.__proto__ || getPrototypeOf(object)); };
-	  /**
-	   * @function isCloneable
-	   *
-	   * @description
-	   * is the object passed considered cloneable
-	   *
-	   * @param object the object that is being checked for cloneability
-	   * @returns whether the object can be cloned
-	   */
-	  var isCloneable = function (object) {
-	      if (!object ||
-	          typeof object !== 'object' ||
-	          object.$$typeof === REACT_ELEMENT) {
-	          return false;
-	      }
-	      var type = toStringObject.call(object);
-	      return type !== '[object Date]' && type !== '[object RegExp]';
-	  };
-	  /**
-	   * @function isEmptyPath
-	   *
-	   * @description
-	   * is the path passed an empty path
-	   *
-	   * @param path the path to check for emptiness
-	   * @returns whether the path passed is considered empty
-	   */
-	  var isEmptyPath = function (path) {
-	      return path == null || (isArray(path) && !path.length);
-	  };
-	  /**
-	   * @function isGlobalConstructor
-	   *
-	   * @description
-	   * is the fn passed a global constructor
-	   *
-	   * @param fn the fn to check if a global constructor
-	   * @returns whether the fn passed is a global constructor
-	   */
-	  var isGlobalConstructor = function (fn) {
-	      return typeof fn === 'function' &&
-	          !!~toStringFunction.call(fn).indexOf('[native code]');
-	  };
-	  /**
-	   * @function callIfFunction
-	   *
-	   * @description
-	   * if the object passed is a function, call it and return its return, else return undefined
-	   *
-	   * @param object the object to call if a function
-	   * @param context the context to call the function with
-	   * @param parameters the parameters to call the function with
-	   * @returns the result of the function call, or undefined
-	   */
-	  var callIfFunction = function (object, context, parameters) {
-	      return typeof object === 'function' ? object.apply(context, parameters) : void 0;
-	  };
-	  /**
-	   * @function getNewEmptyChild
-	   *
-	   * @description
-	   * get a new empty child object based on the key passed
-	   *
-	   * @param key the key to base the empty child on
-	   * @returns the empty object the child is built from
-	   */
-	  var getNewEmptyChild = function (key) {
-	      return typeof key === 'number' ? [] : {};
-	  };
-	  /**
-	   * @function getNewEmptyObject
-	   *
-	   * @description
-	   * get a new empty object based on the object passed
-	   *
-	   * @param object the object to base the empty object on
-	   * @returns an empty version of the object passed
-	   */
-	  var getNewEmptyObject = function (object) { return (isArray(object) ? [] : {}); };
-	  /**
-	   * @function getShallowClone
-	   *
-	   * @description
-	   * create a shallow clone of the object passed, respecting its prototype
-	   *
-	   * @param object the object to clone
-	   * @returns a shallow clone of the object passed
-	   */
-	  var getShallowClone = function (object) {
-	      if (object.constructor === O) {
-	          return assign({}, object);
-	      }
-	      if (isArray(object)) {
-	          return cloneArray(object);
-	      }
-	      return isGlobalConstructor(object.constructor)
-	          ? {}
-	          : assign(createWithProto(object), object);
-	  };
-	  /**
-	   * @function isSameValueZero
-	   *
-	   * @description
-	   * are the values equal based on SameValueZero
-	   *
-	   * @param value1 the first value to test
-	   * @param value2 the second value to test
-	   * @returns are the two values passed equal based on SameValueZero
-	   */
-	  var isSameValueZero = function (value1, value2) {
-	      return value1 === value2 || (value1 !== value1 && value2 !== value2);
-	  };
-	  /**
-	   * @function cloneIfPossible
-	   *
-	   * @description
-	   * clone the object if it can be cloned, otherwise return the object itself
-	   *
-	   * @param object the object to clone
-	   * @returns a cloned version of the object, or the object itself if not cloneable
-	   */
-	  var cloneIfPossible = function (object) {
-	      return isCloneable(object) ? getShallowClone(object) : object;
-	  };
-	  /**
-	   * @function getCloneOrEmptyObject
-	   *
-	   * @description
-	   * if the object is cloneable, get a clone of the object, else get a new
-	   * empty child object based on the key
-	   *
-	   * @param object the object to clone
-	   * @param nextKey the key to base the empty child object on
-	   * @returns a clone of the object, or an empty child object
-	   */
-	  var getCloneOrEmptyObject = function (object, nextKey) {
-	      return isCloneable(object) ? getShallowClone(object) : getNewEmptyChild(nextKey);
-	  };
-	  /**
-	   * @function getCoalescedValue
-	   *
-	   * @description
-	   * return the value if not undefined, otherwise return the fallback value
-	   *
-	   * @param value the value to coalesce if undefined
-	   * @param fallbackValue the value to coalesce to
-	   * @returns the coalesced value
-	   */
-	  var getCoalescedValue = function (value, fallbackValue) { return (value === void 0 ? fallbackValue : value); };
-	  /**
-	   * @function getParsedPath
-	   *
-	   * @description
-	   * parse the path passed into an array path
-	   *
-	   * @param path the path to parse
-	   * @returns the parsed path
-	   */
-	  var getParsedPath = function (path) { return (isArray(path) ? path : pathington.parse(path)); };
-	  /**
-	   * @function getCloneAtPath
-	   *
-	   * @description
-	   * get a new object, cloned at the path specified while leveraging
-	   * structural sharing for the rest of the properties
-	   *
-	   * @param path the path to clone at
-	   * @param object the object with cloned children at path
-	   * @param onMatch the method to call once the end of the path is reached
-	   * @param index the path index
-	   * @returns the object deeply cloned at the path specified
-	   */
-	  var getCloneAtPath = function (path, object, onMatch, index) {
-	      var key = path[index];
-	      var nextIndex = index + 1;
-	      if (nextIndex === path.length) {
-	          onMatch(object, key);
-	      }
-	      else {
-	          object[key] = getCloneAtPath(path, getCloneOrEmptyObject(object[key], path[nextIndex]), onMatch, nextIndex);
-	      }
-	      return object;
-	  };
-	  /**
-	   * @function getDeepClone
-	   *
-	   * @description
-	   * get a clone of the object at the path specified
-	   *
-	   * @param path the path to clone at
-	   * @param object the object to clone at the path
-	   * @param onMatch once a patch match is found, the callback to fire
-	   * @returns the clone of the object at path specified
-	   */
-	  var getDeepClone = function (path, object, onMatch) {
-	      var parsedPath = getParsedPath(path);
-	      var topLevelClone = getCloneOrEmptyObject(object, parsedPath[0]);
-	      if (parsedPath.length === 1) {
-	          onMatch(topLevelClone, parsedPath[0]);
-	          return topLevelClone;
-	      }
-	      return getCloneAtPath(parsedPath, topLevelClone, onMatch, 0);
-	  };
-	  /**
-	   * @function getMergedObject
-	   *
-	   * @description
-	   * merge the source into the target, either deeply or shallowly
-	   *
-	   * @param target the object to merge into
-	   * @param source the object being merged into the target
-	   * @param isDeep is the merge a deep merge
-	   * @returns the merged object
-	   */
-	  var getMergedObject = function (target, source, isDeep) {
-	      var isObject1Array = isArray(target);
-	      if (isObject1Array !== isArray(source) || !isCloneable(target)) {
-	          return cloneIfPossible(source);
-	      }
-	      if (isObject1Array) {
-	          return target.concat(source);
-	      }
-	      var targetClone = target.constructor === O || isGlobalConstructor(target.constructor)
-	          ? {}
-	          : createWithProto(target);
-	      return reduce(getOwnProperties(source), function (clone, key) {
-	          clone[key] =
-	              isDeep && isCloneable(source[key])
-	                  ? getMergedObject(target[key], source[key], isDeep)
-	                  : source[key];
-	          return clone;
-	      }, assign(targetClone, target));
-	  };
-	  /**
-	   * @function getValueAtPath
-	   *
-	   * @description
-	   * get the value at the nested property, or the fallback provided
-	   *
-	   * @param path the path to get the value from
-	   * @param object the object to get the value from at path
-	   * @param noMatchValue the value returned if no match is found
-	   * @returns the matching value, or the fallback provided
-	   */
-	  var getValueAtPath = function (path, object, noMatchValue) {
-	      var parsedPath = getParsedPath(path);
-	      if (parsedPath.length === 1) {
-	          return object
-	              ? getCoalescedValue(object[parsedPath[0]], noMatchValue)
-	              : noMatchValue;
-	      }
-	      var ref = object;
-	      var key = parsedPath[0];
-	      for (var index = 0; index < parsedPath.length - 1; index++) {
-	          if (!ref || !ref[key]) {
-	              return noMatchValue;
-	          }
-	          ref = ref[key];
-	          key = parsedPath[index + 1];
-	      }
-	      return ref ? getCoalescedValue(ref[key], noMatchValue) : noMatchValue;
-	  };
-	  /**
-	   * @function getFullPath
-	   *
-	   * @description
-	   * get the path to add to, based on the object and fn passed
-	   *
-	   * @param path the path to add to
-	   * @param object the object traversed by the path
-	   * @param fn the function to transform the retrieved value with
-	   * @returns the full path to add to
-	   */
-	  var getFullPath = function (path, object, fn) {
-	      var isPathEmpty = isEmptyPath(path);
-	      var valueAtPath = isPathEmpty
-	          ? object
-	          : fn
-	              ? fn(getValueAtPath(path, object))
-	              : getValueAtPath(path, object);
-	      return isArray(valueAtPath)
-	          ? isArray(path)
-	              ? path.concat([valueAtPath.length])
-	              : (isPathEmpty ? '' : path) + "[" + valueAtPath.length + "]"
-	          : path;
-	  };
-	  /**
-	   * @function splice
-	   *
-	   * @description
-	   * a faster, more targeted version of the native splice
-	   *
-	   * @param array the array to remove the value from
-	   * @param splicedIndex the index of the value to remove
-	   */
-	  var splice = function (array, splicedIndex) {
-	      if (array.length) {
-	          var length_1 = array.length;
-	          var index = splicedIndex;
-	          while (index < length_1 - 1) {
-	              array[index] = array[index + 1];
-	              ++index;
-	          }
-	          --array.length;
-	      }
-	  };
-	  /**
-	   * @function throwInvalidFnError
-	   *
-	   * @description
-	   * throw the TypeError based on the invalid handler
-	   *
-	   * @throws
-	   */
-	  var throwInvalidFnError = function () {
-	      throw new TypeError('handler passed is not of type "function".');
-	  };
-
-	  // utils
-	  var isArray$1 = Array.isArray;
-	  var slice = Array.prototype.slice;
-	  /**
-	   * @function createCall
-	   *
-	   * @description
-	   * create handlers for call / callWith
-	   *
-	   * @param isWithHandler is the method using a with handler
-	   * @returns call / callWith
-	   */
-	  var createCall = function (isWithHandler) {
-	      if (isWithHandler) {
-	          return function (fn, path, parameters, object, context) {
-	              if (context === void 0) { context = object; }
-	              if (typeof fn !== 'function') {
-	                  throwInvalidFnError();
-	              }
-	              var extraArgs = slice.call(arguments, 5);
-	              if (isEmptyPath(path)) {
-	                  return callIfFunction(fn.apply(void 0, [object].concat(extraArgs)), context, parameters);
-	              }
-	              var value = getValueAtPath(path, object);
-	              if (value === void 0) {
-	                  return;
-	              }
-	              var result = fn.apply(void 0, [value].concat(extraArgs));
-	              return callIfFunction(result, context, parameters);
-	          };
-	      }
-	      return function (path, parameters, object, context) {
-	          if (context === void 0) { context = object; }
-	          var callable = isEmptyPath(path)
-	              ? object
-	              : getValueAtPath(path, object);
-	          return callIfFunction(callable, context, parameters);
-	      };
-	  };
-	  /**
-	   * @function createGet
-	   *
-	   * @description
-	   * create handlers for get / getWith
-	   *
-	   * @param isWithHandler is the method using a with handler
-	   * @returns get / getWith
-	   */
-	  var createGet = function (isWithHandler) {
-	      if (isWithHandler) {
-	          return function (fn, path, object) {
-	              if (typeof fn !== 'function') {
-	                  throwInvalidFnError();
-	              }
-	              var extraArgs = slice.call(arguments, 4);
-	              if (isEmptyPath(path)) {
-	                  return fn.apply(void 0, [object].concat(extraArgs));
-	              }
-	              var value = getValueAtPath(path, object);
-	              return value === void 0 ? value : fn.apply(void 0, [value].concat(extraArgs));
-	          };
-	      }
-	      return function (path, object) {
-	          return isEmptyPath(path) ? object : getValueAtPath(path, object);
-	      };
-	  };
-	  /**
-	   * @function createGetOr
-	   *
-	   * @description
-	   * create handlers for getOr / getWithOr
-	   *
-	   * @param isWithHandler is the method using a with handler
-	   * @returns getOr / getWithOr
-	   */
-	  var createGetOr = function (isWithHandler) {
-	      if (isWithHandler) {
-	          return function (fn, noMatchValue, path, object) {
-	              if (typeof fn !== 'function') {
-	                  throwInvalidFnError();
-	              }
-	              var extraArgs = slice.call(arguments, 4);
-	              if (isEmptyPath(path)) {
-	                  return fn.apply(void 0, [object].concat(extraArgs));
-	              }
-	              var value = getValueAtPath(path, object);
-	              return value === void 0 ? noMatchValue : fn.apply(void 0, [value].concat(extraArgs));
-	          };
-	      }
-	      return function (noMatchValue, path, object) {
-	          return isEmptyPath(path) ? object : getValueAtPath(path, object, noMatchValue);
-	      };
-	  };
-	  /**
-	   * @function createHas
-	   *
-	   * @description
-	   * create handlers for has / hasWith
-	   *
-	   * @param isWithHandler is the method using a with handler
-	   * @returns has / hasWith
-	   */
-	  var createHas = function (isWithHandler) {
-	      if (isWithHandler) {
-	          return function (fn, path, object) {
-	              if (typeof fn !== 'function') {
-	                  throwInvalidFnError();
-	              }
-	              var extraArgs = slice.call(arguments, 3);
-	              if (isEmptyPath(path)) {
-	                  return !!fn.apply(void 0, [object].concat(extraArgs));
-	              }
-	              var value = getValueAtPath(path, object);
-	              return value !== void 0 && !!fn.apply(void 0, [value].concat(extraArgs));
-	          };
-	      }
-	      return function (path, object) {
-	          return isEmptyPath(path)
-	              ? object != null
-	              : getValueAtPath(path, object) !== void 0;
-	      };
-	  };
-	  /**
-	   * @function createIs
-	   *
-	   * @description
-	   * create handlers for is / isWith
-	   *
-	   * @param isWithHandler is the method using a with handler
-	   * @returns is / isWith
-	   */
-	  var createIs = function (isWithHandler) {
-	      if (isWithHandler) {
-	          return function (fn, path, value, object) {
-	              if (typeof fn !== 'function') {
-	                  throwInvalidFnError();
-	              }
-	              var extraArgs = slice.call(arguments, 4);
-	              if (isEmptyPath(path)) {
-	                  return isSameValueZero(fn.apply(void 0, [object].concat(extraArgs)), value);
-	              }
-	              return isSameValueZero(fn.apply(void 0, [getValueAtPath(path, object)].concat(extraArgs)), value);
-	          };
-	      }
-	      return function (path, value, object) {
-	          return isEmptyPath(path)
-	              ? isSameValueZero(object, value)
-	              : isSameValueZero(getValueAtPath(path, object), value);
-	      };
-	  };
-	  /**
-	   * @function createMerge
-	   *
-	   * @description
-	   * create handlers for merge / mergeWith
-	   *
-	   * @param isWithHandler is the method using a with handler
-	   * @param isDeep is the handler for a deep merge or shallow
-	   * @returns merge / mergeWith
-	   */
-	  var createMerge = function (isWithHandler, isDeep) {
-	      if (isWithHandler) {
-	          return function (fn, path, object) {
-	              if (typeof fn !== 'function') {
-	                  throwInvalidFnError();
-	              }
-	              var extraArgs = slice.call(arguments, 3);
-	              if (!isCloneable(object)) {
-	                  return fn.apply(void 0, [object].concat(extraArgs));
-	              }
-	              if (isEmptyPath(path)) {
-	                  var objectToMerge = fn.apply(void 0, [object].concat(extraArgs));
-	                  return objectToMerge
-	                      ? getMergedObject(object, objectToMerge, isDeep)
-	                      : object;
-	              }
-	              var hasChanged = false;
-	              var result = getDeepClone(path, object, function (ref, key) {
-	                  var objectToMerge = fn.apply(void 0, [ref[key]].concat(extraArgs));
-	                  if (objectToMerge) {
-	                      ref[key] = getMergedObject(ref[key], objectToMerge, isDeep);
-	                      hasChanged = true;
-	                  }
-	              });
-	              return hasChanged ? result : object;
-	          };
-	      }
-	      return function (path, objectToMerge, object) {
-	          if (!isCloneable(object)) {
-	              return objectToMerge;
-	          }
-	          return isEmptyPath(path)
-	              ? getMergedObject(object, objectToMerge, true)
-	              : getDeepClone(path, object, function (ref, key) {
-	                  ref[key] = getMergedObject(ref[key], objectToMerge, isDeep);
-	              });
-	      };
-	  };
-	  /**
-	   * @function createNot
-	   *
-	   * @description
-	   * create handlers for not / notWith
-	   *
-	   * @param isWithHandler not the method using a with handler
-	   * @returns not / notWithHandler
-	   */
-	  var createNot = function (isWithHandler) {
-	      var is = createIs(isWithHandler);
-	      return function () {
-	          return !is.apply(this, arguments);
-	      };
-	  };
-	  /**
-	   * @function createRemove
-	   *
-	   * @description
-	   * create handlers for remove / removeWith
-	   *
-	   * @param isWithHandler is the method using a with handler
-	   * @returns remove / removeWith
-	   */
-	  var createRemove = function (isWithHandler) {
-	      if (isWithHandler) {
-	          return function (fn, path, object) {
-	              if (typeof fn !== 'function') {
-	                  throwInvalidFnError();
-	              }
-	              var extraArgs = slice.call(arguments, 3);
-	              if (isEmptyPath(path)) {
-	                  var emptyObject = getNewEmptyObject(object);
-	                  return fn.apply(void 0, [emptyObject].concat(extraArgs)) ? emptyObject : object;
-	              }
-	              var value = getValueAtPath(path, object);
-	              return value !== void 0 && fn.apply(void 0, [value].concat(extraArgs))
-	                  ? getDeepClone(path, object, function (ref, key) {
-	                      if (isArray$1(ref)) {
-	                          splice(ref, key);
-	                      }
-	                      else {
-	                          delete ref[key];
-	                      }
-	                  })
-	                  : object;
-	          };
-	      }
-	      return function (path, object) {
-	          if (isEmptyPath(path)) {
-	              return getNewEmptyObject(object);
-	          }
-	          return getValueAtPath(path, object) !== void 0
-	              ? getDeepClone(path, object, function (ref, key) {
-	                  if (isArray$1(ref)) {
-	                      splice(ref, key);
-	                  }
-	                  else {
-	                      delete ref[key];
-	                  }
-	              })
-	              : object;
-	      };
-	  };
-	  /**
-	   * @function createSet
-	   *
-	   * @description
-	   * create handlers for set / setWith
-	   *
-	   * @param isWithHandler is the method using a with handler
-	   * @returns set / setWith
-	   */
-	  var createSet = function (isWithHandler) {
-	      if (isWithHandler) {
-	          return function (fn, path, object) {
-	              if (typeof fn !== 'function') {
-	                  throwInvalidFnError();
-	              }
-	              var extraArgs = slice.call(arguments, 3);
-	              return isEmptyPath(path)
-	                  ? fn.apply(void 0, [object].concat(extraArgs)) : getDeepClone(path, object, function (ref, key) {
-	                  ref[key] = fn.apply(void 0, [ref[key]].concat(extraArgs));
-	              });
-	          };
-	      }
-	      return function (path, value, object) {
-	          return isEmptyPath(path)
-	              ? value
-	              : getDeepClone(path, object, function (ref, key) {
-	                  ref[key] = value;
-	              });
-	      };
-	  };
-	  /**
-	   * @function createAdd
-	   *
-	   * @description
-	   * create handlers for add / addWith
-	   *
-	   * @param isWithHandler is the method using a with handler
-	   * @returns add / addWith
-	   */
-	  var createAdd = function (isWithHandler) {
-	      var add = createSet(isWithHandler);
-	      if (isWithHandler) {
-	          return function (fn, path, object) {
-	              return add.apply(this, [fn, getFullPath(path, object, fn), object].concat(slice.call(arguments, 3)));
-	          };
-	      }
-	      return function (path, value, object) { return add(getFullPath(path, object), value, object); };
-	  };
-
-	  // external dependencies
-	  var add = curriable.curry(createAdd(false), 3);
-	  var addWith = curriable.curry(createAdd(true), 3);
-	  var assign$1 = curriable.curry(createMerge(false, false), 3);
-	  var assignWith = curriable.curry(createMerge(true, false), 3);
-	  var call = curriable.curry(createCall(false), 3);
-	  var callWith = curriable.curry(createCall(true), 4);
-	  var get = curriable.curry(createGet(false), 2);
-	  var getOr = curriable.curry(createGetOr(false), 3);
-	  var getWith = curriable.curry(createGet(true), 3);
-	  var getWithOr = curriable.curry(createGetOr(true), 4);
-	  var has = curriable.curry(createHas(false), 2);
-	  var hasWith = curriable.curry(createHas(true), 3);
-	  var is = curriable.curry(createIs(false), 3);
-	  var isWith = curriable.curry(createIs(true), 4);
-	  var merge = curriable.curry(createMerge(false, true), 3);
-	  var mergeWith = curriable.curry(createMerge(true, true), 3);
-	  var not = curriable.curry(createNot(false), 3);
-	  var notWith = curriable.curry(createNot(true), 4);
-	  var remove = curriable.curry(createRemove(false), 2);
-	  var removeWith = curriable.curry(createRemove(true), 3);
-	  var set = curriable.curry(createSet(false), 3);
-	  var setWith = curriable.curry(createSet(true), 3);
-
-	  exports.__ = curriable.__;
-	  exports.add = add;
-	  exports.addWith = addWith;
-	  exports.assign = assign$1;
-	  exports.assignWith = assignWith;
-	  exports.call = call;
-	  exports.callWith = callWith;
-	  exports.get = get;
-	  exports.getOr = getOr;
-	  exports.getWith = getWith;
-	  exports.getWithOr = getWithOr;
-	  exports.has = has;
-	  exports.hasWith = hasWith;
-	  exports.is = is;
-	  exports.isWith = isWith;
-	  exports.merge = merge;
-	  exports.mergeWith = mergeWith;
-	  exports.not = not;
-	  exports.notWith = notWith;
-	  exports.remove = remove;
-	  exports.removeWith = removeWith;
-	  exports.set = set;
-	  exports.setWith = setWith;
-
-	  Object.defineProperty(exports, '__esModule', { value: true });
-
-	}));
-
-	});
-
-	unwrapExports(unchanged);
-
-	var selectorator = createCommonjsModule(function (module, exports) {
-	(function (global, factory) {
-	  factory(exports, es$1, fastEquals, es$2, unchanged);
-	}(commonjsGlobal, function (exports, identitate, fastEquals, reselect, unchanged) {
-	  var INVALID_ARRAY_PATHS_MESSAGE = 'You have not provided any values for paths, so no values can be retrieved from state.';
-	  var INVALID_PATHS_MESSAGE = [
-	      'First parameter passed must be either an array or a plain object.',
-	      'If you are creating a standard selector, pass an array of either',
-	      'properties on the state to retrieve, or custom selector functions.',
-	      'If creating a structured selector, pass a plain object with source',
-	      'and destination properties, where source is an array of properties',
-	      'or custom selector functions, and destination is an array of property',
-	      'names to assign the values from source to.',
-	  ].join(' ');
-	  var INVALID_OBJECT_PATH_MESSAGE = "\nWhen providing an object path, you must provide the following properties:\n  * path: the path to retrieve, e.g. \"foo.bar\"\n  * argIndx: the index of the argument to retrieve the path from\n".trim();
-	  var INVALID_PATH_MESSAGE = "\nPath provided is of invalid type. It can be any one of the following values:\n  * Dot-bracket notation, e.g. \"foo.bar\" or \"bar[0].baz\"\n  * Number index, e.g. 0\n  * Object {path, argIndex}, e.g. {path: \"foo.bar\", argIndex: 1}\n  * Selector function\n".trim();
-
-	  // external dependencies
-	  var hasOwnProperty = Object.prototype.hasOwnProperty;
-	  /**
-	   * @private
-	   *
-	   * @function isFunctionPath
-	   *
-	   * @description
-	   * is the path a function
-	   *
-	   * @param path the path to test
-	   * @param type the typeof value for the path
-	   * @returns is the path a function
-	   */
-	  var isFunctionPath = function (path, type) { return type === 'function'; };
-	  /**
-	   * @private
-	   *
-	   * @function isObjectPath
-	   *
-	   * @description
-	   * is the path an object
-	   *
-	   * @param path the path to test
-	   * @param type the typeof value for the path
-	   * @returns is the path an object
-	   */
-	  var isObjectPath = function (path, type) { return !!path && type === 'object'; };
-	  /**
-	   * @private
-	   *
-	   * @function isUnchangedPath
-	   *
-	   * @description
-	   * is the path an unchanged path value
-	   *
-	   * @param path the path to test
-	   * @param type the typeof value for the path
-	   * @returns is the path an unchanged path value
-	   */
-	  var isUnchangedPath = function (path, type) {
-	      return type === 'string' || type === 'number' || Array.isArray(path);
-	  };
-	  /**
-	   * @private
-	   *
-	   * @function createIdentitySelector
-	   *
-	   * @description
-	   * based on the path passed, create the identity function for it or return the function itself
-	   *
-	   * @param path nested path to retrieve from the state object
-	   * @returns identity function to retrieve value from state for given property
-	   */
-	  var createIdentitySelector = function (path) {
-	      var type = typeof path;
-	      if (isFunctionPath(path, type)) {
-	          return path;
-	      }
-	      if (isUnchangedPath(path, type)) {
-	          return function (state) { return unchanged.get(path, state); };
-	      }
-	      if (isObjectPath(path, type)) {
-	          if (hasOwnProperty.call(path, 'path') &&
-	              hasOwnProperty.call(path, 'argIndex')) {
-	              var selectorIdentity_1 = identitate.createIdentity(path.argIndex);
-	              return function () {
-	                  return unchanged.get(path.path, selectorIdentity_1.apply(null, arguments));
-	              };
-	          }
-	          throw new ReferenceError(INVALID_OBJECT_PATH_MESSAGE);
-	      }
-	      throw new TypeError(INVALID_PATH_MESSAGE);
-	  };
-	  /**
-	   * @private
-	   *
-	   * @function getSelectorCreator
-	   *
-	   * @description
-	   * get the creator function to use when generating the selector
-	   *
-	   * @param deepEqual should the memoizer be based on strict equality
-	   * @param isEqual the custom equality method to use when comparing values
-	   * @param memoizer custom selector memoizer
-	   * @param memoizerParams custom parameters to pass to the memoizer function
-	   * @returns function to create selector with
-	   */
-	  var getSelectorCreator = function (_a) {
-	      var _b = _a.deepEqual, deepEqual = _b === void 0 ? false : _b, _c = _a.isEqual, isEqual = _c === void 0 ? fastEquals.sameValueZeroEqual : _c, memoizer = _a.memoizer, _d = _a.memoizerParams, memoizerParams = _d === void 0 ? [] : _d;
-	      var _e;
-	      var memoizerFn = memoizer || reselect.defaultMemoize;
-	      var equals = deepEqual ? fastEquals.deepEqual : isEqual;
-	      return (_e = reselect.createSelectorCreator).call.apply(_e, [// fix strict mode error
-	          null,
-	          memoizerFn,
-	          equals].concat(memoizerParams));
-	  };
-	  /**
-	   * @private
-	   *
-	   * @function getStandardSelector
-	   *
-	   * @description
-	   * get a standard selector based on the paths and getComputedValue provided
-	   *
-	   * @param paths paths to retrieve values from state from
-	   * @param selectorCreator function to create selector with
-	   * @param getComputedValue function to compute values with, receiving properties in state based
-	   *   on paths and returning computed values from them (defaults to pass-through identity function)
-	   * @returns selector to return computed value from state
-	   */
-	  var getStandardSelector = function (paths, selectorCreator, getComputedValue) {
-	      return selectorCreator(paths.map(createIdentitySelector), getComputedValue);
-	  };
-	  /**
-	   * @private
-	   *
-	   * @function getStructuredObject
-	   *
-	   * @description
-	   * get the structured object based on the computed selector values
-	   *
-	   * @param properties properties to assign values from state to
-	   * @returns object of property => selected value pairs
-	   */
-	  var getStructuredObject = function (properties) { return function () {
-	      var values = [];
-	      for (var _i = 0; _i < arguments.length; _i++) {
-	          values[_i] = arguments[_i];
-	      }
-	      return properties.reduce(function (structuredObject, property, index) {
-	          structuredObject[property] = values[index];
-	          return structuredObject;
-	      }, {});
-	  }; };
-	  /**
-	   * @private
-	   *
-	   * @function getStructuredSelector
-	   *
-	   * @description
-	   * get an object of property => selected value pairs bsaed on paths
-	   *
-	   * @param paths property => path pairs, where path is state value to retrieve and assign to property
-	   * @param selectorCreator function to create selector with
-	   * @returns selector to return structured values from state
-	   */
-	  var getStructuredSelector = function (paths, selectorCreator) {
-	      var destinationKeys = Object.keys(paths);
-	      var selectors = destinationKeys.map(function (key) { return createIdentitySelector(paths[key]); });
-	      return selectorCreator(selectors, getStructuredObject(destinationKeys));
-	  };
-
-	  // external dependencies
-	  function createSelector(// actual implementation - no changes
-	  paths, getComputedValue, options) {
-	      if (getComputedValue === void 0) { getComputedValue = identitate.identity; }
-	      if (options === void 0) { options = {}; }
-	      var selectorCreator = getSelectorCreator(options);
-	      if (Array.isArray(paths)) {
-	          if (!paths.length) {
-	              throw new ReferenceError(INVALID_ARRAY_PATHS_MESSAGE);
-	          }
-	          return getStandardSelector(paths, selectorCreator, getComputedValue);
-	      }
-	      // added null check
-	      if (paths && paths !== null && typeof paths === 'object') {
-	          return getStructuredSelector(paths, selectorCreator);
-	      }
-	      throw new TypeError(INVALID_PATHS_MESSAGE);
-	  }
-
-	  exports.default = createSelector;
-
-	  Object.defineProperty(exports, '__esModule', { value: true });
-
-	}));
-
-	});
-
-	unwrapExports(selectorator);
+	function getCjsExportFromNamespace (n) {
+		return n && n['default'] || n;
+	}
 
 	/**
 	 * These are private action types reserved by Redux.
@@ -3492,7 +3049,7 @@ var CozifySDK = (function (exports, axios) {
 	 * @param {any} obj The object to inspect.
 	 * @returns {boolean} True if the argument appears to be a plain object.
 	 */
-	function isPlainObject$1(obj) {
+	function isPlainObject$2(obj) {
 	  if (typeof obj !== 'object' || obj === null) return false;
 	  var proto = obj;
 
@@ -3533,7 +3090,7 @@ var CozifySDK = (function (exports, axios) {
 	  var _ref2;
 
 	  if (typeof preloadedState === 'function' && typeof enhancer === 'function' || typeof enhancer === 'function' && typeof arguments[3] === 'function') {
-	    throw new Error('It looks like you are passing several store enhancers to ' + 'createStore(). This is not supported. Instead, compose them ' + 'together to a single function');
+	    throw new Error('It looks like you are passing several store enhancers to ' + 'createStore(). This is not supported. Instead, compose them ' + 'together to a single function.');
 	  }
 
 	  if (typeof preloadedState === 'function' && typeof enhancer === 'undefined') {
@@ -3558,6 +3115,13 @@ var CozifySDK = (function (exports, axios) {
 	  var currentListeners = [];
 	  var nextListeners = currentListeners;
 	  var isDispatching = false;
+	  /**
+	   * This makes a shallow copy of currentListeners so we can use
+	   * nextListeners as a temporary list while dispatching.
+	   *
+	   * This prevents any bugs around consumers calling
+	   * subscribe/unsubscribe in the middle of a dispatch.
+	   */
 
 	  function ensureCanMutateNextListeners() {
 	    if (nextListeners === currentListeners) {
@@ -3658,7 +3222,7 @@ var CozifySDK = (function (exports, axios) {
 
 
 	  function dispatch(action) {
-	    if (!isPlainObject$1(action)) {
+	    if (!isPlainObject$2(action)) {
 	      throw new Error('Actions must be plain objects. ' + 'Use custom middleware for async actions.');
 	    }
 
@@ -3703,7 +3267,11 @@ var CozifySDK = (function (exports, axios) {
 	      throw new Error('Expected the nextReducer to be a function.');
 	    }
 
-	    currentReducer = nextReducer;
+	    currentReducer = nextReducer; // This action has a similiar effect to ActionTypes.INIT.
+	    // Any reducers that existed in both the new and old rootReducer
+	    // will receive the previous state. This effectively populates
+	    // the new state tree with any relevant data from the old one.
+
 	    dispatch({
 	      type: ActionTypes$1.REPLACE
 	    });
@@ -3819,7 +3387,7 @@ var CozifySDK = (function (exports, axios) {
 	    }
 	  }
 
-	  var finalReducerKeys = Object.keys(finalReducers);
+	  var finalReducerKeys = Object.keys(finalReducers); // This is used to make sure we don't warn about the same
 
 	  var shapeAssertionError;
 
@@ -3871,8 +3439,8 @@ var CozifySDK = (function (exports, axios) {
 	 * may be invoked directly. This is just a convenience method, as you can call
 	 * `store.dispatch(MyActionCreators.doSomething())` yourself just fine.
 	 *
-	 * For convenience, you can also pass a single function as the first argument,
-	 * and get a function in return.
+	 * For convenience, you can also pass an action creator as the first argument,
+	 * and get a dispatch wrapped function in return.
 	 *
 	 * @param {Function|Object} actionCreators An object whose values are action
 	 * creator functions. One handy way to obtain it is to use ES6 `import * as`
@@ -3897,11 +3465,9 @@ var CozifySDK = (function (exports, axios) {
 	    throw new Error("bindActionCreators expected an object or a function, instead received " + (actionCreators === null ? 'null' : typeof actionCreators) + ". " + "Did you write \"import ActionCreators from\" instead of \"import * as ActionCreators from\"?");
 	  }
 
-	  var keys = Object.keys(actionCreators);
 	  var boundActionCreators = {};
 
-	  for (var i = 0; i < keys.length; i++) {
-	    var key = keys[i];
+	  for (var key in actionCreators) {
 	    var actionCreator = actionCreators[key];
 
 	    if (typeof actionCreator === 'function') {
@@ -3927,20 +3493,34 @@ var CozifySDK = (function (exports, axios) {
 	  return obj;
 	}
 
-	function _objectSpread$1(target) {
+	function ownKeys$1(object, enumerableOnly) {
+	  var keys = Object.keys(object);
+
+	  if (Object.getOwnPropertySymbols) {
+	    keys.push.apply(keys, Object.getOwnPropertySymbols(object));
+	  }
+
+	  if (enumerableOnly) keys = keys.filter(function (sym) {
+	    return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+	  });
+	  return keys;
+	}
+
+	function _objectSpread2(target) {
 	  for (var i = 1; i < arguments.length; i++) {
 	    var source = arguments[i] != null ? arguments[i] : {};
-	    var ownKeys = Object.keys(source);
 
-	    if (typeof Object.getOwnPropertySymbols === 'function') {
-	      ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {
-	        return Object.getOwnPropertyDescriptor(source, sym).enumerable;
-	      }));
+	    if (i % 2) {
+	      ownKeys$1(source, true).forEach(function (key) {
+	        _defineProperty$1(target, key, source[key]);
+	      });
+	    } else if (Object.getOwnPropertyDescriptors) {
+	      Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+	    } else {
+	      ownKeys$1(source).forEach(function (key) {
+	        Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+	      });
 	    }
-
-	    ownKeys.forEach(function (key) {
-	      _defineProperty$1(target, key, source[key]);
-	    });
 	  }
 
 	  return target;
@@ -4005,7 +3585,7 @@ var CozifySDK = (function (exports, axios) {
 	      var store = createStore.apply(void 0, arguments);
 
 	      var _dispatch = function dispatch() {
-	        throw new Error("Dispatching while constructing your middleware is not allowed. " + "Other middleware would not be applied to this dispatch.");
+	        throw new Error('Dispatching while constructing your middleware is not allowed. ' + 'Other middleware would not be applied to this dispatch.');
 	      };
 
 	      var middlewareAPI = {
@@ -4018,7 +3598,7 @@ var CozifySDK = (function (exports, axios) {
 	        return middleware(middlewareAPI);
 	      });
 	      _dispatch = compose$1.apply(void 0, chain)(store.dispatch);
-	      return _objectSpread$1({}, store, {
+	      return _objectSpread2({}, store, {
 	        dispatch: _dispatch
 	      });
 	    };
@@ -4026,17 +3606,20 @@ var CozifySDK = (function (exports, axios) {
 	}
 
 	var redux = /*#__PURE__*/Object.freeze({
-		createStore: createStore$1,
-		combineReducers: combineReducers$1,
-		bindActionCreators: bindActionCreators,
+		__proto__: null,
+		__DO_NOT_USE__ActionTypes: ActionTypes$1,
 		applyMiddleware: applyMiddleware$1,
+		bindActionCreators: bindActionCreators,
+		combineReducers: combineReducers$1,
 		compose: compose$1,
-		__DO_NOT_USE__ActionTypes: ActionTypes$1
+		createStore: createStore$1
 	});
+
+	var require$$0 = getCjsExportFromNamespace(redux);
 
 	var reduxDevtoolsExtension = createCommonjsModule(function (module, exports) {
 
-	var compose = redux.compose;
+	var compose = require$$0.compose;
 
 	exports.__esModule = true;
 	exports.composeWithDevTools = (
@@ -4136,7 +3719,7 @@ var CozifySDK = (function (exports, axios) {
 	 * @param {any} value The value to inspect.
 	 * @returns {boolean} True if the argument appears to be a plain object.
 	 */
-	function isPlainObject$2(value) {
+	function isPlainObject$3(value) {
 	  if (_typeof$1(value) !== 'object' || value === null) return false;
 	  var proto = value;
 
@@ -4188,7 +3771,7 @@ var CozifySDK = (function (exports, axios) {
 
 	  if (typeof reducer === 'function') {
 	    rootReducer = reducer;
-	  } else if (isPlainObject$2(reducer)) {
+	  } else if (isPlainObject$3(reducer)) {
 	    rootReducer = combineReducers(reducer);
 	  } else {
 	    throw new Error('Reducer argument must be a function or an object of functions that can be passed to combineReducers');
@@ -4669,27 +4252,9 @@ var CozifySDK = (function (exports, axios) {
 
 	var defineProperty$1 = _defineProperty$3;
 
-	function _objectSpread$2(target) {
-	  for (var i = 1; i < arguments.length; i++) {
-	    var source = arguments[i] != null ? arguments[i] : {};
-	    var ownKeys = Object.keys(source);
+	function ownKeys$2(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
-	    if (typeof Object.getOwnPropertySymbols === 'function') {
-	      ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {
-	        return Object.getOwnPropertyDescriptor(source, sym).enumerable;
-	      }));
-	    }
-
-	    ownKeys.forEach(function (key) {
-	      defineProperty$1(target, key, source[key]);
-	    });
-	  }
-
-	  return target;
-	}
-
-	var objectSpread = _objectSpread$2;
-
+	function _objectSpread$1(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$2(source, true).forEach(function (key) { defineProperty$1(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$2(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 	/**
 	 * Devices action creators object
 	 * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
@@ -4721,9 +4286,9 @@ var CozifySDK = (function (exports, axios) {
 	      const hubPairingDevices = {};
 	      Object.entries(devices).forEach(entry => {
 	        const [id, device] = entry;
-	        hubPairingDevices[id] = objectSpread({}, device);
+	        hubPairingDevices[id] = _objectSpread$1({}, device);
 	      });
-	      stateToSet[hubId] = objectSpread({}, hubPairingDevices);
+	      stateToSet[hubId] = _objectSpread$1({}, hubPairingDevices);
 	    },
 
 	    /*
@@ -4741,7 +4306,7 @@ var CozifySDK = (function (exports, axios) {
 	      } = action.payload;
 
 	      if (stateToSet[hubId]) {
-	        stateToSet[hubId][device.id] = objectSpread({}, device);
+	        stateToSet[hubId][device.id] = _objectSpread$1({}, device);
 	      }
 	    },
 
@@ -4771,6 +4336,9 @@ var CozifySDK = (function (exports, axios) {
 	  reducer: reducer$1
 	} = pairingsState;
 
+	function ownKeys$3(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+	function _objectSpread$2(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$3(source, true).forEach(function (key) { defineProperty$1(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$3(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 	/**
 	 * Devices action creators object
 	 * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
@@ -4802,9 +4370,9 @@ var CozifySDK = (function (exports, axios) {
 	      const hubDevices = {};
 	      Object.entries(devices).forEach(entry => {
 	        const [id, device] = entry;
-	        hubDevices[id] = objectSpread({}, device);
+	        hubDevices[id] = _objectSpread$2({}, device);
 	      });
-	      stateToSet[hubId] = objectSpread({}, hubDevices);
+	      stateToSet[hubId] = _objectSpread$2({}, hubDevices);
 	    },
 
 	    /*
@@ -4822,7 +4390,7 @@ var CozifySDK = (function (exports, axios) {
 	      } = action.payload;
 
 	      if (stateToSet[hubId]) {
-	        stateToSet[hubId][device.id] = objectSpread({}, device);
+	        stateToSet[hubId][device.id] = _objectSpread$2({}, device);
 	      }
 	    },
 
@@ -4862,6 +4430,9 @@ var CozifySDK = (function (exports, axios) {
 	  deleteDevice
 	} = actions$2;
 
+	function ownKeys$4(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+	function _objectSpread$3(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$4(source, true).forEach(function (key) { defineProperty$1(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$4(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 	/**
 	 * Hubs action creators object
 	 * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
@@ -4888,7 +4459,7 @@ var CozifySDK = (function (exports, axios) {
 	      console.log('updateHubs', hubs);
 	      Object.entries(hubs).forEach(entry => {
 	        const [id, hub] = entry;
-	        stateToSet[id] = objectSpread({}, state[id], hub);
+	        stateToSet[id] = _objectSpread$3({}, state[id], {}, hub);
 	      });
 	    },
 
@@ -5465,7 +5036,7 @@ var CozifySDK = (function (exports, axios) {
 	var hasOwnProperty$3 = objectProto$5.hasOwnProperty;
 
 	/** Built-in value references. */
-	var propertyIsEnumerable = objectProto$5.propertyIsEnumerable;
+	var propertyIsEnumerable$1 = objectProto$5.propertyIsEnumerable;
 
 	/**
 	 * Checks if `value` is likely an `arguments` object.
@@ -5487,7 +5058,7 @@ var CozifySDK = (function (exports, axios) {
 	 */
 	var isArguments = _baseIsArguments(function() { return arguments; }()) ? _baseIsArguments : function(value) {
 	  return isObjectLike_1(value) && hasOwnProperty$3.call(value, 'callee') &&
-	    !propertyIsEnumerable.call(value, 'callee');
+	    !propertyIsEnumerable$1.call(value, 'callee');
 	};
 
 	var isArguments_1 = isArguments;
@@ -5515,9 +5086,9 @@ var CozifySDK = (function (exports, axios) {
 	 * _.isArray(_.noop);
 	 * // => false
 	 */
-	var isArray$1 = Array.isArray;
+	var isArray$3 = Array.isArray;
 
-	var isArray_1 = isArray$1;
+	var isArray_1 = isArray$3;
 
 	/** Used as references for various `Number` constants. */
 	var MAX_SAFE_INTEGER = 9007199254740991;
@@ -5607,7 +5178,7 @@ var CozifySDK = (function (exports, axios) {
 
 	var isBuffer_1 = createCommonjsModule(function (module, exports) {
 	/** Detect free variable `exports`. */
-	var freeExports = exports && !exports.nodeType && exports;
+	var freeExports =  exports && !exports.nodeType && exports;
 
 	/** Detect free variable `module`. */
 	var freeModule = freeExports && 'object' == 'object' && module && !module.nodeType && module;
@@ -5717,7 +5288,7 @@ var CozifySDK = (function (exports, axios) {
 
 	var _nodeUtil = createCommonjsModule(function (module, exports) {
 	/** Detect free variable `exports`. */
-	var freeExports = exports && !exports.nodeType && exports;
+	var freeExports =  exports && !exports.nodeType && exports;
 
 	/** Detect free variable `module`. */
 	var freeModule = freeExports && 'object' == 'object' && module && !module.nodeType && module;
@@ -5967,12 +5538,6 @@ var CozifySDK = (function (exports, axios) {
 
 	            break;
 	          }
-
-	        default:
-	          {
-	            // statements;
-	            break;
-	          }
 	      }
 	    },
 
@@ -6034,6 +5599,9 @@ var CozifySDK = (function (exports, axios) {
 	  reducer: reducer$4
 	} = userState;
 
+	function ownKeys$5(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+	function _objectSpread$4(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$5(source, true).forEach(function (key) { defineProperty$1(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$5(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 	/**
 	 * Rooms action creators object
 	 * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
@@ -6065,9 +5633,9 @@ var CozifySDK = (function (exports, axios) {
 	      const hubRooms = {};
 	      Object.entries(rooms).forEach(entry => {
 	        const [id, room] = entry;
-	        hubRooms[id] = objectSpread({}, room);
+	        hubRooms[id] = _objectSpread$4({}, room);
 	      });
-	      stateToSet[hubId] = objectSpread({}, hubRooms);
+	      stateToSet[hubId] = _objectSpread$4({}, hubRooms);
 	    },
 
 	    /*
@@ -6085,7 +5653,7 @@ var CozifySDK = (function (exports, axios) {
 	      } = action.payload;
 
 	      if (hubId && stateToSet[hubId]) {
-	        stateToSet[hubId][room.id] = objectSpread({}, room);
+	        stateToSet[hubId][room.id] = _objectSpread$4({}, room);
 	      }
 	    },
 
@@ -6123,7 +5691,7 @@ var CozifySDK = (function (exports, axios) {
 	      } = action.payload;
 
 	      if (stateToSet[hubId]) {
-	        stateToSet[hubId][room.id] = objectSpread({}, room);
+	        stateToSet[hubId][room.id] = _objectSpread$4({}, room);
 	      }
 	    }
 
@@ -6442,7 +6010,9 @@ var CozifySDK = (function (exports, axios) {
 		'EADDRINUSE',
 		'ESOCKETTIMEDOUT',
 		'ECONNREFUSED',
-		'EPIPE'
+		'EPIPE',
+		'EHOSTUNREACH',
+		'EAI_AGAIN'
 	];
 
 	var BLACKLIST = [
@@ -8216,11 +7786,6 @@ var CozifySDK = (function (exports, axios) {
 	              pairingDevicesDeltaHandler(hubId, doReset, delta.devices);
 	              break;
 	            }
-
-	          default:
-	            {
-	              break;
-	            }
 	        }
 	      }
 
@@ -8452,21 +8017,6 @@ var CozifySDK = (function (exports, axios) {
 	            case 'ROOM_DELTA':
 	              {
 	                roomsDeltaHandler(hubId, doReset, delta.rooms);
-	                break;
-	              }
-
-	            case 'ZONE_DELTA':
-	              {
-	                break;
-	              }
-
-	            case 'ALARM_DELTA':
-	              {
-	                break;
-	              }
-
-	            default:
-	              {
 	                break;
 	              }
 	          }
@@ -8905,7 +8455,7 @@ var CozifySDK = (function (exports, axios) {
 	var arrayProto = Array.prototype;
 
 	/** Built-in value references. */
-	var splice = arrayProto.splice;
+	var splice$1 = arrayProto.splice;
 
 	/**
 	 * Removes `key` and its value from the list cache.
@@ -8927,7 +8477,7 @@ var CozifySDK = (function (exports, axios) {
 	  if (index == lastIndex) {
 	    data.pop();
 	  } else {
-	    splice.call(data, index, 1);
+	    splice$1.call(data, index, 1);
 	  }
 	  --this.size;
 	  return true;
@@ -9876,11 +9426,11 @@ var CozifySDK = (function (exports, axios) {
 	 * console.log(_.identity(object) === object);
 	 * // => true
 	 */
-	function identity$1(value) {
+	function identity(value) {
 	  return value;
 	}
 
-	var identity_1 = identity$1;
+	var identity_1 = identity;
 
 	/**
 	 * The base implementation of `setToString` without support for hot loop shorting.
@@ -10162,8 +9712,6 @@ var CozifySDK = (function (exports, axios) {
 	  });
 	}
 
-	//
-
 	exports.CLOUD_CONNECTION_STATES = CLOUD_CONNECTION_STATES;
 	exports.HUB_CONNECTION_STATES = HUB_CONNECTION_STATES;
 	exports.HUB_STATES = HUB_STATES;
@@ -10215,7 +9763,7 @@ var CozifySDK = (function (exports, axios) {
 	exports.useTestcloud = useTestcloud;
 	exports.watchChanges = watchChanges;
 
-	return exports;
+	Object.defineProperty(exports, '__esModule', { value: true });
 
-}({}, axios));
-//# sourceMappingURL=sdk-browser.js.map
+})));
+//# sourceMappingURL=sdk.browser.js.map
