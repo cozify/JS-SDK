@@ -1,7 +1,7 @@
 
-const CozifySDK = require('../dist/sdk-node.js');
+const CozifySDK = require('../dist/sdk.node.js');
 console.log('Testing Cozify SDK from node.js')
-
+console.log("CozifySDK", CozifySDK);
  // Fill them as should
 let fixedUsername = '...@cozify.fi'
 let fixedPassword = 'xxx'
@@ -16,11 +16,26 @@ fixedDeviceId = '53d59fdc-bd8d-4231-a4a0-d6c6ee51d30e'
 let LANGUAGES = CozifySDK.LANGUAGES;
 let USER_STATES = CozifySDK.USER_STATES;
 
+CozifySDK.useTestcloud()
+
+
+CozifySDK.watchChanges('user.state', (newState, oldState) => {
+  console.log('user.state changed from %s to %s', oldState, newState);
+});
+
+// Listener for specific changes
+CozifySDK.watchChanges('connections.cloudState', (newState, oldState) => {
+  console.log('connections.cloudState changed from %s to %s', oldState, newState);
+});
+
 console.info(`Initial user state ${CozifySDK.getUserState()}`);
 console.info(`--1--`);
 
-CozifySDK.changeLanguage(LANGUAGES.FI_FI);
+CozifySDK.changeLanguage(LANGUAGES.EN_EN);
 console.info(`--2--`);
+
+
+CozifySDK.setAuthenticated( cozifyCloudToken )
 
 
 CozifySDK.doPwLogin( fixedUsername, fixedPassword )

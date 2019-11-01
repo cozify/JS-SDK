@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="theme-color" content="#000000">
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script type="text/javascript" src="../dist/sdk-browser.js"></script>
+    <script type="text/javascript" src="../dist/sdk.browser.js"></script>
     <script type="text/javascript">
 
 
@@ -17,7 +17,7 @@
       let fixedDeviceName = 'Windpow'
 
 
-
+      //
       let LANGUAGES = CozifySDK.LANGUAGES;
       let USER_STATES = CozifySDK.USER_STATES;
 
@@ -42,7 +42,8 @@
 
       CozifySDK.setAuthenticated( cozifyCloudToken )
 
-      // Example use of just doing one poll;
+
+      // Example of use when doing one poll and scanning;
       //
       CozifySDK.connectHubByTokens(fixedHubId, cozifyHubKey, false)
       CozifySDK.watchChanges('hubs', (newHubsState, oldHubsState) => {
