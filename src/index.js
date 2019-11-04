@@ -24,7 +24,7 @@ export {
   startDiscoveringHubs, stopDiscoveringHubs,
   startPollingById, stopPollingById,
   startPairingById, stopPairingById, ignorePairingByIds, stopPairings,
-  doPoll,
+  doPoll, doRemoteIdQuery,
 } from './hubs/hubs';
 export {
   getDevices, getHubDevices,
