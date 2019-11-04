@@ -7972,7 +7972,7 @@ function doRemoteIdQuery(hubId, authKey, hubKey) {
       hubId
     }).then(hubData => {
       updateFoundHub(undefined, hubData);
-      resolve(hubId);
+      resolve(hubData);
     }).catch(error => {
       console.log(`doRemoteIdQuery ${hubId} error `, error.message);
       reject(hubId);
@@ -7982,7 +7982,6 @@ function doRemoteIdQuery(hubId, authKey, hubKey) {
 /*
  * Local hub metadata request for version etc information
  */
-
 
 function doLocalIdQuery(ip) {
   return new Promise(resolve => {
@@ -10165,5 +10164,5 @@ function setDeviceMeta(hubId, deviceId, name, rooms) {
   });
 }
 
-export { CLOUD_CONNECTION_STATES, HUB_CONNECTION_STATES, HUB_STATES, LANGUAGES, ROLES, USER_STATES, acceptEula, addRoom, changeLanguage, connectHubByTokens, rootReducer as cozifyReducer, deleteDevice, devicesState, doPoll, doPwLogin, editRoom, getCloudConnectionState, getDevices, getHubConnectionState, getHubDevices, getHubPairingDevices, getHubRooms, getHubs, getPairingDevices, getRooms, getUserState, hubsState, identifyDevice, ignorePairingByIds, removeRoom, selectHubById, sendDeviceCmd, sendDeviceStateCmd, setAuthenticated, setDeviceMeta, setDevices, startDiscoveringHubs, startPairingById, startPollingById, stopDiscoveringHubs, stopPairingById, stopPairings, stopPollingById, store, unSelectHubById, unSelectHubs, unpairDevice, updateHubs, useTestcloud, watchChanges };
+export { CLOUD_CONNECTION_STATES, HUB_CONNECTION_STATES, HUB_STATES, LANGUAGES, ROLES, USER_STATES, acceptEula, addRoom, changeLanguage, connectHubByTokens, rootReducer as cozifyReducer, deleteDevice, devicesState, doPoll, doPwLogin, doRemoteIdQuery, editRoom, getCloudConnectionState, getDevices, getHubConnectionState, getHubDevices, getHubPairingDevices, getHubRooms, getHubs, getPairingDevices, getRooms, getUserState, hubsState, identifyDevice, ignorePairingByIds, removeRoom, selectHubById, sendDeviceCmd, sendDeviceStateCmd, setAuthenticated, setDeviceMeta, setDevices, startDiscoveringHubs, startPairingById, startPollingById, stopDiscoveringHubs, stopPairingById, stopPairings, stopPollingById, store, unSelectHubById, unSelectHubs, unpairDevice, updateHubs, useTestcloud, watchChanges };
 //# sourceMappingURL=sdk.es.js.map

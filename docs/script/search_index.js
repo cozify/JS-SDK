@@ -150,6 +150,12 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
+    "cozify-sdk/src/hubs/hubs.js~doremoteidquery",
+    "function/index.html#static-function-doRemoteIdQuery",
+    "<span>doRemoteIdQuery</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/hubs.js</span>",
+    "function"
+  ],
+  [
     "cozify-sdk/src/rooms/rooms.js~editroom",
     "function/index.html#static-function-editRoom",
     "<span>editRoom</span> <span class=\"search-result-import-path\">cozify-sdk/src/rooms/rooms.js</span>",

@@ -84,14 +84,14 @@ function updateFoundHub(hubURL, hub) {
 /*
  * Remote hub metamata request for version etc information
  */
-function doRemoteIdQuery(hubId, authKey, hubKey) {
+export function doRemoteIdQuery(hubId, authKey, hubKey) {
   return new Promise((resolve, reject) => {
     send({
       command: COMMANDS.CLOUD_META, authKey, hubKey, hubId,
     })
       .then((hubData) => {
         updateFoundHub(undefined, hubData);
-        resolve(hubId);
+        resolve(hubData);
       })
       .catch((error) => {
         console.log(`doRemoteIdQuery ${hubId} error `, error.message);

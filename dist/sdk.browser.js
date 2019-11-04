@@ -7519,7 +7519,7 @@
 	      hubId
 	    }).then(hubData => {
 	      updateFoundHub(undefined, hubData);
-	      resolve(hubId);
+	      resolve(hubData);
 	    }).catch(error => {
 	      console.log(`doRemoteIdQuery ${hubId} error `, error.message);
 	      reject(hubId);
@@ -7529,7 +7529,6 @@
 	/*
 	 * Local hub metadata request for version etc information
 	 */
-
 
 	function doLocalIdQuery(ip) {
 	  return new Promise(resolve => {
@@ -9727,6 +9726,7 @@
 	exports.devicesState = devicesState;
 	exports.doPoll = doPoll;
 	exports.doPwLogin = doPwLogin;
+	exports.doRemoteIdQuery = doRemoteIdQuery;
 	exports.editRoom = editRoom;
 	exports.getCloudConnectionState = getCloudConnectionState;
 	exports.getDevices = getDevices;
