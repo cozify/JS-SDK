@@ -417,6 +417,7 @@ export function stopPairingById(hubId) {
         console.debug('SDK: pairingStopped: Ok , data: ', data);
         pairingStopped[hubId] = true;
         stopPairingInAction[hubId] = false;
+        pairingDevicesDeltaHandler(hubId, true, []);
         resolve('ok');
       })
       .catch((error) => {

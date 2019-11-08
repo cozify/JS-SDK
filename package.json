@@ -1,6 +1,6 @@
 {
   "name": "cozify-sdk",
-  "version": "1.0.23",
+  "version": "1.0.24",
   "description": "JavaScript SDK for Cozify REST API",
   "author": "tech-admin",
   "license": "MIT",
