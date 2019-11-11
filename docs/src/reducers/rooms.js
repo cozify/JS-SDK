@@ -108,5 +108,5 @@ console.log(addDevice({ id: 123, name: 'Unnamed device' }))
 {type : "devices/addDevice", payload : {id : 123, name: 'Unnamed device' }}
 */
 export const {
-  setRooms, addRoom, deleteRoom, removeRoom,
+  setRooms, setRoom, removeRoom,
 } = actions;

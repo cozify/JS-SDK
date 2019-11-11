@@ -132,7 +132,8 @@
 </nav>
 
 <div class="content" data-ice="content"><h1 data-ice="title">src/reducers/index.js</h1>
-<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import { connectionsReducer } from &apos;./connections&apos;;
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import { alarmsReducer } from &apos;./alarms&apos;;
+import { connectionsReducer } from &apos;./connections&apos;;
 import { pairingsReducer } from &apos;./pairings&apos;;
 import { devicesReducer } from &apos;./devices&apos;;
 import { hubsReducer } from &apos;./hubs&apos;;
@@ -144,6 +145,7 @@ import { roomsReducer } from &apos;./rooms&apos;;
  * @type {Object}
  */
 const rootReducer = {
+  alarms: alarmsReducer,
   connections: connectionsReducer,
   pairings: pairingsReducer,
   devices: devicesReducer,

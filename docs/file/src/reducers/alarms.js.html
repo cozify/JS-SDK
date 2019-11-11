@@ -165,10 +165,9 @@ export const alarmsState = createSlice({
       const { alarms } = action.payload;
       const hubAlarms = {};
 
-
       Object.entries(alarms).forEach((entry) =&gt; {
-        const [id, room] = entry;
-        hubAlarms[id] = { ...room };
+        const [id, alarm] = entry;
+        hubAlarms[id] = { ...alarm };
       });
       stateToSet[hubId] = { ...hubAlarms };
     },
@@ -226,7 +225,7 @@ console.log(addDevice({ id: 123, name: &apos;Unnamed device&apos; }))
 {type : &quot;devices/addDevice&quot;, payload : {id : 123, name: &apos;Unnamed device&apos; }}
 */
 export const {
-  setAlarms, addAlarm, deleteAlarm, removeAlarm,
+  setAlarms, setAlarm, removeAlarm,
 } = actions;
 </code></pre>
 

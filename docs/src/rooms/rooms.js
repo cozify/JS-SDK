@@ -187,7 +187,7 @@ export function roomsDeltaHandler(hubId, reset, rooms) {
       if (key && room) {
         store.dispatch(roomsState.actions.setRoom(stateRoom));
       } else if (key && oldHubRooms[key]) {
-        store.dispatch(roomsState.actions.removeRoom(key));
+        store.dispatch(roomsState.actions.removeRoom({ hubId, roomId: key }));
       }
     });
   }

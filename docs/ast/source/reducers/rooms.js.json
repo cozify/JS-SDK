@@ -1,7 +1,7 @@
 {
   "type": "File",
   "start": 0,
-  "end": 2825,
+  "end": 2813,
   "loc": {
     "start": {
       "line": 1,
@@ -15,7 +15,7 @@
   "program": {
     "type": "Program",
     "start": 0,
-    "end": 2825,
+    "end": 2813,
     "loc": {
       "start": {
         "line": 1,
@@ -3646,7 +3646,7 @@
       {
         "type": "ExportNamedDeclaration",
         "start": 2752,
-        "end": 2824,
+        "end": 2812,
         "loc": {
           "start": {
             "line": 110,
@@ -3662,7 +3662,7 @@
         "declaration": {
           "type": "VariableDeclaration",
           "start": 2759,
-          "end": 2824,
+          "end": 2812,
           "loc": {
             "start": {
               "line": 110,
@@ -3677,7 +3677,7 @@
             {
               "type": "VariableDeclarator",
               "start": 2765,
-              "end": 2823,
+              "end": 2811,
               "loc": {
                 "start": {
                   "line": 110,
@@ -3691,7 +3691,7 @@
               "id": {
                 "type": "ObjectPattern",
                 "start": 2765,
-                "end": 2813,
+                "end": 2801,
                 "loc": {
                   "start": {
                     "line": 110,
@@ -3790,9 +3790,9 @@
                           "line": 111,
                           "column": 19
                         },
-                        "identifierName": "addRoom"
+                        "identifierName": "setRoom"
                       },
-                      "name": "addRoom"
+                      "name": "setRoom"
                     },
                     "value": {
                       "type": "Identifier",
@@ -3807,9 +3807,9 @@
                           "line": 111,
                           "column": 19
                         },
-                        "identifierName": "addRoom"
+                        "identifierName": "setRoom"
                       },
-                      "name": "addRoom"
+                      "name": "setRoom"
                     },
                     "extra": {
                       "shorthand": true
@@ -3845,9 +3845,9 @@
                           "line": 111,
                           "column": 31
                         },
-                        "identifierName": "deleteRoom"
+                        "identifierName": "removeRoom"
                       },
-                      "name": "deleteRoom"
+                      "name": "removeRoom"
                     },
                     "value": {
                       "type": "Identifier",
@@ -3862,61 +3862,6 @@
                           "line": 111,
                           "column": 31
                         },
-                        "identifierName": "deleteRoom"
-                      },
-                      "name": "deleteRoom"
-                    },
-                    "extra": {
-                      "shorthand": true
-                    }
-                  },
-                  {
-                    "type": "ObjectProperty",
-                    "start": 2800,
-                    "end": 2810,
-                    "loc": {
-                      "start": {
-                        "line": 111,
-                        "column": 33
-                      },
-                      "end": {
-                        "line": 111,
-                        "column": 43
-                      }
-                    },
-                    "method": false,
-                    "shorthand": true,
-                    "computed": false,
-                    "key": {
-                      "type": "Identifier",
-                      "start": 2800,
-                      "end": 2810,
-                      "loc": {
-                        "start": {
-                          "line": 111,
-                          "column": 33
-                        },
-                        "end": {
-                          "line": 111,
-                          "column": 43
-                        },
-                        "identifierName": "removeRoom"
-                      },
-                      "name": "removeRoom"
-                    },
-                    "value": {
-                      "type": "Identifier",
-                      "start": 2800,
-                      "end": 2810,
-                      "loc": {
-                        "start": {
-                          "line": 111,
-                          "column": 33
-                        },
-                        "end": {
-                          "line": 111,
-                          "column": 43
-                        },
                         "identifierName": "removeRoom"
                       },
                       "name": "removeRoom"
@@ -3930,8 +3875,8 @@
               },
               "init": {
                 "type": "Identifier",
-                "start": 2816,
-                "end": 2823,
+                "start": 2804,
+                "end": 2811,
                 "loc": {
                   "start": {
                     "line": 112,
@@ -11080,7 +11025,7 @@
         "postfix": false,
         "binop": null
       },
-      "value": "addRoom",
+      "value": "setRoom",
       "start": 2779,
       "end": 2786,
       "loc": {
@@ -11132,7 +11077,7 @@
         "postfix": false,
         "binop": null
       },
-      "value": "deleteRoom",
+      "value": "removeRoom",
       "start": 2788,
       "end": 2798,
       "loc": {
@@ -11174,58 +11119,6 @@
     },
     {
       "type": {
-        "label": "name",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null
-      },
-      "value": "removeRoom",
-      "start": 2800,
-      "end": 2810,
-      "loc": {
-        "start": {
-          "line": 111,
-          "column": 33
-        },
-        "end": {
-          "line": 111,
-          "column": 43
-        }
-      }
-    },
-    {
-      "type": {
-        "label": ",",
-        "beforeExpr": true,
-        "startsExpr": false,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null,
-        "updateContext": null
-      },
-      "start": 2810,
-      "end": 2811,
-      "loc": {
-        "start": {
-          "line": 111,
-          "column": 43
-        },
-        "end": {
-          "line": 111,
-          "column": 44
-        }
-      }
-    },
-    {
-      "type": {
         "label": "}",
         "beforeExpr": false,
         "startsExpr": false,
@@ -11236,8 +11129,8 @@
         "postfix": false,
         "binop": null
       },
-      "start": 2812,
-      "end": 2813,
+      "start": 2800,
+      "end": 2801,
       "loc": {
         "start": {
           "line": 112,
@@ -11263,8 +11156,8 @@
         "updateContext": null
       },
       "value": "=",
-      "start": 2814,
-      "end": 2815,
+      "start": 2802,
+      "end": 2803,
       "loc": {
         "start": {
           "line": 112,
@@ -11289,8 +11182,8 @@
         "binop": null
       },
       "value": "actions",
-      "start": 2816,
-      "end": 2823,
+      "start": 2804,
+      "end": 2811,
       "loc": {
         "start": {
           "line": 112,
@@ -11315,8 +11208,8 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 2823,
-      "end": 2824,
+      "start": 2811,
+      "end": 2812,
       "loc": {
         "start": {
           "line": 112,
@@ -11341,8 +11234,8 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 2825,
-      "end": 2825,
+      "start": 2813,
+      "end": 2813,
       "loc": {
         "start": {
           "line": 113,

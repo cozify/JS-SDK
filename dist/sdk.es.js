@@ -1,5 +1,22 @@
 import axios from 'axios';
 
+function _defineProperty(obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
+}
+
+var defineProperty = _defineProperty;
+
 function symbolObservablePonyfill(root) {
 	var result;
 	var Symbol = root.Symbol;
@@ -426,7 +443,7 @@ function combineReducers(reducers) {
   };
 }
 
-function _defineProperty(obj, key, value) {
+function _defineProperty$1(obj, key, value) {
   if (key in obj) {
     Object.defineProperty(obj, key, {
       value: value,
@@ -453,7 +470,7 @@ function _objectSpread(target) {
     }
 
     ownKeys.forEach(function (key) {
-      _defineProperty(target, key, source[key]);
+      _defineProperty$1(target, key, source[key]);
     });
   }
 
@@ -583,7 +600,7 @@ var createClass = function () {
 
 
 
-var defineProperty = function (obj, key, value) {
+var defineProperty$1 = function (obj, key, value) {
   if (key in obj) {
     Object.defineProperty(obj, key, {
       value: value,
@@ -598,7 +615,7 @@ var defineProperty = function (obj, key, value) {
   return obj;
 };
 
-var NOTHING = typeof Symbol !== "undefined" ? Symbol("immer-nothing") : defineProperty({}, "immer-nothing", true);
+var NOTHING = typeof Symbol !== "undefined" ? Symbol("immer-nothing") : defineProperty$1({}, "immer-nothing", true);
 
 var DRAFTABLE = typeof Symbol !== "undefined" ? Symbol("immer-draftable") : "__$immer_draftable";
 
@@ -1737,9 +1754,9 @@ var parse = function parse(path) {
 };
 
 var es = /*#__PURE__*/Object.freeze({
-	__proto__: null,
-	create: create,
-	parse: parse
+  __proto__: null,
+  create: create,
+  parse: parse
 });
 
 /**
@@ -1787,12 +1804,12 @@ var identityLast = createIdentity(-1);
 var identitySecondLast = createIdentity(-2);
 
 var es$1 = /*#__PURE__*/Object.freeze({
-	__proto__: null,
-	createIdentity: createIdentity,
-	identity: identity,
-	identitySecond: identitySecond,
-	identityLast: identityLast,
-	identitySecondLast: identitySecondLast
+  __proto__: null,
+  createIdentity: createIdentity,
+  identity: identity,
+  identitySecond: identitySecond,
+  identityLast: identityLast,
+  identitySecondLast: identitySecondLast
 });
 
 var fastEquals = createCommonjsModule(function (module, exports) {
@@ -2383,11 +2400,11 @@ function createStructuredSelector(selectors) {
 }
 
 var es$2 = /*#__PURE__*/Object.freeze({
-	__proto__: null,
-	defaultMemoize: defaultMemoize,
-	createSelectorCreator: createSelectorCreator,
-	createSelector: createSelector,
-	createStructuredSelector: createStructuredSelector
+  __proto__: null,
+  defaultMemoize: defaultMemoize,
+  createSelectorCreator: createSelectorCreator,
+  createSelector: createSelector,
+  createStructuredSelector: createStructuredSelector
 });
 
 var curriable = createCommonjsModule(function (module, exports) {
@@ -3931,7 +3948,7 @@ function bindActionCreators(actionCreators, dispatch) {
   return boundActionCreators;
 }
 
-function _defineProperty$1(obj, key, value) {
+function _defineProperty$2(obj, key, value) {
   if (key in obj) {
     Object.defineProperty(obj, key, {
       value: value,
@@ -3965,7 +3982,7 @@ function _objectSpread2(target) {
 
     if (i % 2) {
       ownKeys$1(source, true).forEach(function (key) {
-        _defineProperty$1(target, key, source[key]);
+        _defineProperty$2(target, key, source[key]);
       });
     } else if (Object.getOwnPropertyDescriptors) {
       Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
@@ -4059,13 +4076,13 @@ function applyMiddleware$1() {
 }
 
 var redux = /*#__PURE__*/Object.freeze({
-	__proto__: null,
-	__DO_NOT_USE__ActionTypes: ActionTypes$1,
-	applyMiddleware: applyMiddleware$1,
-	bindActionCreators: bindActionCreators,
-	combineReducers: combineReducers$1,
-	compose: compose$1,
-	createStore: createStore$1
+  __proto__: null,
+  __DO_NOT_USE__ActionTypes: ActionTypes$1,
+  applyMiddleware: applyMiddleware$1,
+  bindActionCreators: bindActionCreators,
+  combineReducers: combineReducers$1,
+  compose: compose$1,
+  createStore: createStore$1
 });
 
 var require$$0$1 = getCjsExportFromNamespace(redux);
@@ -4129,7 +4146,7 @@ function _typeof$1(obj) {
   return _typeof$1(obj);
 }
 
-function _defineProperty$2(obj, key, value) {
+function _defineProperty$3(obj, key, value) {
   if (key in obj) {
     Object.defineProperty(obj, key, {
       value: value,
@@ -4376,7 +4393,7 @@ function createSlice(options) {
     return map;
   }, {});
 
-  var selectors = _defineProperty$2({}, createSelectorName(slice), createSliceSelector(slice));
+  var selectors = _defineProperty$3({}, createSelectorName(slice), createSliceSelector(slice));
 
   return {
     slice: slice,
@@ -4385,6 +4402,98 @@ function createSlice(options) {
     selectors: selectors
   };
 }
+
+function ownKeys$2(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread$1(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$2(source, true).forEach(function (key) { defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$2(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+/**
+ * Rooms action creators object
+ * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
+ * @return { {
+ *   slice : string,
+ *   reducer : ReducerFunction,
+ *   actions : Object<string, ActionCreator},
+ *   selectors : Object<string, Selector>
+ *   }}
+ */
+
+const alarmsState = createSlice({
+  slice: 'alarms',
+  initialState: {},
+  reducers: {
+    /*
+     * Reducer action of setting alarms state - sets all given alarms of given hub, keeps existing states
+     * @param {Object} state
+     * @param {Object} action
+     */
+    setAlarms(state, action) {
+      const stateToSet = state;
+      const {
+        hubId
+      } = action.payload;
+      const {
+        alarms
+      } = action.payload;
+      const hubAlarms = {};
+      Object.entries(alarms).forEach(entry => {
+        const [id, alarm] = entry;
+        hubAlarms[id] = _objectSpread$1({}, alarm);
+      });
+      stateToSet[hubId] = _objectSpread$1({}, hubAlarms);
+    },
+
+    /*
+     * Reducer action of set alarm state
+     * @param {Object} state
+     * @param {Object} action
+     */
+    setAlarm(state, action) {
+      const stateToSet = state;
+      const {
+        hubId
+      } = action.payload;
+      const {
+        alarm
+      } = action.payload;
+
+      if (hubId && stateToSet[hubId]) {
+        stateToSet[hubId][alarm.id] = _objectSpread$1({}, alarm);
+      }
+    },
+
+    /*
+     * Reducer action of removing alarm state
+     * @param {Object} state
+     * @param {Object} action
+     */
+    removeAlarm(state, action) {
+      const stateToSet = state;
+      const {
+        hubId
+      } = action.payload;
+      const {
+        alarmId
+      } = action.payload;
+
+      if (hubId && alarmId && stateToSet[hubId] && stateToSet[hubId][alarmId]) {
+        delete stateToSet[hubId][alarmId];
+      }
+    }
+
+  }
+});
+/*
+todos.selectors.getCompletedTodoCount = createSelector(
+  [todos.selectors.getTodos],
+  todos =>
+    todos.reduce((count, todo) => (todo.completed ? count + 1 : count), 0)
+);
+*/
+
+const {
+  actions,
+  reducer
+} = alarmsState;
 
 //      
 
@@ -4753,30 +4862,13 @@ const connectionsState = createSlice({
   }
 });
 const {
-  actions,
-  reducer
+  actions: actions$1,
+  reducer: reducer$1
 } = connectionsState;
 
-function _defineProperty$3(obj, key, value) {
-  if (key in obj) {
-    Object.defineProperty(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
+function ownKeys$3(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
-  return obj;
-}
-
-var defineProperty$1 = _defineProperty$3;
-
-function ownKeys$2(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread$1(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$2(source, true).forEach(function (key) { defineProperty$1(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$2(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+function _objectSpread$2(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$3(source, true).forEach(function (key) { defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$3(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 /**
  * Devices action creators object
  * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
@@ -4808,9 +4900,9 @@ const pairingsState = createSlice({
       const hubPairingDevices = {};
       Object.entries(devices).forEach(entry => {
         const [id, device] = entry;
-        hubPairingDevices[id] = _objectSpread$1({}, device);
+        hubPairingDevices[id] = _objectSpread$2({}, device);
       });
-      stateToSet[hubId] = _objectSpread$1({}, hubPairingDevices);
+      stateToSet[hubId] = _objectSpread$2({}, hubPairingDevices);
     },
 
     /*
@@ -4828,7 +4920,7 @@ const pairingsState = createSlice({
       } = action.payload;
 
       if (stateToSet[hubId]) {
-        stateToSet[hubId][device.id] = _objectSpread$1({}, device);
+        stateToSet[hubId][device.id] = _objectSpread$2({}, device);
       }
     },
 
@@ -4854,13 +4946,13 @@ const pairingsState = createSlice({
   }
 });
 const {
-  actions: actions$1,
-  reducer: reducer$1
+  actions: actions$2,
+  reducer: reducer$2
 } = pairingsState;
 
-function ownKeys$3(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+function ownKeys$4(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
-function _objectSpread$2(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$3(source, true).forEach(function (key) { defineProperty$1(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$3(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+function _objectSpread$3(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$4(source, true).forEach(function (key) { defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$4(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 /**
  * Devices action creators object
  * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
@@ -4892,9 +4984,9 @@ const devicesState = createSlice({
       const hubDevices = {};
       Object.entries(devices).forEach(entry => {
         const [id, device] = entry;
-        hubDevices[id] = _objectSpread$2({}, device);
+        hubDevices[id] = _objectSpread$3({}, device);
       });
-      stateToSet[hubId] = _objectSpread$2({}, hubDevices);
+      stateToSet[hubId] = _objectSpread$3({}, hubDevices);
     },
 
     /*
@@ -4912,7 +5004,7 @@ const devicesState = createSlice({
       } = action.payload;
 
       if (stateToSet[hubId]) {
-        stateToSet[hubId][device.id] = _objectSpread$2({}, device);
+        stateToSet[hubId][device.id] = _objectSpread$3({}, device);
       }
     },
 
@@ -4938,8 +5030,8 @@ const devicesState = createSlice({
   }
 });
 const {
-  actions: actions$2,
-  reducer: reducer$2
+  actions: actions$3,
+  reducer: reducer$3
 } = devicesState;
 
 /*
@@ -4950,11 +5042,11 @@ console.log(addDevice({ id: 123, name: 'Unnamed device' }))
 const {
   setDevices,
   deleteDevice
-} = actions$2;
+} = actions$3;
 
-function ownKeys$4(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+function ownKeys$5(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
-function _objectSpread$3(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$4(source, true).forEach(function (key) { defineProperty$1(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$4(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+function _objectSpread$4(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$5(source, true).forEach(function (key) { defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$5(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 /**
  * Hubs action creators object
  * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
@@ -4981,7 +5073,7 @@ const hubsState = createSlice({
       console.log('updateHubs', hubs);
       Object.entries(hubs).forEach(entry => {
         const [id, hub] = entry;
-        stateToSet[id] = _objectSpread$3({}, state[id], {}, hub);
+        stateToSet[id] = _objectSpread$4({}, state[id], {}, hub);
       });
     },
 
@@ -5044,8 +5136,8 @@ const hubsState = createSlice({
 }); // console.log('hubsState ', hubsState)
 
 const {
-  actions: actions$3,
-  reducer: reducer$3
+  actions: actions$4,
+  reducer: reducer$4
 } = hubsState;
 
 /*
@@ -5058,7 +5150,7 @@ const {
   selectHub,
   unSelectHub,
   setHubConnectionState
-} = actions$3;
+} = actions$4;
 
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
@@ -6117,13 +6209,13 @@ console.log(user)
 */
 
 const {
-  actions: actions$4,
-  reducer: reducer$4
+  actions: actions$5,
+  reducer: reducer$5
 } = userState;
 
-function ownKeys$5(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+function ownKeys$6(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
-function _objectSpread$4(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$5(source, true).forEach(function (key) { defineProperty$1(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$5(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+function _objectSpread$5(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$6(source, true).forEach(function (key) { defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$6(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 /**
  * Rooms action creators object
  * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
@@ -6155,9 +6247,9 @@ const roomsState = createSlice({
       const hubRooms = {};
       Object.entries(rooms).forEach(entry => {
         const [id, room] = entry;
-        hubRooms[id] = _objectSpread$4({}, room);
+        hubRooms[id] = _objectSpread$5({}, room);
       });
-      stateToSet[hubId] = _objectSpread$4({}, hubRooms);
+      stateToSet[hubId] = _objectSpread$5({}, hubRooms);
     },
 
     /*
@@ -6175,7 +6267,7 @@ const roomsState = createSlice({
       } = action.payload;
 
       if (hubId && stateToSet[hubId]) {
-        stateToSet[hubId][room.id] = _objectSpread$4({}, room);
+        stateToSet[hubId][room.id] = _objectSpread$5({}, room);
       }
     },
 
@@ -6226,8 +6318,8 @@ todos.selectors.getCompletedTodoCount = createSelector(
 */
 
 const {
-  actions: actions$5,
-  reducer: reducer$5
+  actions: actions$6,
+  reducer: reducer$6
 } = roomsState;
 
 /**
@@ -6236,12 +6328,13 @@ const {
  */
 
 const rootReducer = {
-  connections: reducer,
-  pairings: reducer$1,
-  devices: reducer$2,
-  hubs: reducer$3,
-  user: reducer$4,
-  rooms: reducer$5
+  alarms: reducer,
+  connections: reducer$1,
+  pairings: reducer$2,
+  devices: reducer$3,
+  hubs: reducer$4,
+  user: reducer$5,
+  rooms: reducer$6
 };
 
 /*!
@@ -7946,91 +8039,14 @@ function roomsDeltaHandler(hubId, reset, rooms) {
       if (key && room) {
         store.dispatch(roomsState.actions.setRoom(stateRoom));
       } else if (key && oldHubRooms[key]) {
-        store.dispatch(roomsState.actions.removeRoom(key));
+        store.dispatch(roomsState.actions.removeRoom({
+          hubId,
+          roomId: key
+        }));
       }
     });
   }
 }
-
-function ownKeys$6(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread$5(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$6(source, true).forEach(function (key) { defineProperty$1(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$6(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-/**
- * Rooms action creators object
- * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
- * @return { {
- *   slice : string,
- *   reducer : ReducerFunction,
- *   actions : Object<string, ActionCreator},
- *   selectors : Object<string, Selector>
- *   }}
- */
-
-const alarmsState = createSlice({
-  slice: 'alarms',
-  initialState: {},
-  reducers: {
-    /*
-     * Reducer action of setting alarms state - sets all given alarms of given hub, keeps existing states
-     * @param {Object} state
-     * @param {Object} action
-     */
-    setAlarms(state, action) {
-      const stateToSet = state;
-      const {
-        hubId
-      } = action.payload;
-      const {
-        alarms
-      } = action.payload;
-      const hubAlarms = {};
-      Object.entries(alarms).forEach(entry => {
-        const [id, room] = entry;
-        hubAlarms[id] = _objectSpread$5({}, room);
-      });
-      stateToSet[hubId] = _objectSpread$5({}, hubAlarms);
-    },
-
-    /*
-     * Reducer action of set alarm state
-     * @param {Object} state
-     * @param {Object} action
-     */
-    setAlarm(state, action) {
-      const stateToSet = state;
-      const {
-        hubId
-      } = action.payload;
-      const {
-        alarm
-      } = action.payload;
-
-      if (hubId && stateToSet[hubId]) {
-        stateToSet[hubId][alarm.id] = _objectSpread$5({}, alarm);
-      }
-    },
-
-    /*
-     * Reducer action of removing alarm state
-     * @param {Object} state
-     * @param {Object} action
-     */
-    removeAlarm(state, action) {
-      const stateToSet = state;
-      const {
-        hubId
-      } = action.payload;
-      const {
-        alarmId
-      } = action.payload;
-
-      if (hubId && alarmId && stateToSet[hubId] && stateToSet[hubId][alarmId]) {
-        delete stateToSet[hubId][alarmId];
-      }
-    }
-
-  }
-});
 
 //      
 
@@ -8210,7 +8226,7 @@ function alarmsDeltaHandler(hubId, reset, alarms) {
   }
 
   if (reset) {
-    // If reset then set rooms as they are received
+    // If reset then set alarms as they are received
     const alarmsToBeSet = {};
 
     if (!isEmpty_1(alarms)) {
@@ -8221,7 +8237,7 @@ function alarmsDeltaHandler(hubId, reset, alarms) {
 
     const stateAlarms = {
       hubId,
-      alarmsToBeSet
+      alarms: alarmsToBeSet
     };
     store.dispatch(alarmsState.actions.setAlarms(stateAlarms));
   } else if (!isEmpty_1(alarms)) {
@@ -8234,7 +8250,10 @@ function alarmsDeltaHandler(hubId, reset, alarms) {
         };
         store.dispatch(alarmsState.actions.setAlarm(stateAlarm));
       } else if (key && oldHubAlarms[key]) {
-        store.dispatch(alarmsState.actions.removeAlarm(key));
+        store.dispatch(alarmsState.actions.removeAlarm({
+          hubId,
+          alarmId: key
+        }));
       }
     });
   }
