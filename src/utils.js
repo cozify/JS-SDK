@@ -19,6 +19,56 @@ if (typeof process === 'object') {
 
 export const isNode = isNodeInUse;
 
+let atobC = (a: string) => { console.error('Invalid atob for string ', a); return 'invalid atob'; };
+
+if (!isNodeInUse) {
+  atobC = window.atob;
+} else {
+  const nodeAtob = (a: string) => {
+    const binVal = Buffer.from(a, 'base64').toString('binary');
+    return binVal;
+  };
+  atobC = nodeAtob;
+}
+
+/**
+ * Helper method to strip HTML presentation from string
+ * @param  {string} html - HTML presentation
+ * @return {string}  - text string
+ */
+export function getTextFromNode(givenHTML: string): string {
+  let html = givenHTML;
+  html = html.replace(/<\/div>/ig, ''); // '\n');
+  html = html.replace(/<\/li>/ig, '');
+  html = html.replace(/<li>/ig, '');
+  html = html.replace(/<\/ul>/ig, '');
+  html = html.replace(/<\/p>/ig, '');
+  // eslint-disable-next-line
+  html = html.replace(/<br\s*[\/]?>/gi, '');
+  html = html.replace(/<[^>]+>/ig, '');
+  html = html.replace(/\s\s+/g, ' ');
+  return html.trim();
+}
+
+/**
+ * Helper method to get HTML presentation from unicode decoded base64 string
+ * @param  {string} encoded - string to be decoded
+ * @return {string}  - decoded string
+ */
+export function b64DecodeUnicode(encoded: string): string {
+  try {
+    // eslint-disable-next-line
+    return decodeURIComponent(Array.prototype.map.call(atobC(encoded), function(c) {
+      // eslint-disable-next-line
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+  } catch (error) {
+    console.error('b64DecodeUnicode: trying atob failed');
+    return 'b64DecodeUnicode error';
+  }
+}
+
+
 /**
  * Helper method to Base64 decode
  * @param  {string} encoded - string to be decoded

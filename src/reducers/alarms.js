@@ -15,74 +15,58 @@ import { createSlice } from 'redux-starter-kit';
  *   selectors : Object<string, Selector>
  *   }}
  */
-export const roomsState = createSlice({
-  slice: 'rooms',
+export const alarmsState = createSlice({
+  slice: 'alarms',
   initialState: {},
   reducers: {
 
     /*
-     * Reducer action of setting rooms state - sets all given rooms of given hub, keeps existing states
+     * Reducer action of setting alarms state - sets all given alarms of given hub, keeps existing states
      * @param {Object} state
      * @param {Object} action
      */
-    setRooms(state, action) {
+    setAlarms(state, action) {
       const stateToSet = state;
       const { hubId } = action.payload;
-      const { rooms } = action.payload;
-      const hubRooms = {};
+      const { alarms } = action.payload;
+      const hubAlarms = {};
 
 
-      Object.entries(rooms).forEach((entry) => {
+      Object.entries(alarms).forEach((entry) => {
         const [id, room] = entry;
-        hubRooms[id] = { ...room };
+        hubAlarms[id] = { ...room };
       });
-      stateToSet[hubId] = { ...hubRooms };
+      stateToSet[hubId] = { ...hubAlarms };
     },
 
 
     /*
-     * Reducer action of set room state
+     * Reducer action of set alarm state
      * @param {Object} state
      * @param {Object} action
      */
-    setRoom(state, action) {
+    setAlarm(state, action) {
       const stateToSet = state;
       const { hubId } = action.payload;
-      const { room } = action.payload;
+      const { alarm } = action.payload;
       if (hubId && stateToSet[hubId]) {
-        stateToSet[hubId][room.id] = { ...room };
+        stateToSet[hubId][alarm.id] = { ...alarm };
       }
     },
 
     /*
-     * Reducer action of removing room state
+     * Reducer action of removing alarm state
      * @param {Object} state
      * @param {Object} action
      */
-    removeRoom(state, action) {
+    removeAlarm(state, action) {
       const stateToSet = state;
       const { hubId } = action.payload;
-      const { roomId } = action.payload;
-      if (hubId && roomId && stateToSet[hubId] && stateToSet[hubId][roomId]) {
-        delete stateToSet[hubId][roomId];
+      const { alarmId } = action.payload;
+      if (hubId && alarmId && stateToSet[hubId] && stateToSet[hubId][alarmId]) {
+        delete stateToSet[hubId][alarmId];
       }
     },
-
-    /*
-     * Reducer action of updating room state
-     * @param {Object} state
-     * @param {Object} action
-     */
-    /*
-    editRoom(state, action) {
-      const stateToSet = state;
-      const { hubId } = action.payload;
-      const { room } = action.payload;
-      if (hubId && stateToSet[hubId]) {
-        stateToSet[hubId][room.id] = { ...room };
-      }
-    },
-    */
   },
 });
 
@@ -94,13 +78,13 @@ todos.selectors.getCompletedTodoCount = createSelector(
 );
 */
 
-const { actions, reducer } = roomsState;
+const { actions, reducer } = alarmsState;
 
 /**
  * Devices reducer
  * @type {function} reducer
  */
-export { reducer as roomsReducer };
+export { reducer as alarmsReducer };
 
 // Extract and export each action creator by name
 /*
@@ -108,5 +92,5 @@ console.log(addDevice({ id: 123, name: 'Unnamed device' }))
 {type : "devices/addDevice", payload : {id : 123, name: 'Unnamed device' }}
 */
 export const {
-  setRooms, addRoom, deleteRoom, removeRoom,
+  setAlarms, addAlarm, deleteAlarm, removeAlarm,
 } = actions;

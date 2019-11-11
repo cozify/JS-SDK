@@ -39,6 +39,11 @@ export {
   addRoom, editRoom, removeRoom,
 } from './rooms/rooms';
 
+export {
+  getAlarms, getHubAlarms,
+  closeAlarm, removeAlarm,
+} from './alarms/alarms';
+
 
 export { devicesState, setDevices, deleteDevice } from './reducers/devices';
 export { hubsState, updateHubs } from './reducers/hubs';

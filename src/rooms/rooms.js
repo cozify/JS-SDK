@@ -1,5 +1,5 @@
 // @flow
-// import isEmpty from 'lodash/isEmpty';
+import isEmpty from 'lodash/isEmpty';
 // import isArray from 'lodash/isArray';
 // import pick from 'lodash/pick';
 import { store } from '../store';
@@ -102,7 +102,7 @@ export function sendRoomCmd(hubId: string, commandType: COMMANDS_TYPE, data: Obj
 /**
  * Add room to given hub
  * do not usr store.dispatch(roomsState.actions.addRoom(hubId, room)) as rooms are coming back in delta
- * @param  {string} hubI
+ * @param  {string} hubId
  * @param  {Object} room
  * @return {Promise<Object>} rooms
  */
@@ -113,7 +113,6 @@ export async function addRoom(hubId: string, room: ROOM_TYPE): Promise<ROOMS_MAP
         resolve(rooms);
       })
       .catch((error) => {
-        debugger;
         reject(error);
       });
   });
@@ -133,7 +132,6 @@ export async function editRoom(hubId: string, room: ROOM_TYPE): Promise<ROOMS_MA
         resolve(rooms);
       })
       .catch((error) => {
-        debugger;
         reject(error);
       });
   });
@@ -141,7 +139,7 @@ export async function editRoom(hubId: string, room: ROOM_TYPE): Promise<ROOMS_MA
 
 /**
  * Remove given room of given hub
- * @param  {string} hubI
+ * @param  {string} hubId
  * @param  {Object} room
  */
 export async function removeRoom(hubId: string, room: ROOM_TYPE): Promise<ROOMS_MAP_TYPE> {
@@ -181,7 +179,7 @@ export function roomsDeltaHandler(hubId: string, reset: boolean, rooms: Object) 
       rooms,
     };
     store.dispatch(roomsState.actions.setRooms(stateRooms));
-  } else {
+  } else if (!isEmpty(rooms)) {
     // Loop rooms to check could it be added or should be removed
     Object.entries(rooms).forEach(([key, room]) => {
       const stateRoom = {
