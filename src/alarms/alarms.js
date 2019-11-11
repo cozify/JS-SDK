@@ -172,21 +172,17 @@ export function alarmsDeltaHandler(hubId: string, reset: boolean, alarms: ALARMS
   }
 
   if (reset) {
-    // If reset then set rooms as they are received
-
+    // If reset then set alarms as they are received
     const alarmsToBeSet = {};
-
     if (!isEmpty(alarms)) {
       Object.entries(alarms).forEach(([key, alarm:ALARMS_MAP_TYPE]) => {
         alarmsToBeSet[key] = initAlarm(alarm);
       });
     }
-
     const stateAlarms = {
       hubId,
-      alarmsToBeSet,
+      alarms: alarmsToBeSet,
     };
-
     store.dispatch(alarmsState.actions.setAlarms(stateAlarms));
   } else if (!isEmpty(alarms)) {
     // Loop alarms to check could it be added or should be removed
@@ -198,7 +194,7 @@ export function alarmsDeltaHandler(hubId: string, reset: boolean, alarms: ALARMS
         };
         store.dispatch(alarmsState.actions.setAlarm(stateAlarm));
       } else if (key && oldHubAlarms[key]) {
-        store.dispatch(alarmsState.actions.removeAlarm(key));
+        store.dispatch(alarmsState.actions.removeAlarm({ hubId, alarmId: key }));
       }
     });
   }

@@ -1,3 +1,4 @@
+import { alarmsReducer } from './alarms';
 import { connectionsReducer } from './connections';
 import { pairingsReducer } from './pairings';
 import { devicesReducer } from './devices';
@@ -10,6 +11,7 @@ import { roomsReducer } from './rooms';
  * @type {Object}
  */
 const rootReducer = {
+  alarms: alarmsReducer,
   connections: connectionsReducer,
   pairings: pairingsReducer,
   devices: devicesReducer,
