@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <base data-ice="baseUrl" href="../../../">
-  <title data-ice="title">src/connection/state.js | Cozify SDK</title>
+  <title data-ice="title">src/alarms/constants.js | Cozify SDK</title>
   <link type="text/css" rel="stylesheet" href="css/style.css">
   <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
   <script src="script/prettify/prettify.js"></script>
@@ -131,60 +131,22 @@
 </div>
 </nav>
 
-<div class="content" data-ice="content"><h1 data-ice="title">src/connection/state.js</h1>
+<div class="content" data-ice="content"><h1 data-ice="title">src/alarms/constants.js</h1>
 <pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">// 
+/*
+closed: false
+createdAtMs: 1573477740542
+id: &quot;f9fbd96b-f436-44f8-ba11-4be7aee1238a&quot;
+level: &quot;err&quot;
+message: &quot;PGRpdiBjbGFzcz0iaGVhZGVyIj48aDIgY2xhc3M9InRpdGxlIj5NdXJ0b2jDpGx5dHlzITwvaDI+PC9kaXY+CiAgPGRpdiBjbGFzcz0iZGV2aWNlSWNvbnMiPjxkaXYgY2xhc3M9ImRldmljZSB0ZXh0LWNlbnRlciI+CjxkaXYgY2xhc3M9ImNvbnRhaW5lciI+CjxpIGNsYXNzPSJib3JkZXIgaWNvbi1kZXZpY2UtY2lyY2xlIj48L2k+CjxpIGNsYXNzPSJpY29uIGljb24tbW90aW9uZGV0ZWN0b3IiPjwvaT4KPC9kaXY+CjxkaXYgY2xhc3M9Im5hbWUiPkxpaWtldHTDpCBtYWtrYXJpc3NhITwvZGl2Pgo8L2Rpdj4KICAgIDxkaXYgY2xhc3M9ImNsZWFyZXIiPjwvZGl2PgogIDwvZGl2PgogIDxkaXYgY2xhc3M9Im5vdGlmaWNhdGlvbkNvbnRlbnQiPgogICAgPGgxPk11cnRvaMOkbHl0eXM8L2gxPgogICAgPHA+QXN1bm5vc3Nhc2kgb24gaGF2YWl0dHUgbGlpa2V0dMOkLiBUYXJraXN0YSB0aWxhbm5lIGthbWVyYW4gYXZ1bGxhIGphIHNvaXRhIHRhcnZpdHRhZXNzYSBow6R0w6RudW1lcm9vbiAxMTIuPC9wPgogICAgPGEgaHJlZj0idGVsOjExMiIgY2xhc3M9ImJ1dHRvbiB0cmFuc3BhcmVudCI+CiAgICAgIDxkaXYgY2xhc3M9Im1ha2VDYWxsIj5Tb2l0YSAxMTI8L2Rpdj4KICAgIDwvYT4KICA8L2Rpdj48L2Rpdj4=&quot;
+name: &quot;LT Security Alarm&quot;
+sourceId: &quot;b0d685d8-5270-411b-8d1e-2c45c31c8f07&quot;
+timestamp: 1573477740542
+title: &quot;Murtoh&#xE4;lytys&quot;
+type: &quot;USER_ALARM&quot;
+*/
 
-import { connectionsState } from &apos;../reducers/connections&apos;;
-import { hubsState } from &apos;../reducers/hubs&apos;;
-import { store } from &apos;../store&apos;;
-import { HUB_CONNECTION_STATES } from &apos;./constants&apos;;
 
-
-/**
- * Change Cloud connection state
- * @param {HUB_CONNECTION_STATE_TYPE} state
- */
-export function setCloudConnectionState(state) {
-  store.dispatch(connectionsState.actions.setCloudConnectionState(state));
-}
-
-/**
- * Get Cloud connection state
- * @return {CLOUD_CONNECTION_STATE_TYPE}
- */
-export function getCloudConnectionState() {
-  const stateNow = store.getState();
-  return connectionsState.selectors.getConnections(stateNow).cloudState;
-}
-
-/**
- * Change hub connection state
- * @param {{hubId: string, state: HUB_CONNECTION_STATE_TYPE}} hubAndState - hubId and new state
- */
-export function setHubConnectionState(paramHubAndState) {
-  const stateNow = store.getState();
-  const storedHubs = hubsState.selectors.getHubs(stateNow);
-  const hubAndState = paramHubAndState;
-  /* If hub is unconnected, lets try remote */
-  if (hubAndState.state === HUB_CONNECTION_STATES.UNCONNECTED &amp;&amp; storedHubs[hubAndState.hubId]) {
-    if (storedHubs[hubAndState.hubId].connectionState === HUB_CONNECTION_STATES.REMOTE) {
-      hubAndState.state = HUB_CONNECTION_STATES.LOCAL;
-    }
-  }
-  store.dispatch(hubsState.actions.setHubConnectionState(hubAndState));
-}
-/**
- * Get hub connection state by hub id
- * @param  {string} hubId
- * @return {HUB_CONNECTION_STATE_TYPE}
- */
-export function getHubConnectionState(hubId) {
-  const stateNow = store.getState();
-  if (hubsState.selectors.getHubs(stateNow)[hubId]) {
-    return hubsState.selectors.getHubs(stateNow)[hubId].connectionState;
-  }
-  return HUB_CONNECTION_STATES.UNCONNECTED;
-}
 </code></pre>
 
 </div>

@@ -4577,6 +4577,61 @@ if (typeof process === 'object') {
 }
 
 const isNode = isNodeInUse;
+
+let atobC = a => {
+  console.error('Invalid atob for string ', a);
+  return 'invalid atob';
+};
+
+if (!isNodeInUse) {
+  atobC = window.atob;
+} else {
+  const nodeAtob = a => {
+    const binVal = Buffer.from(a, 'base64').toString('binary');
+    return binVal;
+  };
+
+  atobC = nodeAtob;
+}
+/**
+ * Helper method to strip HTML presentation from string
+ * @param  {string} html - HTML presentation
+ * @return {string}  - text string
+ */
+
+
+function getTextFromNode(givenHTML) {
+  let html = givenHTML;
+  html = html.replace(/<\/div>/ig, ''); // '\n');
+
+  html = html.replace(/<\/li>/ig, '');
+  html = html.replace(/<li>/ig, '');
+  html = html.replace(/<\/ul>/ig, '');
+  html = html.replace(/<\/p>/ig, ''); // eslint-disable-next-line
+
+  html = html.replace(/<br\s*[\/]?>/gi, '');
+  html = html.replace(/<[^>]+>/ig, '');
+  html = html.replace(/\s\s+/g, ' ');
+  return html.trim();
+}
+/**
+ * Helper method to get HTML presentation from unicode decoded base64 string
+ * @param  {string} encoded - string to be decoded
+ * @return {string}  - decoded string
+ */
+
+function b64DecodeUnicode(encoded) {
+  try {
+    // eslint-disable-next-line
+    return decodeURIComponent(Array.prototype.map.call(atobC(encoded), function (c) {
+      // eslint-disable-next-line
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+  } catch (error) {
+    console.error('b64DecodeUnicode: trying atob failed');
+    return 'b64DecodeUnicode error';
+  }
+}
 /**
  * Helper method to Base64 decode
  * @param  {string} encoded - string to be decoded
@@ -4761,6 +4816,20 @@ const COMMANDS = Object.freeze({
   CMD_REMOVE_ROOM: {
     method: 'DELETE',
     url: 'hub/remote/cc/$API_VER/rooms',
+    urlParams: ['roomId']
+  },
+  CMD_GET_ALARMS: {
+    method: 'GET',
+    url: 'hub/remote/cc/$API_VER/alarms'
+  },
+  CMD_CLOSE_ALARM: {
+    method: 'PUT',
+    url: 'hub/remote/cc/$API_VER/alarms/close',
+    urlParams: ['alarmId']
+  },
+  CMD_REMOVE_ALARM: {
+    method: 'DELETE',
+    url: 'hub/remote/cc/$API_VER/alarms',
     urlParams: ['roomId']
   }
 }); // type dataArray = ?Array<{ [key: string | number]: any }>
@@ -6829,27 +6898,24 @@ const roomsState = createSlice({
       if (hubId && roomId && stateToSet[hubId] && stateToSet[hubId][roomId]) {
         delete stateToSet[hubId][roomId];
       }
-    },
-
+    }
     /*
      * Reducer action of updating room state
      * @param {Object} state
      * @param {Object} action
      */
+
+    /*
     editRoom(state, action) {
       const stateToSet = state;
-      const {
-        hubId
-      } = action.payload;
-      const {
-        room
-      } = action.payload;
-
-      if (stateToSet[hubId]) {
-        stateToSet[hubId][room.id] = { ...room
-        };
+      const { hubId } = action.payload;
+      const { room } = action.payload;
+      if (hubId && stateToSet[hubId]) {
+        stateToSet[hubId][room.id] = { ...room };
       }
-    }
+    },
+    */
+
 
   }
 });
@@ -12223,7 +12289,7 @@ function sendRoomCmd(hubId, commandType, data) {
 /**
  * Add room to given hub
  * do not usr store.dispatch(roomsState.actions.addRoom(hubId, room)) as rooms are coming back in delta
- * @param  {string} hubI
+ * @param  {string} hubId
  * @param  {Object} room
  * @return {Promise<Object>} rooms
  */
@@ -12233,7 +12299,6 @@ async function addRoom(hubId, room) {
     sendRoomCmd(hubId, COMMANDS.CMD_SET_ROOM, [room]).then(rooms => {
       resolve(rooms);
     }).catch(error => {
-      debugger;
       reject(error);
     });
   });
@@ -12251,14 +12316,13 @@ async function editRoom(hubId, room) {
     sendRoomCmd(hubId, COMMANDS.CMD_SET_ROOM, [room]).then(rooms => {
       resolve(rooms);
     }).catch(error => {
-      debugger;
       reject(error);
     });
   });
 }
 /**
  * Remove given room of given hub
- * @param  {string} hubI
+ * @param  {string} hubId
  * @param  {Object} room
  */
 
@@ -12301,7 +12365,7 @@ function roomsDeltaHandler(hubId, reset, rooms) {
       rooms
     };
     store$3.dispatch(roomsState.actions.setRooms(stateRooms));
-  } else {
+  } else if (!isEmpty_1(rooms)) {
     // Loop rooms to check could it be added or should be removed
     Object.entries(rooms).forEach(([key, room]) => {
       const stateRoom = {
@@ -12313,6 +12377,292 @@ function roomsDeltaHandler(hubId, reset, rooms) {
         store$3.dispatch(roomsState.actions.setRoom(stateRoom));
       } else if (key && oldHubRooms[key]) {
         store$3.dispatch(roomsState.actions.removeRoom(key));
+      }
+    });
+  }
+}
+
+/**
+ * Rooms action creators object
+ * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
+ * @return { {
+ *   slice : string,
+ *   reducer : ReducerFunction,
+ *   actions : Object<string, ActionCreator},
+ *   selectors : Object<string, Selector>
+ *   }}
+ */
+
+const alarmsState = createSlice({
+  slice: 'alarms',
+  initialState: {},
+  reducers: {
+    /*
+     * Reducer action of setting alarms state - sets all given alarms of given hub, keeps existing states
+     * @param {Object} state
+     * @param {Object} action
+     */
+    setAlarms(state, action) {
+      const stateToSet = state;
+      const {
+        hubId
+      } = action.payload;
+      const {
+        alarms
+      } = action.payload;
+      const hubAlarms = {};
+      Object.entries(alarms).forEach(entry => {
+        const [id, room] = entry;
+        hubAlarms[id] = { ...room
+        };
+      });
+      stateToSet[hubId] = { ...hubAlarms
+      };
+    },
+
+    /*
+     * Reducer action of set alarm state
+     * @param {Object} state
+     * @param {Object} action
+     */
+    setAlarm(state, action) {
+      const stateToSet = state;
+      const {
+        hubId
+      } = action.payload;
+      const {
+        alarm
+      } = action.payload;
+
+      if (hubId && stateToSet[hubId]) {
+        stateToSet[hubId][alarm.id] = { ...alarm
+        };
+      }
+    },
+
+    /*
+     * Reducer action of removing alarm state
+     * @param {Object} state
+     * @param {Object} action
+     */
+    removeAlarm(state, action) {
+      const stateToSet = state;
+      const {
+        hubId
+      } = action.payload;
+      const {
+        alarmId
+      } = action.payload;
+
+      if (hubId && alarmId && stateToSet[hubId] && stateToSet[hubId][alarmId]) {
+        delete stateToSet[hubId][alarmId];
+      }
+    }
+
+  }
+});
+
+const initAlarm = alarm => {
+  const givenAlarm = alarm;
+
+  if (alarm.message) {
+    givenAlarm.messageHTML = b64DecodeUnicode(alarm.message);
+    givenAlarm.messageTxt = getTextFromNode(givenAlarm.message);
+  }
+
+  return givenAlarm;
+};
+/**
+ * Get alarms of all selected hubs
+ * @return {HUB_ALARMS_MAP_TYPE}
+ */
+
+
+function getAlarms() {
+  const stateNow = store$3.getState();
+  return alarmsState.selectors.getAlarms(stateNow);
+}
+/**
+ * Get alarms of given hub
+ * @param  {string} hubId
+ * @return {ROOMS_MAP_TYPE}
+ */
+
+function getHubAlarms(hubId) {
+  let retVal;
+  const alarms = getAlarms();
+
+  if (alarms && alarms[hubId]) {
+    retVal = alarms[hubId];
+  }
+
+  return retVal;
+}
+/**
+ * Close given alarm of given hub
+ * @param  {string} hubI
+ * @param  {Object} alarm
+ */
+
+function sendAlarmCmd(hubId, commandType, data) {
+  return new Promise((resolve, reject) => {
+    const stateNow = store$3.getState();
+    const user = userState.selectors.getUser(stateNow);
+
+    if (!user || !user.authKey) {
+      console.error('SDK closeAlarm error: No userKey!');
+      reject(new Error('Alarm command error: No userKey!'));
+      return;
+    }
+
+    const hubs = hubsState.selectors.getHubs(stateNow);
+    const hub = hubs[hubId];
+    const {
+      hubKey
+    } = hubs[hubId];
+
+    if (!hub || !hubKey) {
+      console.error('SDK closeAlarm error: No hubKey!');
+      reject(new Error('Alarm command error: No hubKey!'));
+      return;
+    }
+
+    if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
+      console.error('SDK closeAlarm error: No Hub connection');
+      reject(new Error('Alarm command error: No hub connection'));
+      return;
+    }
+
+    const {
+      authKey
+    } = user;
+
+    if (!authKey) {
+      console.error('SDK closeAlarm error: No authKey!');
+      reject(new Error('Alarm command error: No authKey!'));
+      return;
+    }
+
+    send({
+      command: commandType,
+      authKey,
+      hubId,
+      localUrl: hub.url,
+      hubKey,
+      data
+    }).then(status => {
+      console.debug('SDK sendAlarmCmd ok', status);
+      send({
+        command: COMMANDS.CMD_GET_ALARMS,
+        authKey,
+        hubId,
+        localUrl: hub.url,
+        hubKey
+      }).then(alarms => {
+        console.debug('SDK sendAlarmCmd refresh alarms ok', alarms);
+        store$3.dispatch(alarmsState.actions.setRooms({
+          hubId,
+          alarms
+        }));
+        resolve(alarms);
+      }).catch(error => {
+        console.error('SDK Alarm command error:', error);
+        reject(error);
+      });
+    }).catch(error => {
+      reject(error);
+    });
+  });
+}
+/**
+ * Remove given alarm of given hub
+ * @param  {string} hubId
+ * @param  {Object} room
+ */
+
+async function removeAlarm(hubId, alarm) {
+  const givenAlarm = alarm;
+  return new Promise((resolve, reject) => {
+    sendAlarmCmd(hubId, COMMANDS.CMD_REMOVE_ALARM, {
+      alarmId: givenAlarm.id
+    }).then(alarms => {
+      /*
+      givenAlarm.closed = true;
+      const stateAlarm = {
+        hubId,
+        alarmId: givenAlarm.id,
+      };
+      store.dispatch(alarmsState.actions.removeAlarm(stateAlarm));
+      resolve(getAlarms());
+      */
+      resolve(alarms);
+    }).catch(error => {
+      reject(error);
+    });
+  });
+}
+async function closeAlarm(hubId, alarm) {
+  const givenAlarm = alarm;
+  return new Promise((resolve, reject) => {
+    sendAlarmCmd(hubId, COMMANDS.CMD_CLOSE_ALARM, {
+      alarmId: givenAlarm.id
+    }).then(alarms => {
+      /*
+      givenAlarm.closed = true;
+      const stateAlarm = {
+        hubId,
+        alarmId: givenAlarm.id,
+      };
+      store.dispatch(alarmsState.actions.setAlarm(stateAlarm));
+      resolve(getAlarms());
+      */
+      resolve(alarms);
+    }).catch(error => {
+      reject(error);
+    });
+  });
+}
+/**
+ * Alarms handler for poll delta results
+ * @param  {string} hubId
+ * @param  {boolean} reset
+ * @param  {Object} rooms
+ */
+
+function alarmsDeltaHandler(hubId, reset, alarms) {
+  let oldHubAlarms = {};
+  const storedAlarms = getAlarms();
+
+  if (storedAlarms && storedAlarms[hubId]) {
+    oldHubAlarms = storedAlarms[hubId];
+  }
+
+  if (reset) {
+    // If reset then set rooms as they are received
+    const alarmsToBeSet = {};
+
+    if (!isEmpty_1(alarms)) {
+      Object.entries(alarms).forEach(([key, alarm]) => {
+        alarmsToBeSet[key] = initAlarm(alarm);
+      });
+    }
+
+    const stateAlarms = {
+      hubId,
+      alarmsToBeSet
+    };
+    store$3.dispatch(alarmsState.actions.setAlarms(stateAlarms));
+  } else if (!isEmpty_1(alarms)) {
+    // Loop alarms to check could it be added or should be removed
+    Object.entries(alarms).forEach(([key, alarm]) => {
+      if (key && alarm) {
+        const stateAlarm = {
+          hubId,
+          alarm: initAlarm(alarm)
+        };
+        store$3.dispatch(alarmsState.actions.setAlarm(stateAlarm));
+      } else if (key && oldHubAlarms[key]) {
+        store$3.dispatch(alarmsState.actions.removeAlarm(key));
       }
     });
   }
@@ -12900,6 +13250,17 @@ function doPoll(hubId, reset = false) {
             case 'ROOM_DELTA':
               {
                 roomsDeltaHandler(hubId, doReset, delta.rooms);
+                break;
+              }
+
+            case 'ZONE_DELTA':
+              {
+                break;
+              }
+
+            case 'ALARM_DELTA':
+              {
+                alarmsDeltaHandler(hubId, doReset, delta.alarms);
                 break;
               }
           }
@@ -14602,6 +14963,7 @@ exports.USER_STATES = USER_STATES;
 exports.acceptEula = acceptEula;
 exports.addRoom = addRoom;
 exports.changeLanguage = changeLanguage;
+exports.closeAlarm = closeAlarm;
 exports.connectHubByTokens = connectHubByTokens;
 exports.cozifyReducer = rootReducer;
 exports.deleteDevice = deleteDevice;
@@ -14610,8 +14972,10 @@ exports.doPoll = doPoll;
 exports.doPwLogin = doPwLogin;
 exports.doRemoteIdQuery = doRemoteIdQuery;
 exports.editRoom = editRoom;
+exports.getAlarms = getAlarms;
 exports.getCloudConnectionState = getCloudConnectionState;
 exports.getDevices = getDevices;
+exports.getHubAlarms = getHubAlarms;
 exports.getHubConnectionState = getHubConnectionState;
 exports.getHubDevices = getHubDevices;
 exports.getHubPairingDevices = getHubPairingDevices;
@@ -14623,6 +14987,7 @@ exports.getUserState = getUserState;
 exports.hubsState = hubsState;
 exports.identifyDevice = identifyDevice;
 exports.ignorePairingByIds = ignorePairingByIds;
+exports.removeAlarm = removeAlarm;
 exports.removeRoom = removeRoom;
 exports.selectHubById = selectHubById;
 exports.sendDeviceCmd = sendDeviceCmd;

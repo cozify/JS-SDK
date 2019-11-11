@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <base data-ice="baseUrl" href="../../../">
-  <title data-ice="title">src/connection/state.js | Cozify SDK</title>
+  <title data-ice="title">src/reducers/alarms.js | Cozify SDK</title>
   <link type="text/css" rel="stylesheet" href="css/style.css">
   <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
   <script src="script/prettify/prettify.js"></script>
@@ -131,60 +131,103 @@
 </div>
 </nav>
 
-<div class="content" data-ice="content"><h1 data-ice="title">src/connection/state.js</h1>
-<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">// 
+<div class="content" data-ice="content"><h1 data-ice="title">src/reducers/alarms.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">
+// 
 
-import { connectionsState } from &apos;../reducers/connections&apos;;
-import { hubsState } from &apos;../reducers/hubs&apos;;
-import { store } from &apos;../store&apos;;
-import { HUB_CONNECTION_STATES } from &apos;./constants&apos;;
+// This actionreducer uses internally https://github.com/mweststrate/immer, so it&apos;s safe to modify given state directly
+import { createSlice } from &apos;redux-starter-kit&apos;;
 
-
-/**
- * Change Cloud connection state
- * @param {HUB_CONNECTION_STATE_TYPE} state
- */
-export function setCloudConnectionState(state) {
-  store.dispatch(connectionsState.actions.setCloudConnectionState(state));
-}
 
 /**
- * Get Cloud connection state
- * @return {CLOUD_CONNECTION_STATE_TYPE}
+ * Rooms action creators object
+ * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
+ * @return { {
+ *   slice : string,
+ *   reducer : ReducerFunction,
+ *   actions : Object&lt;string, ActionCreator},
+ *   selectors : Object&lt;string, Selector&gt;
+ *   }}
  */
-export function getCloudConnectionState() {
-  const stateNow = store.getState();
-  return connectionsState.selectors.getConnections(stateNow).cloudState;
-}
+export const alarmsState = createSlice({
+  slice: &apos;alarms&apos;,
+  initialState: {},
+  reducers: {
+
+    /*
+     * Reducer action of setting alarms state - sets all given alarms of given hub, keeps existing states
+     * @param {Object} state
+     * @param {Object} action
+     */
+    setAlarms(state, action) {
+      const stateToSet = state;
+      const { hubId } = action.payload;
+      const { alarms } = action.payload;
+      const hubAlarms = {};
+
+
+      Object.entries(alarms).forEach((entry) =&gt; {
+        const [id, room] = entry;
+        hubAlarms[id] = { ...room };
+      });
+      stateToSet[hubId] = { ...hubAlarms };
+    },
+
+
+    /*
+     * Reducer action of set alarm state
+     * @param {Object} state
+     * @param {Object} action
+     */
+    setAlarm(state, action) {
+      const stateToSet = state;
+      const { hubId } = action.payload;
+      const { alarm } = action.payload;
+      if (hubId &amp;&amp; stateToSet[hubId]) {
+        stateToSet[hubId][alarm.id] = { ...alarm };
+      }
+    },
+
+    /*
+     * Reducer action of removing alarm state
+     * @param {Object} state
+     * @param {Object} action
+     */
+    removeAlarm(state, action) {
+      const stateToSet = state;
+      const { hubId } = action.payload;
+      const { alarmId } = action.payload;
+      if (hubId &amp;&amp; alarmId &amp;&amp; stateToSet[hubId] &amp;&amp; stateToSet[hubId][alarmId]) {
+        delete stateToSet[hubId][alarmId];
+      }
+    },
+  },
+});
+
+/*
+todos.selectors.getCompletedTodoCount = createSelector(
+  [todos.selectors.getTodos],
+  todos =&gt;
+    todos.reduce((count, todo) =&gt; (todo.completed ? count + 1 : count), 0)
+);
+*/
+
+const { actions, reducer } = alarmsState;
 
 /**
- * Change hub connection state
- * @param {{hubId: string, state: HUB_CONNECTION_STATE_TYPE}} hubAndState - hubId and new state
+ * Devices reducer
+ * @type {function} reducer
  */
-export function setHubConnectionState(paramHubAndState) {
-  const stateNow = store.getState();
-  const storedHubs = hubsState.selectors.getHubs(stateNow);
-  const hubAndState = paramHubAndState;
-  /* If hub is unconnected, lets try remote */
-  if (hubAndState.state === HUB_CONNECTION_STATES.UNCONNECTED &amp;&amp; storedHubs[hubAndState.hubId]) {
-    if (storedHubs[hubAndState.hubId].connectionState === HUB_CONNECTION_STATES.REMOTE) {
-      hubAndState.state = HUB_CONNECTION_STATES.LOCAL;
-    }
-  }
-  store.dispatch(hubsState.actions.setHubConnectionState(hubAndState));
-}
-/**
- * Get hub connection state by hub id
- * @param  {string} hubId
- * @return {HUB_CONNECTION_STATE_TYPE}
- */
-export function getHubConnectionState(hubId) {
-  const stateNow = store.getState();
-  if (hubsState.selectors.getHubs(stateNow)[hubId]) {
-    return hubsState.selectors.getHubs(stateNow)[hubId].connectionState;
-  }
-  return HUB_CONNECTION_STATES.UNCONNECTED;
-}
+export { reducer as alarmsReducer };
+
+// Extract and export each action creator by name
+/*
+console.log(addDevice({ id: 123, name: &apos;Unnamed device&apos; }))
+{type : &quot;devices/addDevice&quot;, payload : {id : 123, name: &apos;Unnamed device&apos; }}
+*/
+export const {
+  setAlarms, addAlarm, deleteAlarm, removeAlarm,
+} = actions;
 </code></pre>
 
 </div>

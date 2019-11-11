@@ -30,9 +30,17 @@
   <ul>
     
   <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-watchChanges">watchChanges</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-b64DecodeUnicode">b64DecodeUnicode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getTextFromNode">getTextFromNode</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-urlBase64Decode">urlBase64Decode</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-store">store</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-isNode">isNode</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#alarms">alarms</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-alarmsDeltaHandler">alarmsDeltaHandler</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-closeAlarm">closeAlarm</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getAlarms">getAlarms</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubAlarms">getHubAlarms</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-removeAlarm">removeAlarm</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sendAlarmCmd">sendAlarmCmd</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#connection">connection</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getCloudHost">getCloudHost</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getCloudURL">getCloudURL</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-useTestcloud">useTestcloud</a></span></span></li>
@@ -87,7 +95,9 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-HUB_STATES">HUB_STATES</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-PAIRING_POLL_INTERVAL_MS">PAIRING_POLL_INTERVAL_MS</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-POLL_INTERVAL_MS">POLL_INTERVAL_MS</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#reducers">reducers</a><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-connectionsState">connectionsState</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#reducers">reducers</a><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-alarmsState">alarmsState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setAlarms">setAlarms</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-connectionsState">connectionsState</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setCloudConnectionState">setCloudConnectionState</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-devicesState">devicesState</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setDevices">setDevices</a></span></span></li>
@@ -169,7 +179,7 @@
           
           <span data-ice="async">async</span>
           
-          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-addRoom">addRoom</a></span></span><span class="code" data-ice="signature">(hubI: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, room: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></span>&lt;<span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>&gt;</span>
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-addRoom">addRoom</a></span></span><span class="code" data-ice="signature">(hubId: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, room: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></span>&lt;<span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>&gt;</span>
         </p>
       </div>
       <div>
@@ -177,6 +187,64 @@
         
         <div data-ice="description"><p>Add room to given hub
 do not usr store.dispatch(roomsState.actions.addRoom(hubId, room)) as rooms are coming back in delta</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-alarmsDeltaHandler">alarmsDeltaHandler</a></span></span><span class="code" data-ice="signature">(hubId: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, reset: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span>, rooms: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>)</span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Alarms handler for poll delta results</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-b64DecodeUnicode">b64DecodeUnicode</a></span></span><span class="code" data-ice="signature">(encoded: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Helper method to get HTML presentation from unicode decoded base64 string</p>
 </div>
       </div>
     </td>
@@ -207,6 +275,34 @@ do not usr store.dispatch(roomsState.actions.addRoom(hubId, room)) as rooms are 
         
         <div data-ice="description"><p>User action to change current language</p>
 </div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          <span data-ice="async">async</span>
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-closeAlarm">closeAlarm</a></span></span><span class="code" data-ice="signature">(hubId: <span>*</span>, alarm: <span>*</span>): <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
       </div>
     </td>
     <td>
@@ -458,6 +554,35 @@ do not usr store.dispatch(roomsState.actions.editRoom(hubId, room)) as rooms are
           
           
           
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-getAlarms">getAlarms</a></span></span><span class="code" data-ice="signature">(): <span>HUB_ALARMS_MAP_TYPE</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Get alarms of all selected hubs</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
           <span class="code" data-ice="name"><span><a href="function/index.html#static-function-getCloudConnectionState">getCloudConnectionState</a></span></span><span class="code" data-ice="signature">(): <span><a href="typedef/index.html#static-typedef-CLOUD_CONNECTION_STATE_TYPE">CLOUD_CONNECTION_STATE_TYPE</a></span></span>
         </p>
       </div>
@@ -550,6 +675,35 @@ do not usr store.dispatch(roomsState.actions.editRoom(hubId, room)) as rooms are
         
         
         <div data-ice="description"><p>Get devices of all selected hubs</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-getHubAlarms">getHubAlarms</a></span></span><span class="code" data-ice="signature">(hubId: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span>ROOMS_MAP_TYPE</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Get alarms of given hub</p>
 </div>
       </div>
     </td>
@@ -775,6 +929,35 @@ do not usr store.dispatch(roomsState.actions.editRoom(hubId, room)) as rooms are
           
           
           
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-getTextFromNode">getTextFromNode</a></span></span><span class="code" data-ice="signature">(html: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Helper method to strip HTML presentation from string</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
           <span class="code" data-ice="name"><span><a href="function/index.html#static-function-getUserState">getUserState</a></span></span><span class="code" data-ice="signature">(): <span>USER_STATE_TYPE</span></span>
         </p>
       </div>
@@ -919,7 +1102,36 @@ do not usr store.dispatch(roomsState.actions.editRoom(hubId, room)) as rooms are
           
           <span data-ice="async">async</span>
           
-          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-removeRoom">removeRoom</a></span></span><span class="code" data-ice="signature">(hubI: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, room: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-removeAlarm">removeAlarm</a></span></span><span class="code" data-ice="signature">(hubId: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, room: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Remove given alarm of given hub</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          <span data-ice="async">async</span>
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-removeRoom">removeRoom</a></span></span><span class="code" data-ice="signature">(hubId: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, room: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -1069,6 +1281,35 @@ do not usr store.dispatch(roomsState.actions.editRoom(hubId, room)) as rooms are
         
         
         <div data-ice="description"><p>Send method for REST API</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-sendAlarmCmd">sendAlarmCmd</a></span></span><span class="code" data-ice="signature">(hubI: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, alarm: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Close given alarm of given hub</p>
 </div>
       </div>
     </td>
@@ -1784,7 +2025,7 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     
     <span data-ice="async">async</span>
     
-    <span class="code" data-ice="name">addRoom</span><span class="code" data-ice="signature">(hubI: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, room: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></span>&lt;<span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>&gt;</span>
+    <span class="code" data-ice="name">addRoom</span><span class="code" data-ice="signature">(hubId: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, room: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></span>&lt;<span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>&gt;</span>
     <span class="right-info">
       
       
@@ -1810,7 +2051,7 @@ do not usr store.dispatch(roomsState.actions.addRoom(hubId, room)) as rooms are 
     <tbody>
     
     <tr data-ice="property" data-depth="0">
-      <td data-ice="name" class="code" data-depth="0">hubI</td>
+      <td data-ice="name" class="code" data-depth="0">hubId</td>
       <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
@@ -1833,6 +2074,152 @@ do not usr store.dispatch(roomsState.actions.addRoom(hubId, room)) as rooms are 
         <tr>
           <td class="return-type code" data-ice="returnType"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></span>&lt;<span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>&gt;</td>
           <td class="return-desc" data-ice="returnDescription"><p>rooms</p>
+</td>
+        </tr>
+      </tbody>
+    </table>
+    <div data-ice="returnProperties">
+</div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="static-function-alarmsDeltaHandler">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    
+    <span class="code" data-ice="name">alarmsDeltaHandler</span><span class="code" data-ice="signature">(hubId: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, reset: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span>, rooms: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>)</span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/alarms/alarms.js.html#lineNumber165">source</a></span></span>
+    </span>
+  </h3>
+
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {alarmsDeltaHandler} from &apos;<span><a href="file/src/alarms/alarms.js.html#lineNumber165">cozify-sdk/src/alarms/alarms.js</a></span>&apos;</code></pre></div>
+  
+  
+  <div data-ice="description"><p>Alarms handler for poll delta results</p>
+</div>
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">hubId</td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">reset</td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">rooms</td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="static-function-b64DecodeUnicode">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    
+    <span class="code" data-ice="name">b64DecodeUnicode</span><span class="code" data-ice="signature">(encoded: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/utils.js.html#lineNumber58">source</a></span></span>
+    </span>
+  </h3>
+
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {b64DecodeUnicode} from &apos;<span><a href="file/src/utils.js.html#lineNumber58">cozify-sdk/src/utils.js</a></span>&apos;</code></pre></div>
+  
+  
+  <div data-ice="description"><p>Helper method to get HTML presentation from unicode decoded base64 string</p>
+</div>
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">encoded</td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"><p>string to be decoded</p>
+</td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  <div class="return-params" data-ice="returnParams">
+    <h4>Return:</h4>
+    <table>
+      <tbody>
+        <tr>
+          <td class="return-type code" data-ice="returnType"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
+          <td class="return-desc" data-ice="returnDescription"><p>decoded string</p>
 </td>
         </tr>
       </tbody>
@@ -1908,6 +2295,83 @@ do not usr store.dispatch(roomsState.actions.addRoom(hubId, room)) as rooms are 
           <td class="return-type code" data-ice="returnType"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></span></td>
           <td class="return-desc" data-ice="returnDescription"><p>true if language was set</p>
 </td>
+        </tr>
+      </tbody>
+    </table>
+    <div data-ice="returnProperties">
+</div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="static-function-closeAlarm">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    <span data-ice="async">async</span>
+    
+    <span class="code" data-ice="name">closeAlarm</span><span class="code" data-ice="signature">(hubId: <span>*</span>, alarm: <span>*</span>): <span>*</span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/alarms/alarms.js.html#lineNumber137">source</a></span></span>
+    </span>
+  </h3>
+
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {closeAlarm} from &apos;<span><a href="file/src/alarms/alarms.js.html#lineNumber137">cozify-sdk/src/alarms/alarms.js</a></span>&apos;</code></pre></div>
+  
+  
+  
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">hubId</td>
+      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">alarm</td>
+      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  <div class="return-params" data-ice="returnParams">
+    <h4>Return:</h4>
+    <table>
+      <tbody>
+        <tr>
+          <td class="return-type code" data-ice="returnType"><span>*</span></td>
+          
         </tr>
       </tbody>
     </table>
@@ -2013,11 +2477,11 @@ do not usr store.dispatch(roomsState.actions.addRoom(hubId, room)) as rooms are 
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber672">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber674">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {connectHubByTokens} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber672">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {connectHubByTokens} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber674">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Connect to the given hub - local or remote.</p>
@@ -2171,11 +2635,11 @@ do not usr store.dispatch(roomsState.actions.addRoom(hubId, room)) as rooms are 
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber462">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber463">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {doPoll} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber462">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {doPoll} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber463">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Do poll on given hub if hub connection is ok.
@@ -2332,11 +2796,11 @@ Remote polls are executed only every second call.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber87">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber88">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {doRemoteIdQuery} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber87">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {doRemoteIdQuery} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber88">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
   
   
   
@@ -2415,11 +2879,11 @@ Remote polls are executed only every second call.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/rooms/rooms.js.html#lineNumber127">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/rooms/rooms.js.html#lineNumber126">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {editRoom} from &apos;<span><a href="file/src/rooms/rooms.js.html#lineNumber127">cozify-sdk/src/rooms/rooms.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {editRoom} from &apos;<span><a href="file/src/rooms/rooms.js.html#lineNumber126">cozify-sdk/src/rooms/rooms.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Edit room of given hub
@@ -2537,6 +3001,62 @@ do not usr store.dispatch(roomsState.actions.editRoom(hubId, room)) as rooms are
       <tbody>
         <tr>
           <td class="return-type code" data-ice="returnType"><span>*</span></td>
+          
+        </tr>
+      </tbody>
+    </table>
+    <div data-ice="returnProperties">
+</div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="static-function-getAlarms">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    
+    <span class="code" data-ice="name">getAlarms</span><span class="code" data-ice="signature">(): <span>HUB_ALARMS_MAP_TYPE</span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/alarms/alarms.js.html#lineNumber26">source</a></span></span>
+    </span>
+  </h3>
+
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getAlarms} from &apos;<span><a href="file/src/alarms/alarms.js.html#lineNumber26">cozify-sdk/src/alarms/alarms.js</a></span>&apos;</code></pre></div>
+  
+  
+  <div data-ice="description"><p>Get alarms of all selected hubs</p>
+</div>
+
+  
+
+  <div data-ice="properties">
+</div>
+
+  <div class="return-params" data-ice="returnParams">
+    <h4>Return:</h4>
+    <table>
+      <tbody>
+        <tr>
+          <td class="return-type code" data-ice="returnType"><span>HUB_ALARMS_MAP_TYPE</span></td>
           
         </tr>
       </tbody>
@@ -2759,6 +3279,78 @@ do not usr store.dispatch(roomsState.actions.editRoom(hubId, room)) as rooms are
       <tbody>
         <tr>
           <td class="return-type code" data-ice="returnType"><span>HUB_DEVICES_MAP_TYPE</span></td>
+          
+        </tr>
+      </tbody>
+    </table>
+    <div data-ice="returnProperties">
+</div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="static-function-getHubAlarms">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    
+    <span class="code" data-ice="name">getHubAlarms</span><span class="code" data-ice="signature">(hubId: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span>ROOMS_MAP_TYPE</span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/alarms/alarms.js.html#lineNumber36">source</a></span></span>
+    </span>
+  </h3>
+
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getHubAlarms} from &apos;<span><a href="file/src/alarms/alarms.js.html#lineNumber36">cozify-sdk/src/alarms/alarms.js</a></span>&apos;</code></pre></div>
+  
+  
+  <div data-ice="description"><p>Get alarms of given hub</p>
+</div>
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">hubId</td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  <div class="return-params" data-ice="returnParams">
+    <h4>Return:</h4>
+    <table>
+      <tbody>
+        <tr>
+          <td class="return-type code" data-ice="returnType"><span>ROOMS_MAP_TYPE</span></td>
           
         </tr>
       </tbody>
@@ -3082,11 +3674,11 @@ do not usr store.dispatch(roomsState.actions.editRoom(hubId, room)) as rooms are
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber130">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber131">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getHubs} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber130">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getHubs} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber131">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Helper to get current hubs from state</p>
@@ -3217,6 +3809,80 @@ do not usr store.dispatch(roomsState.actions.editRoom(hubId, room)) as rooms are
         <tr>
           <td class="return-type code" data-ice="returnType"><span>HUB_ROOMS_MAP_TYPE</span></td>
           
+        </tr>
+      </tbody>
+    </table>
+    <div data-ice="returnProperties">
+</div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="static-function-getTextFromNode">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    
+    <span class="code" data-ice="name">getTextFromNode</span><span class="code" data-ice="signature">(html: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/utils.js.html#lineNumber39">source</a></span></span>
+    </span>
+  </h3>
+
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getTextFromNode} from &apos;<span><a href="file/src/utils.js.html#lineNumber39">cozify-sdk/src/utils.js</a></span>&apos;</code></pre></div>
+  
+  
+  <div data-ice="description"><p>Helper method to strip HTML presentation from string</p>
+</div>
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">html</td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"><p>HTML presentation</p>
+</td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  <div class="return-params" data-ice="returnParams">
+    <h4>Return:</h4>
+    <table>
+      <tbody>
+        <tr>
+          <td class="return-type code" data-ice="returnType"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
+          <td class="return-desc" data-ice="returnDescription"><p>text string</p>
+</td>
         </tr>
       </tbody>
     </table>
@@ -3456,11 +4122,11 @@ do not usr store.dispatch(roomsState.actions.editRoom(hubId, room)) as rooms are
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber364">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber365">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {ignorePairingByIds} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber364">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {ignorePairingByIds} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber365">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Set pairing ignore flag of given device in given hub</p>
@@ -3601,6 +4267,84 @@ do not usr store.dispatch(roomsState.actions.editRoom(hubId, room)) as rooms are
   
 </div>
 <div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="static-function-removeAlarm">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    <span data-ice="async">async</span>
+    
+    <span class="code" data-ice="name">removeAlarm</span><span class="code" data-ice="signature">(hubId: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, room: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span>*</span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/alarms/alarms.js.html#lineNumber115">source</a></span></span>
+    </span>
+  </h3>
+
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {removeAlarm} from &apos;<span><a href="file/src/alarms/alarms.js.html#lineNumber115">cozify-sdk/src/alarms/alarms.js</a></span>&apos;</code></pre></div>
+  
+  
+  <div data-ice="description"><p>Remove given alarm of given hub</p>
+</div>
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">hubId</td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">room</td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  <div class="return-params" data-ice="returnParams">
+    <h4>Return:</h4>
+    <table>
+      <tbody>
+        <tr>
+          <td class="return-type code" data-ice="returnType"><span>*</span></td>
+          
+        </tr>
+      </tbody>
+    </table>
+    <div data-ice="returnProperties">
+</div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
   <h3 data-ice="anchor" id="static-function-removeRoom">
     <span class="access" data-ice="access">public</span>
     
@@ -3608,15 +4352,15 @@ do not usr store.dispatch(roomsState.actions.editRoom(hubId, room)) as rooms are
     
     <span data-ice="async">async</span>
     
-    <span class="code" data-ice="name">removeRoom</span><span class="code" data-ice="signature">(hubI: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, room: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span>*</span></span>
+    <span class="code" data-ice="name">removeRoom</span><span class="code" data-ice="signature">(hubId: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, room: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span>*</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/rooms/rooms.js.html#lineNumber145">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/rooms/rooms.js.html#lineNumber143">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {removeRoom} from &apos;<span><a href="file/src/rooms/rooms.js.html#lineNumber145">cozify-sdk/src/rooms/rooms.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {removeRoom} from &apos;<span><a href="file/src/rooms/rooms.js.html#lineNumber143">cozify-sdk/src/rooms/rooms.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Remove given room of given hub</p>
@@ -3633,7 +4377,7 @@ do not usr store.dispatch(roomsState.actions.editRoom(hubId, room)) as rooms are
     <tbody>
     
     <tr data-ice="property" data-depth="0">
-      <td data-ice="name" class="code" data-depth="0">hubI</td>
+      <td data-ice="name" class="code" data-depth="0">hubId</td>
       <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
@@ -3820,11 +4564,11 @@ do not usr store.dispatch(roomsState.actions.editRoom(hubId, room)) as rooms are
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/rooms/rooms.js.html#lineNumber168">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/rooms/rooms.js.html#lineNumber166">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {roomsDeltaHandler} from &apos;<span><a href="file/src/rooms/rooms.js.html#lineNumber168">cozify-sdk/src/rooms/rooms.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {roomsDeltaHandler} from &apos;<span><a href="file/src/rooms/rooms.js.html#lineNumber166">cozify-sdk/src/rooms/rooms.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Rooms handler for poll delta results</p>
@@ -3892,11 +4636,11 @@ do not usr store.dispatch(roomsState.actions.editRoom(hubId, room)) as rooms are
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber597">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber599">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {selectHubById} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber597">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {selectHubById} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber599">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Select hub by id, starts hub polling</p>
@@ -4044,6 +4788,84 @@ do not usr store.dispatch(roomsState.actions.editRoom(hubId, room)) as rooms are
   .then((hubData) =&gt; {...});</code></pre>
     </div>
 </div>
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="static-function-sendAlarmCmd">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    
+    <span class="code" data-ice="name">sendAlarmCmd</span><span class="code" data-ice="signature">(hubI: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, alarm: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span>*</span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/alarms/alarms.js.html#lineNumber52">source</a></span></span>
+    </span>
+  </h3>
+
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {sendAlarmCmd} from &apos;<span><a href="file/src/alarms/alarms.js.html#lineNumber52">cozify-sdk/src/alarms/alarms.js</a></span>&apos;</code></pre></div>
+  
+  
+  <div data-ice="description"><p>Close given alarm of given hub</p>
+</div>
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">hubI</td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">alarm</td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  <div class="return-params" data-ice="returnParams">
+    <h4>Return:</h4>
+    <table>
+      <tbody>
+        <tr>
+          <td class="return-type code" data-ice="returnType"><span>*</span></td>
+          
+        </tr>
+      </tbody>
+    </table>
+    <div data-ice="returnProperties">
+</div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  
 
   
 
@@ -4685,11 +5507,11 @@ do not usr store.dispatch(roomsState.actions.editRoom(hubId, room)) as rooms are
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber264">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber265">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {startDiscoveringHubs} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber264">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {startDiscoveringHubs} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber265">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Start discovering hubs every DISCOVERY_INTERVAL_MS
@@ -4730,11 +5552,11 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber380">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber381">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {startPairingById} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber380">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {startPairingById} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber381">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Start pairing on given hub</p>
@@ -4809,11 +5631,11 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber568">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber570">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {startPollingById} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber568">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {startPollingById} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber570">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Start polling on given hub</p>
@@ -4882,11 +5704,11 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber276">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber277">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {stopDiscoveringHubs} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber276">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {stopDiscoveringHubs} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber277">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Stop discovering hubs</p>
@@ -4926,11 +5748,11 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber398">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber399">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {stopPairingById} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber398">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {stopPairingById} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber399">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Stop pairing on given hub</p>
@@ -4998,11 +5820,11 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber436">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber437">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {stopPairings} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber436">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {stopPairings} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber437">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Stop pairing on all hubs</p>
@@ -5055,11 +5877,11 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber585">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber587">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {stopPollingById} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber585">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {stopPollingById} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber587">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Stop polling on given hub</p>
@@ -5200,11 +6022,11 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber643">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber645">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {unSelectHubById} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber643">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {unSelectHubById} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber645">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Unselect hub by id, stops hub polling</p>
@@ -5274,11 +6096,11 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber657">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/hubs/hubs.js.html#lineNumber659">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {unSelectHubs} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber657">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {unSelectHubs} from &apos;<span><a href="file/src/hubs/hubs.js.html#lineNumber659">cozify-sdk/src/hubs/hubs.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Unselect hubs, stops hub pollings</p>
@@ -5409,11 +6231,11 @@ Sequence includes requests of hub-keys, remote meta-infos, lan-ips and local met
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/utils.js.html#lineNumber27">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/utils.js.html#lineNumber77">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {urlBase64Decode} from &apos;<span><a href="file/src/utils.js.html#lineNumber27">cozify-sdk/src/utils.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {urlBase64Decode} from &apos;<span><a href="file/src/utils.js.html#lineNumber77">cozify-sdk/src/utils.js</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Helper method to Base64 decode</p>

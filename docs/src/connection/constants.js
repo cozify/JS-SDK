@@ -83,6 +83,9 @@ export const COMMANDS = Object.freeze({
     method: 'PUT', url: 'hub/remote/cc/$API_VER/rooms', type: 'CMD_ROOM', params: ['id', 'name', 'order'],
   },
   CMD_REMOVE_ROOM: { method: 'DELETE', url: 'hub/remote/cc/$API_VER/rooms', urlParams: ['roomId'] },
+  CMD_GET_ALARMS: { method: 'GET', url: 'hub/remote/cc/$API_VER/alarms' },
+  CMD_CLOSE_ALARM: { method: 'PUT', url: 'hub/remote/cc/$API_VER/alarms/close', urlParams: ['alarmId'] },
+  CMD_REMOVE_ALARM: { method: 'DELETE', url: 'hub/remote/cc/$API_VER/alarms', urlParams: ['roomId'] },
 });
 
 

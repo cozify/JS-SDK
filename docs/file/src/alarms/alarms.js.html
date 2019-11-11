@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <base data-ice="baseUrl" href="../../../">
-  <title data-ice="title">src/connection/state.js | Cozify SDK</title>
+  <title data-ice="title">src/alarms/alarms.js | Cozify SDK</title>
   <link type="text/css" rel="stylesheet" href="css/style.css">
   <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
   <script src="script/prettify/prettify.js"></script>
@@ -131,59 +131,209 @@
 </div>
 </nav>
 
-<div class="content" data-ice="content"><h1 data-ice="title">src/connection/state.js</h1>
+<div class="content" data-ice="content"><h1 data-ice="title">src/alarms/alarms.js</h1>
 <pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">// 
-
-import { connectionsState } from &apos;../reducers/connections&apos;;
-import { hubsState } from &apos;../reducers/hubs&apos;;
+import isEmpty from &apos;lodash/isEmpty&apos;;
+// import isArray from &apos;lodash/isArray&apos;;
+// import pick from &apos;lodash/pick&apos;;
 import { store } from &apos;../store&apos;;
-import { HUB_CONNECTION_STATES } from &apos;./constants&apos;;
+import { alarmsState } from &apos;../reducers/alarms&apos;;
+import { hubsState } from &apos;../reducers/hubs&apos;;
+import { userState } from &apos;../reducers/user&apos;;
+import { b64DecodeUnicode, getTextFromNode } from &apos;../utils&apos;;
+import { send, COMMANDS } from &apos;../connection/send&apos;;
+import { HUB_CONNECTION_STATES } from &apos;../connection/constants&apos;;
 
-
-/**
- * Change Cloud connection state
- * @param {HUB_CONNECTION_STATE_TYPE} state
- */
-export function setCloudConnectionState(state) {
-  store.dispatch(connectionsState.actions.setCloudConnectionState(state));
-}
-
-/**
- * Get Cloud connection state
- * @return {CLOUD_CONNECTION_STATE_TYPE}
- */
-export function getCloudConnectionState() {
-  const stateNow = store.getState();
-  return connectionsState.selectors.getConnections(stateNow).cloudState;
-}
-
-/**
- * Change hub connection state
- * @param {{hubId: string, state: HUB_CONNECTION_STATE_TYPE}} hubAndState - hubId and new state
- */
-export function setHubConnectionState(paramHubAndState) {
-  const stateNow = store.getState();
-  const storedHubs = hubsState.selectors.getHubs(stateNow);
-  const hubAndState = paramHubAndState;
-  /* If hub is unconnected, lets try remote */
-  if (hubAndState.state === HUB_CONNECTION_STATES.UNCONNECTED &amp;&amp; storedHubs[hubAndState.hubId]) {
-    if (storedHubs[hubAndState.hubId].connectionState === HUB_CONNECTION_STATES.REMOTE) {
-      hubAndState.state = HUB_CONNECTION_STATES.LOCAL;
-    }
+const initAlarm = (alarm) =&gt; {
+  const givenAlarm = alarm;
+  if (alarm.message) {
+    givenAlarm.messageHTML = b64DecodeUnicode(alarm.message);
+    givenAlarm.messageTxt = getTextFromNode(givenAlarm.message);
   }
-  store.dispatch(hubsState.actions.setHubConnectionState(hubAndState));
-}
+  return givenAlarm;
+};
+
 /**
- * Get hub connection state by hub id
+ * Get alarms of all selected hubs
+ * @return {HUB_ALARMS_MAP_TYPE}
+ */
+export function getAlarms() {
+  const stateNow = store.getState();
+  return alarmsState.selectors.getAlarms(stateNow);
+}
+
+/**
+ * Get alarms of given hub
  * @param  {string} hubId
- * @return {HUB_CONNECTION_STATE_TYPE}
+ * @return {ROOMS_MAP_TYPE}
  */
-export function getHubConnectionState(hubId) {
-  const stateNow = store.getState();
-  if (hubsState.selectors.getHubs(stateNow)[hubId]) {
-    return hubsState.selectors.getHubs(stateNow)[hubId].connectionState;
+export function getHubAlarms(hubId) {
+  let retVal;
+  const alarms = getAlarms();
+  if (alarms &amp;&amp; alarms[hubId]) {
+    retVal = alarms[hubId];
   }
-  return HUB_CONNECTION_STATES.UNCONNECTED;
+  return retVal;
+}
+
+
+/**
+ * Close given alarm of given hub
+ * @param  {string} hubI
+ * @param  {Object} alarm
+ */
+
+export function sendAlarmCmd(hubId, commandType, data) {
+  return new Promise((resolve, reject) =&gt; {
+    const stateNow = store.getState();
+    const user = userState.selectors.getUser(stateNow);
+
+    if (!user || !user.authKey) {
+      console.error(&apos;SDK closeAlarm error: No userKey!&apos;);
+      reject(new Error(&apos;Alarm command error: No userKey!&apos;));
+      return;
+    }
+
+    const hubs = hubsState.selectors.getHubs(stateNow);
+    const hub = hubs[hubId];
+    const { hubKey } = hubs[hubId];
+    if (!hub || !hubKey) {
+      console.error(&apos;SDK closeAlarm error: No hubKey!&apos;);
+      reject(new Error(&apos;Alarm command error: No hubKey!&apos;));
+      return;
+    }
+
+    if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL &amp;&amp; hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
+      console.error(&apos;SDK closeAlarm error: No Hub connection&apos;);
+      reject(new Error(&apos;Alarm command error: No hub connection&apos;));
+      return;
+    }
+
+    const { authKey } = user;
+    if (!authKey) {
+      console.error(&apos;SDK closeAlarm error: No authKey!&apos;);
+      reject(new Error(&apos;Alarm command error: No authKey!&apos;));
+      return;
+    }
+
+    send({
+      command: commandType, authKey, hubId, localUrl: hub.url, hubKey, data,
+    })
+      .then((status) =&gt; {
+        console.debug(&apos;SDK sendAlarmCmd ok&apos;, status);
+        send({
+          command: COMMANDS.CMD_GET_ALARMS, authKey, hubId, localUrl: hub.url, hubKey,
+        })
+          .then((alarms) =&gt; {
+            console.debug(&apos;SDK sendAlarmCmd refresh alarms ok&apos;, alarms);
+            store.dispatch(alarmsState.actions.setRooms({ hubId, alarms }));
+            resolve(alarms);
+          })
+          .catch((error) =&gt; {
+            console.error(&apos;SDK Alarm command error:&apos;, error);
+            reject(error);
+          });
+      })
+      .catch((error) =&gt; {
+        reject(error);
+      });
+  });
+}
+
+
+/**
+ * Remove given alarm of given hub
+ * @param  {string} hubId
+ * @param  {Object} room
+ */
+export async function removeAlarm(hubId, alarm) {
+  const givenAlarm = alarm;
+  return new Promise((resolve, reject) =&gt; {
+    sendAlarmCmd(hubId, COMMANDS.CMD_REMOVE_ALARM, { alarmId: givenAlarm.id })
+      .then((alarms) =&gt; {
+        /*
+        givenAlarm.closed = true;
+        const stateAlarm = {
+          hubId,
+          alarmId: givenAlarm.id,
+        };
+        store.dispatch(alarmsState.actions.removeAlarm(stateAlarm));
+        resolve(getAlarms());
+        */
+        resolve(alarms);
+      })
+      .catch((error) =&gt; {
+        reject(error);
+      });
+  });
+}
+
+export async function closeAlarm(hubId, alarm) {
+  const givenAlarm = alarm;
+  return new Promise((resolve, reject) =&gt; {
+    sendAlarmCmd(hubId, COMMANDS.CMD_CLOSE_ALARM, { alarmId: givenAlarm.id })
+      .then((alarms) =&gt; {
+        /*
+        givenAlarm.closed = true;
+        const stateAlarm = {
+          hubId,
+          alarmId: givenAlarm.id,
+        };
+        store.dispatch(alarmsState.actions.setAlarm(stateAlarm));
+        resolve(getAlarms());
+        */
+        resolve(alarms);
+      })
+      .catch((error) =&gt; {
+        reject(error);
+      });
+  });
+}
+
+/**
+ * Alarms handler for poll delta results
+ * @param  {string} hubId
+ * @param  {boolean} reset
+ * @param  {Object} rooms
+ */
+export function alarmsDeltaHandler(hubId, reset, alarms) {
+  let oldHubAlarms = {};
+  const storedAlarms = getAlarms();
+  if (storedAlarms &amp;&amp; storedAlarms[hubId]) {
+    oldHubAlarms = storedAlarms[hubId];
+  }
+
+  if (reset) {
+    // If reset then set rooms as they are received
+
+    const alarmsToBeSet = {};
+
+    if (!isEmpty(alarms)) {
+      Object.entries(alarms).forEach(([key, alarm]) =&gt; {
+        alarmsToBeSet[key] = initAlarm(alarm);
+      });
+    }
+
+    const stateAlarms = {
+      hubId,
+      alarmsToBeSet,
+    };
+
+    store.dispatch(alarmsState.actions.setAlarms(stateAlarms));
+  } else if (!isEmpty(alarms)) {
+    // Loop alarms to check could it be added or should be removed
+    Object.entries(alarms).forEach(([key, alarm]) =&gt; {
+      if (key &amp;&amp; alarm) {
+        const stateAlarm = {
+          hubId,
+          alarm: initAlarm(alarm),
+        };
+        store.dispatch(alarmsState.actions.setAlarm(stateAlarm));
+      } else if (key &amp;&amp; oldHubAlarms[key]) {
+        store.dispatch(alarmsState.actions.removeAlarm(key));
+      }
+    });
+  }
 }
 </code></pre>
 

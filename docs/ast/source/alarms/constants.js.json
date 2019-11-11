@@ -1,0 +1,162 @@
+{
+  "type": "File",
+  "start": 0,
+  "end": 1106,
+  "loc": {
+    "start": {
+      "line": 1,
+      "column": 0
+    },
+    "end": {
+      "line": 16,
+      "column": 0
+    }
+  },
+  "program": {
+    "type": "Program",
+    "start": 0,
+    "end": 1106,
+    "loc": {
+      "start": {
+        "line": 1,
+        "column": 0
+      },
+      "end": {
+        "line": 16,
+        "column": 0
+      }
+    },
+    "sourceType": "module",
+    "body": [],
+    "directives": [],
+    "leadingComments": null,
+    "innerComments": [
+      {
+        "type": "CommentLine",
+        "value": " ",
+        "start": 0,
+        "end": 3,
+        "loc": {
+          "start": {
+            "line": 1,
+            "column": 0
+          },
+          "end": {
+            "line": 1,
+            "column": 3
+          }
+        }
+      },
+      {
+        "type": "CommentBlock",
+        "value": "\nclosed: false\ncreatedAtMs: 1573477740542\nid: \"f9fbd96b-f436-44f8-ba11-4be7aee1238a\"\nlevel: \"err\"\nmessage: \"PGRpdiBjbGFzcz0iaGVhZGVyIj48aDIgY2xhc3M9InRpdGxlIj5NdXJ0b2jDpGx5dHlzITwvaDI+PC9kaXY+CiAgPGRpdiBjbGFzcz0iZGV2aWNlSWNvbnMiPjxkaXYgY2xhc3M9ImRldmljZSB0ZXh0LWNlbnRlciI+CjxkaXYgY2xhc3M9ImNvbnRhaW5lciI+CjxpIGNsYXNzPSJib3JkZXIgaWNvbi1kZXZpY2UtY2lyY2xlIj48L2k+CjxpIGNsYXNzPSJpY29uIGljb24tbW90aW9uZGV0ZWN0b3IiPjwvaT4KPC9kaXY+CjxkaXYgY2xhc3M9Im5hbWUiPkxpaWtldHTDpCBtYWtrYXJpc3NhITwvZGl2Pgo8L2Rpdj4KICAgIDxkaXYgY2xhc3M9ImNsZWFyZXIiPjwvZGl2PgogIDwvZGl2PgogIDxkaXYgY2xhc3M9Im5vdGlmaWNhdGlvbkNvbnRlbnQiPgogICAgPGgxPk11cnRvaMOkbHl0eXM8L2gxPgogICAgPHA+QXN1bm5vc3Nhc2kgb24gaGF2YWl0dHUgbGlpa2V0dMOkLiBUYXJraXN0YSB0aWxhbm5lIGthbWVyYW4gYXZ1bGxhIGphIHNvaXRhIHRhcnZpdHRhZXNzYSBow6R0w6RudW1lcm9vbiAxMTIuPC9wPgogICAgPGEgaHJlZj0idGVsOjExMiIgY2xhc3M9ImJ1dHRvbiB0cmFuc3BhcmVudCI+CiAgICAgIDxkaXYgY2xhc3M9Im1ha2VDYWxsIj5Tb2l0YSAxMTI8L2Rpdj4KICAgIDwvYT4KICA8L2Rpdj48L2Rpdj4=\"\nname: \"LT Security Alarm\"\nsourceId: \"b0d685d8-5270-411b-8d1e-2c45c31c8f07\"\ntimestamp: 1573477740542\ntitle: \"Murtohälytys\"\ntype: \"USER_ALARM\"\n",
+        "start": 4,
+        "end": 1103,
+        "loc": {
+          "start": {
+            "line": 2,
+            "column": 0
+          },
+          "end": {
+            "line": 13,
+            "column": 2
+          }
+        }
+      }
+    ]
+  },
+  "comments": [
+    {
+      "type": "CommentLine",
+      "value": " ",
+      "start": 0,
+      "end": 3,
+      "loc": {
+        "start": {
+          "line": 1,
+          "column": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 3
+        }
+      }
+    },
+    {
+      "type": "CommentBlock",
+      "value": "\nclosed: false\ncreatedAtMs: 1573477740542\nid: \"f9fbd96b-f436-44f8-ba11-4be7aee1238a\"\nlevel: \"err\"\nmessage: \"PGRpdiBjbGFzcz0iaGVhZGVyIj48aDIgY2xhc3M9InRpdGxlIj5NdXJ0b2jDpGx5dHlzITwvaDI+PC9kaXY+CiAgPGRpdiBjbGFzcz0iZGV2aWNlSWNvbnMiPjxkaXYgY2xhc3M9ImRldmljZSB0ZXh0LWNlbnRlciI+CjxkaXYgY2xhc3M9ImNvbnRhaW5lciI+CjxpIGNsYXNzPSJib3JkZXIgaWNvbi1kZXZpY2UtY2lyY2xlIj48L2k+CjxpIGNsYXNzPSJpY29uIGljb24tbW90aW9uZGV0ZWN0b3IiPjwvaT4KPC9kaXY+CjxkaXYgY2xhc3M9Im5hbWUiPkxpaWtldHTDpCBtYWtrYXJpc3NhITwvZGl2Pgo8L2Rpdj4KICAgIDxkaXYgY2xhc3M9ImNsZWFyZXIiPjwvZGl2PgogIDwvZGl2PgogIDxkaXYgY2xhc3M9Im5vdGlmaWNhdGlvbkNvbnRlbnQiPgogICAgPGgxPk11cnRvaMOkbHl0eXM8L2gxPgogICAgPHA+QXN1bm5vc3Nhc2kgb24gaGF2YWl0dHUgbGlpa2V0dMOkLiBUYXJraXN0YSB0aWxhbm5lIGthbWVyYW4gYXZ1bGxhIGphIHNvaXRhIHRhcnZpdHRhZXNzYSBow6R0w6RudW1lcm9vbiAxMTIuPC9wPgogICAgPGEgaHJlZj0idGVsOjExMiIgY2xhc3M9ImJ1dHRvbiB0cmFuc3BhcmVudCI+CiAgICAgIDxkaXYgY2xhc3M9Im1ha2VDYWxsIj5Tb2l0YSAxMTI8L2Rpdj4KICAgIDwvYT4KICA8L2Rpdj48L2Rpdj4=\"\nname: \"LT Security Alarm\"\nsourceId: \"b0d685d8-5270-411b-8d1e-2c45c31c8f07\"\ntimestamp: 1573477740542\ntitle: \"Murtohälytys\"\ntype: \"USER_ALARM\"\n",
+      "start": 4,
+      "end": 1103,
+      "loc": {
+        "start": {
+          "line": 2,
+          "column": 0
+        },
+        "end": {
+          "line": 13,
+          "column": 2
+        }
+      }
+    }
+  ],
+  "tokens": [
+    {
+      "type": "CommentLine",
+      "value": " ",
+      "start": 0,
+      "end": 3,
+      "loc": {
+        "start": {
+          "line": 1,
+          "column": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 3
+        }
+      }
+    },
+    {
+      "type": "CommentBlock",
+      "value": "\nclosed: false\ncreatedAtMs: 1573477740542\nid: \"f9fbd96b-f436-44f8-ba11-4be7aee1238a\"\nlevel: \"err\"\nmessage: \"PGRpdiBjbGFzcz0iaGVhZGVyIj48aDIgY2xhc3M9InRpdGxlIj5NdXJ0b2jDpGx5dHlzITwvaDI+PC9kaXY+CiAgPGRpdiBjbGFzcz0iZGV2aWNlSWNvbnMiPjxkaXYgY2xhc3M9ImRldmljZSB0ZXh0LWNlbnRlciI+CjxkaXYgY2xhc3M9ImNvbnRhaW5lciI+CjxpIGNsYXNzPSJib3JkZXIgaWNvbi1kZXZpY2UtY2lyY2xlIj48L2k+CjxpIGNsYXNzPSJpY29uIGljb24tbW90aW9uZGV0ZWN0b3IiPjwvaT4KPC9kaXY+CjxkaXYgY2xhc3M9Im5hbWUiPkxpaWtldHTDpCBtYWtrYXJpc3NhITwvZGl2Pgo8L2Rpdj4KICAgIDxkaXYgY2xhc3M9ImNsZWFyZXIiPjwvZGl2PgogIDwvZGl2PgogIDxkaXYgY2xhc3M9Im5vdGlmaWNhdGlvbkNvbnRlbnQiPgogICAgPGgxPk11cnRvaMOkbHl0eXM8L2gxPgogICAgPHA+QXN1bm5vc3Nhc2kgb24gaGF2YWl0dHUgbGlpa2V0dMOkLiBUYXJraXN0YSB0aWxhbm5lIGthbWVyYW4gYXZ1bGxhIGphIHNvaXRhIHRhcnZpdHRhZXNzYSBow6R0w6RudW1lcm9vbiAxMTIuPC9wPgogICAgPGEgaHJlZj0idGVsOjExMiIgY2xhc3M9ImJ1dHRvbiB0cmFuc3BhcmVudCI+CiAgICAgIDxkaXYgY2xhc3M9Im1ha2VDYWxsIj5Tb2l0YSAxMTI8L2Rpdj4KICAgIDwvYT4KICA8L2Rpdj48L2Rpdj4=\"\nname: \"LT Security Alarm\"\nsourceId: \"b0d685d8-5270-411b-8d1e-2c45c31c8f07\"\ntimestamp: 1573477740542\ntitle: \"Murtohälytys\"\ntype: \"USER_ALARM\"\n",
+      "start": 4,
+      "end": 1103,
+      "loc": {
+        "start": {
+          "line": 2,
+          "column": 0
+        },
+        "end": {
+          "line": 13,
+          "column": 2
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "eof",
+        "beforeExpr": false,
+        "startsExpr": false,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null,
+        "updateContext": null
+      },
+      "start": 1106,
+      "end": 1106,
+      "loc": {
+        "start": {
+          "line": 16,
+          "column": 0
+        },
+        "end": {
+          "line": 16,
+          "column": 0
+        }
+      }
+    }
+  ]
+}

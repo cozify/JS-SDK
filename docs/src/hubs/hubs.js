@@ -9,6 +9,7 @@ import { COMMANDS, send, sendAll } from '../connection/send';
 
 import { devicesDeltaHandler, pairingDevicesDeltaHandler } from '../devices/devices';
 import { roomsDeltaHandler } from '../rooms/rooms';
+import { alarmsDeltaHandler } from '../alarms/alarms';
 import { urlBase64Decode } from '../utils';
 import { store, watchChanges } from '../store';
 import { hubsState } from '../reducers/hubs';
@@ -539,6 +540,7 @@ export function doPoll(hubId, reset = false) {
                 break;
               }
               case 'ALARM_DELTA': {
+                alarmsDeltaHandler(hubId, doReset, delta.alarms);
                 break;
               }
               default: {

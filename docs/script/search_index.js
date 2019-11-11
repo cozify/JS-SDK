@@ -96,6 +96,24 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
+    "cozify-sdk/src/alarms/alarms.js~alarmsdeltahandler",
+    "function/index.html#static-function-alarmsDeltaHandler",
+    "<span>alarmsDeltaHandler</span> <span class=\"search-result-import-path\">cozify-sdk/src/alarms/alarms.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/reducers/alarms.js~alarmsstate",
+    "variable/index.html#static-variable-alarmsState",
+    "<span>alarmsState</span> <span class=\"search-result-import-path\">cozify-sdk/src/reducers/alarms.js</span>",
+    "variable"
+  ],
+  [
+    "cozify-sdk/src/utils.js~b64decodeunicode",
+    "function/index.html#static-function-b64DecodeUnicode",
+    "<span>b64DecodeUnicode</span> <span class=\"search-result-import-path\">cozify-sdk/src/utils.js</span>",
+    "function"
+  ],
+  [
     "cozify-sdk/src/user/user.js~changelanguage",
     "function/index.html#static-function-changeLanguage",
     "<span>changeLanguage</span> <span class=\"search-result-import-path\">cozify-sdk/src/user/user.js</span>",
@@ -106,6 +124,12 @@ window.esdocSearchIndex = [
     "variable/index.html#static-variable-changeState",
     "<span>changeState</span> <span class=\"search-result-import-path\">cozify-sdk/src/reducers/user.js</span>",
     "variable"
+  ],
+  [
+    "cozify-sdk/src/alarms/alarms.js~closealarm",
+    "function/index.html#static-function-closeAlarm",
+    "<span>closeAlarm</span> <span class=\"search-result-import-path\">cozify-sdk/src/alarms/alarms.js</span>",
+    "function"
   ],
   [
     "cozify-sdk/src/connection/send-utilities.js~clouderrorstate",
@@ -168,6 +192,12 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
+    "cozify-sdk/src/alarms/alarms.js~getalarms",
+    "function/index.html#static-function-getAlarms",
+    "<span>getAlarms</span> <span class=\"search-result-import-path\">cozify-sdk/src/alarms/alarms.js</span>",
+    "function"
+  ],
+  [
     "cozify-sdk/src/connection/state.js~getcloudconnectionstate",
     "function/index.html#static-function-getCloudConnectionState",
     "<span>getCloudConnectionState</span> <span class=\"search-result-import-path\">cozify-sdk/src/connection/state.js</span>",
@@ -189,6 +219,12 @@ window.esdocSearchIndex = [
     "cozify-sdk/src/devices/devices.js~getdevices",
     "function/index.html#static-function-getDevices",
     "<span>getDevices</span> <span class=\"search-result-import-path\">cozify-sdk/src/devices/devices.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/alarms/alarms.js~gethubalarms",
+    "function/index.html#static-function-getHubAlarms",
+    "<span>getHubAlarms</span> <span class=\"search-result-import-path\">cozify-sdk/src/alarms/alarms.js</span>",
     "function"
   ],
   [
@@ -231,6 +267,12 @@ window.esdocSearchIndex = [
     "cozify-sdk/src/rooms/rooms.js~getrooms",
     "function/index.html#static-function-getRooms",
     "<span>getRooms</span> <span class=\"search-result-import-path\">cozify-sdk/src/rooms/rooms.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/utils.js~gettextfromnode",
+    "function/index.html#static-function-getTextFromNode",
+    "<span>getTextFromNode</span> <span class=\"search-result-import-path\">cozify-sdk/src/utils.js</span>",
     "function"
   ],
   [
@@ -282,6 +324,12 @@ window.esdocSearchIndex = [
     "variable"
   ],
   [
+    "cozify-sdk/src/alarms/alarms.js~removealarm",
+    "function/index.html#static-function-removeAlarm",
+    "<span>removeAlarm</span> <span class=\"search-result-import-path\">cozify-sdk/src/alarms/alarms.js</span>",
+    "function"
+  ],
+  [
     "cozify-sdk/src/rooms/rooms.js~removeroom",
     "function/index.html#static-function-removeRoom",
     "<span>removeRoom</span> <span class=\"search-result-import-path\">cozify-sdk/src/rooms/rooms.js</span>",
@@ -330,6 +378,12 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
+    "cozify-sdk/src/alarms/alarms.js~sendalarmcmd",
+    "function/index.html#static-function-sendAlarmCmd",
+    "<span>sendAlarmCmd</span> <span class=\"search-result-import-path\">cozify-sdk/src/alarms/alarms.js</span>",
+    "function"
+  ],
+  [
     "cozify-sdk/src/connection/send.js~sendall",
     "function/index.html#static-function-sendAll",
     "<span>sendAll</span> <span class=\"search-result-import-path\">cozify-sdk/src/connection/send.js</span>",
@@ -352,6 +406,12 @@ window.esdocSearchIndex = [
     "function/index.html#static-function-sendRoomCmd",
     "<span>sendRoomCmd</span> <span class=\"search-result-import-path\">cozify-sdk/src/rooms/rooms.js</span>",
     "function"
+  ],
+  [
+    "cozify-sdk/src/reducers/alarms.js~setalarms",
+    "variable/index.html#static-variable-setAlarms",
+    "<span>setAlarms</span> <span class=\"search-result-import-path\">cozify-sdk/src/reducers/alarms.js</span>",
+    "variable"
   ],
   [
     "cozify-sdk/src/user/user.js~setauthenticated",
@@ -786,6 +846,18 @@ window.esdocSearchIndex = [
     "external"
   ],
   [
+    "src/alarms/alarms.js",
+    "file/src/alarms/alarms.js.html",
+    "src/alarms/alarms.js",
+    "file"
+  ],
+  [
+    "src/alarms/constants.js",
+    "file/src/alarms/constants.js.html",
+    "src/alarms/constants.js",
+    "file"
+  ],
+  [
     "src/connection/constants.js",
     "file/src/connection/constants.js.html",
     "src/connection/constants.js",
@@ -873,6 +945,12 @@ window.esdocSearchIndex = [
     "src/index.js",
     "file/src/index.js.html",
     "src/index.js",
+    "file"
+  ],
+  [
+    "src/reducers/alarms.js",
+    "file/src/reducers/alarms.js.html",
+    "src/reducers/alarms.js",
     "file"
   ],
   [

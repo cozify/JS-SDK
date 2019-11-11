@@ -1,8 +1,15 @@
 {
-  "coverage": "64.39%",
-  "expectCount": 132,
-  "actualCount": 85,
+  "coverage": "64.82%",
+  "expectCount": 145,
+  "actualCount": 94,
   "files": {
+    "src/alarms/alarms.js": {
+      "expectCount": 7,
+      "actualCount": 6,
+      "undocumentLines": [
+        13
+      ]
+    },
     "src/connection/constants.js": {
       "expectCount": 9,
       "actualCount": 3,
@@ -73,17 +80,25 @@
       "expectCount": 36,
       "actualCount": 25,
       "undocumentLines": [
-        19,
-        284,
+        20,
         285,
         286,
         287,
-        392,
-        448,
+        288,
+        393,
         449,
         450,
         451,
-        452
+        452,
+        453
+      ]
+    },
+    "src/reducers/alarms.js": {
+      "expectCount": 3,
+      "actualCount": 1,
+      "undocumentLines": [
+        81,
+        94
       ]
     },
     "src/reducers/connections.js": {
@@ -168,10 +183,11 @@
       "undocumentLines": []
     },
     "src/utils.js": {
-      "expectCount": 3,
-      "actualCount": 2,
+      "expectCount": 6,
+      "actualCount": 4,
       "undocumentLines": [
-        20
+        20,
+        22
       ]
     }
   }
