@@ -44,6 +44,9 @@ export {
   closeAlarm, removeAlarm,
 } from './alarms/alarms';
 
+export {
+  urlBase64Decode,
+} from './utils';
 
 export { devicesState, setDevices, deleteDevice } from './reducers/devices';
 export { hubsState, updateHubs } from './reducers/hubs';

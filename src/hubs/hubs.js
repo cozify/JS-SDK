@@ -212,7 +212,7 @@ function storedUser(): Object {
 /*
  * Make hubsMap by fetching hub meta data from cloud and local
  */
-function makeHubsMap(tokens: HUB_KEYS_TYPE, sync: boolean = false): Promise<Object> {
+function makeHubsMap(tokens: HUB_KEYS_TYPE, doCloudDicovery: boolean = true, doSynchnonously: boolean = false): Promise<Object> {
   const { authKey } = storedUser();
   return new Promise((resolve) => {
     hubsMap = extractHubInfo(tokens);
@@ -221,10 +221,22 @@ function makeHubsMap(tokens: HUB_KEYS_TYPE, sync: boolean = false): Promise<Obje
       .finally(() => {
         // Hubs map may be changed during fetching cloud metadata
         store.dispatch(hubsState.actions.updateHubs(hubsMap));
-        if (sync) {
-          doCloudDiscovery().then(() => resolve(getHubs())).catch(() => resolve(getHubs()));
+        if (doSynchnonously) {
+          if (doCloudDicovery) {
+            doCloudDiscovery()
+              .then(() => {
+                resolve(getHubs());
+              })
+              .catch(() => {
+                resolve(getHubs());
+              });
+          } else {
+            resolve(getHubs());
+          }
         } else {
-          doCloudDiscovery();
+          if (doCloudDicovery) {
+            doCloudDiscovery();
+          }
           resolve(getHubs());
         }
       });
@@ -669,10 +681,11 @@ export function unSelectHubs() {
  * Connect to the given hub - local or remote.
  * @param  {string} hubId
  * @param  {string} hubKey
- * @param  {boolean} true to wait local hubs reply, false to start with remote connection
+ * @param  {boolean} discovery true to make remote discovery, false to start without discovery
+ * @param  {boolean} sync true to wait local hubs reply (in case of discovery), false to start with remote connection
  * @return {Promise} current hubs, should not reject never
  */
-export function connectHubByTokens(hubId: string, hubKey: string, sync: boolean = true): Promise<Object> {
+export function connectHubByTokens(hubId: string, hubKey: string, discovery: boolean = false, sync: boolean = true): Promise<Object> {
   return new Promise((resolve, reject) => {
     const { authKey } = storedUser();
     if (!hubId) reject(new Error('No Hub Id'));
@@ -680,7 +693,7 @@ export function connectHubByTokens(hubId: string, hubKey: string, sync: boolean 
     if (!authKey) reject(new Error('No AuthKey'));
     const tokens = {};
     tokens[hubId] = hubKey;
-    makeHubsMap(tokens, sync).then(() => {
+    makeHubsMap(tokens, discovery, sync).then(() => {
       selectHubById(hubId, false).then(() => {
         resolve(getHubs());
       }).catch((error) => reject(error));
