@@ -8466,7 +8466,7 @@ function storedUser$1() {
  */
 
 
-function makeHubsMap(tokens, sync = false) {
+function makeHubsMap(tokens, doCloudDicovery = true, doSynchnonously = false) {
   const {
     authKey
   } = storedUser$1();
@@ -8477,10 +8477,21 @@ function makeHubsMap(tokens, sync = false) {
       // Hubs map may be changed during fetching cloud metadata
       store.dispatch(hubsState.actions.updateHubs(hubsMap));
 
-      if (sync) {
-        doCloudDiscovery().then(() => resolve(getHubs())).catch(() => resolve(getHubs()));
+      if (doSynchnonously) {
+        if (doCloudDicovery) {
+          doCloudDiscovery().then(() => {
+            resolve(getHubs());
+          }).catch(() => {
+            resolve(getHubs());
+          });
+        } else {
+          resolve(getHubs());
+        }
       } else {
-        doCloudDiscovery();
+        if (doCloudDicovery) {
+          doCloudDiscovery();
+        }
+
         resolve(getHubs());
       }
     });
@@ -8991,11 +9002,12 @@ function unSelectHubs() {
  * Connect to the given hub - local or remote.
  * @param  {string} hubId
  * @param  {string} hubKey
- * @param  {boolean} true to wait local hubs reply, false to start with remote connection
+ * @param  {boolean} discovery true to make remote discovery, false to start without discovery
+ * @param  {boolean} sync true to wait local hubs reply (in case of discovery), false to start with remote connection
  * @return {Promise} current hubs, should not reject never
  */
 
-function connectHubByTokens(hubId, hubKey, sync = true) {
+function connectHubByTokens(hubId, hubKey, discovery = false, sync = true) {
   return new Promise((resolve, reject) => {
     const {
       authKey
@@ -9005,7 +9017,7 @@ function connectHubByTokens(hubId, hubKey, sync = true) {
     if (!authKey) reject(new Error('No AuthKey'));
     const tokens = {};
     tokens[hubId] = hubKey;
-    makeHubsMap(tokens, sync).then(() => {
+    makeHubsMap(tokens, discovery, sync).then(() => {
       selectHubById(hubId, false).then(() => {
         resolve(getHubs());
       }).catch(error => reject(error));
@@ -10548,5 +10560,5 @@ function setDeviceMeta(hubId, deviceId, name, rooms) {
   });
 }
 
-export { CLOUD_CONNECTION_STATES, HUB_CONNECTION_STATES, HUB_STATES, LANGUAGES, ROLES, USER_STATES, acceptEula, addRoom, changeLanguage, closeAlarm, connectHubByTokens, rootReducer as cozifyReducer, deleteDevice, devicesState, doPoll, doPwLogin, doRemoteIdQuery, editRoom, getAlarms, getCloudConnectionState, getDevices, getHubAlarms, getHubConnectionState, getHubDevices, getHubPairingDevices, getHubRooms, getHubs, getPairingDevices, getRooms, getUserState, hubsState, identifyDevice, ignorePairingByIds, removeAlarm, removeRoom, selectHubById, sendDeviceCmd, sendDeviceStateCmd, setAuthenticated, setDeviceMeta, setDevices, startDiscoveringHubs, startPairingById, startPollingById, stopDiscoveringHubs, stopPairingById, stopPairings, stopPollingById, store, unSelectHubById, unSelectHubs, unpairDevice, updateHubs, useTestcloud, watchChanges };
+export { CLOUD_CONNECTION_STATES, HUB_CONNECTION_STATES, HUB_STATES, LANGUAGES, ROLES, USER_STATES, acceptEula, addRoom, changeLanguage, closeAlarm, connectHubByTokens, rootReducer as cozifyReducer, deleteDevice, devicesState, doPoll, doPwLogin, doRemoteIdQuery, editRoom, getAlarms, getCloudConnectionState, getDevices, getHubAlarms, getHubConnectionState, getHubDevices, getHubPairingDevices, getHubRooms, getHubs, getPairingDevices, getRooms, getUserState, hubsState, identifyDevice, ignorePairingByIds, removeAlarm, removeRoom, selectHubById, sendDeviceCmd, sendDeviceStateCmd, setAuthenticated, setDeviceMeta, setDevices, startDiscoveringHubs, startPairingById, startPollingById, stopDiscoveringHubs, stopPairingById, stopPairings, stopPollingById, store, unSelectHubById, unSelectHubs, unpairDevice, updateHubs, urlBase64Decode, useTestcloud, watchChanges };
 //# sourceMappingURL=sdk.es.js.map

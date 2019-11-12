@@ -211,7 +211,7 @@ function storedUser() {
 /*
  * Make hubsMap by fetching hub meta data from cloud and local
  */
-function makeHubsMap(tokens, sync = false) {
+function makeHubsMap(tokens, doCloudDicovery = true, doSynchnonously = false) {
   const { authKey } = storedUser();
   return new Promise((resolve) => {
     hubsMap = extractHubInfo(tokens);
@@ -220,10 +220,22 @@ function makeHubsMap(tokens, sync = false) {
       .finally(() => {
         // Hubs map may be changed during fetching cloud metadata
         store.dispatch(hubsState.actions.updateHubs(hubsMap));
-        if (sync) {
-          doCloudDiscovery().then(() => resolve(getHubs())).catch(() => resolve(getHubs()));
+        if (doSynchnonously) {
+          if (doCloudDicovery) {
+            doCloudDiscovery()
+              .then(() => {
+                resolve(getHubs());
+              })
+              .catch(() => {
+                resolve(getHubs());
+              });
+          } else {
+            resolve(getHubs());
+          }
         } else {
-          doCloudDiscovery();
+          if (doCloudDicovery) {
+            doCloudDiscovery();
+          }
           resolve(getHubs());
         }
       });
@@ -668,10 +680,11 @@ export function unSelectHubs() {
  * Connect to the given hub - local or remote.
  * @param  {string} hubId
  * @param  {string} hubKey
- * @param  {boolean} true to wait local hubs reply, false to start with remote connection
+ * @param  {boolean} discovery true to make remote discovery, false to start without discovery
+ * @param  {boolean} sync true to wait local hubs reply (in case of discovery), false to start with remote connection
  * @return {Promise} current hubs, should not reject never
  */
-export function connectHubByTokens(hubId, hubKey, sync = true) {
+export function connectHubByTokens(hubId, hubKey, discovery = false, sync = true) {
   return new Promise((resolve, reject) => {
     const { authKey } = storedUser();
     if (!hubId) reject(new Error('No Hub Id'));
@@ -679,7 +692,7 @@ export function connectHubByTokens(hubId, hubKey, sync = true) {
     if (!authKey) reject(new Error('No AuthKey'));
     const tokens = {};
     tokens[hubId] = hubKey;
-    makeHubsMap(tokens, sync).then(() => {
+    makeHubsMap(tokens, discovery, sync).then(() => {
       selectHubById(hubId, false).then(() => {
         resolve(getHubs());
       }).catch((error) => reject(error));

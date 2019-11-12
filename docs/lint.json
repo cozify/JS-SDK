@@ -266,54 +266,6 @@
     ]
   },
   {
-    "name": "connectHubByTokens",
-    "filePath": "src/hubs/hubs.js",
-    "lines": [
-      {
-        "lineNumber": 666,
-        "line": "/**"
-      },
-      {
-        "lineNumber": 667,
-        "line": " * Connect to the given hub - local or remote."
-      },
-      {
-        "lineNumber": 668,
-        "line": " * @param  {string} hubId"
-      },
-      {
-        "lineNumber": 669,
-        "line": " * @param  {string} hubKey"
-      },
-      {
-        "lineNumber": 670,
-        "line": " * @param  {boolean} true to wait local hubs reply, false to start with remote connection"
-      },
-      {
-        "lineNumber": 671,
-        "line": " * @return {Promise} current hubs, should not reject never"
-      },
-      {
-        "lineNumber": 672,
-        "line": " */"
-      },
-      {
-        "lineNumber": 673,
-        "line": "export function connectHubByTokens(hubId, hubKey, sync = true) {"
-      }
-    ],
-    "codeParams": [
-      "hubId",
-      "hubKey",
-      "sync"
-    ],
-    "docParams": [
-      "hubId",
-      "hubKey",
-      "true"
-    ]
-  },
-  {
     "name": "getTextFromNode",
     "filePath": "src/utils.js",
     "lines": [
