@@ -19,6 +19,7 @@ export { getCloudConnectionState, getHubConnectionState } from './connection/sta
 export {
   changeLanguage, doPwLogin, setAuthenticated, acceptEula, getUserState,
 } from './user/user';
+
 export {
   getHubs, selectHubById, unSelectHubById, unSelectHubs, connectHubByTokens,
   startDiscoveringHubs, stopDiscoveringHubs,
@@ -27,6 +28,10 @@ export {
   doPoll, doRemoteIdQuery,
 } from './hubs/hubs';
 export {
+  isZwaveEnabled, doZwavePairing, stopZwavePairing,
+} from './hubs/zwave';
+
+export {
   getDevices, getHubDevices,
   getPairingDevices, getHubPairingDevices,
 } from './devices/devices';
@@ -34,6 +39,7 @@ export {
   sendDeviceStateCmd, sendDeviceCmd,
   unpairDevice, identifyDevice, setDeviceMeta,
 } from './devices/device';
+
 export {
   getRooms, getHubRooms,
   addRoom, editRoom, removeRoom,
