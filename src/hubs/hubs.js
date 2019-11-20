@@ -488,12 +488,14 @@ export function doPoll(hubId: string, reset: boolean = false): Promise<Object> {
       pollTimeStamp[hubId] = 0;
     }
     const hub: HUB_TYPE = getHubs()[hubId];
-    console.debug('doPoll connection state: ', hub.connectionState);
-    if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
+
+    if (!hub || (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE)) {
       console.warn('SDK doPoll: No Hub connection');
       reject(new Error('doPoll error: No Hub connection'));
       return;
     }
+
+    console.debug('doPoll connection state: ', hub.connectionState);
 
     // just return every second -> not doing so often as in local connection
     if (hub.connectionState === HUB_CONNECTION_STATES.REMOTE && !doReset) {
@@ -552,6 +554,9 @@ export function doPoll(hubId: string, reset: boolean = false): Promise<Object> {
               case 'ZONE_DELTA': {
                 break;
               }
+              case 'USER_ALERTS': {
+                break;
+              }
               case 'ALARM_DELTA': {
                 alarmsDeltaHandler(hubId, doReset, delta.alarms);
                 break;
@@ -563,7 +568,7 @@ export function doPoll(hubId: string, reset: boolean = false): Promise<Object> {
           });
         }
         pollInAction[hubId] = false;
-        resolve('done');
+        resolve(deltas);
       })
       .catch((error) => {
       // store.dispatch(hubsState.actions.hubPollFailed())

@@ -27,6 +27,19 @@ export const ZWAVE_INCLUSION_STATES = Object.freeze({
 });
 export type ZWAVE_INCLUSION_STATES_TYPE = $Values<typeof ZWAVE_INCLUSION_STATES>;
 
+
+export const ZWAVE_EXCLUSION_STATES = Object.freeze({
+  IDLE: 'IDLE', // Exclusion is not running
+  RUNNING: 'RUNNING', // Exclusion is running
+  TIMEOUT: 'TIMEOUT', // Exclusion timed out and finished
+  SUCCESS: 'SUCCESS', // Exclusion finished, a device was added
+  CANCEL: 'CANCEL', // Exclusion was cancelled
+  NO_ZWAVE: 'NO_ZWAVE', // ZWave not available
+  ERROR: 'ERROR', // General error
+});
+export type ZWAVE_EXCLUSION_STATES_TYPE = $Values<typeof ZWAVE_EXCLUSION_STATES>;
+
+
 export type ZWAVE_INCLUSION_STATES_MAP_TYPE = {[hubId: string]: ZWAVE_INCLUSION_STATES_TYPE}
 
 export type HUB_TYPE = {
@@ -60,15 +73,15 @@ export const DISCOVERY_INTERVAL_MS: number = 45 * 1000;
 export const POLL_INTERVAL_MS: number = 1 * 1000;
 
 /*
- * Interval defining how often hubs are polled when paired at max
+ * Interval defining how often hubs are polled when paired
  */
 export const PAIRING_POLL_INTERVAL_MS: number = 5 * 1000;
 
 /*
- * Interval defining how often zwave status are polled at max
+ * Interval defining how often zwave statuses are polled
  */
 export const ZWAVE_INCLUSION_INTERVAL_MS: number = 5 * 1000;
-
+export const ZWAVE_EXCLUSION_INTERVAL_MS: number = 5 * 1000;
 
 export const HUB_PROTOCOL: string = 'http://';
 export const HUB_PORT: string = '8893';
