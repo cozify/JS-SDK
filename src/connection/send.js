@@ -214,6 +214,8 @@ export function send({
       if (isArray(body)) {
         if (body[0]) {
           body[0].type = command.type;
+        } else {
+          body.push({ type: command.type });
         }
       } else if (body) {
         body.type = command.type;

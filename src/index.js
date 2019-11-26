@@ -13,7 +13,7 @@ export { store, watchChanges } from './store';
 
 export { CLOUD_CONNECTION_STATES, HUB_CONNECTION_STATES, useTestcloud } from './connection/constants';
 export { LANGUAGES, USER_STATES, ROLES } from './user/constants';
-export { HUB_STATES, ZWAVE_INCLUSION_STATES, ZWAVE_EXCLUSION_STATES } from './hubs/constants';
+export { HUB_STATES, ZWAVE_INCLUSION_STATUS, ZWAVE_EXCLUSION_STATUS } from './hubs/constants';
 
 export { getCloudConnectionState, getHubConnectionState } from './connection/state';
 export {
@@ -28,7 +28,7 @@ export {
   doPoll, doRemoteIdQuery,
 } from './hubs/hubs';
 export {
-  isZwaveEnabled, doZwaveInclusion, stopZwaveInclusion, doZwaveExclusion, stopZwaveExclusion,
+  isZwaveEnabled, doZwaveInclusion, stopZwaveInclusion, doZwaveExclusion, stopZwaveExclusion, healZwave,
 } from './hubs/zwave';
 
 export {

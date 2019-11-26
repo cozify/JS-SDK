@@ -2,7 +2,7 @@
 // @flow
 // import isEmpty from 'lodash/isEmpty';
 import {
-  ZWAVE_INCLUSION_STATES, ZWAVE_EXCLUSION_STATES, ZWAVE_INCLUSION_INTERVAL_MS, ZWAVE_EXCLUSION_INTERVAL_MS,
+  ZWAVE_INCLUSION_STATUS, ZWAVE_EXCLUSION_STATUS, ZWAVE_INCLUSION_INTERVAL_MS, ZWAVE_EXCLUSION_INTERVAL_MS,
 } from './constants';
 // import { USER_STATES, ROLES } from '../user/constants';
 import { HUB_CONNECTION_STATES } from '../connection/constants';
@@ -12,7 +12,7 @@ import { hubsState } from '../reducers/hubs';
 import { userState } from '../reducers/user';
 
 import type {
-  HUB_TYPE, HUBS_MAP_TYPE, ZWAVE_INCLUSION_STATES_TYPE, ZWAVE_EXCLUSION_STATES_TYPE,
+  HUB_TYPE, HUBS_MAP_TYPE, ZWAVE_INCLUSION_STATUS_TYPE, ZWAVE_INCLUSION_STATES_TYPE, ZWAVE_EXCLUSION_STATUS_TYPE, ZWAVE_EXCLUSION_STATES_TYPE,
 } from './constants';
 
 
@@ -71,15 +71,19 @@ function startZwaveInclusion(hubId: string): Promise<Object> {
     inclusionInAction[hubId] = true;
 
     send({
-      command: COMMANDS.ZWAVE_START_INCLUSION, hubId, authKey, hubKey, localUrl: hub.url,
+      command: COMMANDS.ZWAVE_START_INCLUSION, hubId, authKey, hubKey, localUrl: hub.url, data: [],
     })
-      .then((state) => {
+      .then((state: ZWAVE_INCLUSION_STATES_TYPE) => {
         inclusionState[hubId] = state;
         inclusionInAction[hubId] = false;
-        if (state === ZWAVE_INCLUSION_STATES.RUNNING) {
-          resolve(state);
+        if (state) {
+          if (state.status === ZWAVE_INCLUSION_STATUS.RUNNING) {
+            resolve(state);
+          } else {
+            reject(state);
+          }
         } else {
-          reject(state);
+          reject(new Error('No inclusion state received'));
         }
       })
       .catch((error) => {
@@ -121,9 +125,9 @@ function askZwaveInclusionStatus(hubId: string): Promise<Object> {
     inclusionInAction[hubId] = true;
 
     send({
-      command: COMMANDS.ZWAVE_INCLUSION_STATUS, hubId, authKey, hubKey, localUrl: hub.url,
+      command: COMMANDS.ZWAVE_INCLUSION_STATUS, hubId, authKey, hubKey, localUrl: hub.url, data: [],
     })
-      .then((state) => {
+      .then((state: ZWAVE_INCLUSION_STATUS_TYPE) => {
         inclusionState[hubId] = state;
         inclusionInAction[hubId] = false;
         resolve(state);
@@ -141,27 +145,34 @@ function askZwaveInclusionStatus(hubId: string): Promise<Object> {
 function askZwaveInclusionStatusPromise(hubId: string, resolve: (status: boolean) => mixed, reject: (error: any) => mixed) {
   askZwaveInclusionStatus(hubId)
     .then((state: ZWAVE_INCLUSION_STATES_TYPE) => {
-      switch (state) {
-        case ZWAVE_INCLUSION_STATES.RUNNING: {
-          // sleep 5s and try again
-          setTimeout(() => {
-            debugger;
-            askZwaveInclusionStatusPromise(hubId, resolve, reject);
-          }, ZWAVE_INCLUSION_INTERVAL_MS);
-          break;
+      if (state && state.status) {
+        switch (state.status) {
+          case ZWAVE_INCLUSION_STATUS.RUNNING: {
+            // sleep 5s and try again
+            setTimeout(() => {
+              askZwaveInclusionStatusPromise(hubId, resolve, reject);
+            }, ZWAVE_INCLUSION_INTERVAL_MS);
+            break;
+          }
+          case ZWAVE_INCLUSION_STATUS.SUCCESS: {
+            resolve(true);
+            break;
+          }
+          case ZWAVE_INCLUSION_STATUS.TIMEOUT: {
+            resolve(false);
+            break;
+          }
+          case ZWAVE_INCLUSION_STATUS.CANCEL: {
+            resolve(false);
+            break;
+          }
+          default: {
+            reject(new Error('Invalid inclusion state'));
+            break;
+          }
         }
-        case ZWAVE_INCLUSION_STATES.SUCCESS: {
-          resolve(true);
-          break;
-        }
-        case ZWAVE_INCLUSION_STATES.TIMEOUT: {
-          resolve(false);
-          break;
-        }
-        default: {
-          reject(state);
-          break;
-        }
+      } else {
+        reject(new Error('Invalid inclusion state'));
       }
     })
     .catch((error) => {
@@ -182,7 +193,7 @@ export async function doZwaveInclusion(hubId: string): Promise<Object> {
 
     startZwaveInclusion(hubId)
       .then((state: ZWAVE_INCLUSION_STATES_TYPE) => {
-        if (state === ZWAVE_INCLUSION_STATES.RUNNING) {
+        if (state && state.status === ZWAVE_INCLUSION_STATUS.RUNNING) {
           new Promise((r, j) => {
             askZwaveInclusionStatusPromise(hubId, r, j);
           }).then((result) => {
@@ -191,7 +202,7 @@ export async function doZwaveInclusion(hubId: string): Promise<Object> {
             reject(error);
           });
         } else {
-          reject(state);
+          reject(new Error('Wrong inclusion status'));
         }
       })
       .catch((error) => {
@@ -220,9 +231,9 @@ export async function stopZwaveInclusion(hubId: string): Promise<Object> {
     const { hubKey } = hub;
 
     send({
-      command: COMMANDS.ZWAVE_STOP_INCLUSION, hubId, authKey, hubKey, localUrl: hub.url,
+      command: COMMANDS.ZWAVE_STOP_INCLUSION, hubId, authKey, hubKey, localUrl: hub.url, data: [],
     })
-      .then((status) => {
+      .then((status: ZWAVE_INCLUSION_STATES_TYPE) => {
         console.debug('SDK: stopZwavePairing: Ok , status: ', status);
         inclusionStopped[hubId] = true;
         stopInclusionInAction[hubId] = false;
@@ -272,7 +283,6 @@ const exclusionInAction: Object = {};
 const stopExclusionInAction: Object = {};
 const exclusionState: Object = {};
 
-
 /*
  * Start exclusion of given hub if hub connection is ok
  * @param {string} hubId
@@ -301,21 +311,21 @@ function startZwaveExclusion(hubId: string): Promise<Object> {
       return;
     }
     exclusionInAction[hubId] = true;
-
     send({
-      command: COMMANDS.ZWAVE_START_EXCLUSION, hubId, authKey, hubKey, localUrl: hub.url,
+      command: COMMANDS.ZWAVE_START_EXCLUSION, hubId, authKey, hubKey, localUrl: hub.url, data: [],
     })
-      .then((state) => {
+      .then((state: ZWAVE_EXCLUSION_STATES_TYPE) => {
         exclusionState[hubId] = state;
         exclusionInAction[hubId] = false;
-        if (state === ZWAVE_EXCLUSION_STATES.RUNNING) {
+        if (state.status === ZWAVE_EXCLUSION_STATUS.RUNNING) {
           resolve(state);
         } else {
+          console.error('SDK: doExclusionById - wrong state: ', state);
           reject(state);
         }
       })
       .catch((error) => {
-      // store.dispatch(hubsState.actions.hubPollFailed())
+        // store.dispatch(hubsState.actions.hubPollFailed())
         console.error('SDK: doExclusionById error: ', error.message);
         exclusionInAction[hubId] = false;
         reject(error);
@@ -345,22 +355,21 @@ function askZwaveExclusionStatus(hubId: string): Promise<Object> {
       reject(new Error('no hub connection'));
       return;
     }
-
     if (exclusionInAction[hubId]) {
       reject(new Error('exclusion already in action'));
       return;
     }
     exclusionInAction[hubId] = true;
     send({
-      command: COMMANDS.ZWAVE_EXCLUSION_STATUS, hubId, authKey, hubKey, localUrl: hub.url, data: {},
+      command: COMMANDS.ZWAVE_EXCLUSION_STATUS, hubId, authKey, hubKey, localUrl: hub.url, data: [],
     })
-      .then((state) => {
+      .then((state: ZWAVE_EXCLUSION_STATUS_TYPE) => {
         exclusionState[hubId] = state;
         exclusionInAction[hubId] = false;
         resolve(state);
       })
       .catch((error) => {
-      // store.dispatch(hubsState.actions.hubPollFailed())
+        // store.dispatch(hubsState.actions.hubPollFailed())
         console.error('SDK: askZwaveExclusionStatus error: ', error.message);
         exclusionInAction[hubId] = false;
         reject(error);
@@ -372,27 +381,34 @@ function askZwaveExclusionStatus(hubId: string): Promise<Object> {
 function askZwaveExclusionStatusPromise(hubId: string, resolve: (status: boolean) => mixed, reject: (error: any) => mixed) {
   askZwaveExclusionStatus(hubId)
     .then((state: ZWAVE_EXCLUSION_STATES_TYPE) => {
-      switch (state) {
-        case ZWAVE_EXCLUSION_STATES.RUNNING: {
-          // sleep 5s and try again
-          setTimeout(() => {
-            debugger;
-            askZwaveExclusionStatusPromise(hubId, resolve, reject);
-          }, ZWAVE_EXCLUSION_INTERVAL_MS);
-          break;
+      if (state && state.status) {
+        switch (state.status) {
+          case ZWAVE_EXCLUSION_STATUS.RUNNING: {
+            // sleep 5s and try again
+            setTimeout(() => {
+              askZwaveExclusionStatusPromise(hubId, resolve, reject);
+            }, ZWAVE_EXCLUSION_INTERVAL_MS);
+            break;
+          }
+          case ZWAVE_EXCLUSION_STATUS.SUCCESS: {
+            resolve(true);
+            break;
+          }
+          case ZWAVE_EXCLUSION_STATUS.TIMEOUT: {
+            resolve(false);
+            break;
+          }
+          case ZWAVE_EXCLUSION_STATUS.CANCEL: {
+            resolve(false);
+            break;
+          }
+          default: {
+            reject(new Error('Wrong exclusion status'));
+            break;
+          }
         }
-        case ZWAVE_EXCLUSION_STATES.SUCCESS: {
-          resolve(true);
-          break;
-        }
-        case ZWAVE_EXCLUSION_STATES.TIMEOUT: {
-          resolve(false);
-          break;
-        }
-        default: {
-          reject(state);
-          break;
-        }
+      } else {
+        reject(new Error('Wrong exclusion status'));
       }
     })
     .catch((error) => {
@@ -413,7 +429,7 @@ export async function doZwaveExclusion(hubId: string): Promise<Object> {
 
     startZwaveExclusion(hubId)
       .then((state: ZWAVE_EXCLUSION_STATES_TYPE) => {
-        if (state === ZWAVE_EXCLUSION_STATES.RUNNING) {
+        if (state && state.status === ZWAVE_EXCLUSION_STATUS.RUNNING) {
           new Promise((r, j) => {
             askZwaveExclusionStatusPromise(hubId, r, j);
           }).then((result) => {
@@ -422,7 +438,7 @@ export async function doZwaveExclusion(hubId: string): Promise<Object> {
             reject(error);
           });
         } else {
-          reject(state);
+          reject(new Error('Wrong exclusion status'));
         }
       })
       .catch((error) => {
@@ -451,9 +467,9 @@ export async function stopZwaveExclusion(hubId: string): Promise<Object> {
     const { hubKey } = hub;
 
     send({
-      command: COMMANDS.ZWAVE_STOP_EXCLUSION, hubId, authKey, hubKey, localUrl: hub.url,
+      command: COMMANDS.ZWAVE_STOP_EXCLUSION, hubId, authKey, hubKey, localUrl: hub.url, data: [],
     })
-      .then((status) => {
+      .then((status: boolean) => {
         console.debug('SDK: stopZwaveExclusion: Ok , status: ', status);
         exclusionStopped[hubId] = true;
         stopExclusionInAction[hubId] = false;
@@ -475,15 +491,62 @@ export async function stopZwaveExclusion(hubId: string): Promise<Object> {
 export async function isZwaveEnabled(hubId: string): Promise<Object> {
   return new Promise((resolve, reject) => {
     askZwaveExclusionStatus(hubId)
-      .then((state) => {
-        if (state !== ZWAVE_EXCLUSION_STATES.NO_ZWAVE) {
-          resolve(true);
+      .then((state: ZWAVE_EXCLUSION_STATES_TYPE) => {
+        if (state) {
+          if (state.status !== ZWAVE_EXCLUSION_STATUS.NO_ZWAVE) {
+            resolve(true);
+          } else {
+            resolve(false);
+          }
         } else {
           resolve(false);
         }
       })
       .catch((error) => {
         console.error('Error in isZwaveEnabled: ', error);
+        reject(error);
+      });
+  });
+}
+
+
+/*
+**
+** Z-wave healing
+**
+ */
+
+const healingInAction: Object = {};
+
+
+/**
+ * Start healing of Zwave network
+ * @param {string} hubId
+ * @return {Promise} that resolves true when done
+ */
+export async function healZwave(hubId: string): Promise<Object> {
+  return new Promise((resolve, reject) => {
+    if (healingInAction[hubId]) {
+      reject(new Error('healingInAction already in action'));
+      return;
+    }
+    healingInAction[hubId] = true;
+
+    const { authKey } = storedUser();
+    const hub: HUB_TYPE = getHubs()[hubId];
+    const { hubKey } = hub;
+
+    send({
+      command: COMMANDS.ZWAVE_HEAL, hubId, authKey, hubKey, localUrl: hub.url, data: [],
+    })
+      .then((status: boolean) => {
+        console.debug('SDK: healZwave: Ok , status: ', status);
+        healingInAction[hubId] = false;
+        resolve('ok');
+      })
+      .catch((error) => {
+        console.error('SDK: healZwave error: ', error.message);
+        healingInAction[hubId] = false;
         reject(error);
       });
   });
