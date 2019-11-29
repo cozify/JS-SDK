@@ -84,6 +84,24 @@ function updateFoundHub(hubURL: ?string, hub: HUB_TYPE) {
 }
 
 /*
+ * Remote hub backup and lock request
+ */
+export function lockAndBackup(hubId: string, authKey: string, hubKey: string): Promise<any> {
+  return new Promise((resolve, reject) => {
+    send({
+      command: COMMANDS.HUB_LOCK_BACKUP, authKey, hubKey, hubId,
+    })
+      .then((status) => {
+        resolve(status);
+      })
+      .catch((error) => {
+        console.log(`doRemoteIdQuery ${hubId} error `, error.message);
+        reject(error);
+      });
+  });
+}
+
+/*
  * Remote hub metamata request for version etc information
  */
 export function doRemoteIdQuery(hubId: string, authKey: string, hubKey: string): Promise<any> {

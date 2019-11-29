@@ -57,6 +57,7 @@ export const COMMANDS = Object.freeze({
     method: 'POST', url: 'user/login', params: ['password', 'email'], config: { responseType: isNode ? 'blob' : 'stream', timeout: 15000 },
   },
   HUB_KEYS: { method: 'GET', url: 'user/hubkeys', timeout: 15000 },
+  HUB_LOCK_BACKUP: { method: 'POST', url: 'hub/remote/cc/$API_VER/hub/lockconfig' },
   REFRESH_AUTHKEY: { method: 'GET', url: 'user/refreshsession' },
   CLOUD_IP: { method: 'GET', url: 'hub/lan_ip' },
   CLOUD_META: { method: 'GET', url: 'hub/remote/hub' },

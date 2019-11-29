@@ -22,6 +22,7 @@ export {
 
 export {
   getHubs, selectHubById, unSelectHubById, unSelectHubs, connectHubByTokens,
+  lockAndBackup,
   startDiscoveringHubs, stopDiscoveringHubs,
   startPollingById, stopPollingById,
   startPairingById, stopPairingById, ignorePairingByIds, stopPairings,
