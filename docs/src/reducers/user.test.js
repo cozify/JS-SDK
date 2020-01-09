@@ -66,6 +66,5 @@ describe('Store userReducer', () => {
     }, store);
     expect(storedUser.state).toEqual()
      */
-
   });
 });

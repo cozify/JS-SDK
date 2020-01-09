@@ -1,0 +1,38 @@
+{
+  "plans": {
+    "templates": {},
+    "installations": {},
+    "locations": {
+      "root": {
+        "id": "root",
+        "childIds": [
+          "root:country-1",
+          "root:country-3"
+        ]
+      },
+      "root:country-1": {
+        "id": "root:country-1",
+        "data": {
+          "name": "FI"
+        },
+        "childIds": [
+          "root:country-1:city1"
+        ]
+      },
+      "root:country-1:city1": {
+        "id": "root:country-1:city1",
+        "data": {
+          "name": "HEL"
+        },
+        "childIds": []
+      },
+      "root:country-3": {
+        "id": "root:country-3",
+        "data": {
+          "name": "NOR"
+        },
+        "childIds": []
+      }
+    }
+  }
+}

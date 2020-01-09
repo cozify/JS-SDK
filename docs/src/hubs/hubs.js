@@ -83,6 +83,24 @@ function updateFoundHub(hubURL, hub) {
 }
 
 /*
+ * Remote hub backup and lock request
+ */
+export function lockAndBackup(hubId, authKey, hubKey) {
+  return new Promise((resolve, reject) => {
+    send({
+      command: COMMANDS.HUB_LOCK_BACKUP, authKey, hubKey, hubId,
+    })
+      .then((status) => {
+        resolve(status);
+      })
+      .catch((error) => {
+        console.log(`doRemoteIdQuery ${hubId} error `, error.message);
+        reject(error);
+      });
+  });
+}
+
+/*
  * Remote hub metamata request for version etc information
  */
 export function doRemoteIdQuery(hubId, authKey, hubKey) {
@@ -487,12 +505,14 @@ export function doPoll(hubId, reset = false) {
       pollTimeStamp[hubId] = 0;
     }
     const hub = getHubs()[hubId];
-    console.debug('doPoll connection state: ', hub.connectionState);
-    if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
+
+    if (!hub || (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE)) {
       console.warn('SDK doPoll: No Hub connection');
       reject(new Error('doPoll error: No Hub connection'));
       return;
     }
+
+    console.debug('doPoll connection state: ', hub.connectionState);
 
     // just return every second -> not doing so often as in local connection
     if (hub.connectionState === HUB_CONNECTION_STATES.REMOTE && !doReset) {
@@ -551,6 +571,9 @@ export function doPoll(hubId, reset = false) {
               case 'ZONE_DELTA': {
                 break;
               }
+              case 'USER_ALERTS': {
+                break;
+              }
               case 'ALARM_DELTA': {
                 alarmsDeltaHandler(hubId, doReset, delta.alarms);
                 break;
@@ -562,7 +585,7 @@ export function doPoll(hubId, reset = false) {
           });
         }
         pollInAction[hubId] = false;
-        resolve('done');
+        resolve(deltas);
       })
       .catch((error) => {
       // store.dispatch(hubsState.actions.hubPollFailed())

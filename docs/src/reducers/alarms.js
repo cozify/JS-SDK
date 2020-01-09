@@ -6,7 +6,7 @@ import { createSlice } from 'redux-starter-kit';
 
 
 /**
- * Rooms action creators object
+ * Alarms action creators object
  * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
  * @return { {
  *   slice : string,

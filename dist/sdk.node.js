@@ -14,858 +14,6 @@ var util = _interopDefault(require('util'));
 var os = _interopDefault(require('os'));
 var zlib = _interopDefault(require('zlib'));
 
-var fails = function (exec) {
-  try {
-    return !!exec();
-  } catch (error) {
-    return true;
-  }
-};
-
-var toString = {}.toString;
-
-var classofRaw = function (it) {
-  return toString.call(it).slice(8, -1);
-};
-
-var split = ''.split;
-
-// fallback for non-array-like ES3 and non-enumerable old V8 strings
-var indexedObject = fails(function () {
-  // throws an error in rhino, see https://github.com/mozilla/rhino/issues/346
-  // eslint-disable-next-line no-prototype-builtins
-  return !Object('z').propertyIsEnumerable(0);
-}) ? function (it) {
-  return classofRaw(it) == 'String' ? split.call(it, '') : Object(it);
-} : Object;
-
-// `RequireObjectCoercible` abstract operation
-// https://tc39.github.io/ecma262/#sec-requireobjectcoercible
-var requireObjectCoercible = function (it) {
-  if (it == undefined) throw TypeError("Can't call method on " + it);
-  return it;
-};
-
-// toObject with fallback for non-array-like ES3 strings
-
-
-
-var toIndexedObject = function (it) {
-  return indexedObject(requireObjectCoercible(it));
-};
-
-var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
-
-function unwrapExports (x) {
-	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
-}
-
-function createCommonjsModule(fn, module) {
-	return module = { exports: {} }, fn(module, module.exports), module.exports;
-}
-
-function getCjsExportFromNamespace (n) {
-	return n && n['default'] || n;
-}
-
-var check = function (it) {
-  return it && it.Math == Math && it;
-};
-
-// https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
-var global_1 =
-  // eslint-disable-next-line no-undef
-  check(typeof globalThis == 'object' && globalThis) ||
-  check(typeof window == 'object' && window) ||
-  check(typeof self == 'object' && self) ||
-  check(typeof commonjsGlobal == 'object' && commonjsGlobal) ||
-  // eslint-disable-next-line no-new-func
-  Function('return this')();
-
-// Thank's IE8 for his funny defineProperty
-var descriptors = !fails(function () {
-  return Object.defineProperty({}, 'a', { get: function () { return 7; } }).a != 7;
-});
-
-var isObject = function (it) {
-  return typeof it === 'object' ? it !== null : typeof it === 'function';
-};
-
-var document$1 = global_1.document;
-// typeof document.createElement is 'object' in old IE
-var EXISTS = isObject(document$1) && isObject(document$1.createElement);
-
-var documentCreateElement = function (it) {
-  return EXISTS ? document$1.createElement(it) : {};
-};
-
-// Thank's IE8 for his funny defineProperty
-var ie8DomDefine = !descriptors && !fails(function () {
-  return Object.defineProperty(documentCreateElement('div'), 'a', {
-    get: function () { return 7; }
-  }).a != 7;
-});
-
-var anObject = function (it) {
-  if (!isObject(it)) {
-    throw TypeError(String(it) + ' is not an object');
-  } return it;
-};
-
-// `ToPrimitive` abstract operation
-// https://tc39.github.io/ecma262/#sec-toprimitive
-// instead of the ES6 spec version, we didn't implement @@toPrimitive case
-// and the second argument - flag - preferred type is a string
-var toPrimitive = function (input, PREFERRED_STRING) {
-  if (!isObject(input)) return input;
-  var fn, val;
-  if (PREFERRED_STRING && typeof (fn = input.toString) == 'function' && !isObject(val = fn.call(input))) return val;
-  if (typeof (fn = input.valueOf) == 'function' && !isObject(val = fn.call(input))) return val;
-  if (!PREFERRED_STRING && typeof (fn = input.toString) == 'function' && !isObject(val = fn.call(input))) return val;
-  throw TypeError("Can't convert object to primitive value");
-};
-
-var nativeDefineProperty = Object.defineProperty;
-
-// `Object.defineProperty` method
-// https://tc39.github.io/ecma262/#sec-object.defineproperty
-var f = descriptors ? nativeDefineProperty : function defineProperty(O, P, Attributes) {
-  anObject(O);
-  P = toPrimitive(P, true);
-  anObject(Attributes);
-  if (ie8DomDefine) try {
-    return nativeDefineProperty(O, P, Attributes);
-  } catch (error) { /* empty */ }
-  if ('get' in Attributes || 'set' in Attributes) throw TypeError('Accessors not supported');
-  if ('value' in Attributes) O[P] = Attributes.value;
-  return O;
-};
-
-var objectDefineProperty = {
-	f: f
-};
-
-var createPropertyDescriptor = function (bitmap, value) {
-  return {
-    enumerable: !(bitmap & 1),
-    configurable: !(bitmap & 2),
-    writable: !(bitmap & 4),
-    value: value
-  };
-};
-
-var createNonEnumerableProperty = descriptors ? function (object, key, value) {
-  return objectDefineProperty.f(object, key, createPropertyDescriptor(1, value));
-} : function (object, key, value) {
-  object[key] = value;
-  return object;
-};
-
-var setGlobal = function (key, value) {
-  try {
-    createNonEnumerableProperty(global_1, key, value);
-  } catch (error) {
-    global_1[key] = value;
-  } return value;
-};
-
-var SHARED = '__core-js_shared__';
-var store = global_1[SHARED] || setGlobal(SHARED, {});
-
-var sharedStore = store;
-
-var shared = createCommonjsModule(function (module) {
-(module.exports = function (key, value) {
-  return sharedStore[key] || (sharedStore[key] = value !== undefined ? value : {});
-})('versions', []).push({
-  version: '3.3.6',
-  mode:  'global',
-  copyright: '© 2019 Denis Pushkarev (zloirock.ru)'
-});
-});
-
-var id = 0;
-var postfix = Math.random();
-
-var uid = function (key) {
-  return 'Symbol(' + String(key === undefined ? '' : key) + ')_' + (++id + postfix).toString(36);
-};
-
-var nativeSymbol = !!Object.getOwnPropertySymbols && !fails(function () {
-  // Chrome 38 Symbol has incorrect toString conversion
-  // eslint-disable-next-line no-undef
-  return !String(Symbol());
-});
-
-var Symbol$1 = global_1.Symbol;
-var store$1 = shared('wks');
-
-var wellKnownSymbol = function (name) {
-  return store$1[name] || (store$1[name] = nativeSymbol && Symbol$1[name]
-    || (nativeSymbol ? Symbol$1 : uid)('Symbol.' + name));
-};
-
-var hasOwnProperty = {}.hasOwnProperty;
-
-var has = function (it, key) {
-  return hasOwnProperty.call(it, key);
-};
-
-var ceil = Math.ceil;
-var floor = Math.floor;
-
-// `ToInteger` abstract operation
-// https://tc39.github.io/ecma262/#sec-tointeger
-var toInteger = function (argument) {
-  return isNaN(argument = +argument) ? 0 : (argument > 0 ? floor : ceil)(argument);
-};
-
-var min = Math.min;
-
-// `ToLength` abstract operation
-// https://tc39.github.io/ecma262/#sec-tolength
-var toLength = function (argument) {
-  return argument > 0 ? min(toInteger(argument), 0x1FFFFFFFFFFFFF) : 0; // 2 ** 53 - 1 == 9007199254740991
-};
-
-var max = Math.max;
-var min$1 = Math.min;
-
-// Helper for a popular repeating case of the spec:
-// Let integer be ? ToInteger(index).
-// If integer < 0, let result be max((length + integer), 0); else let result be min(length, length).
-var toAbsoluteIndex = function (index, length) {
-  var integer = toInteger(index);
-  return integer < 0 ? max(integer + length, 0) : min$1(integer, length);
-};
-
-// `Array.prototype.{ indexOf, includes }` methods implementation
-var createMethod = function (IS_INCLUDES) {
-  return function ($this, el, fromIndex) {
-    var O = toIndexedObject($this);
-    var length = toLength(O.length);
-    var index = toAbsoluteIndex(fromIndex, length);
-    var value;
-    // Array#includes uses SameValueZero equality algorithm
-    // eslint-disable-next-line no-self-compare
-    if (IS_INCLUDES && el != el) while (length > index) {
-      value = O[index++];
-      // eslint-disable-next-line no-self-compare
-      if (value != value) return true;
-    // Array#indexOf ignores holes, Array#includes - not
-    } else for (;length > index; index++) {
-      if ((IS_INCLUDES || index in O) && O[index] === el) return IS_INCLUDES || index || 0;
-    } return !IS_INCLUDES && -1;
-  };
-};
-
-var arrayIncludes = {
-  // `Array.prototype.includes` method
-  // https://tc39.github.io/ecma262/#sec-array.prototype.includes
-  includes: createMethod(true),
-  // `Array.prototype.indexOf` method
-  // https://tc39.github.io/ecma262/#sec-array.prototype.indexof
-  indexOf: createMethod(false)
-};
-
-var hiddenKeys = {};
-
-var indexOf = arrayIncludes.indexOf;
-
-
-var objectKeysInternal = function (object, names) {
-  var O = toIndexedObject(object);
-  var i = 0;
-  var result = [];
-  var key;
-  for (key in O) !has(hiddenKeys, key) && has(O, key) && result.push(key);
-  // Don't enum bug & hidden keys
-  while (names.length > i) if (has(O, key = names[i++])) {
-    ~indexOf(result, key) || result.push(key);
-  }
-  return result;
-};
-
-// IE8- don't enum bug keys
-var enumBugKeys = [
-  'constructor',
-  'hasOwnProperty',
-  'isPrototypeOf',
-  'propertyIsEnumerable',
-  'toLocaleString',
-  'toString',
-  'valueOf'
-];
-
-// `Object.keys` method
-// https://tc39.github.io/ecma262/#sec-object.keys
-var objectKeys = Object.keys || function keys(O) {
-  return objectKeysInternal(O, enumBugKeys);
-};
-
-// `Object.defineProperties` method
-// https://tc39.github.io/ecma262/#sec-object.defineproperties
-var objectDefineProperties = descriptors ? Object.defineProperties : function defineProperties(O, Properties) {
-  anObject(O);
-  var keys = objectKeys(Properties);
-  var length = keys.length;
-  var index = 0;
-  var key;
-  while (length > index) objectDefineProperty.f(O, key = keys[index++], Properties[key]);
-  return O;
-};
-
-var path = global_1;
-
-var aFunction = function (variable) {
-  return typeof variable == 'function' ? variable : undefined;
-};
-
-var getBuiltIn = function (namespace, method) {
-  return arguments.length < 2 ? aFunction(path[namespace]) || aFunction(global_1[namespace])
-    : path[namespace] && path[namespace][method] || global_1[namespace] && global_1[namespace][method];
-};
-
-var html = getBuiltIn('document', 'documentElement');
-
-var keys = shared('keys');
-
-var sharedKey = function (key) {
-  return keys[key] || (keys[key] = uid(key));
-};
-
-var IE_PROTO = sharedKey('IE_PROTO');
-
-var PROTOTYPE = 'prototype';
-var Empty = function () { /* empty */ };
-
-// Create object with fake `null` prototype: use iframe Object with cleared prototype
-var createDict = function () {
-  // Thrash, waste and sodomy: IE GC bug
-  var iframe = documentCreateElement('iframe');
-  var length = enumBugKeys.length;
-  var lt = '<';
-  var script = 'script';
-  var gt = '>';
-  var js = 'java' + script + ':';
-  var iframeDocument;
-  iframe.style.display = 'none';
-  html.appendChild(iframe);
-  iframe.src = String(js);
-  iframeDocument = iframe.contentWindow.document;
-  iframeDocument.open();
-  iframeDocument.write(lt + script + gt + 'document.F=Object' + lt + '/' + script + gt);
-  iframeDocument.close();
-  createDict = iframeDocument.F;
-  while (length--) delete createDict[PROTOTYPE][enumBugKeys[length]];
-  return createDict();
-};
-
-// `Object.create` method
-// https://tc39.github.io/ecma262/#sec-object.create
-var objectCreate = Object.create || function create(O, Properties) {
-  var result;
-  if (O !== null) {
-    Empty[PROTOTYPE] = anObject(O);
-    result = new Empty();
-    Empty[PROTOTYPE] = null;
-    // add "__proto__" for Object.getPrototypeOf polyfill
-    result[IE_PROTO] = O;
-  } else result = createDict();
-  return Properties === undefined ? result : objectDefineProperties(result, Properties);
-};
-
-hiddenKeys[IE_PROTO] = true;
-
-var UNSCOPABLES = wellKnownSymbol('unscopables');
-var ArrayPrototype = Array.prototype;
-
-// Array.prototype[@@unscopables]
-// https://tc39.github.io/ecma262/#sec-array.prototype-@@unscopables
-if (ArrayPrototype[UNSCOPABLES] == undefined) {
-  createNonEnumerableProperty(ArrayPrototype, UNSCOPABLES, objectCreate(null));
-}
-
-// add a key to Array.prototype[@@unscopables]
-var addToUnscopables = function (key) {
-  ArrayPrototype[UNSCOPABLES][key] = true;
-};
-
-var iterators = {};
-
-var functionToString = shared('native-function-to-string', Function.toString);
-
-var WeakMap = global_1.WeakMap;
-
-var nativeWeakMap = typeof WeakMap === 'function' && /native code/.test(functionToString.call(WeakMap));
-
-var WeakMap$1 = global_1.WeakMap;
-var set, get, has$1;
-
-var enforce = function (it) {
-  return has$1(it) ? get(it) : set(it, {});
-};
-
-var getterFor = function (TYPE) {
-  return function (it) {
-    var state;
-    if (!isObject(it) || (state = get(it)).type !== TYPE) {
-      throw TypeError('Incompatible receiver, ' + TYPE + ' required');
-    } return state;
-  };
-};
-
-if (nativeWeakMap) {
-  var store$2 = new WeakMap$1();
-  var wmget = store$2.get;
-  var wmhas = store$2.has;
-  var wmset = store$2.set;
-  set = function (it, metadata) {
-    wmset.call(store$2, it, metadata);
-    return metadata;
-  };
-  get = function (it) {
-    return wmget.call(store$2, it) || {};
-  };
-  has$1 = function (it) {
-    return wmhas.call(store$2, it);
-  };
-} else {
-  var STATE = sharedKey('state');
-  hiddenKeys[STATE] = true;
-  set = function (it, metadata) {
-    createNonEnumerableProperty(it, STATE, metadata);
-    return metadata;
-  };
-  get = function (it) {
-    return has(it, STATE) ? it[STATE] : {};
-  };
-  has$1 = function (it) {
-    return has(it, STATE);
-  };
-}
-
-var internalState = {
-  set: set,
-  get: get,
-  has: has$1,
-  enforce: enforce,
-  getterFor: getterFor
-};
-
-var nativePropertyIsEnumerable = {}.propertyIsEnumerable;
-var getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
-
-// Nashorn ~ JDK8 bug
-var NASHORN_BUG = getOwnPropertyDescriptor && !nativePropertyIsEnumerable.call({ 1: 2 }, 1);
-
-// `Object.prototype.propertyIsEnumerable` method implementation
-// https://tc39.github.io/ecma262/#sec-object.prototype.propertyisenumerable
-var f$1 = NASHORN_BUG ? function propertyIsEnumerable(V) {
-  var descriptor = getOwnPropertyDescriptor(this, V);
-  return !!descriptor && descriptor.enumerable;
-} : nativePropertyIsEnumerable;
-
-var objectPropertyIsEnumerable = {
-	f: f$1
-};
-
-var nativeGetOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
-
-// `Object.getOwnPropertyDescriptor` method
-// https://tc39.github.io/ecma262/#sec-object.getownpropertydescriptor
-var f$2 = descriptors ? nativeGetOwnPropertyDescriptor : function getOwnPropertyDescriptor(O, P) {
-  O = toIndexedObject(O);
-  P = toPrimitive(P, true);
-  if (ie8DomDefine) try {
-    return nativeGetOwnPropertyDescriptor(O, P);
-  } catch (error) { /* empty */ }
-  if (has(O, P)) return createPropertyDescriptor(!objectPropertyIsEnumerable.f.call(O, P), O[P]);
-};
-
-var objectGetOwnPropertyDescriptor = {
-	f: f$2
-};
-
-var redefine = createCommonjsModule(function (module) {
-var getInternalState = internalState.get;
-var enforceInternalState = internalState.enforce;
-var TEMPLATE = String(functionToString).split('toString');
-
-shared('inspectSource', function (it) {
-  return functionToString.call(it);
-});
-
-(module.exports = function (O, key, value, options) {
-  var unsafe = options ? !!options.unsafe : false;
-  var simple = options ? !!options.enumerable : false;
-  var noTargetGet = options ? !!options.noTargetGet : false;
-  if (typeof value == 'function') {
-    if (typeof key == 'string' && !has(value, 'name')) createNonEnumerableProperty(value, 'name', key);
-    enforceInternalState(value).source = TEMPLATE.join(typeof key == 'string' ? key : '');
-  }
-  if (O === global_1) {
-    if (simple) O[key] = value;
-    else setGlobal(key, value);
-    return;
-  } else if (!unsafe) {
-    delete O[key];
-  } else if (!noTargetGet && O[key]) {
-    simple = true;
-  }
-  if (simple) O[key] = value;
-  else createNonEnumerableProperty(O, key, value);
-// add fake Function#toString for correct work wrapped methods / constructors with methods like LoDash isNative
-})(Function.prototype, 'toString', function toString() {
-  return typeof this == 'function' && getInternalState(this).source || functionToString.call(this);
-});
-});
-
-var hiddenKeys$1 = enumBugKeys.concat('length', 'prototype');
-
-// `Object.getOwnPropertyNames` method
-// https://tc39.github.io/ecma262/#sec-object.getownpropertynames
-var f$3 = Object.getOwnPropertyNames || function getOwnPropertyNames(O) {
-  return objectKeysInternal(O, hiddenKeys$1);
-};
-
-var objectGetOwnPropertyNames = {
-	f: f$3
-};
-
-var f$4 = Object.getOwnPropertySymbols;
-
-var objectGetOwnPropertySymbols = {
-	f: f$4
-};
-
-// all object keys, includes non-enumerable and symbols
-var ownKeys = getBuiltIn('Reflect', 'ownKeys') || function ownKeys(it) {
-  var keys = objectGetOwnPropertyNames.f(anObject(it));
-  var getOwnPropertySymbols = objectGetOwnPropertySymbols.f;
-  return getOwnPropertySymbols ? keys.concat(getOwnPropertySymbols(it)) : keys;
-};
-
-var copyConstructorProperties = function (target, source) {
-  var keys = ownKeys(source);
-  var defineProperty = objectDefineProperty.f;
-  var getOwnPropertyDescriptor = objectGetOwnPropertyDescriptor.f;
-  for (var i = 0; i < keys.length; i++) {
-    var key = keys[i];
-    if (!has(target, key)) defineProperty(target, key, getOwnPropertyDescriptor(source, key));
-  }
-};
-
-var replacement = /#|\.prototype\./;
-
-var isForced = function (feature, detection) {
-  var value = data[normalize(feature)];
-  return value == POLYFILL ? true
-    : value == NATIVE ? false
-    : typeof detection == 'function' ? fails(detection)
-    : !!detection;
-};
-
-var normalize = isForced.normalize = function (string) {
-  return String(string).replace(replacement, '.').toLowerCase();
-};
-
-var data = isForced.data = {};
-var NATIVE = isForced.NATIVE = 'N';
-var POLYFILL = isForced.POLYFILL = 'P';
-
-var isForced_1 = isForced;
-
-var getOwnPropertyDescriptor$1 = objectGetOwnPropertyDescriptor.f;
-
-
-
-
-
-
-/*
-  options.target      - name of the target object
-  options.global      - target is the global object
-  options.stat        - export as static methods of target
-  options.proto       - export as prototype methods of target
-  options.real        - real prototype method for the `pure` version
-  options.forced      - export even if the native feature is available
-  options.bind        - bind methods to the target, required for the `pure` version
-  options.wrap        - wrap constructors to preventing global pollution, required for the `pure` version
-  options.unsafe      - use the simple assignment of property instead of delete + defineProperty
-  options.sham        - add a flag to not completely full polyfills
-  options.enumerable  - export as enumerable property
-  options.noTargetGet - prevent calling a getter on target
-*/
-var _export = function (options, source) {
-  var TARGET = options.target;
-  var GLOBAL = options.global;
-  var STATIC = options.stat;
-  var FORCED, target, key, targetProperty, sourceProperty, descriptor;
-  if (GLOBAL) {
-    target = global_1;
-  } else if (STATIC) {
-    target = global_1[TARGET] || setGlobal(TARGET, {});
-  } else {
-    target = (global_1[TARGET] || {}).prototype;
-  }
-  if (target) for (key in source) {
-    sourceProperty = source[key];
-    if (options.noTargetGet) {
-      descriptor = getOwnPropertyDescriptor$1(target, key);
-      targetProperty = descriptor && descriptor.value;
-    } else targetProperty = target[key];
-    FORCED = isForced_1(GLOBAL ? key : TARGET + (STATIC ? '.' : '#') + key, options.forced);
-    // contained in target
-    if (!FORCED && targetProperty !== undefined) {
-      if (typeof sourceProperty === typeof targetProperty) continue;
-      copyConstructorProperties(sourceProperty, targetProperty);
-    }
-    // add a flag to not completely full polyfills
-    if (options.sham || (targetProperty && targetProperty.sham)) {
-      createNonEnumerableProperty(sourceProperty, 'sham', true);
-    }
-    // extend global
-    redefine(target, key, sourceProperty, options);
-  }
-};
-
-// `ToObject` abstract operation
-// https://tc39.github.io/ecma262/#sec-toobject
-var toObject = function (argument) {
-  return Object(requireObjectCoercible(argument));
-};
-
-var correctPrototypeGetter = !fails(function () {
-  function F() { /* empty */ }
-  F.prototype.constructor = null;
-  return Object.getPrototypeOf(new F()) !== F.prototype;
-});
-
-var IE_PROTO$1 = sharedKey('IE_PROTO');
-var ObjectPrototype = Object.prototype;
-
-// `Object.getPrototypeOf` method
-// https://tc39.github.io/ecma262/#sec-object.getprototypeof
-var objectGetPrototypeOf = correctPrototypeGetter ? Object.getPrototypeOf : function (O) {
-  O = toObject(O);
-  if (has(O, IE_PROTO$1)) return O[IE_PROTO$1];
-  if (typeof O.constructor == 'function' && O instanceof O.constructor) {
-    return O.constructor.prototype;
-  } return O instanceof Object ? ObjectPrototype : null;
-};
-
-var ITERATOR = wellKnownSymbol('iterator');
-var BUGGY_SAFARI_ITERATORS = false;
-
-var returnThis = function () { return this; };
-
-// `%IteratorPrototype%` object
-// https://tc39.github.io/ecma262/#sec-%iteratorprototype%-object
-var IteratorPrototype, PrototypeOfArrayIteratorPrototype, arrayIterator;
-
-if ([].keys) {
-  arrayIterator = [].keys();
-  // Safari 8 has buggy iterators w/o `next`
-  if (!('next' in arrayIterator)) BUGGY_SAFARI_ITERATORS = true;
-  else {
-    PrototypeOfArrayIteratorPrototype = objectGetPrototypeOf(objectGetPrototypeOf(arrayIterator));
-    if (PrototypeOfArrayIteratorPrototype !== Object.prototype) IteratorPrototype = PrototypeOfArrayIteratorPrototype;
-  }
-}
-
-if (IteratorPrototype == undefined) IteratorPrototype = {};
-
-// 25.1.2.1.1 %IteratorPrototype%[@@iterator]()
-if ( !has(IteratorPrototype, ITERATOR)) {
-  createNonEnumerableProperty(IteratorPrototype, ITERATOR, returnThis);
-}
-
-var iteratorsCore = {
-  IteratorPrototype: IteratorPrototype,
-  BUGGY_SAFARI_ITERATORS: BUGGY_SAFARI_ITERATORS
-};
-
-var defineProperty = objectDefineProperty.f;
-
-
-
-var TO_STRING_TAG = wellKnownSymbol('toStringTag');
-
-var setToStringTag = function (it, TAG, STATIC) {
-  if (it && !has(it = STATIC ? it : it.prototype, TO_STRING_TAG)) {
-    defineProperty(it, TO_STRING_TAG, { configurable: true, value: TAG });
-  }
-};
-
-var IteratorPrototype$1 = iteratorsCore.IteratorPrototype;
-
-
-
-
-
-var returnThis$1 = function () { return this; };
-
-var createIteratorConstructor = function (IteratorConstructor, NAME, next) {
-  var TO_STRING_TAG = NAME + ' Iterator';
-  IteratorConstructor.prototype = objectCreate(IteratorPrototype$1, { next: createPropertyDescriptor(1, next) });
-  setToStringTag(IteratorConstructor, TO_STRING_TAG, false);
-  iterators[TO_STRING_TAG] = returnThis$1;
-  return IteratorConstructor;
-};
-
-var aPossiblePrototype = function (it) {
-  if (!isObject(it) && it !== null) {
-    throw TypeError("Can't set " + String(it) + ' as a prototype');
-  } return it;
-};
-
-// `Object.setPrototypeOf` method
-// https://tc39.github.io/ecma262/#sec-object.setprototypeof
-// Works with __proto__ only. Old v8 can't work with null proto objects.
-/* eslint-disable no-proto */
-var objectSetPrototypeOf = Object.setPrototypeOf || ('__proto__' in {} ? function () {
-  var CORRECT_SETTER = false;
-  var test = {};
-  var setter;
-  try {
-    setter = Object.getOwnPropertyDescriptor(Object.prototype, '__proto__').set;
-    setter.call(test, []);
-    CORRECT_SETTER = test instanceof Array;
-  } catch (error) { /* empty */ }
-  return function setPrototypeOf(O, proto) {
-    anObject(O);
-    aPossiblePrototype(proto);
-    if (CORRECT_SETTER) setter.call(O, proto);
-    else O.__proto__ = proto;
-    return O;
-  };
-}() : undefined);
-
-var IteratorPrototype$2 = iteratorsCore.IteratorPrototype;
-var BUGGY_SAFARI_ITERATORS$1 = iteratorsCore.BUGGY_SAFARI_ITERATORS;
-var ITERATOR$1 = wellKnownSymbol('iterator');
-var KEYS = 'keys';
-var VALUES = 'values';
-var ENTRIES = 'entries';
-
-var returnThis$2 = function () { return this; };
-
-var defineIterator = function (Iterable, NAME, IteratorConstructor, next, DEFAULT, IS_SET, FORCED) {
-  createIteratorConstructor(IteratorConstructor, NAME, next);
-
-  var getIterationMethod = function (KIND) {
-    if (KIND === DEFAULT && defaultIterator) return defaultIterator;
-    if (!BUGGY_SAFARI_ITERATORS$1 && KIND in IterablePrototype) return IterablePrototype[KIND];
-    switch (KIND) {
-      case KEYS: return function keys() { return new IteratorConstructor(this, KIND); };
-      case VALUES: return function values() { return new IteratorConstructor(this, KIND); };
-      case ENTRIES: return function entries() { return new IteratorConstructor(this, KIND); };
-    } return function () { return new IteratorConstructor(this); };
-  };
-
-  var TO_STRING_TAG = NAME + ' Iterator';
-  var INCORRECT_VALUES_NAME = false;
-  var IterablePrototype = Iterable.prototype;
-  var nativeIterator = IterablePrototype[ITERATOR$1]
-    || IterablePrototype['@@iterator']
-    || DEFAULT && IterablePrototype[DEFAULT];
-  var defaultIterator = !BUGGY_SAFARI_ITERATORS$1 && nativeIterator || getIterationMethod(DEFAULT);
-  var anyNativeIterator = NAME == 'Array' ? IterablePrototype.entries || nativeIterator : nativeIterator;
-  var CurrentIteratorPrototype, methods, KEY;
-
-  // fix native
-  if (anyNativeIterator) {
-    CurrentIteratorPrototype = objectGetPrototypeOf(anyNativeIterator.call(new Iterable()));
-    if (IteratorPrototype$2 !== Object.prototype && CurrentIteratorPrototype.next) {
-      if ( objectGetPrototypeOf(CurrentIteratorPrototype) !== IteratorPrototype$2) {
-        if (objectSetPrototypeOf) {
-          objectSetPrototypeOf(CurrentIteratorPrototype, IteratorPrototype$2);
-        } else if (typeof CurrentIteratorPrototype[ITERATOR$1] != 'function') {
-          createNonEnumerableProperty(CurrentIteratorPrototype, ITERATOR$1, returnThis$2);
-        }
-      }
-      // Set @@toStringTag to native iterators
-      setToStringTag(CurrentIteratorPrototype, TO_STRING_TAG, true);
-    }
-  }
-
-  // fix Array#{values, @@iterator}.name in V8 / FF
-  if (DEFAULT == VALUES && nativeIterator && nativeIterator.name !== VALUES) {
-    INCORRECT_VALUES_NAME = true;
-    defaultIterator = function values() { return nativeIterator.call(this); };
-  }
-
-  // define iterator
-  if ( IterablePrototype[ITERATOR$1] !== defaultIterator) {
-    createNonEnumerableProperty(IterablePrototype, ITERATOR$1, defaultIterator);
-  }
-  iterators[NAME] = defaultIterator;
-
-  // export additional methods
-  if (DEFAULT) {
-    methods = {
-      values: getIterationMethod(VALUES),
-      keys: IS_SET ? defaultIterator : getIterationMethod(KEYS),
-      entries: getIterationMethod(ENTRIES)
-    };
-    if (FORCED) for (KEY in methods) {
-      if (BUGGY_SAFARI_ITERATORS$1 || INCORRECT_VALUES_NAME || !(KEY in IterablePrototype)) {
-        redefine(IterablePrototype, KEY, methods[KEY]);
-      }
-    } else _export({ target: NAME, proto: true, forced: BUGGY_SAFARI_ITERATORS$1 || INCORRECT_VALUES_NAME }, methods);
-  }
-
-  return methods;
-};
-
-var ARRAY_ITERATOR = 'Array Iterator';
-var setInternalState = internalState.set;
-var getInternalState = internalState.getterFor(ARRAY_ITERATOR);
-
-// `Array.prototype.entries` method
-// https://tc39.github.io/ecma262/#sec-array.prototype.entries
-// `Array.prototype.keys` method
-// https://tc39.github.io/ecma262/#sec-array.prototype.keys
-// `Array.prototype.values` method
-// https://tc39.github.io/ecma262/#sec-array.prototype.values
-// `Array.prototype[@@iterator]` method
-// https://tc39.github.io/ecma262/#sec-array.prototype-@@iterator
-// `CreateArrayIterator` internal method
-// https://tc39.github.io/ecma262/#sec-createarrayiterator
-var es_array_iterator = defineIterator(Array, 'Array', function (iterated, kind) {
-  setInternalState(this, {
-    type: ARRAY_ITERATOR,
-    target: toIndexedObject(iterated), // target
-    index: 0,                          // next index
-    kind: kind                         // kind
-  });
-// `%ArrayIteratorPrototype%.next` method
-// https://tc39.github.io/ecma262/#sec-%arrayiteratorprototype%.next
-}, function () {
-  var state = getInternalState(this);
-  var target = state.target;
-  var kind = state.kind;
-  var index = state.index++;
-  if (!target || index >= target.length) {
-    state.target = undefined;
-    return { value: undefined, done: true };
-  }
-  if (kind == 'keys') return { value: index, done: false };
-  if (kind == 'values') return { value: target[index], done: false };
-  return { value: [index, target[index]], done: false };
-}, 'values');
-
-// argumentsList[@@iterator] is %ArrayProto_values%
-// https://tc39.github.io/ecma262/#sec-createunmappedargumentsobject
-// https://tc39.github.io/ecma262/#sec-createmappedargumentsobject
-iterators.Arguments = iterators.Array;
-
-// https://tc39.github.io/ecma262/#sec-array.prototype-@@unscopables
-addToUnscopables('keys');
-addToUnscopables('values');
-addToUnscopables('entries');
-
 function symbolObservablePonyfill(root) {
 	var result;
 	var Symbol = root.Symbol;
@@ -1449,7 +597,7 @@ var createClass = function () {
 
 
 
-var defineProperty$1 = function (obj, key, value) {
+var defineProperty = function (obj, key, value) {
   if (key in obj) {
     Object.defineProperty(obj, key, {
       value: value,
@@ -1464,7 +612,7 @@ var defineProperty$1 = function (obj, key, value) {
   return obj;
 };
 
-var NOTHING = typeof Symbol !== "undefined" ? Symbol("immer-nothing") : defineProperty$1({}, "immer-nothing", true);
+var NOTHING = typeof Symbol !== "undefined" ? Symbol("immer-nothing") : defineProperty({}, "immer-nothing", true);
 
 var DRAFTABLE = typeof Symbol !== "undefined" ? Symbol("immer-draftable") : "__$immer_draftable";
 
@@ -1484,14 +632,14 @@ function isDraftable(value) {
 
 var assign = Object.assign || function assign(target, value) {
     for (var key in value) {
-        if (has$2(value, key)) {
+        if (has(value, key)) {
             target[key] = value[key];
         }
     }
     return target;
 };
 
-var ownKeys$1 = typeof Reflect !== "undefined" && Reflect.ownKeys ? Reflect.ownKeys : typeof Object.getOwnPropertySymbols !== "undefined" ? function (obj) {
+var ownKeys = typeof Reflect !== "undefined" && Reflect.ownKeys ? Reflect.ownKeys : typeof Object.getOwnPropertySymbols !== "undefined" ? function (obj) {
     return Object.getOwnPropertyNames(obj).concat(Object.getOwnPropertySymbols(obj));
 } : Object.getOwnPropertyNames;
 
@@ -1500,7 +648,7 @@ function shallowCopy(base) {
 
     if (Array.isArray(base)) return base.slice();
     var clone = Object.create(Object.getPrototypeOf(base));
-    ownKeys$1(base).forEach(function (key) {
+    ownKeys(base).forEach(function (key) {
         if (key === DRAFT_STATE) {
             return; // Never copy over draft state.
         }
@@ -1530,7 +678,7 @@ function each(value, cb) {
             cb(i, value[i], value);
         }
     } else {
-        ownKeys$1(value).forEach(function (key) {
+        ownKeys(value).forEach(function (key) {
             return cb(key, value[key], value);
         });
     }
@@ -1540,7 +688,7 @@ function isEnumerable(base, prop) {
     return Object.getOwnPropertyDescriptor(base, prop).enumerable;
 }
 
-function has$2(thing, prop) {
+function has(thing, prop) {
     return Object.prototype.hasOwnProperty.call(thing, prop);
 }
 
@@ -1555,7 +703,7 @@ function is(x, y) {
 
 // @ts-check
 
-var descriptors$1 = {};
+var descriptors = {};
 
 // For nested produce calls:
 var scopes = [];
@@ -1655,11 +803,11 @@ function clonePotentialDraft(base) {
 }
 
 function proxyProperty(draft, prop, enumerable) {
-    var desc = descriptors$1[prop];
+    var desc = descriptors[prop];
     if (desc) {
         desc.enumerable = enumerable;
     } else {
-        descriptors$1[prop] = desc = {
+        descriptors[prop] = desc = {
             configurable: true,
             enumerable: enumerable,
             get: function get$$1() {
@@ -1705,7 +853,7 @@ function markChangesRecursively(object) {
         // Look for added keys.
         Object.keys(draft).forEach(function (key) {
             // The `undefined` check is a fast path for pre-existing keys.
-            if (base[key] === undefined && !has$2(base, key)) {
+            if (base[key] === undefined && !has(base, key)) {
                 assigned[key] = true;
                 markChanged(state);
             } else if (!assigned[key]) {
@@ -1716,7 +864,7 @@ function markChangesRecursively(object) {
         // Look for removed keys.
         Object.keys(base).forEach(function (key) {
             // The `undefined` check is a fast path for pre-existing keys.
-            if (draft[key] === undefined && !has$2(draft, key)) {
+            if (draft[key] === undefined && !has(draft, key)) {
                 assigned[key] = false;
                 markChanged(state);
             }
@@ -1750,7 +898,7 @@ function hasObjectChanges(state) {
     var keys = Object.keys(draft);
     for (var i = keys.length - 1; i >= 0; i--) {
         // The `undefined` check is a fast path for pre-existing keys.
-        if (base[keys[i]] === undefined && !has$2(base, keys[i])) {
+        if (base[keys[i]] === undefined && !has(base, keys[i])) {
             return true;
         }
     }
@@ -1852,7 +1000,7 @@ var objectTraps = {
 
     set: set$1,
     deleteProperty: deleteProperty,
-    getOwnPropertyDescriptor: getOwnPropertyDescriptor$2,
+    getOwnPropertyDescriptor: getOwnPropertyDescriptor,
     defineProperty: function defineProperty() {
         throw new Error("Object.defineProperty() cannot be used on an Immer draft"); // prettier-ignore
     },
@@ -1894,7 +1042,7 @@ function get$1(state, prop) {
 
     // Check for existing draft in unmodified state.
 
-    if (!state.modified && has$2(drafts, prop)) {
+    if (!state.modified && has(drafts, prop)) {
         return drafts[prop];
     }
 
@@ -1936,7 +1084,7 @@ function deleteProperty(state, prop) {
     return true;
 }
 
-function getOwnPropertyDescriptor$2(state, prop) {
+function getOwnPropertyDescriptor(state, prop) {
     var owner = source$1(state);
     var desc = Reflect.getOwnPropertyDescriptor(owner, prop);
     if (desc) {
@@ -2230,7 +1378,7 @@ var Immer = function () {
                             copy = state.copy;
 
                         each(base, function (prop) {
-                            if (!has$2(copy, prop)) _this2.onDelete(state, prop);
+                            if (!has(copy, prop)) _this2.onDelete(state, prop);
                         });
                     }
                 }
@@ -2520,7 +1668,7 @@ var HAS_SET_SUPPORT = typeof Set === 'function';
 var HAS_WEAKSET_SUPPORT = typeof WeakSet === 'function';
 
 // constants
-var keys$1 = Object.keys;
+var keys = Object.keys;
 /**
  * @function addObjectToCache
  *
@@ -2780,8 +1928,8 @@ var areMapsEqual = function areMapsEqual(mapA, mapB, isEqual, meta) {
  */
 
 var areObjectsEqual = function areObjectsEqual(objectA, objectB, isEqual, meta) {
-  var keysA = keys$1(objectA);
-  var keysB = keys$1(objectB);
+  var keysA = keys(objectA);
+  var keysB = keys(objectB);
 
   if (keysA.length !== keysB.length) {
     return false;
@@ -3124,7 +2272,7 @@ curry.uncurry = uncurry;
 
 // external dependencies
 var O = Object;
-var create = O.create, getOwnPropertySymbols = O.getOwnPropertySymbols, getPrototypeOf = O.getPrototypeOf, keys$2 = O.keys, propertyIsEnumerable = O.propertyIsEnumerable;
+var create = O.create, getOwnPropertySymbols = O.getOwnPropertySymbols, getPrototypeOf = O.getPrototypeOf, keys$1 = O.keys, propertyIsEnumerable = O.propertyIsEnumerable;
 var toStringObject = O.prototype.toString;
 var toStringFunction = Function.prototype.toString;
 var isArray$2 = Array.isArray;
@@ -3181,9 +2329,9 @@ var reduce = function (array, fn, initialValue) {
 var getOwnProperties = function (object) {
     var ownSymbols = getOwnPropertySymbols(object);
     if (!ownSymbols.length) {
-        return keys$2(object);
+        return keys$1(object);
     }
-    return keys$2(object).concat(reduce(ownSymbols, function (enumerableSymbols, symbol) {
+    return keys$1(object).concat(reduce(ownSymbols, function (enumerableSymbols, symbol) {
         if (propertyIsEnumerable.call(object, symbol)) {
             enumerableSymbols.push(symbol);
         }
@@ -3856,11 +3004,11 @@ var assign$1$1 = curry(createMerge(false, false), 3);
 var assignWith = curry(createMerge(true, false), 3);
 var call = curry(createCall(false), 3);
 var callWith = curry(createCall(true), 4);
-var get$2 = curry(createGet(false), 2);
+var get = curry(createGet(false), 2);
 var getOr = curry(createGetOr(false), 3);
 var getWith = curry(createGet(true), 3);
 var getWithOr = curry(createGetOr(true), 4);
-var has$3 = curry(createHas(false), 2);
+var has$1 = curry(createHas(false), 2);
 var hasWith = curry(createHas(true), 3);
 var is$1 = curry(createIs(false), 3);
 var isWith = curry(createIs(true), 4);
@@ -3870,8 +3018,22 @@ var not = curry(createNot(false), 3);
 var notWith = curry(createNot(true), 4);
 var remove = curry(createRemove(false), 2);
 var removeWith = curry(createRemove(true), 3);
-var set$2 = curry(createSet(false), 3);
+var set = curry(createSet(false), 3);
 var setWith = curry(createSet(true), 3);
+
+var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
+function unwrapExports (x) {
+	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
+}
+
+function createCommonjsModule(fn, module) {
+	return module = { exports: {} }, fn(module, module.exports), module.exports;
+}
+
+function getCjsExportFromNamespace (n) {
+	return n && n['default'] || n;
+}
 
 /**
  * These are private action types reserved by Redux.
@@ -4339,7 +3501,7 @@ function _defineProperty$1(obj, key, value) {
   return obj;
 }
 
-function ownKeys$2(object, enumerableOnly) {
+function ownKeys$1(object, enumerableOnly) {
   var keys = Object.keys(object);
 
   if (Object.getOwnPropertySymbols) {
@@ -4357,13 +3519,13 @@ function _objectSpread2(target) {
     var source = arguments[i] != null ? arguments[i] : {};
 
     if (i % 2) {
-      ownKeys$2(source, true).forEach(function (key) {
+      ownKeys$1(source, true).forEach(function (key) {
         _defineProperty$1(target, key, source[key]);
       });
     } else if (Object.getOwnPropertyDescriptors) {
       Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
     } else {
-      ownKeys$2(source).forEach(function (key) {
+      ownKeys$1(source).forEach(function (key) {
         Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
       });
     }
@@ -4452,13 +3614,13 @@ function applyMiddleware$1() {
 }
 
 var redux = /*#__PURE__*/Object.freeze({
-  __proto__: null,
-  __DO_NOT_USE__ActionTypes: ActionTypes$1,
-  applyMiddleware: applyMiddleware$1,
-  bindActionCreators: bindActionCreators,
-  combineReducers: combineReducers$1,
-  compose: compose$1,
-  createStore: createStore$1
+	__proto__: null,
+	__DO_NOT_USE__ActionTypes: ActionTypes$1,
+	applyMiddleware: applyMiddleware$1,
+	bindActionCreators: bindActionCreators,
+	combineReducers: combineReducers$1,
+	compose: compose$1,
+	createStore: createStore$1
 });
 
 var reduxDevtoolsExtension = createCommonjsModule(function (module, exports) {
@@ -4777,8 +3939,9 @@ function createSlice(options) {
   };
 }
 
+//      
 /**
- * Rooms action creators object
+ * Alarms action creators object
  * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
  * @return { {
  *   slice : string,
@@ -4868,335 +4031,6 @@ const {
   actions,
   reducer
 } = alarmsState;
-
-// `RegExp.prototype.flags` getter implementation
-// https://tc39.github.io/ecma262/#sec-get-regexp.prototype.flags
-var regexpFlags = function () {
-  var that = anObject(this);
-  var result = '';
-  if (that.global) result += 'g';
-  if (that.ignoreCase) result += 'i';
-  if (that.multiline) result += 'm';
-  if (that.dotAll) result += 's';
-  if (that.unicode) result += 'u';
-  if (that.sticky) result += 'y';
-  return result;
-};
-
-var nativeExec = RegExp.prototype.exec;
-// This always refers to the native implementation, because the
-// String#replace polyfill uses ./fix-regexp-well-known-symbol-logic.js,
-// which loads this file before patching the method.
-var nativeReplace = String.prototype.replace;
-
-var patchedExec = nativeExec;
-
-var UPDATES_LAST_INDEX_WRONG = (function () {
-  var re1 = /a/;
-  var re2 = /b*/g;
-  nativeExec.call(re1, 'a');
-  nativeExec.call(re2, 'a');
-  return re1.lastIndex !== 0 || re2.lastIndex !== 0;
-})();
-
-// nonparticipating capturing group, copied from es5-shim's String#split patch.
-var NPCG_INCLUDED = /()??/.exec('')[1] !== undefined;
-
-var PATCH = UPDATES_LAST_INDEX_WRONG || NPCG_INCLUDED;
-
-if (PATCH) {
-  patchedExec = function exec(str) {
-    var re = this;
-    var lastIndex, reCopy, match, i;
-
-    if (NPCG_INCLUDED) {
-      reCopy = new RegExp('^' + re.source + '$(?!\\s)', regexpFlags.call(re));
-    }
-    if (UPDATES_LAST_INDEX_WRONG) lastIndex = re.lastIndex;
-
-    match = nativeExec.call(re, str);
-
-    if (UPDATES_LAST_INDEX_WRONG && match) {
-      re.lastIndex = re.global ? match.index + match[0].length : lastIndex;
-    }
-    if (NPCG_INCLUDED && match && match.length > 1) {
-      // Fix browsers whose `exec` methods don't consistently return `undefined`
-      // for NPCG, like IE8. NOTE: This doesn' work for /(.?)?/
-      nativeReplace.call(match[0], reCopy, function () {
-        for (i = 1; i < arguments.length - 2; i++) {
-          if (arguments[i] === undefined) match[i] = undefined;
-        }
-      });
-    }
-
-    return match;
-  };
-}
-
-var regexpExec = patchedExec;
-
-var SPECIES = wellKnownSymbol('species');
-
-var REPLACE_SUPPORTS_NAMED_GROUPS = !fails(function () {
-  // #replace needs built-in support for named groups.
-  // #match works fine because it just return the exec results, even if it has
-  // a "grops" property.
-  var re = /./;
-  re.exec = function () {
-    var result = [];
-    result.groups = { a: '7' };
-    return result;
-  };
-  return ''.replace(re, '$<a>') !== '7';
-});
-
-// Chrome 51 has a buggy "split" implementation when RegExp#exec !== nativeExec
-// Weex JS has frozen built-in prototypes, so use try / catch wrapper
-var SPLIT_WORKS_WITH_OVERWRITTEN_EXEC = !fails(function () {
-  var re = /(?:)/;
-  var originalExec = re.exec;
-  re.exec = function () { return originalExec.apply(this, arguments); };
-  var result = 'ab'.split(re);
-  return result.length !== 2 || result[0] !== 'a' || result[1] !== 'b';
-});
-
-var fixRegexpWellKnownSymbolLogic = function (KEY, length, exec, sham) {
-  var SYMBOL = wellKnownSymbol(KEY);
-
-  var DELEGATES_TO_SYMBOL = !fails(function () {
-    // String methods call symbol-named RegEp methods
-    var O = {};
-    O[SYMBOL] = function () { return 7; };
-    return ''[KEY](O) != 7;
-  });
-
-  var DELEGATES_TO_EXEC = DELEGATES_TO_SYMBOL && !fails(function () {
-    // Symbol-named RegExp methods call .exec
-    var execCalled = false;
-    var re = /a/;
-
-    if (KEY === 'split') {
-      // We can't use real regex here since it causes deoptimization
-      // and serious performance degradation in V8
-      // https://github.com/zloirock/core-js/issues/306
-      re = {};
-      // RegExp[@@split] doesn't call the regex's exec method, but first creates
-      // a new one. We need to return the patched regex when creating the new one.
-      re.constructor = {};
-      re.constructor[SPECIES] = function () { return re; };
-      re.flags = '';
-      re[SYMBOL] = /./[SYMBOL];
-    }
-
-    re.exec = function () { execCalled = true; return null; };
-
-    re[SYMBOL]('');
-    return !execCalled;
-  });
-
-  if (
-    !DELEGATES_TO_SYMBOL ||
-    !DELEGATES_TO_EXEC ||
-    (KEY === 'replace' && !REPLACE_SUPPORTS_NAMED_GROUPS) ||
-    (KEY === 'split' && !SPLIT_WORKS_WITH_OVERWRITTEN_EXEC)
-  ) {
-    var nativeRegExpMethod = /./[SYMBOL];
-    var methods = exec(SYMBOL, ''[KEY], function (nativeMethod, regexp, str, arg2, forceStringMethod) {
-      if (regexp.exec === regexpExec) {
-        if (DELEGATES_TO_SYMBOL && !forceStringMethod) {
-          // The native String method already delegates to @@method (this
-          // polyfilled function), leasing to infinite recursion.
-          // We avoid it by directly calling the native @@method method.
-          return { done: true, value: nativeRegExpMethod.call(regexp, str, arg2) };
-        }
-        return { done: true, value: nativeMethod.call(str, regexp, arg2) };
-      }
-      return { done: false };
-    });
-    var stringMethod = methods[0];
-    var regexMethod = methods[1];
-
-    redefine(String.prototype, KEY, stringMethod);
-    redefine(RegExp.prototype, SYMBOL, length == 2
-      // 21.2.5.8 RegExp.prototype[@@replace](string, replaceValue)
-      // 21.2.5.11 RegExp.prototype[@@split](string, limit)
-      ? function (string, arg) { return regexMethod.call(string, this, arg); }
-      // 21.2.5.6 RegExp.prototype[@@match](string)
-      // 21.2.5.9 RegExp.prototype[@@search](string)
-      : function (string) { return regexMethod.call(string, this); }
-    );
-    if (sham) createNonEnumerableProperty(RegExp.prototype[SYMBOL], 'sham', true);
-  }
-};
-
-// `String.prototype.{ codePointAt, at }` methods implementation
-var createMethod$1 = function (CONVERT_TO_STRING) {
-  return function ($this, pos) {
-    var S = String(requireObjectCoercible($this));
-    var position = toInteger(pos);
-    var size = S.length;
-    var first, second;
-    if (position < 0 || position >= size) return CONVERT_TO_STRING ? '' : undefined;
-    first = S.charCodeAt(position);
-    return first < 0xD800 || first > 0xDBFF || position + 1 === size
-      || (second = S.charCodeAt(position + 1)) < 0xDC00 || second > 0xDFFF
-        ? CONVERT_TO_STRING ? S.charAt(position) : first
-        : CONVERT_TO_STRING ? S.slice(position, position + 2) : (first - 0xD800 << 10) + (second - 0xDC00) + 0x10000;
-  };
-};
-
-var stringMultibyte = {
-  // `String.prototype.codePointAt` method
-  // https://tc39.github.io/ecma262/#sec-string.prototype.codepointat
-  codeAt: createMethod$1(false),
-  // `String.prototype.at` method
-  // https://github.com/mathiasbynens/String.prototype.at
-  charAt: createMethod$1(true)
-};
-
-var charAt = stringMultibyte.charAt;
-
-// `AdvanceStringIndex` abstract operation
-// https://tc39.github.io/ecma262/#sec-advancestringindex
-var advanceStringIndex = function (S, index, unicode) {
-  return index + (unicode ? charAt(S, index).length : 1);
-};
-
-// `RegExpExec` abstract operation
-// https://tc39.github.io/ecma262/#sec-regexpexec
-var regexpExecAbstract = function (R, S) {
-  var exec = R.exec;
-  if (typeof exec === 'function') {
-    var result = exec.call(R, S);
-    if (typeof result !== 'object') {
-      throw TypeError('RegExp exec method returned something other than an Object or null');
-    }
-    return result;
-  }
-
-  if (classofRaw(R) !== 'RegExp') {
-    throw TypeError('RegExp#exec called on incompatible receiver');
-  }
-
-  return regexpExec.call(R, S);
-};
-
-var max$1 = Math.max;
-var min$2 = Math.min;
-var floor$1 = Math.floor;
-var SUBSTITUTION_SYMBOLS = /\$([$&'`]|\d\d?|<[^>]*>)/g;
-var SUBSTITUTION_SYMBOLS_NO_NAMED = /\$([$&'`]|\d\d?)/g;
-
-var maybeToString = function (it) {
-  return it === undefined ? it : String(it);
-};
-
-// @@replace logic
-fixRegexpWellKnownSymbolLogic('replace', 2, function (REPLACE, nativeReplace, maybeCallNative) {
-  return [
-    // `String.prototype.replace` method
-    // https://tc39.github.io/ecma262/#sec-string.prototype.replace
-    function replace(searchValue, replaceValue) {
-      var O = requireObjectCoercible(this);
-      var replacer = searchValue == undefined ? undefined : searchValue[REPLACE];
-      return replacer !== undefined
-        ? replacer.call(searchValue, O, replaceValue)
-        : nativeReplace.call(String(O), searchValue, replaceValue);
-    },
-    // `RegExp.prototype[@@replace]` method
-    // https://tc39.github.io/ecma262/#sec-regexp.prototype-@@replace
-    function (regexp, replaceValue) {
-      var res = maybeCallNative(nativeReplace, regexp, this, replaceValue);
-      if (res.done) return res.value;
-
-      var rx = anObject(regexp);
-      var S = String(this);
-
-      var functionalReplace = typeof replaceValue === 'function';
-      if (!functionalReplace) replaceValue = String(replaceValue);
-
-      var global = rx.global;
-      if (global) {
-        var fullUnicode = rx.unicode;
-        rx.lastIndex = 0;
-      }
-      var results = [];
-      while (true) {
-        var result = regexpExecAbstract(rx, S);
-        if (result === null) break;
-
-        results.push(result);
-        if (!global) break;
-
-        var matchStr = String(result[0]);
-        if (matchStr === '') rx.lastIndex = advanceStringIndex(S, toLength(rx.lastIndex), fullUnicode);
-      }
-
-      var accumulatedResult = '';
-      var nextSourcePosition = 0;
-      for (var i = 0; i < results.length; i++) {
-        result = results[i];
-
-        var matched = String(result[0]);
-        var position = max$1(min$2(toInteger(result.index), S.length), 0);
-        var captures = [];
-        // NOTE: This is equivalent to
-        //   captures = result.slice(1).map(maybeToString)
-        // but for some reason `nativeSlice.call(result, 1, result.length)` (called in
-        // the slice polyfill when slicing native arrays) "doesn't work" in safari 9 and
-        // causes a crash (https://pastebin.com/N21QzeQA) when trying to debug it.
-        for (var j = 1; j < result.length; j++) captures.push(maybeToString(result[j]));
-        var namedCaptures = result.groups;
-        if (functionalReplace) {
-          var replacerArgs = [matched].concat(captures, position, S);
-          if (namedCaptures !== undefined) replacerArgs.push(namedCaptures);
-          var replacement = String(replaceValue.apply(undefined, replacerArgs));
-        } else {
-          replacement = getSubstitution(matched, S, position, captures, namedCaptures, replaceValue);
-        }
-        if (position >= nextSourcePosition) {
-          accumulatedResult += S.slice(nextSourcePosition, position) + replacement;
-          nextSourcePosition = position + matched.length;
-        }
-      }
-      return accumulatedResult + S.slice(nextSourcePosition);
-    }
-  ];
-
-  // https://tc39.github.io/ecma262/#sec-getsubstitution
-  function getSubstitution(matched, str, position, captures, namedCaptures, replacement) {
-    var tailPos = position + matched.length;
-    var m = captures.length;
-    var symbols = SUBSTITUTION_SYMBOLS_NO_NAMED;
-    if (namedCaptures !== undefined) {
-      namedCaptures = toObject(namedCaptures);
-      symbols = SUBSTITUTION_SYMBOLS;
-    }
-    return nativeReplace.call(replacement, symbols, function (match, ch) {
-      var capture;
-      switch (ch.charAt(0)) {
-        case '$': return '$';
-        case '&': return matched;
-        case '`': return str.slice(0, position);
-        case "'": return str.slice(tailPos);
-        case '<':
-          capture = namedCaptures[ch.slice(1, -1)];
-          break;
-        default: // \d\d?
-          var n = +ch;
-          if (n === 0) return match;
-          if (n > m) {
-            var f = floor$1(n / 10);
-            if (f === 0) return match;
-            if (f <= m) return captures[f - 1] === undefined ? ch.charAt(1) : captures[f - 1] + ch.charAt(1);
-            return match;
-          }
-          capture = captures[n - 1];
-      }
-      return capture === undefined ? '' : capture;
-    });
-  }
-});
 
 //      
 
@@ -5388,6 +4222,10 @@ const COMMANDS = Object.freeze({
     url: 'user/hubkeys',
     timeout: 15000
   },
+  HUB_LOCK_BACKUP: {
+    method: 'POST',
+    url: 'hub/remote/cc/$API_VER/hub/lockconfig'
+  },
   REFRESH_AUTHKEY: {
     method: 'GET',
     url: 'user/refreshsession'
@@ -5472,6 +4310,50 @@ const COMMANDS = Object.freeze({
     method: 'DELETE',
     url: 'hub/remote/cc/$API_VER/alarms',
     urlParams: ['roomId']
+  },
+  ZWAVE_START_INCLUSION: {
+    method: 'POST',
+    url: 'hub/remote/cc/$API_VER/hub/protocolconfig',
+    type: 'ZWAVE_START_INCLUSION'
+  },
+  ZWAVE_STOP_INCLUSION: {
+    method: 'POST',
+    url: 'hub/remote/cc/$API_VER/hub/protocolconfig',
+    type: 'ZWAVE_CANCEL_INCLUSION'
+  },
+  ZWAVE_START_EXCLUSION: {
+    method: 'POST',
+    url: 'hub/remote/cc/$API_VER/hub/protocolconfig',
+    type: 'ZWAVE_START_EXCLUSION'
+  },
+  ZWAVE_STOP_EXCLUSION: {
+    method: 'POST',
+    url: 'hub/remote/cc/$API_VER/hub/protocolconfig',
+    type: 'ZWAVE_CANCEL_EXCLUSION'
+  },
+  ZWAVE_INCLUSION_STATUS: {
+    method: 'POST',
+    url: 'hub/remote/cc/$API_VER/hub/protocolconfig',
+    type: 'GET_ZWAVE_INCLUSION_STATUS'
+  },
+  ZWAVE_EXCLUSION_STATUS: {
+    method: 'POST',
+    url: 'hub/remote/cc/$API_VER/hub/protocolconfig',
+    type: 'GET_ZWAVE_EXCLUSION_STATUS'
+  },
+  ZWAVE_HEAL: {
+    method: 'POST',
+    url: 'hub/remote/cc/$API_VER/hub/protocolconfig',
+    type: 'ZWAVE_HEAL'
+  },
+  CMD_GET_PLANS: {
+    method: 'GET',
+    url: 'plans'
+  },
+  CMD_SAVE_PLANS: {
+    method: 'POST',
+    url: 'plans',
+    params: ['templates', 'installations', 'locations']
   }
 }); // type dataArray = ?Array<{ [key: string | number]: any }>
 // type dataObject = ?{ [key: string | number]: any }
@@ -5569,6 +4451,7 @@ const {
   reducer: reducer$1
 } = connectionsState;
 
+//      
 /**
  * Devices action creators object
  * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
@@ -5653,6 +4536,7 @@ const {
   reducer: reducer$2
 } = pairingsState;
 
+//      
 /**
  * Devices action creators object
  * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
@@ -5747,6 +4631,7 @@ const {
   deleteDevice
 } = actions$3;
 
+//      
 /**
  * Hubs action creators object
  * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
@@ -5898,7 +4783,7 @@ var _nativeKeys = nativeKeys;
 var objectProto$1 = Object.prototype;
 
 /** Used to check objects for own properties. */
-var hasOwnProperty$1 = objectProto$1.hasOwnProperty;
+var hasOwnProperty = objectProto$1.hasOwnProperty;
 
 /**
  * The base implementation of `_.keys` which doesn't treat sparse arrays as dense.
@@ -5913,7 +4798,7 @@ function baseKeys(object) {
   }
   var result = [];
   for (var key in Object(object)) {
-    if (hasOwnProperty$1.call(object, key) && key != 'constructor') {
+    if (hasOwnProperty.call(object, key) && key != 'constructor') {
       result.push(key);
     }
   }
@@ -5936,15 +4821,15 @@ var root$1 = _freeGlobal || freeSelf || Function('return this')();
 var _root = root$1;
 
 /** Built-in value references. */
-var Symbol$2 = _root.Symbol;
+var Symbol$1 = _root.Symbol;
 
-var _Symbol = Symbol$2;
+var _Symbol = Symbol$1;
 
 /** Used for built-in method references. */
 var objectProto$2 = Object.prototype;
 
 /** Used to check objects for own properties. */
-var hasOwnProperty$2 = objectProto$2.hasOwnProperty;
+var hasOwnProperty$1 = objectProto$2.hasOwnProperty;
 
 /**
  * Used to resolve the
@@ -5964,7 +4849,7 @@ var symToStringTag = _Symbol ? _Symbol.toStringTag : undefined;
  * @returns {string} Returns the raw `toStringTag`.
  */
 function getRawTag(value) {
-  var isOwn = hasOwnProperty$2.call(value, symToStringTag),
+  var isOwn = hasOwnProperty$1.call(value, symToStringTag),
       tag = value[symToStringTag];
 
   try {
@@ -6058,12 +4943,12 @@ var _baseGetTag = baseGetTag;
  * _.isObject(null);
  * // => false
  */
-function isObject$1(value) {
+function isObject(value) {
   var type = typeof value;
   return value != null && (type == 'object' || type == 'function');
 }
 
-var isObject_1 = isObject$1;
+var isObject_1 = isObject;
 
 /** `Object#toString` result references. */
 var asyncTag = '[object AsyncFunction]',
@@ -6168,11 +5053,11 @@ var funcProto$1 = Function.prototype,
 var funcToString$1 = funcProto$1.toString;
 
 /** Used to check objects for own properties. */
-var hasOwnProperty$3 = objectProto$4.hasOwnProperty;
+var hasOwnProperty$2 = objectProto$4.hasOwnProperty;
 
 /** Used to detect if a method is native. */
 var reIsNative = RegExp('^' +
-  funcToString$1.call(hasOwnProperty$3).replace(reRegExpChar, '\\$&')
+  funcToString$1.call(hasOwnProperty$2).replace(reRegExpChar, '\\$&')
   .replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$'
 );
 
@@ -6244,9 +5129,9 @@ var Set$1 = _getNative(_root, 'Set');
 var _Set = Set$1;
 
 /* Built-in method references that are verified to be native. */
-var WeakMap$2 = _getNative(_root, 'WeakMap');
+var WeakMap = _getNative(_root, 'WeakMap');
 
-var _WeakMap = WeakMap$2;
+var _WeakMap = WeakMap;
 
 /** `Object#toString` result references. */
 var mapTag = '[object Map]',
@@ -6349,7 +5234,7 @@ var _baseIsArguments = baseIsArguments;
 var objectProto$5 = Object.prototype;
 
 /** Used to check objects for own properties. */
-var hasOwnProperty$4 = objectProto$5.hasOwnProperty;
+var hasOwnProperty$3 = objectProto$5.hasOwnProperty;
 
 /** Built-in value references. */
 var propertyIsEnumerable$1 = objectProto$5.propertyIsEnumerable;
@@ -6373,7 +5258,7 @@ var propertyIsEnumerable$1 = objectProto$5.propertyIsEnumerable;
  * // => false
  */
 var isArguments = _baseIsArguments(function() { return arguments; }()) ? _baseIsArguments : function(value) {
-  return isObjectLike_1(value) && hasOwnProperty$4.call(value, 'callee') &&
+  return isObjectLike_1(value) && hasOwnProperty$3.call(value, 'callee') &&
     !propertyIsEnumerable$1.call(value, 'callee');
 };
 
@@ -6665,7 +5550,7 @@ var mapTag$2 = '[object Map]',
 var objectProto$6 = Object.prototype;
 
 /** Used to check objects for own properties. */
-var hasOwnProperty$5 = objectProto$6.hasOwnProperty;
+var hasOwnProperty$4 = objectProto$6.hasOwnProperty;
 
 /**
  * Checks if `value` is an empty object, collection, map, or set.
@@ -6717,7 +5602,7 @@ function isEmpty(value) {
     return !_baseKeys(value).length;
   }
   for (var key in value) {
-    if (hasOwnProperty$5.call(value, key)) {
+    if (hasOwnProperty$4.call(value, key)) {
       return false;
     }
   }
@@ -6915,6 +5800,7 @@ const {
   reducer: reducer$5
 } = userState;
 
+//      
 /**
  * Rooms action creators object
  * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
@@ -7024,6 +5910,382 @@ const {
   reducer: reducer$6
 } = roomsState;
 
+//      
+/*
+* Helpers
+*/
+
+const setId = idObj => {
+  const givenObject = idObj;
+
+  if (!givenObject.id) {
+    givenObject.id = Date.now();
+  }
+
+  return givenObject;
+};
+
+const getAllDescendantIds = (state, nodeId) => state[nodeId].childIds.reduce((acc, childId) => [...acc, childId, ...getAllDescendantIds(state, childId)], []);
+
+const deleteMany = (givenState, ids) => {
+  const state = { ...givenState
+  };
+  ids.forEach(id => delete state[id]);
+  return state;
+};
+
+const findChild = (state, id) => {
+  let found;
+  Object.values(state).forEach(node => {
+    if (!found) {
+      if (node && node.childIds) {
+        // console.error(`FIND ${id} in ${JSON.stringify(node.childIds)} when node ${JSON.stringify(node)}`);
+        if (isArray_1(node.childIds)) {
+          if (node.childIds.includes(id)) {
+            found = node;
+          }
+        }
+      }
+    }
+  }); // console.error(`FOUND ${id} => ${JSON.stringify(found)}`);
+
+  return found;
+};
+/**
+ * Plans action creators object
+ * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
+ * @return { {
+ *   slice : string,
+ *   reducer : ReducerFunction,
+ *   actions : Object<string, ActionCreator},
+ *   selectors : Object<string, Selector>
+ *   }}
+ */
+
+
+const plansState = createSlice({
+  slice: 'plans',
+  initialState: {
+    templates: {},
+    installations: {},
+    locations: {
+      root: {
+        id: 'root',
+        childIds: []
+      }
+    }
+  },
+  reducers: {
+    setPlansState(state, action) {
+      const stateToSet = state;
+      const newState = action.payload;
+      const oldState = stateToSet.plansState;
+      console.log(`PLANS state ${oldState} -> ${newState}`);
+      stateToSet.templates = { ...newState.templates
+      };
+      stateToSet.installations = { ...newState.installations
+      };
+      stateToSet.locations = { ...newState.locations
+      };
+    },
+
+    /*
+     * Reducer action of setting all templates state
+     * @param {Object} state
+     * @param {Object} action
+     */
+    setTemplates(state, action) {
+      const stateToSet = state;
+      const {
+        templates
+      } = action.payload;
+      const newTemplates = {};
+      Object.entries(templates).forEach(entry => {
+        setId(entry);
+        const [id, template] = entry;
+        newTemplates[id] = { ...template
+        };
+      });
+      stateToSet.templates = { ...newTemplates
+      };
+    },
+
+    /*
+     * Reducer action of adding template state
+     * @param {Object} state
+     * @param {Object} action
+     */
+    addTemplate(state, action) {
+      const stateToSet = state;
+      const template = action.payload;
+      setId(template);
+
+      if (template.id) {
+        stateToSet.templates[template.id] = { ...template
+        };
+      }
+    },
+
+    /*
+     * Reducer action of setting template state
+     * @param {Object} state
+     * @param {Object} action
+     */
+    setTemplate(state, action) {
+      const stateToSet = state;
+      const template = action.payload;
+      setId(template);
+
+      if (template.id && stateToSet.templates[template.id]) {
+        stateToSet.templates[template.id] = { ...template
+        };
+      }
+    },
+
+    /*
+     * Reducer action of removing plan state
+     * @param {Object} state
+     * @param {Object} action
+     */
+    removeTemplate(state, action) {
+      const stateToSet = state;
+      const template = action.payload;
+      setId(template);
+
+      if (template.id && stateToSet.templates[template.id]) {
+        delete stateToSet.templates[template.id];
+      }
+    },
+
+    /*
+     * Reducer action of setting installations state
+     * @param {Object} state
+     * @param {Object} action
+     */
+    setInstallations(state, action) {
+      const stateToSet = state;
+      const {
+        installations
+      } = action.payload;
+      const newInstallations = {};
+      Object.entries(installations).forEach(entry => {
+        setId(entry);
+        const [id, installation] = entry;
+        newInstallations[id] = { ...installation
+        };
+      });
+      stateToSet.installations = { ...newInstallations
+      };
+    },
+
+    /*
+     * Reducer action of adding installation state
+     * @param {Object} state
+     * @param {Object} action
+     */
+    addInstallation(state, action) {
+      const stateToSet = state;
+      const installation = action.payload;
+      setId(installation);
+
+      if (installation.id) {
+        stateToSet.installations[installation.id] = { ...installation
+        };
+      }
+    },
+
+    /*
+     * Reducer action of setting plan state
+     * @param {Object} state
+     * @param {Object} action
+     */
+    setInstallation(state, action) {
+      const stateToSet = state;
+      const installation = action.payload;
+      setId(installation);
+
+      if (stateToSet.installations[installation.id]) {
+        stateToSet.installations[installation.id] = { ...installation
+        };
+      }
+    },
+
+    /*
+     * Reducer action of removing plan state
+     * @param {Object} state
+     * @param {Object} action
+     */
+    removeInstallation(state, action) {
+      const stateToSet = state;
+      const installation = action.payload;
+      setId(installation);
+
+      if (installation.id && stateToSet.installations[installation.id]) {
+        delete stateToSet.installations[installation.id];
+      }
+    },
+
+    /*
+     * Reducer action of adding country state
+     * @param {Object} state
+     * @param {Object} action
+     */
+    addLocationCountry(state, action) {
+      const stateToSet = state;
+      const country = action.payload;
+      setId(country);
+
+      if (country.id) {
+        stateToSet.locations[country.id] = { ...country
+        };
+      }
+    },
+
+    /*
+     * Reducer action of setting country state
+     * @param {Object} state
+     * @param {Object} action
+     */
+    setLocationCountry(state, action) {
+      const stateToSet = state;
+      const country = action.payload;
+      setId(country);
+
+      if (stateToSet.locations[country.id]) {
+        stateToSet.locations[country.id] = { ...country
+        };
+      }
+    },
+
+    /*
+     * Reducer action of removing country state
+     * @param {Object} state
+     * @param {Object} action
+     */
+    removeLocationCountry(state, action) {
+      const stateToSet = state;
+      const country = action.payload;
+      setId(country);
+
+      if (country.id && stateToSet.locations[country.id]) {
+        delete stateToSet.locations[country.id];
+      }
+    },
+
+    /*
+     * Reducer action of adding location node state
+     *
+     * addLocationNode({parentId: parent, data:{}})
+     *
+     * addLocationNode({ parentId: null, newNode: country }));
+     *
+     */
+    addLocationNode(state, action) {
+      const stateToSet = state;
+      const {
+        parentId,
+        newNode
+      } = action.payload;
+      const parentTempId = parentId || 'root';
+
+      if (newNode.id) {
+        newNode.id = parentTempId.concat(':').concat(newNode.id);
+      } else if (newNode.data && newNode.data.name) {
+        newNode.id = parentTempId.concat(':').concat(newNode.data.name.replace(/\s+/g, '').replace(/\./g, '').replace(/:/g, ''));
+      } else {
+        newNode.id = parentTempId.concat(':?');
+      } // Check that node doesn't already exist
+
+
+      if (!newNode || !newNode.id) {
+        throw new Error('SDK addLocationNode - no new node given');
+      }
+
+      if (stateToSet.locations[newNode.id]) {
+        throw new Error(`SDK addLocationNode - node ${newNode.id} already exist`);
+      }
+
+      if (!newNode.childIds) {
+        newNode.childIds = [];
+      }
+
+      if (stateToSet.locations[parentTempId] && newNode && newNode.id) {
+        if (!stateToSet.locations[parentTempId].childIds) {
+          stateToSet.locations[parentTempId].childIds = [];
+        }
+
+        stateToSet.locations[parentTempId].childIds = [...stateToSet.locations[parentTempId].childIds, newNode.id];
+        stateToSet.locations[newNode.id] = { ...newNode
+        };
+      }
+    },
+
+    /*
+     * setLocationNode(node)
+     */
+    setLocationNode(state, action) {
+      const stateToSet = state;
+      const node = action.payload;
+
+      if (!node || !node.id) {
+        throw new Error('SDK setLocationNode - no node given');
+      }
+
+      if (!stateToSet.locations[node.id]) {
+        throw new Error(`SDK setLocationNode - node ${node.id} does not exist`);
+      }
+
+      if (!node.childIds) {
+        node.childIds = [];
+      }
+
+      if (node && node.id && stateToSet.locations[node.id]) {
+        stateToSet.locations[node.id] = { ...node
+        };
+      }
+    },
+
+    /*
+     * removeLocationNode
+     */
+    removeLocationNode(state, action) {
+      const stateToSet = state;
+      const nodeId = action.payload;
+
+      if (!nodeId) {
+        throw new Error('SDK removeLocationNode - no nodeId given');
+      }
+
+      if (!stateToSet.locations[nodeId]) {
+        throw new Error(`SDK removeLocationNode - node ${nodeId} doesnt exist`);
+      }
+
+      console.info('removeLocationNode ', nodeId);
+
+      if (nodeId && nodeId !== 'root') {
+        const descendantIds = getAllDescendantIds(stateToSet.locations, nodeId);
+        console.info('descendantIds', descendantIds);
+        const parent = findChild(stateToSet.locations, nodeId);
+        console.info('PARENT', JSON.stringify(parent));
+
+        if (parent && parent.id) {
+          stateToSet.locations = deleteMany(stateToSet.locations, [nodeId, ...descendantIds]);
+          console.info('child not yet removed', JSON.stringify(stateToSet.locations[parent.id].childIds));
+          stateToSet.locations[parent.id].childIds = stateToSet.locations[parent.id].childIds.filter(id => id !== nodeId);
+          console.info('child removed', JSON.stringify(stateToSet.locations[parent.id].childIds));
+        } else {
+          throw new Error(`SDK removeLocationNode - node ${nodeId} parent does not exist`);
+        }
+      }
+    }
+
+  }
+});
+const {
+  actions: actions$7,
+  reducer: reducer$7
+} = plansState;
+
 /**
  * Root reducer
  * @type {Object}
@@ -7036,7 +6298,8 @@ const rootReducer = {
   devices: reducer$3,
   hubs: reducer$4,
   user: reducer$5,
-  rooms: reducer$6
+  rooms: reducer$6,
+  plans: reducer$7
 };
 
 /*!
@@ -7085,7 +6348,7 @@ var getValue$1 = function(target, path, options) {
     return isValid(path, target, options) ? target[path] : options.default;
   }
 
-  let segs = isArray ? path : split$1(path, splitChar, options);
+  let segs = isArray ? path : split(path, splitChar, options);
   let len = segs.length;
   let idx = 0;
 
@@ -7143,7 +6406,7 @@ function join(segs, joinChar, options) {
   return segs[0] + joinChar + segs[1];
 }
 
-function split$1(path, splitChar, options) {
+function split(path, splitChar, options) {
   if (typeof options.split === 'function') {
     return options.split(path);
   }
@@ -7166,14 +6429,14 @@ function isValidObject(val) {
  * @type {Object}
  */
 
-const store$3 = configureStore({
+const store = configureStore({
   reducer: rootReducer // middleware: [...getDefaultMiddleware(), logger]
   // default true like: devTools: 'production' !== 'production'
   // preloadedState
   // enhancers: [reduxBatch]
 
 });
-console.log('Store Initial State: ', store$3.getState());
+console.log('Store Initial State: ', store.getState());
 
 function watchState(getState, objectPath) {
   let currentValue = getValue$1(getState(), objectPath);
@@ -7198,7 +6461,7 @@ function watchState(getState, objectPath) {
 
 
 function watchChanges(path, changed, optionalStore) {
-  const selectedStore = optionalStore || store$3;
+  const selectedStore = optionalStore || store;
   const watchFn = watchState(selectedStore.getState, path);
   selectedStore.subscribe(watchFn(changed));
 }
@@ -7219,6 +6482,40 @@ const HUB_STATES = Object.freeze({
   NO_ACCESS: 'no access',
   CONNECTED: 'connected'
 });
+const ZWAVE_INCLUSION_STATUS = Object.freeze({
+  NOT_PAIRING: 'NOT_PAIRING',
+  // Inclusion is not running
+  IDLE: 'IDLE',
+  // Inclusion is not running
+  RUNNING: 'RUNNING',
+  // Inclusion is running
+  TIMEOUT: 'TIMEOUT',
+  // Inclusion timed out and finished
+  SUCCESS: 'SUCCESS',
+  // Inclusion finished, a device was added
+  CANCEL: 'CANCEL',
+  // Inclusion was cancelled
+  NO_ZWAVE: 'NO_ZWAVE',
+  // ZWave not available
+  ERROR: 'ERROR' // General error
+
+});
+const ZWAVE_EXCLUSION_STATUS = Object.freeze({
+  IDLE: 'IDLE',
+  // Exclusion is not running
+  RUNNING: 'RUNNING',
+  // Exclusion is running
+  TIMEOUT: 'TIMEOUT',
+  // Exclusion timed out and finished
+  SUCCESS: 'SUCCESS',
+  // Exclusion finished, a device was added
+  CANCEL: 'CANCEL',
+  // Exclusion was cancelled
+  NO_ZWAVE: 'NO_ZWAVE',
+  // ZWave not available
+  ERROR: 'ERROR' // General error
+
+});
 /*
  * Intervall defining how often hubkeys and metadatas are fetched
  */
@@ -7231,11 +6528,16 @@ const DISCOVERY_INTERVAL_MS = 45 * 1000;
 
 const POLL_INTERVAL_MS = 1 * 1000;
 /*
- * Interval defining how often hubs are polled when paired at max
- * This value is used as is in local connection, and multiplied in remote connection
+ * Interval defining how often hubs are polled when paired
  */
 
-const PAIRING_POLL_INTERVAL_MS = 5 * 1000;
+const PAIRING_POLL_INTERVAL_MS = 3 * 1000;
+/*
+ * Interval defining how often zwave statuses are polled
+ */
+
+const ZWAVE_INCLUSION_INTERVAL_MS = 3 * 1000;
+const ZWAVE_EXCLUSION_INTERVAL_MS = 3 * 1000;
 const HUB_PROTOCOL = 'http://';
 const HUB_PORT = '8893';
 
@@ -7246,7 +6548,7 @@ const HUB_PORT = '8893';
  */
 
 function setCloudConnectionState(state) {
-  store$3.dispatch(connectionsState.actions.setCloudConnectionState(state));
+  store.dispatch(connectionsState.actions.setCloudConnectionState(state));
 }
 /**
  * Get Cloud connection state
@@ -7254,7 +6556,7 @@ function setCloudConnectionState(state) {
  */
 
 function getCloudConnectionState() {
-  const stateNow = store$3.getState();
+  const stateNow = store.getState();
   return connectionsState.selectors.getConnections(stateNow).cloudState;
 }
 /**
@@ -7263,7 +6565,7 @@ function getCloudConnectionState() {
  */
 
 function setHubConnectionState$1(paramHubAndState) {
-  const stateNow = store$3.getState();
+  const stateNow = store.getState();
   const storedHubs = hubsState.selectors.getHubs(stateNow);
   const hubAndState = paramHubAndState;
   /* If hub is unconnected, lets try remote */
@@ -7274,7 +6576,7 @@ function setHubConnectionState$1(paramHubAndState) {
     }
   }
 
-  store$3.dispatch(hubsState.actions.setHubConnectionState(hubAndState));
+  store.dispatch(hubsState.actions.setHubConnectionState(hubAndState));
 }
 /**
  * Get hub connection state by hub id
@@ -7283,7 +6585,7 @@ function setHubConnectionState$1(paramHubAndState) {
  */
 
 function getHubConnectionState(hubId) {
-  const stateNow = store$3.getState();
+  const stateNow = store.getState();
 
   if (hubsState.selectors.getHubs(stateNow)[hubId]) {
     return hubsState.selectors.getHubs(stateNow)[hubId].connectionState;
@@ -7291,792 +6593,6 @@ function getHubConnectionState(hubId) {
 
   return HUB_CONNECTION_STATES.UNCONNECTED;
 }
-
-var nativePromiseConstructor = global_1.Promise;
-
-var redefineAll = function (target, src, options) {
-  for (var key in src) redefine(target, key, src[key], options);
-  return target;
-};
-
-var SPECIES$1 = wellKnownSymbol('species');
-
-var setSpecies = function (CONSTRUCTOR_NAME) {
-  var Constructor = getBuiltIn(CONSTRUCTOR_NAME);
-  var defineProperty = objectDefineProperty.f;
-
-  if (descriptors && Constructor && !Constructor[SPECIES$1]) {
-    defineProperty(Constructor, SPECIES$1, {
-      configurable: true,
-      get: function () { return this; }
-    });
-  }
-};
-
-var aFunction$1 = function (it) {
-  if (typeof it != 'function') {
-    throw TypeError(String(it) + ' is not a function');
-  } return it;
-};
-
-var anInstance = function (it, Constructor, name) {
-  if (!(it instanceof Constructor)) {
-    throw TypeError('Incorrect ' + (name ? name + ' ' : '') + 'invocation');
-  } return it;
-};
-
-var ITERATOR$2 = wellKnownSymbol('iterator');
-var ArrayPrototype$1 = Array.prototype;
-
-// check on default Array iterator
-var isArrayIteratorMethod = function (it) {
-  return it !== undefined && (iterators.Array === it || ArrayPrototype$1[ITERATOR$2] === it);
-};
-
-// optional / simple context binding
-var bindContext = function (fn, that, length) {
-  aFunction$1(fn);
-  if (that === undefined) return fn;
-  switch (length) {
-    case 0: return function () {
-      return fn.call(that);
-    };
-    case 1: return function (a) {
-      return fn.call(that, a);
-    };
-    case 2: return function (a, b) {
-      return fn.call(that, a, b);
-    };
-    case 3: return function (a, b, c) {
-      return fn.call(that, a, b, c);
-    };
-  }
-  return function (/* ...args */) {
-    return fn.apply(that, arguments);
-  };
-};
-
-var TO_STRING_TAG$1 = wellKnownSymbol('toStringTag');
-// ES3 wrong here
-var CORRECT_ARGUMENTS = classofRaw(function () { return arguments; }()) == 'Arguments';
-
-// fallback for IE11 Script Access Denied error
-var tryGet = function (it, key) {
-  try {
-    return it[key];
-  } catch (error) { /* empty */ }
-};
-
-// getting tag from ES6+ `Object.prototype.toString`
-var classof = function (it) {
-  var O, tag, result;
-  return it === undefined ? 'Undefined' : it === null ? 'Null'
-    // @@toStringTag case
-    : typeof (tag = tryGet(O = Object(it), TO_STRING_TAG$1)) == 'string' ? tag
-    // builtinTag case
-    : CORRECT_ARGUMENTS ? classofRaw(O)
-    // ES3 arguments fallback
-    : (result = classofRaw(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : result;
-};
-
-var ITERATOR$3 = wellKnownSymbol('iterator');
-
-var getIteratorMethod = function (it) {
-  if (it != undefined) return it[ITERATOR$3]
-    || it['@@iterator']
-    || iterators[classof(it)];
-};
-
-// call something on iterator step with safe closing on error
-var callWithSafeIterationClosing = function (iterator, fn, value, ENTRIES) {
-  try {
-    return ENTRIES ? fn(anObject(value)[0], value[1]) : fn(value);
-  // 7.4.6 IteratorClose(iterator, completion)
-  } catch (error) {
-    var returnMethod = iterator['return'];
-    if (returnMethod !== undefined) anObject(returnMethod.call(iterator));
-    throw error;
-  }
-};
-
-var iterate_1 = createCommonjsModule(function (module) {
-var Result = function (stopped, result) {
-  this.stopped = stopped;
-  this.result = result;
-};
-
-var iterate = module.exports = function (iterable, fn, that, AS_ENTRIES, IS_ITERATOR) {
-  var boundFunction = bindContext(fn, that, AS_ENTRIES ? 2 : 1);
-  var iterator, iterFn, index, length, result, next, step;
-
-  if (IS_ITERATOR) {
-    iterator = iterable;
-  } else {
-    iterFn = getIteratorMethod(iterable);
-    if (typeof iterFn != 'function') throw TypeError('Target is not iterable');
-    // optimisation for array iterators
-    if (isArrayIteratorMethod(iterFn)) {
-      for (index = 0, length = toLength(iterable.length); length > index; index++) {
-        result = AS_ENTRIES
-          ? boundFunction(anObject(step = iterable[index])[0], step[1])
-          : boundFunction(iterable[index]);
-        if (result && result instanceof Result) return result;
-      } return new Result(false);
-    }
-    iterator = iterFn.call(iterable);
-  }
-
-  next = iterator.next;
-  while (!(step = next.call(iterator)).done) {
-    result = callWithSafeIterationClosing(iterator, boundFunction, step.value, AS_ENTRIES);
-    if (typeof result == 'object' && result && result instanceof Result) return result;
-  } return new Result(false);
-};
-
-iterate.stop = function (result) {
-  return new Result(true, result);
-};
-});
-
-var ITERATOR$4 = wellKnownSymbol('iterator');
-var SAFE_CLOSING = false;
-
-try {
-  var called = 0;
-  var iteratorWithReturn = {
-    next: function () {
-      return { done: !!called++ };
-    },
-    'return': function () {
-      SAFE_CLOSING = true;
-    }
-  };
-  iteratorWithReturn[ITERATOR$4] = function () {
-    return this;
-  };
-  // eslint-disable-next-line no-throw-literal
-  Array.from(iteratorWithReturn, function () { throw 2; });
-} catch (error) { /* empty */ }
-
-var checkCorrectnessOfIteration = function (exec, SKIP_CLOSING) {
-  if (!SKIP_CLOSING && !SAFE_CLOSING) return false;
-  var ITERATION_SUPPORT = false;
-  try {
-    var object = {};
-    object[ITERATOR$4] = function () {
-      return {
-        next: function () {
-          return { done: ITERATION_SUPPORT = true };
-        }
-      };
-    };
-    exec(object);
-  } catch (error) { /* empty */ }
-  return ITERATION_SUPPORT;
-};
-
-var SPECIES$2 = wellKnownSymbol('species');
-
-// `SpeciesConstructor` abstract operation
-// https://tc39.github.io/ecma262/#sec-speciesconstructor
-var speciesConstructor = function (O, defaultConstructor) {
-  var C = anObject(O).constructor;
-  var S;
-  return C === undefined || (S = anObject(C)[SPECIES$2]) == undefined ? defaultConstructor : aFunction$1(S);
-};
-
-var userAgent = getBuiltIn('navigator', 'userAgent') || '';
-
-var location = global_1.location;
-var set$3 = global_1.setImmediate;
-var clear = global_1.clearImmediate;
-var process$1 = global_1.process;
-var MessageChannel = global_1.MessageChannel;
-var Dispatch = global_1.Dispatch;
-var counter = 0;
-var queue = {};
-var ONREADYSTATECHANGE = 'onreadystatechange';
-var defer, channel, port;
-
-var run = function (id) {
-  // eslint-disable-next-line no-prototype-builtins
-  if (queue.hasOwnProperty(id)) {
-    var fn = queue[id];
-    delete queue[id];
-    fn();
-  }
-};
-
-var runner = function (id) {
-  return function () {
-    run(id);
-  };
-};
-
-var listener = function (event) {
-  run(event.data);
-};
-
-var post = function (id) {
-  // old engines have not location.origin
-  global_1.postMessage(id + '', location.protocol + '//' + location.host);
-};
-
-// Node.js 0.9+ & IE10+ has setImmediate, otherwise:
-if (!set$3 || !clear) {
-  set$3 = function setImmediate(fn) {
-    var args = [];
-    var i = 1;
-    while (arguments.length > i) args.push(arguments[i++]);
-    queue[++counter] = function () {
-      // eslint-disable-next-line no-new-func
-      (typeof fn == 'function' ? fn : Function(fn)).apply(undefined, args);
-    };
-    defer(counter);
-    return counter;
-  };
-  clear = function clearImmediate(id) {
-    delete queue[id];
-  };
-  // Node.js 0.8-
-  if (classofRaw(process$1) == 'process') {
-    defer = function (id) {
-      process$1.nextTick(runner(id));
-    };
-  // Sphere (JS game engine) Dispatch API
-  } else if (Dispatch && Dispatch.now) {
-    defer = function (id) {
-      Dispatch.now(runner(id));
-    };
-  // Browsers with MessageChannel, includes WebWorkers
-  // except iOS - https://github.com/zloirock/core-js/issues/624
-  } else if (MessageChannel && !/(iphone|ipod|ipad).*applewebkit/i.test(userAgent)) {
-    channel = new MessageChannel();
-    port = channel.port2;
-    channel.port1.onmessage = listener;
-    defer = bindContext(port.postMessage, port, 1);
-  // Browsers with postMessage, skip WebWorkers
-  // IE8 has postMessage, but it's sync & typeof its postMessage is 'object'
-  } else if (global_1.addEventListener && typeof postMessage == 'function' && !global_1.importScripts && !fails(post)) {
-    defer = post;
-    global_1.addEventListener('message', listener, false);
-  // IE8-
-  } else if (ONREADYSTATECHANGE in documentCreateElement('script')) {
-    defer = function (id) {
-      html.appendChild(documentCreateElement('script'))[ONREADYSTATECHANGE] = function () {
-        html.removeChild(this);
-        run(id);
-      };
-    };
-  // Rest old browsers
-  } else {
-    defer = function (id) {
-      setTimeout(runner(id), 0);
-    };
-  }
-}
-
-var task = {
-  set: set$3,
-  clear: clear
-};
-
-var getOwnPropertyDescriptor$3 = objectGetOwnPropertyDescriptor.f;
-
-var macrotask = task.set;
-
-
-var MutationObserver = global_1.MutationObserver || global_1.WebKitMutationObserver;
-var process$2 = global_1.process;
-var Promise$2 = global_1.Promise;
-var IS_NODE = classofRaw(process$2) == 'process';
-// Node.js 11 shows ExperimentalWarning on getting `queueMicrotask`
-var queueMicrotaskDescriptor = getOwnPropertyDescriptor$3(global_1, 'queueMicrotask');
-var queueMicrotask = queueMicrotaskDescriptor && queueMicrotaskDescriptor.value;
-
-var flush, head, last, notify, toggle, node, promise, then;
-
-// modern engines have queueMicrotask method
-if (!queueMicrotask) {
-  flush = function () {
-    var parent, fn;
-    if (IS_NODE && (parent = process$2.domain)) parent.exit();
-    while (head) {
-      fn = head.fn;
-      head = head.next;
-      try {
-        fn();
-      } catch (error) {
-        if (head) notify();
-        else last = undefined;
-        throw error;
-      }
-    } last = undefined;
-    if (parent) parent.enter();
-  };
-
-  // Node.js
-  if (IS_NODE) {
-    notify = function () {
-      process$2.nextTick(flush);
-    };
-  // browsers with MutationObserver, except iOS - https://github.com/zloirock/core-js/issues/339
-  } else if (MutationObserver && !/(iphone|ipod|ipad).*applewebkit/i.test(userAgent)) {
-    toggle = true;
-    node = document.createTextNode('');
-    new MutationObserver(flush).observe(node, { characterData: true });
-    notify = function () {
-      node.data = toggle = !toggle;
-    };
-  // environments with maybe non-completely correct, but existent Promise
-  } else if (Promise$2 && Promise$2.resolve) {
-    // Promise.resolve without an argument throws an error in LG WebOS 2
-    promise = Promise$2.resolve(undefined);
-    then = promise.then;
-    notify = function () {
-      then.call(promise, flush);
-    };
-  // for other environments - macrotask based on:
-  // - setImmediate
-  // - MessageChannel
-  // - window.postMessag
-  // - onreadystatechange
-  // - setTimeout
-  } else {
-    notify = function () {
-      // strange IE + webpack dev server bug - use .call(global)
-      macrotask.call(global_1, flush);
-    };
-  }
-}
-
-var microtask = queueMicrotask || function (fn) {
-  var task = { fn: fn, next: undefined };
-  if (last) last.next = task;
-  if (!head) {
-    head = task;
-    notify();
-  } last = task;
-};
-
-var PromiseCapability = function (C) {
-  var resolve, reject;
-  this.promise = new C(function ($$resolve, $$reject) {
-    if (resolve !== undefined || reject !== undefined) throw TypeError('Bad Promise constructor');
-    resolve = $$resolve;
-    reject = $$reject;
-  });
-  this.resolve = aFunction$1(resolve);
-  this.reject = aFunction$1(reject);
-};
-
-// 25.4.1.5 NewPromiseCapability(C)
-var f$5 = function (C) {
-  return new PromiseCapability(C);
-};
-
-var newPromiseCapability = {
-	f: f$5
-};
-
-var promiseResolve = function (C, x) {
-  anObject(C);
-  if (isObject(x) && x.constructor === C) return x;
-  var promiseCapability = newPromiseCapability.f(C);
-  var resolve = promiseCapability.resolve;
-  resolve(x);
-  return promiseCapability.promise;
-};
-
-var hostReportErrors = function (a, b) {
-  var console = global_1.console;
-  if (console && console.error) {
-    arguments.length === 1 ? console.error(a) : console.error(a, b);
-  }
-};
-
-var perform = function (exec) {
-  try {
-    return { error: false, value: exec() };
-  } catch (error) {
-    return { error: true, value: error };
-  }
-};
-
-var process$3 = global_1.process;
-var versions = process$3 && process$3.versions;
-var v8 = versions && versions.v8;
-var match, version;
-
-if (v8) {
-  match = v8.split('.');
-  version = match[0] + match[1];
-} else if (userAgent) {
-  match = userAgent.match(/Edge\/(\d+)/);
-  if (!match || match[1] >= 74) {
-    match = userAgent.match(/Chrome\/(\d+)/);
-    if (match) version = match[1];
-  }
-}
-
-var v8Version = version && +version;
-
-var task$1 = task.set;
-
-
-
-
-
-
-
-
-
-
-var SPECIES$3 = wellKnownSymbol('species');
-var PROMISE = 'Promise';
-var getInternalState$1 = internalState.get;
-var setInternalState$1 = internalState.set;
-var getInternalPromiseState = internalState.getterFor(PROMISE);
-var PromiseConstructor = nativePromiseConstructor;
-var TypeError$1 = global_1.TypeError;
-var document$2 = global_1.document;
-var process$4 = global_1.process;
-var $fetch = getBuiltIn('fetch');
-var newPromiseCapability$1 = newPromiseCapability.f;
-var newGenericPromiseCapability = newPromiseCapability$1;
-var IS_NODE$1 = classofRaw(process$4) == 'process';
-var DISPATCH_EVENT = !!(document$2 && document$2.createEvent && global_1.dispatchEvent);
-var UNHANDLED_REJECTION = 'unhandledrejection';
-var REJECTION_HANDLED = 'rejectionhandled';
-var PENDING = 0;
-var FULFILLED = 1;
-var REJECTED = 2;
-var HANDLED = 1;
-var UNHANDLED = 2;
-var Internal, OwnPromiseCapability, PromiseWrapper, nativeThen;
-
-var FORCED = isForced_1(PROMISE, function () {
-  // V8 6.6 (Node 10 and Chrome 66) have a bug with resolving custom thenables
-  // https://bugs.chromium.org/p/chromium/issues/detail?id=830565
-  // We can't detect it synchronously, so just check versions
-  if (v8Version === 66) return true;
-  // Unhandled rejections tracking support, NodeJS Promise without it fails @@species test
-  if (!IS_NODE$1 && typeof PromiseRejectionEvent != 'function') return true;
-  // We can't use @@species feature detection in V8 since it causes
-  // deoptimization and performance degradation
-  // https://github.com/zloirock/core-js/issues/679
-  if (v8Version >= 51 && /native code/.test(PromiseConstructor)) return false;
-  // Detect correctness of subclassing with @@species support
-  var promise = PromiseConstructor.resolve(1);
-  var FakePromise = function (exec) {
-    exec(function () { /* empty */ }, function () { /* empty */ });
-  };
-  var constructor = promise.constructor = {};
-  constructor[SPECIES$3] = FakePromise;
-  return !(promise.then(function () { /* empty */ }) instanceof FakePromise);
-});
-
-var INCORRECT_ITERATION = FORCED || !checkCorrectnessOfIteration(function (iterable) {
-  PromiseConstructor.all(iterable)['catch'](function () { /* empty */ });
-});
-
-// helpers
-var isThenable = function (it) {
-  var then;
-  return isObject(it) && typeof (then = it.then) == 'function' ? then : false;
-};
-
-var notify$1 = function (promise, state, isReject) {
-  if (state.notified) return;
-  state.notified = true;
-  var chain = state.reactions;
-  microtask(function () {
-    var value = state.value;
-    var ok = state.state == FULFILLED;
-    var index = 0;
-    // variable length - can't use forEach
-    while (chain.length > index) {
-      var reaction = chain[index++];
-      var handler = ok ? reaction.ok : reaction.fail;
-      var resolve = reaction.resolve;
-      var reject = reaction.reject;
-      var domain = reaction.domain;
-      var result, then, exited;
-      try {
-        if (handler) {
-          if (!ok) {
-            if (state.rejection === UNHANDLED) onHandleUnhandled(promise, state);
-            state.rejection = HANDLED;
-          }
-          if (handler === true) result = value;
-          else {
-            if (domain) domain.enter();
-            result = handler(value); // can throw
-            if (domain) {
-              domain.exit();
-              exited = true;
-            }
-          }
-          if (result === reaction.promise) {
-            reject(TypeError$1('Promise-chain cycle'));
-          } else if (then = isThenable(result)) {
-            then.call(result, resolve, reject);
-          } else resolve(result);
-        } else reject(value);
-      } catch (error) {
-        if (domain && !exited) domain.exit();
-        reject(error);
-      }
-    }
-    state.reactions = [];
-    state.notified = false;
-    if (isReject && !state.rejection) onUnhandled(promise, state);
-  });
-};
-
-var dispatchEvent = function (name, promise, reason) {
-  var event, handler;
-  if (DISPATCH_EVENT) {
-    event = document$2.createEvent('Event');
-    event.promise = promise;
-    event.reason = reason;
-    event.initEvent(name, false, true);
-    global_1.dispatchEvent(event);
-  } else event = { promise: promise, reason: reason };
-  if (handler = global_1['on' + name]) handler(event);
-  else if (name === UNHANDLED_REJECTION) hostReportErrors('Unhandled promise rejection', reason);
-};
-
-var onUnhandled = function (promise, state) {
-  task$1.call(global_1, function () {
-    var value = state.value;
-    var IS_UNHANDLED = isUnhandled(state);
-    var result;
-    if (IS_UNHANDLED) {
-      result = perform(function () {
-        if (IS_NODE$1) {
-          process$4.emit('unhandledRejection', value, promise);
-        } else dispatchEvent(UNHANDLED_REJECTION, promise, value);
-      });
-      // Browsers should not trigger `rejectionHandled` event if it was handled here, NodeJS - should
-      state.rejection = IS_NODE$1 || isUnhandled(state) ? UNHANDLED : HANDLED;
-      if (result.error) throw result.value;
-    }
-  });
-};
-
-var isUnhandled = function (state) {
-  return state.rejection !== HANDLED && !state.parent;
-};
-
-var onHandleUnhandled = function (promise, state) {
-  task$1.call(global_1, function () {
-    if (IS_NODE$1) {
-      process$4.emit('rejectionHandled', promise);
-    } else dispatchEvent(REJECTION_HANDLED, promise, state.value);
-  });
-};
-
-var bind = function (fn, promise, state, unwrap) {
-  return function (value) {
-    fn(promise, state, value, unwrap);
-  };
-};
-
-var internalReject = function (promise, state, value, unwrap) {
-  if (state.done) return;
-  state.done = true;
-  if (unwrap) state = unwrap;
-  state.value = value;
-  state.state = REJECTED;
-  notify$1(promise, state, true);
-};
-
-var internalResolve = function (promise, state, value, unwrap) {
-  if (state.done) return;
-  state.done = true;
-  if (unwrap) state = unwrap;
-  try {
-    if (promise === value) throw TypeError$1("Promise can't be resolved itself");
-    var then = isThenable(value);
-    if (then) {
-      microtask(function () {
-        var wrapper = { done: false };
-        try {
-          then.call(value,
-            bind(internalResolve, promise, wrapper, state),
-            bind(internalReject, promise, wrapper, state)
-          );
-        } catch (error) {
-          internalReject(promise, wrapper, error, state);
-        }
-      });
-    } else {
-      state.value = value;
-      state.state = FULFILLED;
-      notify$1(promise, state, false);
-    }
-  } catch (error) {
-    internalReject(promise, { done: false }, error, state);
-  }
-};
-
-// constructor polyfill
-if (FORCED) {
-  // 25.4.3.1 Promise(executor)
-  PromiseConstructor = function Promise(executor) {
-    anInstance(this, PromiseConstructor, PROMISE);
-    aFunction$1(executor);
-    Internal.call(this);
-    var state = getInternalState$1(this);
-    try {
-      executor(bind(internalResolve, this, state), bind(internalReject, this, state));
-    } catch (error) {
-      internalReject(this, state, error);
-    }
-  };
-  // eslint-disable-next-line no-unused-vars
-  Internal = function Promise(executor) {
-    setInternalState$1(this, {
-      type: PROMISE,
-      done: false,
-      notified: false,
-      parent: false,
-      reactions: [],
-      rejection: false,
-      state: PENDING,
-      value: undefined
-    });
-  };
-  Internal.prototype = redefineAll(PromiseConstructor.prototype, {
-    // `Promise.prototype.then` method
-    // https://tc39.github.io/ecma262/#sec-promise.prototype.then
-    then: function then(onFulfilled, onRejected) {
-      var state = getInternalPromiseState(this);
-      var reaction = newPromiseCapability$1(speciesConstructor(this, PromiseConstructor));
-      reaction.ok = typeof onFulfilled == 'function' ? onFulfilled : true;
-      reaction.fail = typeof onRejected == 'function' && onRejected;
-      reaction.domain = IS_NODE$1 ? process$4.domain : undefined;
-      state.parent = true;
-      state.reactions.push(reaction);
-      if (state.state != PENDING) notify$1(this, state, false);
-      return reaction.promise;
-    },
-    // `Promise.prototype.catch` method
-    // https://tc39.github.io/ecma262/#sec-promise.prototype.catch
-    'catch': function (onRejected) {
-      return this.then(undefined, onRejected);
-    }
-  });
-  OwnPromiseCapability = function () {
-    var promise = new Internal();
-    var state = getInternalState$1(promise);
-    this.promise = promise;
-    this.resolve = bind(internalResolve, promise, state);
-    this.reject = bind(internalReject, promise, state);
-  };
-  newPromiseCapability.f = newPromiseCapability$1 = function (C) {
-    return C === PromiseConstructor || C === PromiseWrapper
-      ? new OwnPromiseCapability(C)
-      : newGenericPromiseCapability(C);
-  };
-
-  if ( typeof nativePromiseConstructor == 'function') {
-    nativeThen = nativePromiseConstructor.prototype.then;
-
-    // wrap native Promise#then for native async functions
-    redefine(nativePromiseConstructor.prototype, 'then', function then(onFulfilled, onRejected) {
-      var that = this;
-      return new PromiseConstructor(function (resolve, reject) {
-        nativeThen.call(that, resolve, reject);
-      }).then(onFulfilled, onRejected);
-    // https://github.com/zloirock/core-js/issues/640
-    }, { unsafe: true });
-
-    // wrap fetch result
-    if (typeof $fetch == 'function') _export({ global: true, enumerable: true, forced: true }, {
-      // eslint-disable-next-line no-unused-vars
-      fetch: function fetch(input /* , init */) {
-        return promiseResolve(PromiseConstructor, $fetch.apply(global_1, arguments));
-      }
-    });
-  }
-}
-
-_export({ global: true, wrap: true, forced: FORCED }, {
-  Promise: PromiseConstructor
-});
-
-setToStringTag(PromiseConstructor, PROMISE, false);
-setSpecies(PROMISE);
-
-PromiseWrapper = getBuiltIn(PROMISE);
-
-// statics
-_export({ target: PROMISE, stat: true, forced: FORCED }, {
-  // `Promise.reject` method
-  // https://tc39.github.io/ecma262/#sec-promise.reject
-  reject: function reject(r) {
-    var capability = newPromiseCapability$1(this);
-    capability.reject.call(undefined, r);
-    return capability.promise;
-  }
-});
-
-_export({ target: PROMISE, stat: true, forced:  FORCED }, {
-  // `Promise.resolve` method
-  // https://tc39.github.io/ecma262/#sec-promise.resolve
-  resolve: function resolve(x) {
-    return promiseResolve( this, x);
-  }
-});
-
-_export({ target: PROMISE, stat: true, forced: INCORRECT_ITERATION }, {
-  // `Promise.all` method
-  // https://tc39.github.io/ecma262/#sec-promise.all
-  all: function all(iterable) {
-    var C = this;
-    var capability = newPromiseCapability$1(C);
-    var resolve = capability.resolve;
-    var reject = capability.reject;
-    var result = perform(function () {
-      var $promiseResolve = aFunction$1(C.resolve);
-      var values = [];
-      var counter = 0;
-      var remaining = 1;
-      iterate_1(iterable, function (promise) {
-        var index = counter++;
-        var alreadyCalled = false;
-        values.push(undefined);
-        remaining++;
-        $promiseResolve.call(C, promise).then(function (value) {
-          if (alreadyCalled) return;
-          alreadyCalled = true;
-          values[index] = value;
-          --remaining || resolve(values);
-        }, reject);
-      });
-      --remaining || resolve(values);
-    });
-    if (result.error) reject(result.value);
-    return capability.promise;
-  },
-  // `Promise.race` method
-  // https://tc39.github.io/ecma262/#sec-promise.race
-  race: function race(iterable) {
-    var C = this;
-    var capability = newPromiseCapability$1(C);
-    var reject = capability.reject;
-    var result = perform(function () {
-      var $promiseResolve = aFunction$1(C.resolve);
-      iterate_1(iterable, function (promise) {
-        $promiseResolve.call(C, promise).then(capability.resolve, reject);
-      });
-    });
-    if (result.error) reject(result.value);
-    return capability.promise;
-  }
-});
 
 /** `Object#toString` result references. */
 var stringTag$1 = '[object String]';
@@ -8105,7 +6621,7 @@ function isString(value) {
 
 var isString_1 = isString;
 
-var bind$1 = function bind(fn, thisArg) {
+var bind = function bind(fn, thisArg) {
   return function wrap() {
     var args = new Array(arguments.length);
     for (var i = 0; i < args.length; i++) {
@@ -8131,7 +6647,7 @@ var isBuffer = function isBuffer (obj) {
 
 // utils is a library of generic helper functions non-specific to axios
 
-var toString$1 = Object.prototype.toString;
+var toString = Object.prototype.toString;
 
 /**
  * Determine if a value is an Array
@@ -8140,7 +6656,7 @@ var toString$1 = Object.prototype.toString;
  * @returns {boolean} True if value is an Array, otherwise false
  */
 function isArray$4(val) {
-  return toString$1.call(val) === '[object Array]';
+  return toString.call(val) === '[object Array]';
 }
 
 /**
@@ -8150,7 +6666,7 @@ function isArray$4(val) {
  * @returns {boolean} True if value is an ArrayBuffer, otherwise false
  */
 function isArrayBuffer(val) {
-  return toString$1.call(val) === '[object ArrayBuffer]';
+  return toString.call(val) === '[object ArrayBuffer]';
 }
 
 /**
@@ -8215,7 +6731,7 @@ function isUndefined(val) {
  * @param {Object} val The value to test
  * @returns {boolean} True if value is an Object, otherwise false
  */
-function isObject$2(val) {
+function isObject$1(val) {
   return val !== null && typeof val === 'object';
 }
 
@@ -8226,7 +6742,7 @@ function isObject$2(val) {
  * @returns {boolean} True if value is a Date, otherwise false
  */
 function isDate(val) {
-  return toString$1.call(val) === '[object Date]';
+  return toString.call(val) === '[object Date]';
 }
 
 /**
@@ -8236,7 +6752,7 @@ function isDate(val) {
  * @returns {boolean} True if value is a File, otherwise false
  */
 function isFile(val) {
-  return toString$1.call(val) === '[object File]';
+  return toString.call(val) === '[object File]';
 }
 
 /**
@@ -8246,7 +6762,7 @@ function isFile(val) {
  * @returns {boolean} True if value is a Blob, otherwise false
  */
 function isBlob(val) {
-  return toString$1.call(val) === '[object Blob]';
+  return toString.call(val) === '[object Blob]';
 }
 
 /**
@@ -8256,7 +6772,7 @@ function isBlob(val) {
  * @returns {boolean} True if value is a Function, otherwise false
  */
 function isFunction$1(val) {
-  return toString$1.call(val) === '[object Function]';
+  return toString.call(val) === '[object Function]';
 }
 
 /**
@@ -8266,7 +6782,7 @@ function isFunction$1(val) {
  * @returns {boolean} True if value is a Stream, otherwise false
  */
 function isStream(val) {
-  return isObject$2(val) && isFunction$1(val.pipe);
+  return isObject$1(val) && isFunction$1(val.pipe);
 }
 
 /**
@@ -8301,9 +6817,13 @@ function trim(str) {
  *
  * react-native:
  *  navigator.product -> 'ReactNative'
+ * nativescript
+ *  navigator.product -> 'NativeScript' or 'NS'
  */
 function isStandardBrowserEnv() {
-  if (typeof navigator !== 'undefined' && navigator.product === 'ReactNative') {
+  if (typeof navigator !== 'undefined' && (navigator.product === 'ReactNative' ||
+                                           navigator.product === 'NativeScript' ||
+                                           navigator.product === 'NS')) {
     return false;
   }
   return (
@@ -8385,6 +6905,32 @@ function merge$1(/* obj1, obj2, obj3, ... */) {
 }
 
 /**
+ * Function equal to merge with the difference being that no reference
+ * to original objects is kept.
+ *
+ * @see merge
+ * @param {Object} obj1 Object to merge
+ * @returns {Object} Result of all merge properties
+ */
+function deepMerge(/* obj1, obj2, obj3, ... */) {
+  var result = {};
+  function assignValue(val, key) {
+    if (typeof result[key] === 'object' && typeof val === 'object') {
+      result[key] = deepMerge(result[key], val);
+    } else if (typeof val === 'object') {
+      result[key] = deepMerge({}, val);
+    } else {
+      result[key] = val;
+    }
+  }
+
+  for (var i = 0, l = arguments.length; i < l; i++) {
+    forEach(arguments[i], assignValue);
+  }
+  return result;
+}
+
+/**
  * Extends object a by mutably adding to it the properties of object b.
  *
  * @param {Object} a The object to be extended
@@ -8395,7 +6941,7 @@ function merge$1(/* obj1, obj2, obj3, ... */) {
 function extend(a, b, thisArg) {
   forEach(b, function assignValue(val, key) {
     if (thisArg && typeof val === 'function') {
-      a[key] = bind$1(val, thisArg);
+      a[key] = bind(val, thisArg);
     } else {
       a[key] = val;
     }
@@ -8411,7 +6957,7 @@ var utils = {
   isArrayBufferView: isArrayBufferView,
   isString: isString$1,
   isNumber: isNumber,
-  isObject: isObject$2,
+  isObject: isObject$1,
   isUndefined: isUndefined,
   isDate: isDate,
   isFile: isFile,
@@ -8422,75 +6968,9 @@ var utils = {
   isStandardBrowserEnv: isStandardBrowserEnv,
   forEach: forEach,
   merge: merge$1,
+  deepMerge: deepMerge,
   extend: extend,
   trim: trim
-};
-
-var normalizeHeaderName = function normalizeHeaderName(headers, normalizedName) {
-  utils.forEach(headers, function processHeader(value, name) {
-    if (name !== normalizedName && name.toUpperCase() === normalizedName.toUpperCase()) {
-      headers[normalizedName] = value;
-      delete headers[name];
-    }
-  });
-};
-
-/**
- * Update an Error with the specified config, error code, and response.
- *
- * @param {Error} error The error to update.
- * @param {Object} config The config.
- * @param {string} [code] The error code (for example, 'ECONNABORTED').
- * @param {Object} [request] The request.
- * @param {Object} [response] The response.
- * @returns {Error} The error.
- */
-var enhanceError = function enhanceError(error, config, code, request, response) {
-  error.config = config;
-  if (code) {
-    error.code = code;
-  }
-  error.request = request;
-  error.response = response;
-  return error;
-};
-
-/**
- * Create an Error with the specified message, config, error code, request and response.
- *
- * @param {string} message The error message.
- * @param {Object} config The config.
- * @param {string} [code] The error code (for example, 'ECONNABORTED').
- * @param {Object} [request] The request.
- * @param {Object} [response] The response.
- * @returns {Error} The created error.
- */
-var createError = function createError(message, config, code, request, response) {
-  var error = new Error(message);
-  return enhanceError(error, config, code, request, response);
-};
-
-/**
- * Resolve or reject a Promise based on response status.
- *
- * @param {Function} resolve A function that resolves the promise.
- * @param {Function} reject A function that rejects the promise.
- * @param {object} response The response.
- */
-var settle = function settle(resolve, reject, response) {
-  var validateStatus = response.config.validateStatus;
-  // Note: status is not exposed by XDomainRequest
-  if (!response.status || !validateStatus || validateStatus(response.status)) {
-    resolve(response);
-  } else {
-    reject(createError(
-      'Request failed with status code ' + response.status,
-      response.config,
-      null,
-      response.request,
-      response
-    ));
-  }
 };
 
 function encode(val) {
@@ -8550,329 +7030,172 @@ var buildURL = function buildURL(url, params, paramsSerializer) {
   }
 
   if (serializedParams) {
+    var hashmarkIndex = url.indexOf('#');
+    if (hashmarkIndex !== -1) {
+      url = url.slice(0, hashmarkIndex);
+    }
+
     url += (url.indexOf('?') === -1 ? '?' : '&') + serializedParams;
   }
 
   return url;
 };
 
-// Headers whose duplicates are ignored by node
-// c.f. https://nodejs.org/api/http.html#http_message_headers
-var ignoreDuplicateOf = [
-  'age', 'authorization', 'content-length', 'content-type', 'etag',
-  'expires', 'from', 'host', 'if-modified-since', 'if-unmodified-since',
-  'last-modified', 'location', 'max-forwards', 'proxy-authorization',
-  'referer', 'retry-after', 'user-agent'
-];
+function InterceptorManager() {
+  this.handlers = [];
+}
 
 /**
- * Parse headers into an object
+ * Add a new interceptor to the stack
  *
- * ```
- * Date: Wed, 27 Aug 2014 08:58:49 GMT
- * Content-Type: application/json
- * Connection: keep-alive
- * Transfer-Encoding: chunked
- * ```
+ * @param {Function} fulfilled The function to handle `then` for a `Promise`
+ * @param {Function} rejected The function to handle `reject` for a `Promise`
  *
- * @param {String} headers Headers needing to be parsed
- * @returns {Object} Headers parsed into an object
+ * @return {Number} An ID used to remove interceptor later
  */
-var parseHeaders = function parseHeaders(headers) {
-  var parsed = {};
-  var key;
-  var val;
-  var i;
-
-  if (!headers) { return parsed; }
-
-  utils.forEach(headers.split('\n'), function parser(line) {
-    i = line.indexOf(':');
-    key = utils.trim(line.substr(0, i)).toLowerCase();
-    val = utils.trim(line.substr(i + 1));
-
-    if (key) {
-      if (parsed[key] && ignoreDuplicateOf.indexOf(key) >= 0) {
-        return;
-      }
-      if (key === 'set-cookie') {
-        parsed[key] = (parsed[key] ? parsed[key] : []).concat([val]);
-      } else {
-        parsed[key] = parsed[key] ? parsed[key] + ', ' + val : val;
-      }
-    }
+InterceptorManager.prototype.use = function use(fulfilled, rejected) {
+  this.handlers.push({
+    fulfilled: fulfilled,
+    rejected: rejected
   });
-
-  return parsed;
+  return this.handlers.length - 1;
 };
 
-var isURLSameOrigin = (
-  utils.isStandardBrowserEnv() ?
+/**
+ * Remove an interceptor from the stack
+ *
+ * @param {Number} id The ID that was returned by `use`
+ */
+InterceptorManager.prototype.eject = function eject(id) {
+  if (this.handlers[id]) {
+    this.handlers[id] = null;
+  }
+};
 
-  // Standard browser envs have full support of the APIs needed to test
-  // whether the request URL is of the same origin as current location.
-  (function standardBrowserEnv() {
-    var msie = /(msie|trident)/i.test(navigator.userAgent);
-    var urlParsingNode = document.createElement('a');
-    var originURL;
-
-    /**
-    * Parse a URL to discover it's components
-    *
-    * @param {String} url The URL to be parsed
-    * @returns {Object}
-    */
-    function resolveURL(url) {
-      var href = url;
-
-      if (msie) {
-        // IE needs attribute set twice to normalize properties
-        urlParsingNode.setAttribute('href', href);
-        href = urlParsingNode.href;
-      }
-
-      urlParsingNode.setAttribute('href', href);
-
-      // urlParsingNode provides the UrlUtils interface - http://url.spec.whatwg.org/#urlutils
-      return {
-        href: urlParsingNode.href,
-        protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, '') : '',
-        host: urlParsingNode.host,
-        search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, '') : '',
-        hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, '') : '',
-        hostname: urlParsingNode.hostname,
-        port: urlParsingNode.port,
-        pathname: (urlParsingNode.pathname.charAt(0) === '/') ?
-                  urlParsingNode.pathname :
-                  '/' + urlParsingNode.pathname
-      };
+/**
+ * Iterate over all the registered interceptors
+ *
+ * This method is particularly useful for skipping over any
+ * interceptors that may have become `null` calling `eject`.
+ *
+ * @param {Function} fn The function to call for each interceptor
+ */
+InterceptorManager.prototype.forEach = function forEach(fn) {
+  utils.forEach(this.handlers, function forEachHandler(h) {
+    if (h !== null) {
+      fn(h);
     }
-
-    originURL = resolveURL(window.location.href);
-
-    /**
-    * Determine if a URL shares the same origin as the current location
-    *
-    * @param {String} requestURL The URL to test
-    * @returns {boolean} True if URL shares the same origin, otherwise false
-    */
-    return function isURLSameOrigin(requestURL) {
-      var parsed = (utils.isString(requestURL)) ? resolveURL(requestURL) : requestURL;
-      return (parsed.protocol === originURL.protocol &&
-            parsed.host === originURL.host);
-    };
-  })() :
-
-  // Non standard browser envs (web workers, react-native) lack needed support.
-  (function nonStandardBrowserEnv() {
-    return function isURLSameOrigin() {
-      return true;
-    };
-  })()
-);
-
-var cookies = (
-  utils.isStandardBrowserEnv() ?
-
-  // Standard browser envs support document.cookie
-  (function standardBrowserEnv() {
-    return {
-      write: function write(name, value, expires, path, domain, secure) {
-        var cookie = [];
-        cookie.push(name + '=' + encodeURIComponent(value));
-
-        if (utils.isNumber(expires)) {
-          cookie.push('expires=' + new Date(expires).toGMTString());
-        }
-
-        if (utils.isString(path)) {
-          cookie.push('path=' + path);
-        }
-
-        if (utils.isString(domain)) {
-          cookie.push('domain=' + domain);
-        }
-
-        if (secure === true) {
-          cookie.push('secure');
-        }
-
-        document.cookie = cookie.join('; ');
-      },
-
-      read: function read(name) {
-        var match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
-        return (match ? decodeURIComponent(match[3]) : null);
-      },
-
-      remove: function remove(name) {
-        this.write(name, '', Date.now() - 86400000);
-      }
-    };
-  })() :
-
-  // Non standard browser env (web workers, react-native) lack needed support.
-  (function nonStandardBrowserEnv() {
-    return {
-      write: function write() {},
-      read: function read() { return null; },
-      remove: function remove() {}
-    };
-  })()
-);
-
-var xhr = function xhrAdapter(config) {
-  return new Promise(function dispatchXhrRequest(resolve, reject) {
-    var requestData = config.data;
-    var requestHeaders = config.headers;
-
-    if (utils.isFormData(requestData)) {
-      delete requestHeaders['Content-Type']; // Let the browser set it
-    }
-
-    var request = new XMLHttpRequest();
-
-    // HTTP basic authentication
-    if (config.auth) {
-      var username = config.auth.username || '';
-      var password = config.auth.password || '';
-      requestHeaders.Authorization = 'Basic ' + btoa(username + ':' + password);
-    }
-
-    request.open(config.method.toUpperCase(), buildURL(config.url, config.params, config.paramsSerializer), true);
-
-    // Set the request timeout in MS
-    request.timeout = config.timeout;
-
-    // Listen for ready state
-    request.onreadystatechange = function handleLoad() {
-      if (!request || request.readyState !== 4) {
-        return;
-      }
-
-      // The request errored out and we didn't get a response, this will be
-      // handled by onerror instead
-      // With one exception: request that using file: protocol, most browsers
-      // will return status as 0 even though it's a successful request
-      if (request.status === 0 && !(request.responseURL && request.responseURL.indexOf('file:') === 0)) {
-        return;
-      }
-
-      // Prepare the response
-      var responseHeaders = 'getAllResponseHeaders' in request ? parseHeaders(request.getAllResponseHeaders()) : null;
-      var responseData = !config.responseType || config.responseType === 'text' ? request.responseText : request.response;
-      var response = {
-        data: responseData,
-        status: request.status,
-        statusText: request.statusText,
-        headers: responseHeaders,
-        config: config,
-        request: request
-      };
-
-      settle(resolve, reject, response);
-
-      // Clean up request
-      request = null;
-    };
-
-    // Handle low level network errors
-    request.onerror = function handleError() {
-      // Real errors are hidden from us by the browser
-      // onerror should only fire if it's a network error
-      reject(createError('Network Error', config, null, request));
-
-      // Clean up request
-      request = null;
-    };
-
-    // Handle timeout
-    request.ontimeout = function handleTimeout() {
-      reject(createError('timeout of ' + config.timeout + 'ms exceeded', config, 'ECONNABORTED',
-        request));
-
-      // Clean up request
-      request = null;
-    };
-
-    // Add xsrf header
-    // This is only done if running in a standard browser environment.
-    // Specifically not if we're in a web worker, or react-native.
-    if (utils.isStandardBrowserEnv()) {
-      var cookies$1 = cookies;
-
-      // Add xsrf header
-      var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
-          cookies$1.read(config.xsrfCookieName) :
-          undefined;
-
-      if (xsrfValue) {
-        requestHeaders[config.xsrfHeaderName] = xsrfValue;
-      }
-    }
-
-    // Add headers to the request
-    if ('setRequestHeader' in request) {
-      utils.forEach(requestHeaders, function setRequestHeader(val, key) {
-        if (typeof requestData === 'undefined' && key.toLowerCase() === 'content-type') {
-          // Remove Content-Type if data is undefined
-          delete requestHeaders[key];
-        } else {
-          // Otherwise add header to the request
-          request.setRequestHeader(key, val);
-        }
-      });
-    }
-
-    // Add withCredentials to request if needed
-    if (config.withCredentials) {
-      request.withCredentials = true;
-    }
-
-    // Add responseType to request if needed
-    if (config.responseType) {
-      try {
-        request.responseType = config.responseType;
-      } catch (e) {
-        // Expected DOMException thrown by browsers not compatible XMLHttpRequest Level 2.
-        // But, this can be suppressed for 'json' type as it can be parsed by default 'transformResponse' function.
-        if (config.responseType !== 'json') {
-          throw e;
-        }
-      }
-    }
-
-    // Handle progress if needed
-    if (typeof config.onDownloadProgress === 'function') {
-      request.addEventListener('progress', config.onDownloadProgress);
-    }
-
-    // Not all browsers support upload events
-    if (typeof config.onUploadProgress === 'function' && request.upload) {
-      request.upload.addEventListener('progress', config.onUploadProgress);
-    }
-
-    if (config.cancelToken) {
-      // Handle cancellation
-      config.cancelToken.promise.then(function onCanceled(cancel) {
-        if (!request) {
-          return;
-        }
-
-        request.abort();
-        reject(cancel);
-        // Clean up request
-        request = null;
-      });
-    }
-
-    if (requestData === undefined) {
-      requestData = null;
-    }
-
-    // Send the request
-    request.send(requestData);
   });
+};
+
+var InterceptorManager_1 = InterceptorManager;
+
+/**
+ * Transform the data for a request or a response
+ *
+ * @param {Object|String} data The data to be transformed
+ * @param {Array} headers The headers for the request or response
+ * @param {Array|Function} fns A single function or Array of functions
+ * @returns {*} The resulting transformed data
+ */
+var transformData = function transformData(data, headers, fns) {
+  /*eslint no-param-reassign:0*/
+  utils.forEach(fns, function transform(fn) {
+    data = fn(data, headers);
+  });
+
+  return data;
+};
+
+var isCancel = function isCancel(value) {
+  return !!(value && value.__CANCEL__);
+};
+
+var normalizeHeaderName = function normalizeHeaderName(headers, normalizedName) {
+  utils.forEach(headers, function processHeader(value, name) {
+    if (name !== normalizedName && name.toUpperCase() === normalizedName.toUpperCase()) {
+      headers[normalizedName] = value;
+      delete headers[name];
+    }
+  });
+};
+
+/**
+ * Update an Error with the specified config, error code, and response.
+ *
+ * @param {Error} error The error to update.
+ * @param {Object} config The config.
+ * @param {string} [code] The error code (for example, 'ECONNABORTED').
+ * @param {Object} [request] The request.
+ * @param {Object} [response] The response.
+ * @returns {Error} The error.
+ */
+var enhanceError = function enhanceError(error, config, code, request, response) {
+  error.config = config;
+  if (code) {
+    error.code = code;
+  }
+
+  error.request = request;
+  error.response = response;
+  error.isAxiosError = true;
+
+  error.toJSON = function() {
+    return {
+      // Standard
+      message: this.message,
+      name: this.name,
+      // Microsoft
+      description: this.description,
+      number: this.number,
+      // Mozilla
+      fileName: this.fileName,
+      lineNumber: this.lineNumber,
+      columnNumber: this.columnNumber,
+      stack: this.stack,
+      // Axios
+      config: this.config,
+      code: this.code
+    };
+  };
+  return error;
+};
+
+/**
+ * Create an Error with the specified message, config, error code, request and response.
+ *
+ * @param {string} message The error message.
+ * @param {Object} config The config.
+ * @param {string} [code] The error code (for example, 'ECONNABORTED').
+ * @param {Object} [request] The request.
+ * @param {Object} [response] The response.
+ * @returns {Error} The created error.
+ */
+var createError = function createError(message, config, code, request, response) {
+  var error = new Error(message);
+  return enhanceError(error, config, code, request, response);
+};
+
+/**
+ * Resolve or reject a Promise based on response status.
+ *
+ * @param {Function} resolve A function that resolves the promise.
+ * @param {Function} reject A function that rejects the promise.
+ * @param {object} response The response.
+ */
+var settle = function settle(resolve, reject, response) {
+  var validateStatus = response.config.validateStatus;
+  if (!validateStatus || validateStatus(response.status)) {
+    resolve(response);
+  } else {
+    reject(createError(
+      'Request failed with status code ' + response.status,
+      response.config,
+      null,
+      response.request,
+      response
+    ));
+  }
 };
 
 /**
@@ -9605,7 +7928,7 @@ var supportsColor_1 = {
 	stderr: getSupportLevel(process.stderr)
 };
 
-var node$1 = createCommonjsModule(function (module, exports) {
+var node = createCommonjsModule(function (module, exports) {
 /**
  * Module dependencies.
  */
@@ -9793,14 +8116,14 @@ function init (debug) {
 
 exports.enable(load());
 });
-var node_1 = node$1.init;
-var node_2 = node$1.log;
-var node_3 = node$1.formatArgs;
-var node_4 = node$1.save;
-var node_5 = node$1.load;
-var node_6 = node$1.useColors;
-var node_7 = node$1.colors;
-var node_8 = node$1.inspectOpts;
+var node_1 = node.init;
+var node_2 = node.log;
+var node_3 = node.formatArgs;
+var node_4 = node.save;
+var node_5 = node.load;
+var node_6 = node.useColors;
+var node_7 = node.colors;
+var node_8 = node.inspectOpts;
 
 var src = createCommonjsModule(function (module) {
 /**
@@ -9811,7 +8134,7 @@ var src = createCommonjsModule(function (module) {
 if (typeof process === 'undefined' || process.type === 'renderer') {
   module.exports = browser;
 } else {
-  module.exports = node$1;
+  module.exports = node;
 }
 });
 
@@ -10135,30 +8458,34 @@ var followRedirects = wrap({ http: http, https: https });
 var wrap_1 = wrap;
 followRedirects.wrap = wrap_1;
 
-var _from = "axios@0.18.1";
-var _id = "axios@0.18.1";
+var _args = [
+	[
+		"axios@0.19.0",
+		"/Users/vesa/code/JS-SDK"
+	]
+];
+var _from = "axios@0.19.0";
+var _id = "axios@0.19.0";
 var _inBundle = false;
-var _integrity = "sha512-0BfJq4NSfQXd+SkFdrvFbG7addhYSBA2mQwISr46pD6E5iqkWg02RAs8vyTT/j0RTnoYmeXauBuSv1qKwR179g==";
+var _integrity = "sha512-1uvKqKQta3KBxIz14F2v06AEHZ/dIoeKfbTRkK1E5oqjDnuEerLmYTgJB5AiQZHJcljpg1TuRzdjDR06qNk0DQ==";
 var _location = "/axios";
 var _phantomChildren = {
 };
 var _requested = {
 	type: "version",
 	registry: true,
-	raw: "axios@0.18.1",
+	raw: "axios@0.19.0",
 	name: "axios",
 	escapedName: "axios",
-	rawSpec: "0.18.1",
+	rawSpec: "0.19.0",
 	saveSpec: null,
-	fetchSpec: "0.18.1"
+	fetchSpec: "0.19.0"
 };
 var _requiredBy = [
-	"#USER",
 	"/"
 ];
-var _resolved = "https://registry.npmjs.org/axios/-/axios-0.18.1.tgz";
-var _shasum = "ff3f0de2e7b5d180e757ad98000f1081b87bcea3";
-var _spec = "axios@0.18.1";
+var _resolved = "https://registry.npmjs.org/axios/-/axios-0.19.0.tgz";
+var _spec = "0.19.0";
 var _where = "/Users/vesa/code/JS-SDK";
 var author = {
 	name: "Matt Zabriskie"
@@ -10169,7 +8496,6 @@ var browser$1 = {
 var bugs = {
 	url: "https://github.com/axios/axios/issues"
 };
-var bundleDependencies = false;
 var bundlesize = [
 	{
 		path: "./dist/axios.min.js",
@@ -10180,41 +8506,41 @@ var dependencies = {
 	"follow-redirects": "1.5.10",
 	"is-buffer": "^2.0.2"
 };
-var deprecated = false;
 var description = "Promise based HTTP client for the browser and node.js";
 var devDependencies = {
-	bundlesize: "^0.5.7",
-	coveralls: "^2.11.9",
-	"es6-promise": "^4.0.5",
-	grunt: "^1.0.1",
+	bundlesize: "^0.17.0",
+	coveralls: "^3.0.0",
+	"es6-promise": "^4.2.4",
+	grunt: "^1.0.2",
 	"grunt-banner": "^0.6.0",
 	"grunt-cli": "^1.2.0",
-	"grunt-contrib-clean": "^1.0.0",
-	"grunt-contrib-nodeunit": "^1.0.0",
+	"grunt-contrib-clean": "^1.1.0",
 	"grunt-contrib-watch": "^1.0.0",
-	"grunt-eslint": "^19.0.0",
+	"grunt-eslint": "^20.1.0",
 	"grunt-karma": "^2.0.0",
-	"grunt-ts": "^6.0.0-beta.3",
+	"grunt-mocha-test": "^0.13.3",
+	"grunt-ts": "^6.0.0-beta.19",
 	"grunt-webpack": "^1.0.18",
 	"istanbul-instrumenter-loader": "^1.0.0",
 	"jasmine-core": "^2.4.1",
 	karma: "^1.3.0",
-	"karma-chrome-launcher": "^2.0.0",
-	"karma-coverage": "^1.0.0",
-	"karma-firefox-launcher": "^1.0.0",
-	"karma-jasmine": "^1.0.2",
+	"karma-chrome-launcher": "^2.2.0",
+	"karma-coverage": "^1.1.1",
+	"karma-firefox-launcher": "^1.1.0",
+	"karma-jasmine": "^1.1.1",
 	"karma-jasmine-ajax": "^0.1.13",
 	"karma-opera-launcher": "^1.0.0",
 	"karma-safari-launcher": "^1.0.0",
-	"karma-sauce-launcher": "^1.1.0",
+	"karma-sauce-launcher": "^1.2.0",
 	"karma-sinon": "^1.0.5",
 	"karma-sourcemap-loader": "^0.3.7",
 	"karma-webpack": "^1.7.0",
 	"load-grunt-tasks": "^3.5.2",
 	minimist: "^1.2.0",
-	sinon: "^1.17.4",
-	typescript: "^2.0.3",
-	"url-search-params": "^0.6.1",
+	mocha: "^5.2.0",
+	sinon: "^4.5.0",
+	typescript: "^2.8.1",
+	"url-search-params": "^0.10.0",
 	webpack: "^1.13.1",
 	"webpack-dev-server": "^1.14.1"
 };
@@ -10237,6 +8563,7 @@ var scripts = {
 	build: "NODE_ENV=production grunt build",
 	coveralls: "cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
 	examples: "node ./examples/server.js",
+	fix: "eslint --fix lib/**/*.js",
 	postversion: "git push && git push --tags",
 	preversion: "npm test",
 	start: "node ./sandbox/server.js",
@@ -10244,8 +8571,9 @@ var scripts = {
 	version: "npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json"
 };
 var typings = "./index.d.ts";
-var version$1 = "0.18.1";
+var version = "0.19.0";
 var _package = {
+	_args: _args,
 	_from: _from,
 	_id: _id,
 	_inBundle: _inBundle,
@@ -10255,16 +8583,13 @@ var _package = {
 	_requested: _requested,
 	_requiredBy: _requiredBy,
 	_resolved: _resolved,
-	_shasum: _shasum,
 	_spec: _spec,
 	_where: _where,
 	author: author,
 	browser: browser$1,
 	bugs: bugs,
-	bundleDependencies: bundleDependencies,
 	bundlesize: bundlesize,
 	dependencies: dependencies,
-	deprecated: deprecated,
 	description: description,
 	devDependencies: devDependencies,
 	homepage: homepage,
@@ -10275,42 +8600,40 @@ var _package = {
 	repository: repository,
 	scripts: scripts,
 	typings: typings,
-	version: version$1
+	version: version
 };
 
 var _package$1 = /*#__PURE__*/Object.freeze({
-  __proto__: null,
-  _from: _from,
-  _id: _id,
-  _inBundle: _inBundle,
-  _integrity: _integrity,
-  _location: _location,
-  _phantomChildren: _phantomChildren,
-  _requested: _requested,
-  _requiredBy: _requiredBy,
-  _resolved: _resolved,
-  _shasum: _shasum,
-  _spec: _spec,
-  _where: _where,
-  author: author,
-  browser: browser$1,
-  bugs: bugs,
-  bundleDependencies: bundleDependencies,
-  bundlesize: bundlesize,
-  dependencies: dependencies,
-  deprecated: deprecated,
-  description: description,
-  devDependencies: devDependencies,
-  homepage: homepage,
-  keywords: keywords,
-  license: license,
-  main: main,
-  name: name,
-  repository: repository,
-  scripts: scripts,
-  typings: typings,
-  version: version$1,
-  'default': _package
+	__proto__: null,
+	_args: _args,
+	_from: _from,
+	_id: _id,
+	_inBundle: _inBundle,
+	_integrity: _integrity,
+	_location: _location,
+	_phantomChildren: _phantomChildren,
+	_requested: _requested,
+	_requiredBy: _requiredBy,
+	_resolved: _resolved,
+	_spec: _spec,
+	_where: _where,
+	author: author,
+	browser: browser$1,
+	bugs: bugs,
+	bundlesize: bundlesize,
+	dependencies: dependencies,
+	description: description,
+	devDependencies: devDependencies,
+	homepage: homepage,
+	keywords: keywords,
+	license: license,
+	main: main,
+	name: name,
+	repository: repository,
+	scripts: scripts,
+	typings: typings,
+	version: version,
+	'default': _package
 });
 
 var pkg = getCjsExportFromNamespace(_package$1);
@@ -10323,12 +8646,22 @@ var httpsFollow = followRedirects.https;
 
 
 
+var isHttps = /https:?/;
+
 /*eslint consistent-return:0*/
 var http_1 = function httpAdapter(config) {
-  return new Promise(function dispatchHttpRequest(resolve, reject) {
+  return new Promise(function dispatchHttpRequest(resolvePromise, rejectPromise) {
+    var timer;
+    var resolve = function resolve(value) {
+      clearTimeout(timer);
+      resolvePromise(value);
+    };
+    var reject = function reject(value) {
+      clearTimeout(timer);
+      rejectPromise(value);
+    };
     var data = config.data;
     var headers = config.headers;
-    var timer;
 
     // Set User-Agent (required by some servers)
     // Only set header if it hasn't been set in config
@@ -10339,9 +8672,9 @@ var http_1 = function httpAdapter(config) {
 
     if (data && !utils.isStream(data)) {
       if (Buffer.isBuffer(data)) ; else if (utils.isArrayBuffer(data)) {
-        data = new Buffer(new Uint8Array(data));
+        data = Buffer.from(new Uint8Array(data));
       } else if (utils.isString(data)) {
-        data = new Buffer(data, 'utf-8');
+        data = Buffer.from(data, 'utf-8');
       } else {
         return reject(createError(
           'Data after transformation must be a string, an ArrayBuffer, a Buffer, or a Stream',
@@ -10376,12 +8709,12 @@ var http_1 = function httpAdapter(config) {
       delete headers.Authorization;
     }
 
-    var isHttps = protocol === 'https:';
-    var agent = isHttps ? config.httpsAgent : config.httpAgent;
+    var isHttpsRequest = isHttps.test(protocol);
+    var agent = isHttpsRequest ? config.httpsAgent : config.httpAgent;
 
     var options = {
       path: buildURL(parsed.path, config.params, config.paramsSerializer).replace(/^\?/, ''),
-      method: config.method,
+      method: config.method.toUpperCase(),
       headers: headers,
       agent: agent,
       auth: auth
@@ -10400,17 +8733,45 @@ var http_1 = function httpAdapter(config) {
       var proxyUrl = process.env[proxyEnv] || process.env[proxyEnv.toUpperCase()];
       if (proxyUrl) {
         var parsedProxyUrl = url.parse(proxyUrl);
-        proxy = {
-          host: parsedProxyUrl.hostname,
-          port: parsedProxyUrl.port
-        };
+        var noProxyEnv = process.env.no_proxy || process.env.NO_PROXY;
+        var shouldProxy = true;
 
-        if (parsedProxyUrl.auth) {
-          var proxyUrlAuth = parsedProxyUrl.auth.split(':');
-          proxy.auth = {
-            username: proxyUrlAuth[0],
-            password: proxyUrlAuth[1]
+        if (noProxyEnv) {
+          var noProxy = noProxyEnv.split(',').map(function trim(s) {
+            return s.trim();
+          });
+
+          shouldProxy = !noProxy.some(function proxyMatch(proxyElement) {
+            if (!proxyElement) {
+              return false;
+            }
+            if (proxyElement === '*') {
+              return true;
+            }
+            if (proxyElement[0] === '.' &&
+                parsed.hostname.substr(parsed.hostname.length - proxyElement.length) === proxyElement &&
+                proxyElement.match(/\./g).length === parsed.hostname.match(/\./g).length) {
+              return true;
+            }
+
+            return parsed.hostname === proxyElement;
+          });
+        }
+
+
+        if (shouldProxy) {
+          proxy = {
+            host: parsedProxyUrl.hostname,
+            port: parsedProxyUrl.port
           };
+
+          if (parsedProxyUrl.auth) {
+            var proxyUrlAuth = parsedProxyUrl.auth.split(':');
+            proxy.auth = {
+              username: proxyUrlAuth[0],
+              password: proxyUrlAuth[1]
+            };
+          }
         }
       }
     }
@@ -10424,21 +8785,22 @@ var http_1 = function httpAdapter(config) {
 
       // Basic proxy authorization
       if (proxy.auth) {
-        var base64 = new Buffer(proxy.auth.username + ':' + proxy.auth.password, 'utf8').toString('base64');
+        var base64 = Buffer.from(proxy.auth.username + ':' + proxy.auth.password, 'utf8').toString('base64');
         options.headers['Proxy-Authorization'] = 'Basic ' + base64;
       }
     }
 
     var transport;
+    var isHttpsProxy = isHttpsRequest && (proxy ? isHttps.test(proxy.protocol) : true);
     if (config.transport) {
       transport = config.transport;
     } else if (config.maxRedirects === 0) {
-      transport = isHttps ? https : http;
+      transport = isHttpsProxy ? https : http;
     } else {
       if (config.maxRedirects) {
         options.maxRedirects = config.maxRedirects;
       }
-      transport = isHttps ? httpsFollow : httpFollow;
+      transport = isHttpsProxy ? httpsFollow : httpFollow;
     }
 
     if (config.maxContentLength && config.maxContentLength > -1) {
@@ -10449,10 +8811,6 @@ var http_1 = function httpAdapter(config) {
     var req = transport.request(options, function handleResponse(res) {
       if (req.aborted) return;
 
-      // Response has been received so kill timer that handles request timeout
-      clearTimeout(timer);
-      timer = null;
-
       // uncompress the response body transparently if required
       var stream = res;
       switch (res.headers['content-encoding']) {
@@ -10461,7 +8819,7 @@ var http_1 = function httpAdapter(config) {
       case 'compress':
       case 'deflate':
         // add the unzipper to the body stream processing pipeline
-        stream = stream.pipe(zlib.createUnzip());
+        stream = (res.statusCode === 204) ? stream : stream.pipe(zlib.createUnzip());
 
         // remove the content-encoding in order to not confuse downstream operations
         delete res.headers['content-encoding'];
@@ -10503,7 +8861,7 @@ var http_1 = function httpAdapter(config) {
         stream.on('end', function handleStreamEnd() {
           var responseData = Buffer.concat(responseBuffer);
           if (config.responseType !== 'arraybuffer') {
-            responseData = responseData.toString('utf8');
+            responseData = responseData.toString(config.responseEncoding);
           }
 
           response.data = responseData;
@@ -10519,7 +8877,7 @@ var http_1 = function httpAdapter(config) {
     });
 
     // Handle request timeout
-    if (config.timeout && !timer) {
+    if (config.timeout) {
       timer = setTimeout(function handleRequestTimeout() {
         req.abort();
         reject(createError('timeout of ' + config.timeout + 'ms exceeded', config, 'ECONNABORTED', req));
@@ -10538,10 +8896,343 @@ var http_1 = function httpAdapter(config) {
 
     // Send the request
     if (utils.isStream(data)) {
-      data.pipe(req);
+      data.on('error', function handleStreamError(err) {
+        reject(enhanceError(err, config, null, req));
+      }).pipe(req);
     } else {
       req.end(data);
     }
+  });
+};
+
+// Headers whose duplicates are ignored by node
+// c.f. https://nodejs.org/api/http.html#http_message_headers
+var ignoreDuplicateOf = [
+  'age', 'authorization', 'content-length', 'content-type', 'etag',
+  'expires', 'from', 'host', 'if-modified-since', 'if-unmodified-since',
+  'last-modified', 'location', 'max-forwards', 'proxy-authorization',
+  'referer', 'retry-after', 'user-agent'
+];
+
+/**
+ * Parse headers into an object
+ *
+ * ```
+ * Date: Wed, 27 Aug 2014 08:58:49 GMT
+ * Content-Type: application/json
+ * Connection: keep-alive
+ * Transfer-Encoding: chunked
+ * ```
+ *
+ * @param {String} headers Headers needing to be parsed
+ * @returns {Object} Headers parsed into an object
+ */
+var parseHeaders = function parseHeaders(headers) {
+  var parsed = {};
+  var key;
+  var val;
+  var i;
+
+  if (!headers) { return parsed; }
+
+  utils.forEach(headers.split('\n'), function parser(line) {
+    i = line.indexOf(':');
+    key = utils.trim(line.substr(0, i)).toLowerCase();
+    val = utils.trim(line.substr(i + 1));
+
+    if (key) {
+      if (parsed[key] && ignoreDuplicateOf.indexOf(key) >= 0) {
+        return;
+      }
+      if (key === 'set-cookie') {
+        parsed[key] = (parsed[key] ? parsed[key] : []).concat([val]);
+      } else {
+        parsed[key] = parsed[key] ? parsed[key] + ', ' + val : val;
+      }
+    }
+  });
+
+  return parsed;
+};
+
+var isURLSameOrigin = (
+  utils.isStandardBrowserEnv() ?
+
+  // Standard browser envs have full support of the APIs needed to test
+  // whether the request URL is of the same origin as current location.
+    (function standardBrowserEnv() {
+      var msie = /(msie|trident)/i.test(navigator.userAgent);
+      var urlParsingNode = document.createElement('a');
+      var originURL;
+
+      /**
+    * Parse a URL to discover it's components
+    *
+    * @param {String} url The URL to be parsed
+    * @returns {Object}
+    */
+      function resolveURL(url) {
+        var href = url;
+
+        if (msie) {
+        // IE needs attribute set twice to normalize properties
+          urlParsingNode.setAttribute('href', href);
+          href = urlParsingNode.href;
+        }
+
+        urlParsingNode.setAttribute('href', href);
+
+        // urlParsingNode provides the UrlUtils interface - http://url.spec.whatwg.org/#urlutils
+        return {
+          href: urlParsingNode.href,
+          protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, '') : '',
+          host: urlParsingNode.host,
+          search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, '') : '',
+          hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, '') : '',
+          hostname: urlParsingNode.hostname,
+          port: urlParsingNode.port,
+          pathname: (urlParsingNode.pathname.charAt(0) === '/') ?
+            urlParsingNode.pathname :
+            '/' + urlParsingNode.pathname
+        };
+      }
+
+      originURL = resolveURL(window.location.href);
+
+      /**
+    * Determine if a URL shares the same origin as the current location
+    *
+    * @param {String} requestURL The URL to test
+    * @returns {boolean} True if URL shares the same origin, otherwise false
+    */
+      return function isURLSameOrigin(requestURL) {
+        var parsed = (utils.isString(requestURL)) ? resolveURL(requestURL) : requestURL;
+        return (parsed.protocol === originURL.protocol &&
+            parsed.host === originURL.host);
+      };
+    })() :
+
+  // Non standard browser envs (web workers, react-native) lack needed support.
+    (function nonStandardBrowserEnv() {
+      return function isURLSameOrigin() {
+        return true;
+      };
+    })()
+);
+
+var cookies = (
+  utils.isStandardBrowserEnv() ?
+
+  // Standard browser envs support document.cookie
+    (function standardBrowserEnv() {
+      return {
+        write: function write(name, value, expires, path, domain, secure) {
+          var cookie = [];
+          cookie.push(name + '=' + encodeURIComponent(value));
+
+          if (utils.isNumber(expires)) {
+            cookie.push('expires=' + new Date(expires).toGMTString());
+          }
+
+          if (utils.isString(path)) {
+            cookie.push('path=' + path);
+          }
+
+          if (utils.isString(domain)) {
+            cookie.push('domain=' + domain);
+          }
+
+          if (secure === true) {
+            cookie.push('secure');
+          }
+
+          document.cookie = cookie.join('; ');
+        },
+
+        read: function read(name) {
+          var match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
+          return (match ? decodeURIComponent(match[3]) : null);
+        },
+
+        remove: function remove(name) {
+          this.write(name, '', Date.now() - 86400000);
+        }
+      };
+    })() :
+
+  // Non standard browser env (web workers, react-native) lack needed support.
+    (function nonStandardBrowserEnv() {
+      return {
+        write: function write() {},
+        read: function read() { return null; },
+        remove: function remove() {}
+      };
+    })()
+);
+
+var xhr = function xhrAdapter(config) {
+  return new Promise(function dispatchXhrRequest(resolve, reject) {
+    var requestData = config.data;
+    var requestHeaders = config.headers;
+
+    if (utils.isFormData(requestData)) {
+      delete requestHeaders['Content-Type']; // Let the browser set it
+    }
+
+    var request = new XMLHttpRequest();
+
+    // HTTP basic authentication
+    if (config.auth) {
+      var username = config.auth.username || '';
+      var password = config.auth.password || '';
+      requestHeaders.Authorization = 'Basic ' + btoa(username + ':' + password);
+    }
+
+    request.open(config.method.toUpperCase(), buildURL(config.url, config.params, config.paramsSerializer), true);
+
+    // Set the request timeout in MS
+    request.timeout = config.timeout;
+
+    // Listen for ready state
+    request.onreadystatechange = function handleLoad() {
+      if (!request || request.readyState !== 4) {
+        return;
+      }
+
+      // The request errored out and we didn't get a response, this will be
+      // handled by onerror instead
+      // With one exception: request that using file: protocol, most browsers
+      // will return status as 0 even though it's a successful request
+      if (request.status === 0 && !(request.responseURL && request.responseURL.indexOf('file:') === 0)) {
+        return;
+      }
+
+      // Prepare the response
+      var responseHeaders = 'getAllResponseHeaders' in request ? parseHeaders(request.getAllResponseHeaders()) : null;
+      var responseData = !config.responseType || config.responseType === 'text' ? request.responseText : request.response;
+      var response = {
+        data: responseData,
+        status: request.status,
+        statusText: request.statusText,
+        headers: responseHeaders,
+        config: config,
+        request: request
+      };
+
+      settle(resolve, reject, response);
+
+      // Clean up request
+      request = null;
+    };
+
+    // Handle browser request cancellation (as opposed to a manual cancellation)
+    request.onabort = function handleAbort() {
+      if (!request) {
+        return;
+      }
+
+      reject(createError('Request aborted', config, 'ECONNABORTED', request));
+
+      // Clean up request
+      request = null;
+    };
+
+    // Handle low level network errors
+    request.onerror = function handleError() {
+      // Real errors are hidden from us by the browser
+      // onerror should only fire if it's a network error
+      reject(createError('Network Error', config, null, request));
+
+      // Clean up request
+      request = null;
+    };
+
+    // Handle timeout
+    request.ontimeout = function handleTimeout() {
+      reject(createError('timeout of ' + config.timeout + 'ms exceeded', config, 'ECONNABORTED',
+        request));
+
+      // Clean up request
+      request = null;
+    };
+
+    // Add xsrf header
+    // This is only done if running in a standard browser environment.
+    // Specifically not if we're in a web worker, or react-native.
+    if (utils.isStandardBrowserEnv()) {
+      var cookies$1 = cookies;
+
+      // Add xsrf header
+      var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
+        cookies$1.read(config.xsrfCookieName) :
+        undefined;
+
+      if (xsrfValue) {
+        requestHeaders[config.xsrfHeaderName] = xsrfValue;
+      }
+    }
+
+    // Add headers to the request
+    if ('setRequestHeader' in request) {
+      utils.forEach(requestHeaders, function setRequestHeader(val, key) {
+        if (typeof requestData === 'undefined' && key.toLowerCase() === 'content-type') {
+          // Remove Content-Type if data is undefined
+          delete requestHeaders[key];
+        } else {
+          // Otherwise add header to the request
+          request.setRequestHeader(key, val);
+        }
+      });
+    }
+
+    // Add withCredentials to request if needed
+    if (config.withCredentials) {
+      request.withCredentials = true;
+    }
+
+    // Add responseType to request if needed
+    if (config.responseType) {
+      try {
+        request.responseType = config.responseType;
+      } catch (e) {
+        // Expected DOMException thrown by browsers not compatible XMLHttpRequest Level 2.
+        // But, this can be suppressed for 'json' type as it can be parsed by default 'transformResponse' function.
+        if (config.responseType !== 'json') {
+          throw e;
+        }
+      }
+    }
+
+    // Handle progress if needed
+    if (typeof config.onDownloadProgress === 'function') {
+      request.addEventListener('progress', config.onDownloadProgress);
+    }
+
+    // Not all browsers support upload events
+    if (typeof config.onUploadProgress === 'function' && request.upload) {
+      request.upload.addEventListener('progress', config.onUploadProgress);
+    }
+
+    if (config.cancelToken) {
+      // Handle cancellation
+      config.cancelToken.promise.then(function onCanceled(cancel) {
+        if (!request) {
+          return;
+        }
+
+        request.abort();
+        reject(cancel);
+        // Clean up request
+        request = null;
+      });
+    }
+
+    if (requestData === undefined) {
+      requestData = null;
+    }
+
+    // Send the request
+    request.send(requestData);
   });
 };
 
@@ -10557,12 +9248,13 @@ function setContentTypeIfUnset(headers, value) {
 
 function getDefaultAdapter() {
   var adapter;
-  if (typeof XMLHttpRequest !== 'undefined') {
-    // For browsers use XHR adapter
-    adapter = xhr;
-  } else if (typeof process !== 'undefined') {
+  // Only Node.JS has a process variable that is of [[Class]] process
+  if (typeof process !== 'undefined' && Object.prototype.toString.call(process) === '[object process]') {
     // For node use HTTP adapter
     adapter = http_1;
+  } else if (typeof XMLHttpRequest !== 'undefined') {
+    // For browsers use XHR adapter
+    adapter = xhr;
   }
   return adapter;
 }
@@ -10571,6 +9263,7 @@ var defaults = {
   adapter: getDefaultAdapter(),
 
   transformRequest: [function transformRequest(data, headers) {
+    normalizeHeaderName(headers, 'Accept');
     normalizeHeaderName(headers, 'Content-Type');
     if (utils.isFormData(data) ||
       utils.isArrayBuffer(data) ||
@@ -10636,76 +9329,6 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 });
 
 var defaults_1 = defaults;
-
-function InterceptorManager() {
-  this.handlers = [];
-}
-
-/**
- * Add a new interceptor to the stack
- *
- * @param {Function} fulfilled The function to handle `then` for a `Promise`
- * @param {Function} rejected The function to handle `reject` for a `Promise`
- *
- * @return {Number} An ID used to remove interceptor later
- */
-InterceptorManager.prototype.use = function use(fulfilled, rejected) {
-  this.handlers.push({
-    fulfilled: fulfilled,
-    rejected: rejected
-  });
-  return this.handlers.length - 1;
-};
-
-/**
- * Remove an interceptor from the stack
- *
- * @param {Number} id The ID that was returned by `use`
- */
-InterceptorManager.prototype.eject = function eject(id) {
-  if (this.handlers[id]) {
-    this.handlers[id] = null;
-  }
-};
-
-/**
- * Iterate over all the registered interceptors
- *
- * This method is particularly useful for skipping over any
- * interceptors that may have become `null` calling `eject`.
- *
- * @param {Function} fn The function to call for each interceptor
- */
-InterceptorManager.prototype.forEach = function forEach(fn) {
-  utils.forEach(this.handlers, function forEachHandler(h) {
-    if (h !== null) {
-      fn(h);
-    }
-  });
-};
-
-var InterceptorManager_1 = InterceptorManager;
-
-/**
- * Transform the data for a request or a response
- *
- * @param {Object|String} data The data to be transformed
- * @param {Array} headers The headers for the request or response
- * @param {Array|Function} fns A single function or Array of functions
- * @returns {*} The resulting transformed data
- */
-var transformData = function transformData(data, headers, fns) {
-  /*eslint no-param-reassign:0*/
-  utils.forEach(fns, function transform(fn) {
-    data = fn(data, headers);
-  });
-
-  return data;
-};
-
-var isCancel = function isCancel(value) {
-  return !!(value && value.__CANCEL__);
-};
 
 /**
  * Determines whether the specified URL is absolute
@@ -10812,6 +9435,54 @@ var dispatchRequest = function dispatchRequest(config) {
 };
 
 /**
+ * Config-specific merge-function which creates a new config-object
+ * by merging two configuration objects together.
+ *
+ * @param {Object} config1
+ * @param {Object} config2
+ * @returns {Object} New object resulting from merging config2 to config1
+ */
+var mergeConfig = function mergeConfig(config1, config2) {
+  // eslint-disable-next-line no-param-reassign
+  config2 = config2 || {};
+  var config = {};
+
+  utils.forEach(['url', 'method', 'params', 'data'], function valueFromConfig2(prop) {
+    if (typeof config2[prop] !== 'undefined') {
+      config[prop] = config2[prop];
+    }
+  });
+
+  utils.forEach(['headers', 'auth', 'proxy'], function mergeDeepProperties(prop) {
+    if (utils.isObject(config2[prop])) {
+      config[prop] = utils.deepMerge(config1[prop], config2[prop]);
+    } else if (typeof config2[prop] !== 'undefined') {
+      config[prop] = config2[prop];
+    } else if (utils.isObject(config1[prop])) {
+      config[prop] = utils.deepMerge(config1[prop]);
+    } else if (typeof config1[prop] !== 'undefined') {
+      config[prop] = config1[prop];
+    }
+  });
+
+  utils.forEach([
+    'baseURL', 'transformRequest', 'transformResponse', 'paramsSerializer',
+    'timeout', 'withCredentials', 'adapter', 'responseType', 'xsrfCookieName',
+    'xsrfHeaderName', 'onUploadProgress', 'onDownloadProgress', 'maxContentLength',
+    'validateStatus', 'maxRedirects', 'httpAgent', 'httpsAgent', 'cancelToken',
+    'socketPath'
+  ], function defaultToConfig2(prop) {
+    if (typeof config2[prop] !== 'undefined') {
+      config[prop] = config2[prop];
+    } else if (typeof config1[prop] !== 'undefined') {
+      config[prop] = config1[prop];
+    }
+  });
+
+  return config;
+};
+
+/**
  * Create a new instance of Axios
  *
  * @param {Object} instanceConfig The default config for the instance
@@ -10833,13 +9504,14 @@ Axios.prototype.request = function request(config) {
   /*eslint no-param-reassign:0*/
   // Allow for axios('example/url'[, config]) a la fetch API
   if (typeof config === 'string') {
-    config = utils.merge({
-      url: arguments[0]
-    }, arguments[1]);
+    config = arguments[1] || {};
+    config.url = arguments[0];
+  } else {
+    config = config || {};
   }
 
-  config = utils.merge(defaults_1, {method: 'get'}, this.defaults, config);
-  config.method = config.method.toLowerCase();
+  config = mergeConfig(this.defaults, config);
+  config.method = config.method ? config.method.toLowerCase() : 'get';
 
   // Hook up interceptors middleware
   var chain = [dispatchRequest, undefined];
@@ -10858,6 +9530,11 @@ Axios.prototype.request = function request(config) {
   }
 
   return promise;
+};
+
+Axios.prototype.getUri = function getUri(config) {
+  config = mergeConfig(this.defaults, config);
+  return buildURL(config.url, config.params, config.paramsSerializer).replace(/^\?/, '');
 };
 
 // Provide aliases for supported request methods
@@ -10990,7 +9667,7 @@ var spread = function spread(callback) {
  */
 function createInstance(defaultConfig) {
   var context = new Axios_1(defaultConfig);
-  var instance = bind$1(Axios_1.prototype.request, context);
+  var instance = bind(Axios_1.prototype.request, context);
 
   // Copy axios.prototype to instance
   utils.extend(instance, Axios_1.prototype, context);
@@ -11009,7 +9686,7 @@ axios.Axios = Axios_1;
 
 // Factory for creating new instances
 axios.create = function create(instanceConfig) {
-  return createInstance(utils.merge(defaults_1, instanceConfig));
+  return createInstance(mergeConfig(axios.defaults, instanceConfig));
 };
 
 // Expose Cancel & CancelToken
@@ -11355,6 +10032,7 @@ var lib_6 = lib.exponentialDelay;
 
 var axiosRetry = lib.default;
 
+//      
 const SSL_CHECK_INTERVALL = 1000 * 60 * 60; // One hour
 
 /*
@@ -11606,6 +10284,7 @@ function isNetworkOrIdempotentRequestError(error) {
 }
  */
 
+//      
 let refreshingToken = false;
 /* eslint no-use-before-define: ["error", { "functions": false }] */
 
@@ -11625,7 +10304,7 @@ function refreshAuthKey(authKey) {
       }, 1000 * 60 * 10); // 10min
 
       if (response.length > 10) {
-        store$3.dispatch(userState.actions.setAuthKey(response));
+        store.dispatch(userState.actions.setAuthKey(response));
       }
     }).catch(() => {
       refreshingToken = false;
@@ -11760,7 +10439,7 @@ function send({
   let remoteConnection = false; // Flag to indicate are we sending hub command meaning using commandAPI (vrs. some cloud/videocloud command like login, log etc)
 
   const hubCommand = !isEmpty_1(hubId);
-  const stateNow = store$3.getState();
+  const stateNow = store.getState();
   const user = userState.selectors.getUser(stateNow); // const { storedAuthKey } = user;
 
   if (typeof command !== 'undefined' && command) {
@@ -11817,6 +10496,10 @@ function send({
       if (isArray_1(body)) {
         if (body[0]) {
           body[0].type = command.type;
+        } else {
+          body.push({
+            type: command.type
+          });
         }
       } else if (body) {
         body.type = command.type;
@@ -12027,13 +10710,14 @@ function send({
   });
 }
 
+//      
 /*
  * Helper to get user
  * @return {Object} user
  */
 
 function storedUser() {
-  return userState.selectors.getUser(store$3.getState());
+  return userState.selectors.getUser(store.getState());
 }
 /**
  * User action to change current language
@@ -12046,11 +10730,11 @@ function changeLanguage(newLanguage) {
   let retVel = false;
 
   if (Object.values(LANGUAGES).indexOf(newLanguage) > -1) {
-    store$3.dispatch(userState.actions.setLanguage(newLanguage));
+    store.dispatch(userState.actions.setLanguage(newLanguage));
     retVel = true;
 
     if (storedUser().state === USER_STATES.WAITING_LANGUAGE) {
-      store$3.dispatch(userState.actions.changeState(USER_STATES.LANGUAGE_SET));
+      store.dispatch(userState.actions.changeState(USER_STATES.LANGUAGE_SET));
     }
   }
 
@@ -12062,10 +10746,10 @@ function changeLanguage(newLanguage) {
  */
 
 function acceptEula() {
-  store$3.dispatch(userState.actions.setEula(true));
+  store.dispatch(userState.actions.setEula(true));
 
   if (storedUser().state === USER_STATES.WAITING_EULA) {
-    store$3.dispatch(userState.actions.changeState(USER_STATES.EULA_ACCEPTED));
+    store.dispatch(userState.actions.changeState(USER_STATES.EULA_ACCEPTED));
   }
 
   return true;
@@ -12087,10 +10771,10 @@ function doPwLogin(email, password) {
       }
     }).then(response => {
       if (response && isString_1(response)) {
-        store$3.dispatch(userState.actions.setAuthKey(response));
+        store.dispatch(userState.actions.setAuthKey(response));
 
         if (storedUser().state === USER_STATES.WAITING_LOGIN) {
-          store$3.dispatch(userState.actions.changeState(USER_STATES.LOGIN_DONE));
+          store.dispatch(userState.actions.changeState(USER_STATES.LOGIN_DONE));
         }
       }
 
@@ -12108,7 +10792,7 @@ function doPwLogin(email, password) {
  */
 
 function setAuthenticated(userToken) {
-  store$3.dispatch(userState.actions.setAuthenticated(userToken));
+  store.dispatch(userState.actions.setAuthenticated(userToken));
   return storedUser();
 }
 /**
@@ -12120,35 +10804,14 @@ function getUserState() {
   return storedUser().state;
 }
 
-// `Promise.prototype.finally` method
-// https://tc39.github.io/ecma262/#sec-promise.prototype.finally
-_export({ target: 'Promise', proto: true, real: true }, {
-  'finally': function (onFinally) {
-    var C = speciesConstructor(this, getBuiltIn('Promise'));
-    var isFunction = typeof onFinally == 'function';
-    return this.then(
-      isFunction ? function (x) {
-        return promiseResolve(C, onFinally()).then(function () { return x; });
-      } : onFinally,
-      isFunction ? function (e) {
-        return promiseResolve(C, onFinally()).then(function () { throw e; });
-      } : onFinally
-    );
-  }
-});
-
-// patch native Promise.prototype for native async functions
-if ( typeof nativePromiseConstructor == 'function' && !nativePromiseConstructor.prototype['finally']) {
-  redefine(nativePromiseConstructor.prototype, 'finally', getBuiltIn('Promise').prototype['finally']);
-}
-
+//      
 /**
  * Get devices of all selected hubs
  * @return {HUB_DEVICES_MAP_TYPE}
  */
 
 function getDevices() {
-  const stateNow = store$3.getState();
+  const stateNow = store.getState();
   return devicesState.selectors.getDevices(stateNow);
 }
 /**
@@ -12157,7 +10820,7 @@ function getDevices() {
  */
 
 function getPairingDevices() {
-  const stateNow = store$3.getState();
+  const stateNow = store.getState();
   return pairingsState.selectors.getPairings(stateNow);
 }
 /**
@@ -12213,7 +10876,7 @@ function devicesDeltaHandler(hubId, reset, devices) {
       hubId,
       devices
     };
-    store$3.dispatch(devicesState.actions.setDevices(stateDevices));
+    store.dispatch(devicesState.actions.setDevices(stateDevices));
   } else {
     // Loop devices to check could it be added or should be removed
     Object.entries(devices).forEach(([key, device]) => {
@@ -12223,9 +10886,9 @@ function devicesDeltaHandler(hubId, reset, devices) {
       };
 
       if (key && device) {
-        store$3.dispatch(devicesState.actions.setDevice(stateDevice));
+        store.dispatch(devicesState.actions.setDevice(stateDevice));
       } else if (key && oldHubDevices[key]) {
-        store$3.dispatch(devicesState.actions.deleteDevice(key));
+        store.dispatch(devicesState.actions.deleteDevice(key));
       }
     });
   }
@@ -12257,7 +10920,7 @@ function pairingDevicesDeltaHandler(hubId, reset, pairingDevices) {
 
   if (reset) {
     // If reset then set  devices as they are received
-    store$3.dispatch(pairingsState.actions.setPairingDevices(statePairingDevices));
+    store.dispatch(pairingsState.actions.setPairingDevices(statePairingDevices));
   } else {
     // Loop devices to check could it be added or should be removed
     Object.entries(statePairingDevices.devices).forEach(([key, device]) => {
@@ -12273,13 +10936,15 @@ function pairingDevicesDeltaHandler(hubId, reset, pairingDevices) {
       */
 
       if (key && device) {
-        store$3.dispatch(pairingsState.actions.setPairingDevice(statePairingDevice));
+        store.dispatch(pairingsState.actions.setPairingDevice(statePairingDevice));
       } else if (key && oldPairingDevices[key]) {
-        store$3.dispatch(pairingsState.actions.deletePairingDevice(key));
+        store.dispatch(pairingsState.actions.deletePairingDevice(key));
       }
     });
   }
 }
+
+//      
 
 /**
  * Get rooms of all selected hubs
@@ -12287,7 +10952,7 @@ function pairingDevicesDeltaHandler(hubId, reset, pairingDevices) {
  */
 
 function getRooms() {
-  const stateNow = store$3.getState();
+  const stateNow = store.getState();
   return roomsState.selectors.getRooms(stateNow);
 }
 /**
@@ -12308,7 +10973,7 @@ function getHubRooms(hubId) {
 }
 function sendRoomCmd(hubId, commandType, data) {
   return new Promise((resolve, reject) => {
-    const stateNow = store$3.getState();
+    const stateNow = store.getState();
     const user = userState.selectors.getUser(stateNow);
 
     if (!user || !user.authKey) {
@@ -12363,7 +11028,7 @@ function sendRoomCmd(hubId, commandType, data) {
           hubKey
         }).then(rooms => {
           console.debug('SDK sendRoomCmd refresh rooms ok', rooms);
-          store$3.dispatch(roomsState.actions.setRooms({
+          store.dispatch(roomsState.actions.setRooms({
             hubId,
             rooms
           }));
@@ -12457,7 +11122,7 @@ function roomsDeltaHandler(hubId, reset, rooms) {
       hubId,
       rooms
     };
-    store$3.dispatch(roomsState.actions.setRooms(stateRooms));
+    store.dispatch(roomsState.actions.setRooms(stateRooms));
   } else if (!isEmpty_1(rooms)) {
     // Loop rooms to check could it be added or should be removed
     Object.entries(rooms).forEach(([key, room]) => {
@@ -12467,9 +11132,9 @@ function roomsDeltaHandler(hubId, reset, rooms) {
       };
 
       if (key && room) {
-        store$3.dispatch(roomsState.actions.setRoom(stateRoom));
+        store.dispatch(roomsState.actions.setRoom(stateRoom));
       } else if (key && oldHubRooms[key]) {
-        store$3.dispatch(roomsState.actions.removeRoom({
+        store.dispatch(roomsState.actions.removeRoom({
           hubId,
           roomId: key
         }));
@@ -12477,6 +11142,8 @@ function roomsDeltaHandler(hubId, reset, rooms) {
     });
   }
 }
+
+//      
 
 const initAlarm = alarm => {
   const givenAlarm = alarm;
@@ -12495,7 +11162,7 @@ const initAlarm = alarm => {
 
 
 function getAlarms() {
-  const stateNow = store$3.getState();
+  const stateNow = store.getState();
   return alarmsState.selectors.getAlarms(stateNow);
 }
 /**
@@ -12522,7 +11189,7 @@ function getHubAlarms(hubId) {
 
 function sendAlarmCmd(hubId, commandType, data) {
   return new Promise((resolve, reject) => {
-    const stateNow = store$3.getState();
+    const stateNow = store.getState();
     const user = userState.selectors.getUser(stateNow);
 
     if (!user || !user.authKey) {
@@ -12576,7 +11243,7 @@ function sendAlarmCmd(hubId, commandType, data) {
         hubKey
       }).then(alarms => {
         console.debug('SDK sendAlarmCmd refresh alarms ok', alarms);
-        store$3.dispatch(alarmsState.actions.setRooms({
+        store.dispatch(alarmsState.actions.setRooms({
           hubId,
           alarms
         }));
@@ -12667,7 +11334,7 @@ function alarmsDeltaHandler(hubId, reset, alarms) {
       hubId,
       alarms: alarmsToBeSet
     };
-    store$3.dispatch(alarmsState.actions.setAlarms(stateAlarms));
+    store.dispatch(alarmsState.actions.setAlarms(stateAlarms));
   } else if (!isEmpty_1(alarms)) {
     // Loop alarms to check could it be added or should be removed
     Object.entries(alarms).forEach(([key, alarm]) => {
@@ -12676,9 +11343,9 @@ function alarmsDeltaHandler(hubId, reset, alarms) {
           hubId,
           alarm: initAlarm(alarm)
         };
-        store$3.dispatch(alarmsState.actions.setAlarm(stateAlarm));
+        store.dispatch(alarmsState.actions.setAlarm(stateAlarm));
       } else if (key && oldHubAlarms[key]) {
-        store$3.dispatch(alarmsState.actions.removeAlarm({
+        store.dispatch(alarmsState.actions.removeAlarm({
           hubId,
           alarmId: key
         }));
@@ -12687,6 +11354,7 @@ function alarmsDeltaHandler(hubId, reset, alarms) {
   }
 }
 
+//      
 let hubsMap = {};
 /*
  * Helper method to extract hub info from JWT based hub keys
@@ -12758,9 +11426,28 @@ function updateFoundHub(hubURL, hub) {
   }
 }
 /*
- * Remote hub metamata request for version etc information
+ * Remote hub backup and lock request
  */
 
+
+function lockAndBackup(hubId, authKey, hubKey) {
+  return new Promise((resolve, reject) => {
+    send({
+      command: COMMANDS.HUB_LOCK_BACKUP,
+      authKey,
+      hubKey,
+      hubId
+    }).then(status => {
+      resolve(status);
+    }).catch(error => {
+      console.log(`doRemoteIdQuery ${hubId} error `, error.message);
+      reject(error);
+    });
+  });
+}
+/*
+ * Remote hub metamata request for version etc information
+ */
 
 function doRemoteIdQuery(hubId, authKey, hubKey) {
   return new Promise((resolve, reject) => {
@@ -12809,7 +11496,7 @@ function doLocalIdQuery(ip) {
 
 
 function getHubs() {
-  return hubsState.selectors.getHubs(store$3.getState());
+  return hubsState.selectors.getHubs(store.getState());
 }
 /*
  * Check hubs that are currently selected and mark them selected also in map of given hubs
@@ -12848,12 +11535,12 @@ function doCloudDiscovery() {
       sendAll(queries).finally(() => {
         // mark selected hubs to be selected after
         setSelectedHubs(hubsMap);
-        store$3.dispatch(hubsState.actions.updateHubs(hubsMap));
+        store.dispatch(hubsState.actions.updateHubs(hubsMap));
         resolve('ok');
       });
     }).catch(error => {
       console.error('doCloudDiscovery error: ', error.message);
-      store$3.dispatch(hubsState.actions.updateHubs(hubsMap));
+      store.dispatch(hubsState.actions.updateHubs(hubsMap));
       resolve('error');
     });
   });
@@ -12886,7 +11573,7 @@ function fetchCloudMetaData(hubs, authKey) {
 
 
 function storedUser$1() {
-  return userState.selectors.getUser(store$3.getState());
+  return userState.selectors.getUser(store.getState());
 }
 /*
  * Make hubsMap by fetching hub meta data from cloud and local
@@ -12899,10 +11586,10 @@ function makeHubsMap(tokens, doCloudDicovery = true, doSynchnonously = false) {
   } = storedUser$1();
   return new Promise(resolve => {
     hubsMap = extractHubInfo(tokens);
-    store$3.dispatch(hubsState.actions.updateHubs(hubsMap));
+    store.dispatch(hubsState.actions.updateHubs(hubsMap));
     fetchCloudMetaData(hubsMap, authKey).finally(() => {
       // Hubs map may be changed during fetching cloud metadata
-      store$3.dispatch(hubsState.actions.updateHubs(hubsMap));
+      store.dispatch(hubsState.actions.updateHubs(hubsMap));
 
       if (doSynchnonously) {
         if (doCloudDicovery) {
@@ -13199,14 +11886,14 @@ function doPoll(hubId, reset = false) {
     }
 
     const hub = getHubs()[hubId];
-    console.debug('doPoll connection state: ', hub.connectionState);
 
-    if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
+    if (!hub || hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
       console.warn('SDK doPoll: No Hub connection');
       reject(new Error('doPoll error: No Hub connection'));
       return;
-    } // just return every second -> not doing so often as in local connection
+    }
 
+    console.debug('doPoll connection state: ', hub.connectionState); // just return every second -> not doing so often as in local connection
 
     if (hub.connectionState === HUB_CONNECTION_STATES.REMOTE && !doReset) {
       if (secondPoll[hubId]) {
@@ -13288,6 +11975,11 @@ function doPoll(hubId, reset = false) {
                 break;
               }
 
+            case 'USER_ALERTS':
+              {
+                break;
+              }
+
             case 'ALARM_DELTA':
               {
                 alarmsDeltaHandler(hubId, doReset, delta.alarms);
@@ -13298,7 +11990,7 @@ function doPoll(hubId, reset = false) {
       }
 
       pollInAction[hubId] = false;
-      resolve('done');
+      resolve(deltas);
     }).catch(error => {
       // store.dispatch(hubsState.actions.hubPollFailed())
       console.error('SDK doPoll error: ', error.message);
@@ -13353,7 +12045,7 @@ function selectHubById(hubId, poll = false) {
       let error = null;
       Object.values(hubs).every(hub => {
         if (hubId === hub.id) {
-          store$3.dispatch(hubsState.actions.selectHub({
+          store.dispatch(hubsState.actions.selectHub({
             hubId: hub.id
           }));
 
@@ -13404,7 +12096,7 @@ function unSelectHubById(hubId) {
   const hubs = getHubs();
   Object.values(hubs).forEach(hub => {
     if (hubId === hub.id) {
-      store$3.dispatch(hubsState.actions.unSelectHub({
+      store.dispatch(hubsState.actions.unSelectHub({
         hubId: hub.id
       }));
       stopPollingById(hub.id);
@@ -13419,7 +12111,7 @@ function unSelectHubById(hubId) {
 function unSelectHubs() {
   const hubs = getHubs();
   Object.values(hubs).forEach(hub => {
-    store$3.dispatch(hubsState.actions.unSelectHub({
+    store.dispatch(hubsState.actions.unSelectHub({
       hubId: hub.id
     }));
     stopPollingById(hub.id);
@@ -13462,6 +12154,590 @@ watchChanges('user.state', newState => {
     startDiscoveringHubs();
   }
 });
+
+//      
+/**
+ * Helper to get current user from state
+ */
+
+function storedUser$2() {
+  return userState.selectors.getUser(store.getState());
+}
+/**
+ * Helper to get current hubs from state
+ * @return {HUBS_MAP_TYPE} - hubs
+ */
+
+
+function getHubs$1() {
+  return hubsState.selectors.getHubs(store.getState());
+}
+/*
+** Z-wave inclusion
+ */
+
+const inclusionStopped = {};
+const inclusionInAction = {};
+const stopInclusionInAction = {};
+/*
+ * Start inclusion of given hub if hub connection is ok
+ * @param {string} hubId
+ * @return {Promise}
+ */
+
+function startZwaveInclusion(hubId) {
+  return new Promise((resolve, reject) => {
+    if (inclusionStopped[hubId]) {
+      console.debug('startZwaveInclusion: inclusion stopped');
+      reject(new Error('inclusion stopped'));
+      return;
+    }
+
+    const hub = getHubs$1()[hubId];
+    const {
+      authKey
+    } = storedUser$2();
+    const {
+      hubKey
+    } = hub;
+    console.debug('startZwaveInclusion connection state: ', hub.connectionState);
+
+    if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
+      console.warn('SDK startZwaveInclusion: no Hub connection');
+      reject(new Error('no hub connection'));
+      return;
+    }
+
+    if (inclusionInAction[hubId]) {
+      reject(new Error('inclusion already in action'));
+      return;
+    }
+
+    inclusionInAction[hubId] = true;
+    send({
+      command: COMMANDS.ZWAVE_START_INCLUSION,
+      hubId,
+      authKey,
+      hubKey,
+      localUrl: hub.url,
+      data: []
+    }).then(state => {
+      inclusionInAction[hubId] = false;
+
+      if (state) {
+        if (state.status === ZWAVE_INCLUSION_STATUS.RUNNING) {
+          resolve(state);
+        } else {
+          reject(state);
+        }
+      } else {
+        reject(new Error('No inclusion state received'));
+      }
+    }).catch(error => {
+      // store.dispatch(hubsState.actions.hubPollFailed())
+      console.error('SDK: startZwaveInclusion error: ', error.message);
+      inclusionInAction[hubId] = false;
+      reject(error);
+    });
+  });
+}
+/*
+ * Ask inclusion status of given hub if hub connection is ok
+ * @param {string} hubId
+ * @return {Promise}
+ */
+
+
+function askZwaveInclusionStatus(hubId) {
+  return new Promise((resolve, reject) => {
+    if (inclusionStopped[hubId]) {
+      console.debug('askZwaveInclusionStatus: inclusion stopped');
+      reject(new Error('inclusion stopped'));
+      return;
+    }
+
+    const hub = getHubs$1()[hubId];
+    const {
+      authKey
+    } = storedUser$2();
+    const {
+      hubKey
+    } = hub;
+    console.debug('askZwaveInclusionStatus connection state: ', hub.connectionState);
+
+    if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
+      console.warn('SDK askZwaveInclusionStatus: no Hub connection');
+      reject(new Error('no hub connection'));
+      return;
+    }
+
+    if (inclusionInAction[hubId]) {
+      reject(new Error('inclusion already in action'));
+      return;
+    }
+
+    inclusionInAction[hubId] = true;
+    send({
+      command: COMMANDS.ZWAVE_INCLUSION_STATUS,
+      hubId,
+      authKey,
+      hubKey,
+      localUrl: hub.url,
+      data: []
+    }).then(state => {
+      inclusionInAction[hubId] = false;
+      resolve(state);
+    }).catch(error => {
+      // store.dispatch(hubsState.actions.hubPollFailed())
+      console.error('SDK: askZwaveInclusionStatus error: ', error.message);
+      inclusionInAction[hubId] = false;
+      reject(error);
+    });
+  });
+}
+
+function askZwaveInclusionStatusPromise(hubId, resolve, reject) {
+  askZwaveInclusionStatus(hubId).then(state => {
+    if (state && state.status) {
+      switch (state.status) {
+        case ZWAVE_INCLUSION_STATUS.RUNNING:
+          {
+            // sleep 5s and try again
+            setTimeout(() => {
+              askZwaveInclusionStatusPromise(hubId, resolve, reject);
+            }, ZWAVE_INCLUSION_INTERVAL_MS);
+            break;
+          }
+
+        case ZWAVE_INCLUSION_STATUS.SUCCESS:
+          {
+            resolve(true);
+            break;
+          }
+
+        case ZWAVE_INCLUSION_STATUS.TIMEOUT:
+          {
+            resolve(false);
+            break;
+          }
+
+        case ZWAVE_INCLUSION_STATUS.CANCEL:
+          {
+            resolve(false);
+            break;
+          }
+
+        default:
+          {
+            reject(new Error('Invalid inclusion state'));
+            break;
+          }
+      }
+    } else {
+      reject(new Error('Invalid inclusion state'));
+    }
+  }).catch(error => {
+    console.error('Error in askZwaveInclusionStatusPromise: ', error);
+    reject(error);
+  });
+}
+/**
+ * Start zwave inclusion on given hub
+ * @param {string} hubId
+ * @return {Promise} that resolves true if device found and false if not
+ */
+
+
+async function doZwaveInclusion(hubId) {
+  return new Promise((resolve, reject) => {
+    inclusionStopped[hubId] = false;
+    startZwaveInclusion(hubId).then(state => {
+      if (state && state.status === ZWAVE_INCLUSION_STATUS.RUNNING) {
+        new Promise((r, j) => {
+          askZwaveInclusionStatusPromise(hubId, r, j);
+        }).then(result => {
+          resolve(result);
+        }).catch(error => {
+          reject(error);
+        });
+      } else {
+        reject(new Error('Wrong inclusion status'));
+      }
+    }).catch(error => {
+      console.error('Error in doZwavePairing: ', error);
+      reject(error);
+    });
+  });
+}
+/**
+ * Stop zwave inclusion on given hub
+ * @param {string} hubId
+ * @return {Promise}
+ */
+
+async function stopZwaveInclusion(hubId) {
+  return new Promise((resolve, reject) => {
+    if (stopInclusionInAction[hubId]) {
+      reject(new Error('stopInclusionById already stopping'));
+      return;
+    }
+
+    stopInclusionInAction[hubId] = true;
+    const {
+      authKey
+    } = storedUser$2();
+    const hub = getHubs$1()[hubId];
+    const {
+      hubKey
+    } = hub;
+    send({
+      command: COMMANDS.ZWAVE_STOP_INCLUSION,
+      hubId,
+      authKey,
+      hubKey,
+      localUrl: hub.url,
+      data: []
+    }).then(status => {
+      console.debug('SDK: stopZwavePairing: Ok , status: ', status);
+      inclusionStopped[hubId] = true;
+      stopInclusionInAction[hubId] = false;
+      resolve('ok');
+    }).catch(error => {
+      console.error('SDK: stopZwavePairing error: ', error.message);
+      stopInclusionInAction[hubId] = false;
+      reject(error);
+    });
+  });
+}
+/**
+ * Test if zwave of given hub is enabled
+ * @param {string} hubId
+ * @return {Promise} that resolves true if zwave is enabled
+
+export async function isZwaveEnabled(hubId: string): Promise<Object> {
+  return new Promise((resolve, reject) => {
+    askZwaveInclusionStatus(hubId)
+      .then((state) => {
+        if (state !== ZWAVE_INCLUSION_STATES.NO_ZWAVE) {
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      })
+      .catch((error) => {
+        console.error('Error in isZwaveById: ', error);
+        reject(error);
+      });
+  });
+}
+*/
+
+/*
+**
+** Z-wave exclusion
+**
+ */
+
+const exclusionStopped = {};
+const exclusionInAction = {};
+const stopExclusionInAction = {};
+/*
+ * Start exclusion of given hub if hub connection is ok
+ * @param {string} hubId
+ * @return {Promise}
+ */
+
+function startZwaveExclusion(hubId) {
+  return new Promise((resolve, reject) => {
+    if (exclusionStopped[hubId]) {
+      console.debug('startZwaveExclusion: exclusion stopped');
+      reject(new Error('exclusion stopped'));
+      return;
+    }
+
+    const hub = getHubs$1()[hubId];
+    const {
+      authKey
+    } = storedUser$2();
+    const {
+      hubKey
+    } = hub;
+    console.debug('startZwaveExclusion connection state: ', hub.connectionState);
+
+    if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
+      console.warn('SDK startZwaveExclusion: no Hub connection');
+      reject(new Error('no hub connection'));
+      return;
+    }
+
+    if (exclusionInAction[hubId]) {
+      reject(new Error('exclusion already in action'));
+      return;
+    }
+
+    exclusionInAction[hubId] = true;
+    send({
+      command: COMMANDS.ZWAVE_START_EXCLUSION,
+      hubId,
+      authKey,
+      hubKey,
+      localUrl: hub.url,
+      data: []
+    }).then(state => {
+      exclusionInAction[hubId] = false;
+
+      if (state.status === ZWAVE_EXCLUSION_STATUS.RUNNING) {
+        resolve(state);
+      } else {
+        console.error('SDK: doExclusionById - wrong state: ', state);
+        reject(state);
+      }
+    }).catch(error => {
+      // store.dispatch(hubsState.actions.hubPollFailed())
+      console.error('SDK: doExclusionById error: ', error.message);
+      exclusionInAction[hubId] = false;
+      reject(error);
+    });
+  });
+}
+/*
+ * Ask exclusion status of given hub if hub connection is ok
+ * @param {string} hubId
+ * @return {Promise}
+ */
+
+
+function askZwaveExclusionStatus(hubId) {
+  return new Promise((resolve, reject) => {
+    if (exclusionStopped[hubId]) {
+      console.debug('askZwaveExclusionStatus: exclusion stopped');
+      reject(new Error('exclusion stopped'));
+      return;
+    }
+
+    const hub = getHubs$1()[hubId];
+    const {
+      authKey
+    } = storedUser$2();
+    const {
+      hubKey
+    } = hub;
+    console.debug('askZwaveExclusionStatus connection state: ', hub.connectionState);
+
+    if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
+      console.warn('SDK askZwaveExclusionStatus: no Hub connection');
+      reject(new Error('no hub connection'));
+      return;
+    }
+
+    if (exclusionInAction[hubId]) {
+      reject(new Error('exclusion already in action'));
+      return;
+    }
+
+    exclusionInAction[hubId] = true;
+    send({
+      command: COMMANDS.ZWAVE_EXCLUSION_STATUS,
+      hubId,
+      authKey,
+      hubKey,
+      localUrl: hub.url,
+      data: []
+    }).then(state => {
+      exclusionInAction[hubId] = false;
+      resolve(state);
+    }).catch(error => {
+      // store.dispatch(hubsState.actions.hubPollFailed())
+      console.error('SDK: askZwaveExclusionStatus error: ', error.message);
+      exclusionInAction[hubId] = false;
+      reject(error);
+    });
+  });
+}
+
+function askZwaveExclusionStatusPromise(hubId, resolve, reject) {
+  askZwaveExclusionStatus(hubId).then(state => {
+    if (state && state.status) {
+      switch (state.status) {
+        case ZWAVE_EXCLUSION_STATUS.RUNNING:
+          {
+            // sleep 5s and try again
+            setTimeout(() => {
+              askZwaveExclusionStatusPromise(hubId, resolve, reject);
+            }, ZWAVE_EXCLUSION_INTERVAL_MS);
+            break;
+          }
+
+        case ZWAVE_EXCLUSION_STATUS.SUCCESS:
+          {
+            resolve(true);
+            break;
+          }
+
+        case ZWAVE_EXCLUSION_STATUS.TIMEOUT:
+          {
+            resolve(false);
+            break;
+          }
+
+        case ZWAVE_EXCLUSION_STATUS.CANCEL:
+          {
+            resolve(false);
+            break;
+          }
+
+        default:
+          {
+            reject(new Error('Wrong exclusion status'));
+            break;
+          }
+      }
+    } else {
+      reject(new Error('Wrong exclusion status'));
+    }
+  }).catch(error => {
+    console.error('Error in askZwaveExclusionStatusPromise: ', error);
+    reject(error);
+  });
+}
+/**
+ * Start zwave exclusion on given hub
+ * @param {string} hubId
+ * @return {Promise} that resolves true if device found and false if not
+ */
+
+
+async function doZwaveExclusion(hubId) {
+  return new Promise((resolve, reject) => {
+    exclusionStopped[hubId] = false;
+    startZwaveExclusion(hubId).then(state => {
+      if (state && state.status === ZWAVE_EXCLUSION_STATUS.RUNNING) {
+        new Promise((r, j) => {
+          askZwaveExclusionStatusPromise(hubId, r, j);
+        }).then(result => {
+          resolve(result);
+        }).catch(error => {
+          reject(error);
+        });
+      } else {
+        reject(new Error('Wrong exclusion status'));
+      }
+    }).catch(error => {
+      console.error('Error in doZwaveExclusion: ', error);
+      reject(error);
+    });
+  });
+}
+/**
+ * Stop zwave exclusion on given hub
+ * @param {string} hubId
+ * @return {Promise}
+ */
+
+async function stopZwaveExclusion(hubId) {
+  return new Promise((resolve, reject) => {
+    if (stopExclusionInAction[hubId]) {
+      reject(new Error('stopExclusionById already stopping'));
+      return;
+    }
+
+    stopExclusionInAction[hubId] = true;
+    const {
+      authKey
+    } = storedUser$2();
+    const hub = getHubs$1()[hubId];
+    const {
+      hubKey
+    } = hub;
+    send({
+      command: COMMANDS.ZWAVE_STOP_EXCLUSION,
+      hubId,
+      authKey,
+      hubKey,
+      localUrl: hub.url,
+      data: []
+    }).then(status => {
+      console.debug('SDK: stopZwaveExclusion: Ok , status: ', status);
+      exclusionStopped[hubId] = true;
+      stopExclusionInAction[hubId] = false;
+      resolve('ok');
+    }).catch(error => {
+      console.error('SDK: stopZwaveExclusion error: ', error.message);
+      stopExclusionInAction[hubId] = false;
+      reject(error);
+    });
+  });
+}
+/**
+ * Test if zwave of given hub is enabled
+ * @param {string} hubId
+ * @return {Promise} that resolves true if zwave is enabled
+ */
+
+async function isZwaveEnabled(hubId) {
+  return new Promise((resolve, reject) => {
+    askZwaveExclusionStatus(hubId).then(state => {
+      if (state) {
+        if (state.status !== ZWAVE_EXCLUSION_STATUS.NO_ZWAVE) {
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      } else {
+        resolve(false);
+      }
+    }).catch(error => {
+      console.error('Error in isZwaveEnabled: ', error);
+      reject(error);
+    });
+  });
+}
+/*
+**
+** Z-wave healing
+**
+ */
+
+const healingInAction = {};
+/**
+ * Start healing of Zwave network
+ * @param {string} hubId
+ * @return {Promise} that resolves true when done
+ */
+
+async function healZwave(hubId) {
+  return new Promise((resolve, reject) => {
+    if (healingInAction[hubId]) {
+      reject(new Error('healingInAction already in action'));
+      return;
+    }
+
+    healingInAction[hubId] = true;
+    const {
+      authKey
+    } = storedUser$2();
+    const hub = getHubs$1()[hubId];
+    const {
+      hubKey
+    } = hub;
+    send({
+      command: COMMANDS.ZWAVE_HEAL,
+      hubId,
+      authKey,
+      hubKey,
+      localUrl: hub.url,
+      data: []
+    }).then(status => {
+      console.debug('SDK: healZwave: Ok , status: ', status);
+      healingInAction[hubId] = false;
+      resolve('ok');
+    }).catch(error => {
+      console.error('SDK: healZwave error: ', error.message);
+      healingInAction[hubId] = false;
+      reject(error);
+    });
+  });
+}
 
 /** `Object#toString` result references. */
 var symbolTag = '[object Symbol]';
@@ -13561,7 +12837,7 @@ var HASH_UNDEFINED = '__lodash_hash_undefined__';
 var objectProto$7 = Object.prototype;
 
 /** Used to check objects for own properties. */
-var hasOwnProperty$6 = objectProto$7.hasOwnProperty;
+var hasOwnProperty$5 = objectProto$7.hasOwnProperty;
 
 /**
  * Gets the hash value for `key`.
@@ -13578,7 +12854,7 @@ function hashGet(key) {
     var result = data[key];
     return result === HASH_UNDEFINED ? undefined : result;
   }
-  return hasOwnProperty$6.call(data, key) ? data[key] : undefined;
+  return hasOwnProperty$5.call(data, key) ? data[key] : undefined;
 }
 
 var _hashGet = hashGet;
@@ -13587,7 +12863,7 @@ var _hashGet = hashGet;
 var objectProto$8 = Object.prototype;
 
 /** Used to check objects for own properties. */
-var hasOwnProperty$7 = objectProto$8.hasOwnProperty;
+var hasOwnProperty$6 = objectProto$8.hasOwnProperty;
 
 /**
  * Checks if a hash value for `key` exists.
@@ -13600,7 +12876,7 @@ var hasOwnProperty$7 = objectProto$8.hasOwnProperty;
  */
 function hashHas(key) {
   var data = this.__data__;
-  return _nativeCreate ? (data[key] !== undefined) : hasOwnProperty$7.call(data, key);
+  return _nativeCreate ? (data[key] !== undefined) : hasOwnProperty$6.call(data, key);
 }
 
 var _hashHas = hashHas;
@@ -14190,11 +13466,11 @@ var _baseToString = baseToString;
  * _.toString([1, 2, 3]);
  * // => '1,2,3'
  */
-function toString$2(value) {
+function toString$1(value) {
   return value == null ? '' : _baseToString(value);
 }
 
-var toString_1 = toString$2;
+var toString_1 = toString$1;
 
 /**
  * Casts `value` to a path array if it's not one.
@@ -14255,7 +13531,7 @@ function baseGet(object, path) {
 
 var _baseGet = baseGet;
 
-var defineProperty$2 = (function() {
+var defineProperty$1 = (function() {
   try {
     var func = _getNative(Object, 'defineProperty');
     func({}, '', {});
@@ -14263,7 +13539,7 @@ var defineProperty$2 = (function() {
   } catch (e) {}
 }());
 
-var _defineProperty$3 = defineProperty$2;
+var _defineProperty$3 = defineProperty$1;
 
 /**
  * The base implementation of `assignValue` and `assignMergeValue` without
@@ -14293,7 +13569,7 @@ var _baseAssignValue = baseAssignValue;
 var objectProto$9 = Object.prototype;
 
 /** Used to check objects for own properties. */
-var hasOwnProperty$8 = objectProto$9.hasOwnProperty;
+var hasOwnProperty$7 = objectProto$9.hasOwnProperty;
 
 /**
  * Assigns `value` to `key` of `object` if the existing value is not equivalent
@@ -14307,7 +13583,7 @@ var hasOwnProperty$8 = objectProto$9.hasOwnProperty;
  */
 function assignValue(object, key, value) {
   var objValue = object[key];
-  if (!(hasOwnProperty$8.call(object, key) && eq_1(objValue, value)) ||
+  if (!(hasOwnProperty$7.call(object, key) && eq_1(objValue, value)) ||
       (value === undefined && !(key in object))) {
     _baseAssignValue(object, key, value);
   }
@@ -14812,6 +14088,8 @@ var pick = _flatRest(function(object, paths) {
 
 var pick_1 = pick;
 
+//      
+
 /**
  * Device state command to be sent
  * @param  {string} hubId
@@ -14823,7 +14101,7 @@ var pick_1 = pick;
 
 function sendDeviceStateCmd(hubId, deviceId, state, properties) {
   return new Promise((resolve, reject) => {
-    const stateNow = store$3.getState();
+    const stateNow = store.getState();
     const user = userState.selectors.getUser(stateNow);
 
     if (!user || !user.authKey) {
@@ -14882,7 +14160,7 @@ function sendDeviceStateCmd(hubId, deviceId, state, properties) {
 
 function sendDeviceCmd(hubId, deviceId, commandType, data, properties) {
   return new Promise((resolve, reject) => {
-    const stateNow = store$3.getState();
+    const stateNow = store.getState();
     const user = userState.selectors.getUser(stateNow);
 
     if (!user || !user.authKey) {
@@ -14985,13 +14263,136 @@ function setDeviceMeta(hubId, deviceId, name, rooms) {
   });
 }
 
+//      
+/**
+ * Set plans
+ * @return {PLANS_TYPE}
+ */
+
+function setPlans(plans) {
+  store.dispatch(plansState.actions.setPlansState(plans));
+}
+/**
+ * Get plans
+ * @return {PLANS_TYPE}
+ */
+
+function getPlans() {
+  const stateNow = store.getState();
+  return plansState.selectors.getPlans(stateNow);
+}
+function addLocationNode(parentId, newNode) {
+  store.dispatch(plansState.actions.addLocationNode({
+    parentId,
+    newNode
+  }));
+}
+function setLocationNode(nodeToBeSet) {
+  store.dispatch(plansState.actions.setLocationNode(nodeToBeSet));
+}
+function removeLocationNode(nodeId) {
+  store.dispatch(plansState.actions.removeLocationNode(nodeId));
+}
+/**
+ * Load plans
+ * @return {PLANS_TYPE}
+ */
+
+async function loadPlans() {
+  return new Promise((resolve, reject) => {
+    const stateNow = store.getState();
+    const user = userState.selectors.getUser(stateNow);
+
+    if (!user || !user.authKey) {
+      console.error('SDK loadPlans error: No userKey!');
+      reject(new Error('Load plans error: No userKey!'));
+      return;
+    }
+
+    const {
+      authKey
+    } = user;
+
+    if (!authKey) {
+      console.error('SDK loadPlans error: No authKey!');
+      reject(new Error('Load plans error: No authKey!'));
+      return;
+    }
+
+    send({
+      command: COMMANDS.CMD_GET_PLANS,
+      authKey,
+      url: 'http://localhost:3001/plans'
+    }).then(plans => {
+      console.debug('SDK loadPlans ok', plans);
+      setPlans(plans);
+      resolve(getPlans());
+    }).catch(error => {
+      console.error('SDK loadPlans error:', error);
+      reject(error);
+    });
+  });
+}
+/**
+ * Save plans
+ * @return {PLANS_TYPE}
+ */
+
+async function savePlans() {
+  return new Promise((resolve, reject) => {
+    const stateNow = store.getState();
+    const user = userState.selectors.getUser(stateNow);
+
+    if (!user || !user.authKey) {
+      console.error('SDK savePlans error: No userKey!');
+      reject(new Error('Save plans error: No userKey!'));
+      return;
+    }
+
+    const {
+      authKey
+    } = user;
+
+    if (!authKey) {
+      console.error('SDK savePlans error: No authKey!');
+      reject(new Error('Save plans error: No authKey!'));
+      return;
+    }
+
+    const plansToBeSaved = getPlans();
+    const data = {
+      templates: plansToBeSaved.templates,
+      installations: plansToBeSaved.installations,
+      locations: plansToBeSaved.locations
+    };
+    send({
+      command: COMMANDS.CMD_SAVE_PLANS,
+      authKey,
+      data,
+      url: 'http://localhost:3001/plans'
+    }).then(status => {
+      debugger;
+      console.debug('SDK savePlans ok', status); // store.dispatch(setPlans(plans));
+
+      resolve(status);
+    }).catch(error => {
+      debugger;
+      console.error('SDK savePlans error:', error);
+      reject(error);
+    });
+  });
+}
+
 exports.CLOUD_CONNECTION_STATES = CLOUD_CONNECTION_STATES;
 exports.HUB_CONNECTION_STATES = HUB_CONNECTION_STATES;
 exports.HUB_STATES = HUB_STATES;
 exports.LANGUAGES = LANGUAGES;
 exports.ROLES = ROLES;
 exports.USER_STATES = USER_STATES;
+exports.ZWAVE_EXCLUSION_STATUS = ZWAVE_EXCLUSION_STATUS;
+exports.ZWAVE_INCLUSION_STATUS = ZWAVE_INCLUSION_STATUS;
 exports.acceptEula = acceptEula;
+exports.addLocationNode = addLocationNode;
 exports.addRoom = addRoom;
 exports.changeLanguage = changeLanguage;
 exports.closeAlarm = closeAlarm;
@@ -15002,6 +14403,8 @@ exports.devicesState = devicesState;
 exports.doPoll = doPoll;
 exports.doPwLogin = doPwLogin;
 exports.doRemoteIdQuery = doRemoteIdQuery;
+exports.doZwaveExclusion = doZwaveExclusion;
+exports.doZwaveInclusion = doZwaveInclusion;
 exports.editRoom = editRoom;
 exports.getAlarms = getAlarms;
 exports.getCloudConnectionState = getCloudConnectionState;
@@ -15013,19 +14416,28 @@ exports.getHubPairingDevices = getHubPairingDevices;
 exports.getHubRooms = getHubRooms;
 exports.getHubs = getHubs;
 exports.getPairingDevices = getPairingDevices;
+exports.getPlans = getPlans;
 exports.getRooms = getRooms;
 exports.getUserState = getUserState;
+exports.healZwave = healZwave;
 exports.hubsState = hubsState;
 exports.identifyDevice = identifyDevice;
 exports.ignorePairingByIds = ignorePairingByIds;
+exports.isZwaveEnabled = isZwaveEnabled;
+exports.loadPlans = loadPlans;
+exports.lockAndBackup = lockAndBackup;
 exports.removeAlarm = removeAlarm;
+exports.removeLocationNode = removeLocationNode;
 exports.removeRoom = removeRoom;
+exports.savePlans = savePlans;
 exports.selectHubById = selectHubById;
 exports.sendDeviceCmd = sendDeviceCmd;
 exports.sendDeviceStateCmd = sendDeviceStateCmd;
 exports.setAuthenticated = setAuthenticated;
 exports.setDeviceMeta = setDeviceMeta;
 exports.setDevices = setDevices;
+exports.setLocationNode = setLocationNode;
+exports.setPlans = setPlans;
 exports.startDiscoveringHubs = startDiscoveringHubs;
 exports.startPairingById = startPairingById;
 exports.startPollingById = startPollingById;
@@ -15033,7 +14445,9 @@ exports.stopDiscoveringHubs = stopDiscoveringHubs;
 exports.stopPairingById = stopPairingById;
 exports.stopPairings = stopPairings;
 exports.stopPollingById = stopPollingById;
-exports.store = store$3;
+exports.stopZwaveExclusion = stopZwaveExclusion;
+exports.stopZwaveInclusion = stopZwaveInclusion;
+exports.store = store;
 exports.unSelectHubById = unSelectHubById;
 exports.unSelectHubs = unSelectHubs;
 exports.unpairDevice = unpairDevice;

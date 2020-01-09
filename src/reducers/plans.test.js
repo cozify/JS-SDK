@@ -10,14 +10,17 @@ describe('Pure plansReducer', () => {
       templates: {},
       installations: {},
       locations: {
-        childIds: [],
+        root: {
+          id: 'root',
+          childIds: [],
+        },
       },
     };
     expect(plansReducer(undefined, {})).toEqual(initialState);
   });
 });
 
-
+/*
 describe('Store plansReducer', () => {
   it('setTemplates and addTemplate will add template', () => {
     const template1 = { id: 111, name: 'testiI' };
@@ -123,7 +126,11 @@ describe('Templates ', () => {
     expect(storedPlans.templates['template-1']).toEqual(template);
   });
 });
+*/
 
+/*
+ * Locations
+ */
 describe('Locations ', () => {
   it('addLocationNode will add country 1 to empty locations', () => {
     const country = {
@@ -132,11 +139,18 @@ describe('Locations ', () => {
         name: 'fi',
       },
     };
+    const countryStored = {
+      id: 'root:country-1',
+      data: {
+        name: 'fi',
+      },
+      childIds: [],
+    };
     store.dispatch(plansState.actions.addLocationNode({ parentId: null, newNode: country }));
     const stateNow = store.getState();
     const storedPlans = plansState.selectors.getPlans(stateNow);
-    console.log('Locations after addLocationNode country 1', JSON.stringify(storedPlans.locations));
-    expect(storedPlans.locations['country-1']).toEqual(country);
+    // console.log('Locations after addLocationNode country 1', JSON.stringify(storedPlans.locations));
+    expect(storedPlans.locations['root:country-1']).toEqual(countryStored);
   });
 
   it('addLocationNode will add country 2 ', () => {
@@ -146,16 +160,24 @@ describe('Locations ', () => {
         name: 'en',
       },
     };
+    const countryStored = {
+      id: 'root:country-2',
+      data: {
+        name: 'en',
+      },
+      childIds: [],
+    };
     store.dispatch(plansState.actions.addLocationNode({ parentId: null, newNode: country }));
     const stateNow = store.getState();
     const storedPlans = plansState.selectors.getPlans(stateNow);
-    console.log('Locations after addLocationNode country 2', JSON.stringify(storedPlans.locations));
-    expect(storedPlans.locations['country-2']).toEqual(country);
+    // console.log('Locations after addLocationNode country 2', JSON.stringify(storedPlans.locations));
+    expect(storedPlans.locations['root:country-2']).toEqual(countryStored);
   });
+
 
   it('setLocationNode will change country 1 data (name)', () => {
     const country = {
-      id: 'country-1',
+      id: 'root:country-1',
       data: {
         name: 'Finland',
       },
@@ -164,9 +186,10 @@ describe('Locations ', () => {
     const stateNow = store.getState();
     const storedPlans = plansState.selectors.getPlans(stateNow);
 
-    console.log('Locations after setLocationNode country 1 data', JSON.stringify(storedPlans.locations));
-    expect(storedPlans.locations['country-1']).toEqual(country);
+    // console.log('Locations after setLocationNode country 1 data', JSON.stringify(storedPlans.locations));
+    expect(storedPlans.locations['root:country-1']).toEqual(country);
   });
+
 
   it('addLocationNode will add city 1', () => {
     const city = {
@@ -175,12 +198,21 @@ describe('Locations ', () => {
         name: 'Hel',
       },
     };
-    store.dispatch(plansState.actions.addLocationNode({ parentId: 'country-2', newNode: city }));
+    const cityStored = {
+      id: 'root:country-2:city-1',
+      data: {
+        name: 'Hel',
+      },
+      childIds: [],
+    };
+    store.dispatch(plansState.actions.addLocationNode({ parentId: 'root:country-2', newNode: city }));
+    // console.log('City after addLocationNode city 1', JSON.stringify(city));
     const stateNow = store.getState();
     const storedPlans = plansState.selectors.getPlans(stateNow);
-    console.log('Locations after addLocationNode city 1', JSON.stringify(storedPlans.locations));
-    expect(storedPlans.locations['city-1']).toEqual(city);
+    // console.log('Locations after addLocationNode city 1', JSON.stringify(storedPlans.locations));
+    expect(storedPlans.locations['root:country-2:city-1']).toEqual(cityStored);
   });
+
 
   it('addLocationNode will add address 1', () => {
     const address = {
@@ -189,25 +221,34 @@ describe('Locations ', () => {
         name: 'Erottaja',
       },
     };
-    store.dispatch(plansState.actions.addLocationNode({ parentId: 'city-1', newNode: address }));
+    const addressStored = {
+      id: 'root:country-2:city-1:address-1',
+      data: {
+        name: 'Erottaja',
+      },
+      childIds: [],
+    };
+    store.dispatch(plansState.actions.addLocationNode({ parentId: 'root:country-2:city-1', newNode: address }));
     const stateNow = store.getState();
     const storedPlans = plansState.selectors.getPlans(stateNow);
-    console.log('Locations after addLocationNode address 1', JSON.stringify(storedPlans.locations));
-    expect(storedPlans.locations['address-1']).toEqual(address);
+    // console.log('Locations after addLocationNode address 1', JSON.stringify(storedPlans.locations));
+    expect(storedPlans.locations['root:country-2:city-1:address-1']).toEqual(addressStored);
   });
 
+
   it('removeLocationNode will remove address 1', () => {
-    const stateNow = store.getState();
-    const storedPlans = plansState.selectors.getPlans(stateNow);
-    console.log('Locations before removeLocationNode address 1', storedPlans);
-    store.dispatch(plansState.actions.removeLocationNode('address-1'));
+    // const stateNow = store.getState();
+    // const storedPlans = plansState.selectors.getPlans(stateNow);
+    // console.log('Locations before removeLocationNode address 1', storedPlans);
+    store.dispatch(plansState.actions.removeLocationNode('root:country-2:city-1:address-1'));
     const stateNowI = store.getState();
     const storedPlansI = plansState.selectors.getPlans(stateNowI);
-    console.log('Locations after removeLocationNode address 1', JSON.stringify(storedPlansI.locations));
-    console.log('City childIds after removeLocationNode address1', storedPlansI.locations['city-1'].childIds);
-    expect(storedPlansI.locations['city-1'].childIds).toHaveLength(0);
-    expect(storedPlansI.locations['address-1']).not.toBeDefined();
+    // console.log('Locations after removeLocationNode address 1', JSON.stringify(storedPlansI.locations));
+    // console.log('City childIds after removeLocationNode address1', storedPlansI.locations['root:country-2:city-1'].childIds);
+    expect(storedPlansI.locations['root:country-2:city-1'].childIds).toHaveLength(0);
+    expect(storedPlansI.locations['root:country-2:city-1:address-1']).not.toBeDefined();
   });
+
 
   it('addLocationNode will add city 2', () => {
     const city = {
@@ -216,12 +257,20 @@ describe('Locations ', () => {
         name: 'Tku',
       },
     };
-    store.dispatch(plansState.actions.addLocationNode({ parentId: 'country-1', newNode: city }));
+    const cityStored = {
+      id: 'root:country-1:city-2',
+      data: {
+        name: 'Tku',
+      },
+      childIds: [],
+    };
+    store.dispatch(plansState.actions.addLocationNode({ parentId: 'root:country-1', newNode: city }));
     const stateNow = store.getState();
     const storedPlans = plansState.selectors.getPlans(stateNow);
-    console.log('Locations after addLocationNode city 2', JSON.stringify(storedPlans.locations));
-    expect(storedPlans.locations['city-2']).toEqual(city);
+    // console.log('Locations after addLocationNode city 2', JSON.stringify(storedPlans.locations));
+    expect(storedPlans.locations['root:country-1:city-2']).toEqual(cityStored);
   });
+
 
   it('addLocationNode will add address 3', () => {
     const address = {
@@ -230,12 +279,22 @@ describe('Locations ', () => {
         name: 'Aura',
       },
     };
-    store.dispatch(plansState.actions.addLocationNode({ parentId: 'city-2', newNode: address }));
+
+    const addressStored = {
+      id: 'root:country-1:city-2:address-3',
+      data: {
+        name: 'Aura',
+      },
+      childIds: [],
+    };
+
+    store.dispatch(plansState.actions.addLocationNode({ parentId: 'root:country-1:city-2', newNode: address }));
     const stateNow = store.getState();
     const storedPlans = plansState.selectors.getPlans(stateNow);
-    console.log('Locations after addLocationNode address 3', JSON.stringify(storedPlans.locations));
-    expect(storedPlans.locations['address-3']).toEqual(address);
+    // console.log('Locations after addLocationNode address 3', JSON.stringify(storedPlans.locations));
+    expect(storedPlans.locations['root:country-1:city-2:address-3']).toEqual(addressStored);
   });
+
 
   it('addLocationNode will add buildin 1', () => {
     const building = {
@@ -244,52 +303,62 @@ describe('Locations ', () => {
         name: '1',
       },
     };
-    store.dispatch(plansState.actions.addLocationNode({ parentId: 'address-3', newNode: building }));
+    const storedBuilding = {
+      id: 'root:country-1:city-2:address-3:building-1',
+      data: {
+        name: '1',
+      },
+      childIds: [],
+    };
+    store.dispatch(plansState.actions.addLocationNode({ parentId: 'root:country-1:city-2:address-3', newNode: building }));
     const stateNow = store.getState();
     const storedPlans = plansState.selectors.getPlans(stateNow);
-    console.log('Locations after addLocationNode building 1', JSON.stringify(storedPlans.locations));
-    expect(storedPlans.locations['building-1']).toEqual(building);
+    // console.log('Locations after addLocationNode building 1', JSON.stringify(storedPlans.locations));
+    expect(storedPlans.locations['root:country-1:city-2:address-3:building-1']).toEqual(storedBuilding);
   });
 
 
   it('removeLocationNode will remove address 3', () => {
-    const stateNow = store.getState();
-    const storedPlans = plansState.selectors.getPlans(stateNow);
-    console.log('Locations before removeLocationNode address 3', storedPlans.locations);
-    store.dispatch(plansState.actions.removeLocationNode('address-3'));
+    // const stateNow = store.getState();
+    // const storedPlans = plansState.selectors.getPlans(stateNow);
+    // console.log('Locations before removeLocationNode address 3', storedPlans.locations);
+    store.dispatch(plansState.actions.removeLocationNode('root:country-1:city-2:address-3'));
     const stateNowI = store.getState();
     const storedPlansI = plansState.selectors.getPlans(stateNowI);
-    console.log('Locations after removeLocationNode address 3', JSON.stringify(storedPlansI.locations));
-    console.log('City childIds after removeLocationNode address 3', storedPlans.locations['city-2'].childIds);
-    expect(storedPlansI.locations['city-2'].childIds).toHaveLength(0);
-    expect(storedPlansI.locations['address-2']).not.toBeDefined();
+    // console.log('Locations after removeLocationNode address 3', JSON.stringify(storedPlansI.locations));
+    // console.log('City childIds after removeLocationNode address 3', storedPlans.locations['root:country-1:city-2'].childIds);
+    expect(storedPlansI.locations['root:country-1:city-2'].childIds).toHaveLength(0);
+    expect(storedPlansI.locations['root:country-1:city-2:address-3']).not.toBeDefined();
   });
+
 
   it('removeLocationNode will remove country 1', () => {
-    const stateNow = store.getState();
-    const storedPlans = plansState.selectors.getPlans(stateNow);
-    console.log('Locations before removeLocationNode country 1', storedPlans.locations);
-    store.dispatch(plansState.actions.removeLocationNode('country-1'));
+    // const stateNow = store.getState();
+    // const storedPlans = plansState.selectors.getPlans(stateNow);
+    // console.log('Locations before removeLocationNode country 1', storedPlans.locations);
+    store.dispatch(plansState.actions.removeLocationNode('root:country-1'));
     const stateNowI = store.getState();
     const storedPlansI = plansState.selectors.getPlans(stateNowI);
-    console.log('Locations after removeLocationNode country 1', JSON.stringify(storedPlansI.locations));
-    console.log('Root childIds after removeLocationNode country 1', storedPlansI.locations.childIds);
-    expect(storedPlansI.locations.childIds).toHaveLength(1);
-    expect(storedPlansI.locations['country-1']).not.toBeDefined();
+    // console.log('Locations after removeLocationNode country 1', JSON.stringify(storedPlansI.locations));
+    // console.log('Root childIds after removeLocationNode country 1', storedPlansI.locations.root.childIds);
+    expect(storedPlansI.locations.root.childIds).toHaveLength(1);
+    expect(storedPlansI.locations['root:country-1']).not.toBeDefined();
   });
 
+
   it('removeLocationNode will remove country 2', () => {
-    const stateNow = store.getState();
-    const storedPlans = plansState.selectors.getPlans(stateNow);
-    console.log('Locations before removeLocationNode country 2', storedPlans.locations);
-    store.dispatch(plansState.actions.removeLocationNode('country-2'));
+    // const stateNow = store.getState();
+    // const storedPlans = plansState.selectors.getPlans(stateNow);
+    // console.log('Locations before removeLocationNode country 2', storedPlans.locations);
+    store.dispatch(plansState.actions.removeLocationNode('root:country-2'));
     const stateNowI = store.getState();
     const storedPlansI = plansState.selectors.getPlans(stateNowI);
-    console.log('Locations after removeLocationNode country 2', JSON.stringify(storedPlansI.locations));
-    console.log('Root childIds after removeLocationNode country 2', storedPlansI.locations.childIds);
-    expect(storedPlansI.locations.childIds).toHaveLength(0);
-    expect(storedPlansI.locations['country-2']).not.toBeDefined();
+    // console.log('Locations after removeLocationNode country 2', JSON.stringify(storedPlansI.locations));
+    // console.log('Root childIds after removeLocationNode country 2', storedPlansI.locations.root.childIds);
+    expect(storedPlansI.locations.root.childIds).toHaveLength(0);
+    expect(storedPlansI.locations['root:country-2']).not.toBeDefined();
   });
+
 
   it('addLocationNode will add address 1 to root', () => {
     const address = {
@@ -298,23 +367,31 @@ describe('Locations ', () => {
         name: 'Erottaja',
       },
     };
+    const addressStored = {
+      id: 'root:address-1',
+      data: {
+        name: 'Erottaja',
+      },
+      childIds: [],
+    };
     store.dispatch(plansState.actions.addLocationNode({ parentId: null, newNode: address }));
     const stateNow = store.getState();
     const storedPlans = plansState.selectors.getPlans(stateNow);
-    console.log('Locations after addLocationNode address 1', JSON.stringify(storedPlans.locations));
-    expect(storedPlans.locations['address-1']).toEqual(address);
+    // console.log('Locations after addLocationNode address 1', JSON.stringify(storedPlans.locations));
+    expect(storedPlans.locations['root:address-1']).toEqual(addressStored);
   });
+
 
   it('removeLocationNode will remove address 1 from root', () => {
     const stateNow = store.getState();
     const storedPlans = plansState.selectors.getPlans(stateNow);
     console.log('Locations before removeLocationNode address 1', storedPlans.locations);
-    store.dispatch(plansState.actions.removeLocationNode('address-1'));
+    store.dispatch(plansState.actions.removeLocationNode('root:address-1'));
     const stateNowI = store.getState();
     const storedPlansI = plansState.selectors.getPlans(stateNowI);
     console.log('Locations after removeLocationNode address 1', JSON.stringify(storedPlansI.locations));
-    console.log('Root childIds after removeLocationNode country 2', storedPlansI.locations.childIds);
-    expect(storedPlansI.locations.childIds).toHaveLength(0);
-    expect(storedPlansI.locations['address-1']).not.toBeDefined();
+    console.log('Root childIds after removeLocationNode country 2', storedPlansI.locations.root.childIds);
+    expect(storedPlansI.locations.root.childIds).toHaveLength(0);
+    expect(storedPlansI.locations.root['address-1']).not.toBeDefined();
   });
 });

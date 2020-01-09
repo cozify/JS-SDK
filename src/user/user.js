@@ -7,7 +7,7 @@ import { store } from '../store';
 import { userState } from '../reducers/user';
 
 import { USER_STATES, LANGUAGES } from './constants';
-import type { LANGUAGES_TYPE, USER_STATE_TYPE } from './constants';
+import type { LANGUAGES_TYPE } from './constants';
 
 
 /*

@@ -9,7 +9,8 @@ import isArray from 'lodash/isArray';
 * Helpers
 */
 
-const setId = (givenObject: Object) => {
+const setId = (idObj: Object) => {
+  const givenObject = idObj;
   if (!givenObject.id) {
     givenObject.id = Date.now();
   }
@@ -71,10 +72,23 @@ export const plansState = createSlice({
     templates: {},
     installations: {},
     locations: {
-      childIds: [],
+      root: {
+        id: 'root',
+        childIds: [],
+      },
     },
   },
   reducers: {
+
+    setPlansState(state, action) {
+      const stateToSet = state;
+      const newState = action.payload;
+      const oldState = stateToSet.plansState;
+      console.log(`PLANS state ${oldState} -> ${newState}`);
+      stateToSet.templates = { ...newState.templates };
+      stateToSet.installations = { ...newState.installations };
+      stateToSet.locations = { ...newState.locations };
+    },
 
     /*
      * Reducer action of setting all templates state
@@ -252,19 +266,32 @@ export const plansState = createSlice({
     addLocationNode(state, action) {
       const stateToSet = state;
       const { parentId, newNode } = action.payload;
-      setId(newNode);
+      const parentTempId = parentId || 'root';
+      if (newNode.id) {
+        newNode.id = parentTempId.concat(':').concat(newNode.id);
+      } else if (newNode.data && newNode.data.name) {
+        newNode.id = parentTempId.concat(':').concat(newNode.data.name.replace(/\s+/g, '').replace(/\./g, '').replace(/:/g, ''));
+      } else {
+        newNode.id = parentTempId.concat(':?');
+      }
+
+      // Check that node doesn't already exist
+      if (!newNode || !newNode.id) {
+        throw new Error('SDK addLocationNode - no new node given');
+      }
+      if (stateToSet.locations[newNode.id]) {
+        throw new Error(`SDK addLocationNode - node ${newNode.id} already exist`);
+      }
+
       if (!newNode.childIds) {
         newNode.childIds = [];
       }
 
-      if (!parentId) {
-        stateToSet.locations.childIds = [...stateToSet.locations.childIds, newNode.id];
-        stateToSet.locations[newNode.id] = { ...newNode };
-      } else if (stateToSet.locations[parentId] && newNode && newNode.id) {
-        if (!stateToSet.locations[parentId].childIds) {
-          stateToSet.locations[parentId].childIds = [];
+      if (stateToSet.locations[parentTempId] && newNode && newNode.id) {
+        if (!stateToSet.locations[parentTempId].childIds) {
+          stateToSet.locations[parentTempId].childIds = [];
         }
-        stateToSet.locations[parentId].childIds = [...stateToSet.locations[parentId].childIds, newNode.id];
+        stateToSet.locations[parentTempId].childIds = [...stateToSet.locations[parentTempId].childIds, newNode.id];
         stateToSet.locations[newNode.id] = { ...newNode };
       }
     },
@@ -275,6 +302,15 @@ export const plansState = createSlice({
     setLocationNode(state, action) {
       const stateToSet = state;
       const node = action.payload;
+
+
+      if (!node || !node.id) {
+        throw new Error('SDK setLocationNode - no node given');
+      }
+      if (!stateToSet.locations[node.id]) {
+        throw new Error(`SDK setLocationNode - node ${node.id} does not exist`);
+      }
+
       if (!node.childIds) {
         node.childIds = [];
       }
@@ -290,22 +326,25 @@ export const plansState = createSlice({
     removeLocationNode(state, action) {
       const stateToSet = state;
       const nodeId = action.payload;
-      if (nodeId) {
+      if (!nodeId) {
+        throw new Error('SDK removeLocationNode - no nodeId given');
+      }
+      if (!stateToSet.locations[nodeId]) {
+        throw new Error(`SDK removeLocationNode - node ${nodeId} doesnt exist`);
+      }
+      console.info('removeLocationNode ', nodeId);
+      if (nodeId && nodeId !== 'root') {
         const descendantIds = getAllDescendantIds(stateToSet.locations, nodeId);
-        // console.debug('descendantIds', descendantIds);
+        console.info('descendantIds', descendantIds);
         const parent = findChild(stateToSet.locations, nodeId);
-        if (parent) {
-          // console.debug('PARENT', JSON.stringify(parent));
+        console.info('PARENT', JSON.stringify(parent));
+        if (parent && parent.id) {
           stateToSet.locations = deleteMany(stateToSet.locations, [nodeId, ...descendantIds]);
-          // console.debug('child not yet removed', JSON.stringify(stateToSet.locations[parent.id].childIds));
+          console.info('child not yet removed', JSON.stringify(stateToSet.locations[parent.id].childIds));
           stateToSet.locations[parent.id].childIds = stateToSet.locations[parent.id].childIds.filter((id) => id !== nodeId);
-          // console.debug('child removed', JSON.stringify(stateToSet.locations[parent.id].childIds));
+          console.info('child removed', JSON.stringify(stateToSet.locations[parent.id].childIds));
         } else {
-          // console.debug('ROOT PARENT', nodeId);
-          stateToSet.locations = deleteMany(stateToSet.locations, [nodeId, ...descendantIds]);
-          // console.debug('root child not yet removed', JSON.stringify(stateToSet.locations.childIds));
-          stateToSet.locations.childIds = stateToSet.locations.childIds.filter((id) => id !== nodeId);
-          // console.debug('root child removed', JSON.stringify(stateToSet.locations.childIds));
+          throw new Error(`SDK removeLocationNode - node ${nodeId} parent does not exist`);
         }
       }
     },
@@ -330,5 +369,5 @@ export const {
   setTemplates, addTemplate, setTemplate, removeTemplate,
   setInstallations, addInstallation, setInstallation, removeInstallation,
   addLocationCountry, setLocationCountry, removeLocationCountry,
-
+  addLocationNode, setLocationNode, removeLocationNode,
 } = actions;

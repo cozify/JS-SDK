@@ -1,0 +1,12 @@
+{
+  "plans": {
+    "templates": {},
+    "installations": {},
+    "locations": {
+      "root": {
+        "id": "root",
+        "childIds":[]
+      }
+    }
+  }
+}

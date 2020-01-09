@@ -1,6 +1,6 @@
 import { COMMANDS } from './constants';
 
-import { send } from './send';
+// import { send } from './send';
 
 /** @test {send} */
 describe('COMMANDS', () => {

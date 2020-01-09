@@ -3954,7 +3954,7 @@
 
   function _objectSpread$1(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$2(source, true).forEach(function (key) { defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$2(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
   /**
-   * Rooms action creators object
+   * Alarms action creators object
    * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
    * @return { {
    *   slice : string,
@@ -4232,6 +4232,10 @@
       url: 'user/hubkeys',
       timeout: 15000
     },
+    HUB_LOCK_BACKUP: {
+      method: 'POST',
+      url: 'hub/remote/cc/$API_VER/hub/lockconfig'
+    },
     REFRESH_AUTHKEY: {
       method: 'GET',
       url: 'user/refreshsession'
@@ -4316,6 +4320,50 @@
       method: 'DELETE',
       url: 'hub/remote/cc/$API_VER/alarms',
       urlParams: ['roomId']
+    },
+    ZWAVE_START_INCLUSION: {
+      method: 'POST',
+      url: 'hub/remote/cc/$API_VER/hub/protocolconfig',
+      type: 'ZWAVE_START_INCLUSION'
+    },
+    ZWAVE_STOP_INCLUSION: {
+      method: 'POST',
+      url: 'hub/remote/cc/$API_VER/hub/protocolconfig',
+      type: 'ZWAVE_CANCEL_INCLUSION'
+    },
+    ZWAVE_START_EXCLUSION: {
+      method: 'POST',
+      url: 'hub/remote/cc/$API_VER/hub/protocolconfig',
+      type: 'ZWAVE_START_EXCLUSION'
+    },
+    ZWAVE_STOP_EXCLUSION: {
+      method: 'POST',
+      url: 'hub/remote/cc/$API_VER/hub/protocolconfig',
+      type: 'ZWAVE_CANCEL_EXCLUSION'
+    },
+    ZWAVE_INCLUSION_STATUS: {
+      method: 'POST',
+      url: 'hub/remote/cc/$API_VER/hub/protocolconfig',
+      type: 'GET_ZWAVE_INCLUSION_STATUS'
+    },
+    ZWAVE_EXCLUSION_STATUS: {
+      method: 'POST',
+      url: 'hub/remote/cc/$API_VER/hub/protocolconfig',
+      type: 'GET_ZWAVE_EXCLUSION_STATUS'
+    },
+    ZWAVE_HEAL: {
+      method: 'POST',
+      url: 'hub/remote/cc/$API_VER/hub/protocolconfig',
+      type: 'ZWAVE_HEAL'
+    },
+    CMD_GET_PLANS: {
+      method: 'GET',
+      url: 'plans'
+    },
+    CMD_SAVE_PLANS: {
+      method: 'POST',
+      url: 'plans',
+      params: ['templates', 'installations', 'locations']
     }
   }); // type dataArray = ?Array<{ [key: string | number]: any }>
   // type dataObject = ?{ [key: string | number]: any }
@@ -5869,6 +5917,369 @@
     reducer: reducer$6
   } = roomsState;
 
+  function ownKeys$7(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+  function _objectSpread$6(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$7(source, true).forEach(function (key) { defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$7(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+  /*
+  * Helpers
+  */
+
+  const setId = idObj => {
+    const givenObject = idObj;
+
+    if (!givenObject.id) {
+      givenObject.id = Date.now();
+    }
+
+    return givenObject;
+  };
+
+  const getAllDescendantIds = (state, nodeId) => state[nodeId].childIds.reduce((acc, childId) => [...acc, childId, ...getAllDescendantIds(state, childId)], []);
+
+  const deleteMany = (givenState, ids) => {
+    const state = _objectSpread$6({}, givenState);
+
+    ids.forEach(id => delete state[id]);
+    return state;
+  };
+
+  const findChild = (state, id) => {
+    let found;
+    Object.values(state).forEach(node => {
+      if (!found) {
+        if (node && node.childIds) {
+          // console.error(`FIND ${id} in ${JSON.stringify(node.childIds)} when node ${JSON.stringify(node)}`);
+          if (isArray_1(node.childIds)) {
+            if (node.childIds.includes(id)) {
+              found = node;
+            }
+          }
+        }
+      }
+    }); // console.error(`FOUND ${id} => ${JSON.stringify(found)}`);
+
+    return found;
+  };
+  /**
+   * Plans action creators object
+   * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
+   * @return { {
+   *   slice : string,
+   *   reducer : ReducerFunction,
+   *   actions : Object<string, ActionCreator},
+   *   selectors : Object<string, Selector>
+   *   }}
+   */
+
+
+  const plansState = createSlice({
+    slice: 'plans',
+    initialState: {
+      templates: {},
+      installations: {},
+      locations: {
+        root: {
+          id: 'root',
+          childIds: []
+        }
+      }
+    },
+    reducers: {
+      setPlansState(state, action) {
+        const stateToSet = state;
+        const newState = action.payload;
+        const oldState = stateToSet.plansState;
+        console.log(`PLANS state ${oldState} -> ${newState}`);
+        stateToSet.templates = _objectSpread$6({}, newState.templates);
+        stateToSet.installations = _objectSpread$6({}, newState.installations);
+        stateToSet.locations = _objectSpread$6({}, newState.locations);
+      },
+
+      /*
+       * Reducer action of setting all templates state
+       * @param {Object} state
+       * @param {Object} action
+       */
+      setTemplates(state, action) {
+        const stateToSet = state;
+        const {
+          templates
+        } = action.payload;
+        const newTemplates = {};
+        Object.entries(templates).forEach(entry => {
+          setId(entry);
+          const [id, template] = entry;
+          newTemplates[id] = _objectSpread$6({}, template);
+        });
+        stateToSet.templates = _objectSpread$6({}, newTemplates);
+      },
+
+      /*
+       * Reducer action of adding template state
+       * @param {Object} state
+       * @param {Object} action
+       */
+      addTemplate(state, action) {
+        const stateToSet = state;
+        const template = action.payload;
+        setId(template);
+
+        if (template.id) {
+          stateToSet.templates[template.id] = _objectSpread$6({}, template);
+        }
+      },
+
+      /*
+       * Reducer action of setting template state
+       * @param {Object} state
+       * @param {Object} action
+       */
+      setTemplate(state, action) {
+        const stateToSet = state;
+        const template = action.payload;
+        setId(template);
+
+        if (template.id && stateToSet.templates[template.id]) {
+          stateToSet.templates[template.id] = _objectSpread$6({}, template);
+        }
+      },
+
+      /*
+       * Reducer action of removing plan state
+       * @param {Object} state
+       * @param {Object} action
+       */
+      removeTemplate(state, action) {
+        const stateToSet = state;
+        const template = action.payload;
+        setId(template);
+
+        if (template.id && stateToSet.templates[template.id]) {
+          delete stateToSet.templates[template.id];
+        }
+      },
+
+      /*
+       * Reducer action of setting installations state
+       * @param {Object} state
+       * @param {Object} action
+       */
+      setInstallations(state, action) {
+        const stateToSet = state;
+        const {
+          installations
+        } = action.payload;
+        const newInstallations = {};
+        Object.entries(installations).forEach(entry => {
+          setId(entry);
+          const [id, installation] = entry;
+          newInstallations[id] = _objectSpread$6({}, installation);
+        });
+        stateToSet.installations = _objectSpread$6({}, newInstallations);
+      },
+
+      /*
+       * Reducer action of adding installation state
+       * @param {Object} state
+       * @param {Object} action
+       */
+      addInstallation(state, action) {
+        const stateToSet = state;
+        const installation = action.payload;
+        setId(installation);
+
+        if (installation.id) {
+          stateToSet.installations[installation.id] = _objectSpread$6({}, installation);
+        }
+      },
+
+      /*
+       * Reducer action of setting plan state
+       * @param {Object} state
+       * @param {Object} action
+       */
+      setInstallation(state, action) {
+        const stateToSet = state;
+        const installation = action.payload;
+        setId(installation);
+
+        if (stateToSet.installations[installation.id]) {
+          stateToSet.installations[installation.id] = _objectSpread$6({}, installation);
+        }
+      },
+
+      /*
+       * Reducer action of removing plan state
+       * @param {Object} state
+       * @param {Object} action
+       */
+      removeInstallation(state, action) {
+        const stateToSet = state;
+        const installation = action.payload;
+        setId(installation);
+
+        if (installation.id && stateToSet.installations[installation.id]) {
+          delete stateToSet.installations[installation.id];
+        }
+      },
+
+      /*
+       * Reducer action of adding country state
+       * @param {Object} state
+       * @param {Object} action
+       */
+      addLocationCountry(state, action) {
+        const stateToSet = state;
+        const country = action.payload;
+        setId(country);
+
+        if (country.id) {
+          stateToSet.locations[country.id] = _objectSpread$6({}, country);
+        }
+      },
+
+      /*
+       * Reducer action of setting country state
+       * @param {Object} state
+       * @param {Object} action
+       */
+      setLocationCountry(state, action) {
+        const stateToSet = state;
+        const country = action.payload;
+        setId(country);
+
+        if (stateToSet.locations[country.id]) {
+          stateToSet.locations[country.id] = _objectSpread$6({}, country);
+        }
+      },
+
+      /*
+       * Reducer action of removing country state
+       * @param {Object} state
+       * @param {Object} action
+       */
+      removeLocationCountry(state, action) {
+        const stateToSet = state;
+        const country = action.payload;
+        setId(country);
+
+        if (country.id && stateToSet.locations[country.id]) {
+          delete stateToSet.locations[country.id];
+        }
+      },
+
+      /*
+       * Reducer action of adding location node state
+       *
+       * addLocationNode({parentId: parent, data:{}})
+       *
+       * addLocationNode({ parentId: null, newNode: country }));
+       *
+       */
+      addLocationNode(state, action) {
+        const stateToSet = state;
+        const {
+          parentId,
+          newNode
+        } = action.payload;
+        const parentTempId = parentId || 'root';
+
+        if (newNode.id) {
+          newNode.id = parentTempId.concat(':').concat(newNode.id);
+        } else if (newNode.data && newNode.data.name) {
+          newNode.id = parentTempId.concat(':').concat(newNode.data.name.replace(/\s+/g, '').replace(/\./g, '').replace(/:/g, ''));
+        } else {
+          newNode.id = parentTempId.concat(':?');
+        } // Check that node doesn't already exist
+
+
+        if (!newNode || !newNode.id) {
+          throw new Error('SDK addLocationNode - no new node given');
+        }
+
+        if (stateToSet.locations[newNode.id]) {
+          throw new Error(`SDK addLocationNode - node ${newNode.id} already exist`);
+        }
+
+        if (!newNode.childIds) {
+          newNode.childIds = [];
+        }
+
+        if (stateToSet.locations[parentTempId] && newNode && newNode.id) {
+          if (!stateToSet.locations[parentTempId].childIds) {
+            stateToSet.locations[parentTempId].childIds = [];
+          }
+
+          stateToSet.locations[parentTempId].childIds = [...stateToSet.locations[parentTempId].childIds, newNode.id];
+          stateToSet.locations[newNode.id] = _objectSpread$6({}, newNode);
+        }
+      },
+
+      /*
+       * setLocationNode(node)
+       */
+      setLocationNode(state, action) {
+        const stateToSet = state;
+        const node = action.payload;
+
+        if (!node || !node.id) {
+          throw new Error('SDK setLocationNode - no node given');
+        }
+
+        if (!stateToSet.locations[node.id]) {
+          throw new Error(`SDK setLocationNode - node ${node.id} does not exist`);
+        }
+
+        if (!node.childIds) {
+          node.childIds = [];
+        }
+
+        if (node && node.id && stateToSet.locations[node.id]) {
+          stateToSet.locations[node.id] = _objectSpread$6({}, node);
+        }
+      },
+
+      /*
+       * removeLocationNode
+       */
+      removeLocationNode(state, action) {
+        const stateToSet = state;
+        const nodeId = action.payload;
+
+        if (!nodeId) {
+          throw new Error('SDK removeLocationNode - no nodeId given');
+        }
+
+        if (!stateToSet.locations[nodeId]) {
+          throw new Error(`SDK removeLocationNode - node ${nodeId} doesnt exist`);
+        }
+
+        console.info('removeLocationNode ', nodeId);
+
+        if (nodeId && nodeId !== 'root') {
+          const descendantIds = getAllDescendantIds(stateToSet.locations, nodeId);
+          console.info('descendantIds', descendantIds);
+          const parent = findChild(stateToSet.locations, nodeId);
+          console.info('PARENT', JSON.stringify(parent));
+
+          if (parent && parent.id) {
+            stateToSet.locations = deleteMany(stateToSet.locations, [nodeId, ...descendantIds]);
+            console.info('child not yet removed', JSON.stringify(stateToSet.locations[parent.id].childIds));
+            stateToSet.locations[parent.id].childIds = stateToSet.locations[parent.id].childIds.filter(id => id !== nodeId);
+            console.info('child removed', JSON.stringify(stateToSet.locations[parent.id].childIds));
+          } else {
+            throw new Error(`SDK removeLocationNode - node ${nodeId} parent does not exist`);
+          }
+        }
+      }
+
+    }
+  });
+  const {
+    actions: actions$7,
+    reducer: reducer$7
+  } = plansState;
+
   /**
    * Root reducer
    * @type {Object}
@@ -5881,7 +6292,8 @@
     devices: reducer$3,
     hubs: reducer$4,
     user: reducer$5,
-    rooms: reducer$6
+    rooms: reducer$6,
+    plans: reducer$7
   };
 
   /*!
@@ -6064,6 +6476,40 @@
     NO_ACCESS: 'no access',
     CONNECTED: 'connected'
   });
+  const ZWAVE_INCLUSION_STATUS = Object.freeze({
+    NOT_PAIRING: 'NOT_PAIRING',
+    // Inclusion is not running
+    IDLE: 'IDLE',
+    // Inclusion is not running
+    RUNNING: 'RUNNING',
+    // Inclusion is running
+    TIMEOUT: 'TIMEOUT',
+    // Inclusion timed out and finished
+    SUCCESS: 'SUCCESS',
+    // Inclusion finished, a device was added
+    CANCEL: 'CANCEL',
+    // Inclusion was cancelled
+    NO_ZWAVE: 'NO_ZWAVE',
+    // ZWave not available
+    ERROR: 'ERROR' // General error
+
+  });
+  const ZWAVE_EXCLUSION_STATUS = Object.freeze({
+    IDLE: 'IDLE',
+    // Exclusion is not running
+    RUNNING: 'RUNNING',
+    // Exclusion is running
+    TIMEOUT: 'TIMEOUT',
+    // Exclusion timed out and finished
+    SUCCESS: 'SUCCESS',
+    // Exclusion finished, a device was added
+    CANCEL: 'CANCEL',
+    // Exclusion was cancelled
+    NO_ZWAVE: 'NO_ZWAVE',
+    // ZWave not available
+    ERROR: 'ERROR' // General error
+
+  });
   /*
    * Intervall defining how often hubkeys and metadatas are fetched
    */
@@ -6076,11 +6522,16 @@
 
   const POLL_INTERVAL_MS = 1 * 1000;
   /*
-   * Interval defining how often hubs are polled when paired at max
-   * This value is used as is in local connection, and multiplied in remote connection
+   * Interval defining how often hubs are polled when paired
    */
 
-  const PAIRING_POLL_INTERVAL_MS = 5 * 1000;
+  const PAIRING_POLL_INTERVAL_MS = 3 * 1000;
+  /*
+   * Interval defining how often zwave statuses are polled
+   */
+
+  const ZWAVE_INCLUSION_INTERVAL_MS = 3 * 1000;
+  const ZWAVE_EXCLUSION_INTERVAL_MS = 3 * 1000;
   const HUB_PROTOCOL = 'http://';
   const HUB_PORT = '8893';
 
@@ -6952,6 +7403,10 @@
         if (isArray_1(body)) {
           if (body[0]) {
             body[0].type = command.type;
+          } else {
+            body.push({
+              type: command.type
+            });
           }
         } else if (body) {
           body.type = command.type;
@@ -7878,9 +8333,28 @@
     }
   }
   /*
-   * Remote hub metamata request for version etc information
+   * Remote hub backup and lock request
    */
 
+
+  function lockAndBackup(hubId, authKey, hubKey) {
+    return new Promise((resolve, reject) => {
+      send({
+        command: COMMANDS.HUB_LOCK_BACKUP,
+        authKey,
+        hubKey,
+        hubId
+      }).then(status => {
+        resolve(status);
+      }).catch(error => {
+        console.log(`doRemoteIdQuery ${hubId} error `, error.message);
+        reject(error);
+      });
+    });
+  }
+  /*
+   * Remote hub metamata request for version etc information
+   */
 
   function doRemoteIdQuery(hubId, authKey, hubKey) {
     return new Promise((resolve, reject) => {
@@ -8319,14 +8793,14 @@
       }
 
       const hub = getHubs()[hubId];
-      console.debug('doPoll connection state: ', hub.connectionState);
 
-      if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
+      if (!hub || hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
         console.warn('SDK doPoll: No Hub connection');
         reject(new Error('doPoll error: No Hub connection'));
         return;
-      } // just return every second -> not doing so often as in local connection
+      }
 
+      console.debug('doPoll connection state: ', hub.connectionState); // just return every second -> not doing so often as in local connection
 
       if (hub.connectionState === HUB_CONNECTION_STATES.REMOTE && !doReset) {
         if (secondPoll[hubId]) {
@@ -8408,6 +8882,11 @@
                   break;
                 }
 
+              case 'USER_ALERTS':
+                {
+                  break;
+                }
+
               case 'ALARM_DELTA':
                 {
                   alarmsDeltaHandler(hubId, doReset, delta.alarms);
@@ -8418,7 +8897,7 @@
         }
 
         pollInAction[hubId] = false;
-        resolve('done');
+        resolve(deltas);
       }).catch(error => {
         // store.dispatch(hubsState.actions.hubPollFailed())
         console.error('SDK doPoll error: ', error.message);
@@ -8582,6 +9061,590 @@
       startDiscoveringHubs();
     }
   });
+
+  //      
+  /**
+   * Helper to get current user from state
+   */
+
+  function storedUser$2() {
+    return userState.selectors.getUser(store.getState());
+  }
+  /**
+   * Helper to get current hubs from state
+   * @return {HUBS_MAP_TYPE} - hubs
+   */
+
+
+  function getHubs$1() {
+    return hubsState.selectors.getHubs(store.getState());
+  }
+  /*
+  ** Z-wave inclusion
+   */
+
+  const inclusionStopped = {};
+  const inclusionInAction = {};
+  const stopInclusionInAction = {};
+  /*
+   * Start inclusion of given hub if hub connection is ok
+   * @param {string} hubId
+   * @return {Promise}
+   */
+
+  function startZwaveInclusion(hubId) {
+    return new Promise((resolve, reject) => {
+      if (inclusionStopped[hubId]) {
+        console.debug('startZwaveInclusion: inclusion stopped');
+        reject(new Error('inclusion stopped'));
+        return;
+      }
+
+      const hub = getHubs$1()[hubId];
+      const {
+        authKey
+      } = storedUser$2();
+      const {
+        hubKey
+      } = hub;
+      console.debug('startZwaveInclusion connection state: ', hub.connectionState);
+
+      if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
+        console.warn('SDK startZwaveInclusion: no Hub connection');
+        reject(new Error('no hub connection'));
+        return;
+      }
+
+      if (inclusionInAction[hubId]) {
+        reject(new Error('inclusion already in action'));
+        return;
+      }
+
+      inclusionInAction[hubId] = true;
+      send({
+        command: COMMANDS.ZWAVE_START_INCLUSION,
+        hubId,
+        authKey,
+        hubKey,
+        localUrl: hub.url,
+        data: []
+      }).then(state => {
+        inclusionInAction[hubId] = false;
+
+        if (state) {
+          if (state.status === ZWAVE_INCLUSION_STATUS.RUNNING) {
+            resolve(state);
+          } else {
+            reject(state);
+          }
+        } else {
+          reject(new Error('No inclusion state received'));
+        }
+      }).catch(error => {
+        // store.dispatch(hubsState.actions.hubPollFailed())
+        console.error('SDK: startZwaveInclusion error: ', error.message);
+        inclusionInAction[hubId] = false;
+        reject(error);
+      });
+    });
+  }
+  /*
+   * Ask inclusion status of given hub if hub connection is ok
+   * @param {string} hubId
+   * @return {Promise}
+   */
+
+
+  function askZwaveInclusionStatus(hubId) {
+    return new Promise((resolve, reject) => {
+      if (inclusionStopped[hubId]) {
+        console.debug('askZwaveInclusionStatus: inclusion stopped');
+        reject(new Error('inclusion stopped'));
+        return;
+      }
+
+      const hub = getHubs$1()[hubId];
+      const {
+        authKey
+      } = storedUser$2();
+      const {
+        hubKey
+      } = hub;
+      console.debug('askZwaveInclusionStatus connection state: ', hub.connectionState);
+
+      if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
+        console.warn('SDK askZwaveInclusionStatus: no Hub connection');
+        reject(new Error('no hub connection'));
+        return;
+      }
+
+      if (inclusionInAction[hubId]) {
+        reject(new Error('inclusion already in action'));
+        return;
+      }
+
+      inclusionInAction[hubId] = true;
+      send({
+        command: COMMANDS.ZWAVE_INCLUSION_STATUS,
+        hubId,
+        authKey,
+        hubKey,
+        localUrl: hub.url,
+        data: []
+      }).then(state => {
+        inclusionInAction[hubId] = false;
+        resolve(state);
+      }).catch(error => {
+        // store.dispatch(hubsState.actions.hubPollFailed())
+        console.error('SDK: askZwaveInclusionStatus error: ', error.message);
+        inclusionInAction[hubId] = false;
+        reject(error);
+      });
+    });
+  }
+
+  function askZwaveInclusionStatusPromise(hubId, resolve, reject) {
+    askZwaveInclusionStatus(hubId).then(state => {
+      if (state && state.status) {
+        switch (state.status) {
+          case ZWAVE_INCLUSION_STATUS.RUNNING:
+            {
+              // sleep 5s and try again
+              setTimeout(() => {
+                askZwaveInclusionStatusPromise(hubId, resolve, reject);
+              }, ZWAVE_INCLUSION_INTERVAL_MS);
+              break;
+            }
+
+          case ZWAVE_INCLUSION_STATUS.SUCCESS:
+            {
+              resolve(true);
+              break;
+            }
+
+          case ZWAVE_INCLUSION_STATUS.TIMEOUT:
+            {
+              resolve(false);
+              break;
+            }
+
+          case ZWAVE_INCLUSION_STATUS.CANCEL:
+            {
+              resolve(false);
+              break;
+            }
+
+          default:
+            {
+              reject(new Error('Invalid inclusion state'));
+              break;
+            }
+        }
+      } else {
+        reject(new Error('Invalid inclusion state'));
+      }
+    }).catch(error => {
+      console.error('Error in askZwaveInclusionStatusPromise: ', error);
+      reject(error);
+    });
+  }
+  /**
+   * Start zwave inclusion on given hub
+   * @param {string} hubId
+   * @return {Promise} that resolves true if device found and false if not
+   */
+
+
+  async function doZwaveInclusion(hubId) {
+    return new Promise((resolve, reject) => {
+      inclusionStopped[hubId] = false;
+      startZwaveInclusion(hubId).then(state => {
+        if (state && state.status === ZWAVE_INCLUSION_STATUS.RUNNING) {
+          new Promise((r, j) => {
+            askZwaveInclusionStatusPromise(hubId, r, j);
+          }).then(result => {
+            resolve(result);
+          }).catch(error => {
+            reject(error);
+          });
+        } else {
+          reject(new Error('Wrong inclusion status'));
+        }
+      }).catch(error => {
+        console.error('Error in doZwavePairing: ', error);
+        reject(error);
+      });
+    });
+  }
+  /**
+   * Stop zwave inclusion on given hub
+   * @param {string} hubId
+   * @return {Promise}
+   */
+
+  async function stopZwaveInclusion(hubId) {
+    return new Promise((resolve, reject) => {
+      if (stopInclusionInAction[hubId]) {
+        reject(new Error('stopInclusionById already stopping'));
+        return;
+      }
+
+      stopInclusionInAction[hubId] = true;
+      const {
+        authKey
+      } = storedUser$2();
+      const hub = getHubs$1()[hubId];
+      const {
+        hubKey
+      } = hub;
+      send({
+        command: COMMANDS.ZWAVE_STOP_INCLUSION,
+        hubId,
+        authKey,
+        hubKey,
+        localUrl: hub.url,
+        data: []
+      }).then(status => {
+        console.debug('SDK: stopZwavePairing: Ok , status: ', status);
+        inclusionStopped[hubId] = true;
+        stopInclusionInAction[hubId] = false;
+        resolve('ok');
+      }).catch(error => {
+        console.error('SDK: stopZwavePairing error: ', error.message);
+        stopInclusionInAction[hubId] = false;
+        reject(error);
+      });
+    });
+  }
+  /**
+   * Test if zwave of given hub is enabled
+   * @param {string} hubId
+   * @return {Promise} that resolves true if zwave is enabled
+
+  export async function isZwaveEnabled(hubId: string): Promise<Object> {
+    return new Promise((resolve, reject) => {
+      askZwaveInclusionStatus(hubId)
+        .then((state) => {
+          if (state !== ZWAVE_INCLUSION_STATES.NO_ZWAVE) {
+            resolve(true);
+          } else {
+            resolve(false);
+          }
+        })
+        .catch((error) => {
+          console.error('Error in isZwaveById: ', error);
+          reject(error);
+        });
+    });
+  }
+  */
+
+  /*
+  **
+  ** Z-wave exclusion
+  **
+   */
+
+  const exclusionStopped = {};
+  const exclusionInAction = {};
+  const stopExclusionInAction = {};
+  /*
+   * Start exclusion of given hub if hub connection is ok
+   * @param {string} hubId
+   * @return {Promise}
+   */
+
+  function startZwaveExclusion(hubId) {
+    return new Promise((resolve, reject) => {
+      if (exclusionStopped[hubId]) {
+        console.debug('startZwaveExclusion: exclusion stopped');
+        reject(new Error('exclusion stopped'));
+        return;
+      }
+
+      const hub = getHubs$1()[hubId];
+      const {
+        authKey
+      } = storedUser$2();
+      const {
+        hubKey
+      } = hub;
+      console.debug('startZwaveExclusion connection state: ', hub.connectionState);
+
+      if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
+        console.warn('SDK startZwaveExclusion: no Hub connection');
+        reject(new Error('no hub connection'));
+        return;
+      }
+
+      if (exclusionInAction[hubId]) {
+        reject(new Error('exclusion already in action'));
+        return;
+      }
+
+      exclusionInAction[hubId] = true;
+      send({
+        command: COMMANDS.ZWAVE_START_EXCLUSION,
+        hubId,
+        authKey,
+        hubKey,
+        localUrl: hub.url,
+        data: []
+      }).then(state => {
+        exclusionInAction[hubId] = false;
+
+        if (state.status === ZWAVE_EXCLUSION_STATUS.RUNNING) {
+          resolve(state);
+        } else {
+          console.error('SDK: doExclusionById - wrong state: ', state);
+          reject(state);
+        }
+      }).catch(error => {
+        // store.dispatch(hubsState.actions.hubPollFailed())
+        console.error('SDK: doExclusionById error: ', error.message);
+        exclusionInAction[hubId] = false;
+        reject(error);
+      });
+    });
+  }
+  /*
+   * Ask exclusion status of given hub if hub connection is ok
+   * @param {string} hubId
+   * @return {Promise}
+   */
+
+
+  function askZwaveExclusionStatus(hubId) {
+    return new Promise((resolve, reject) => {
+      if (exclusionStopped[hubId]) {
+        console.debug('askZwaveExclusionStatus: exclusion stopped');
+        reject(new Error('exclusion stopped'));
+        return;
+      }
+
+      const hub = getHubs$1()[hubId];
+      const {
+        authKey
+      } = storedUser$2();
+      const {
+        hubKey
+      } = hub;
+      console.debug('askZwaveExclusionStatus connection state: ', hub.connectionState);
+
+      if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL && hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
+        console.warn('SDK askZwaveExclusionStatus: no Hub connection');
+        reject(new Error('no hub connection'));
+        return;
+      }
+
+      if (exclusionInAction[hubId]) {
+        reject(new Error('exclusion already in action'));
+        return;
+      }
+
+      exclusionInAction[hubId] = true;
+      send({
+        command: COMMANDS.ZWAVE_EXCLUSION_STATUS,
+        hubId,
+        authKey,
+        hubKey,
+        localUrl: hub.url,
+        data: []
+      }).then(state => {
+        exclusionInAction[hubId] = false;
+        resolve(state);
+      }).catch(error => {
+        // store.dispatch(hubsState.actions.hubPollFailed())
+        console.error('SDK: askZwaveExclusionStatus error: ', error.message);
+        exclusionInAction[hubId] = false;
+        reject(error);
+      });
+    });
+  }
+
+  function askZwaveExclusionStatusPromise(hubId, resolve, reject) {
+    askZwaveExclusionStatus(hubId).then(state => {
+      if (state && state.status) {
+        switch (state.status) {
+          case ZWAVE_EXCLUSION_STATUS.RUNNING:
+            {
+              // sleep 5s and try again
+              setTimeout(() => {
+                askZwaveExclusionStatusPromise(hubId, resolve, reject);
+              }, ZWAVE_EXCLUSION_INTERVAL_MS);
+              break;
+            }
+
+          case ZWAVE_EXCLUSION_STATUS.SUCCESS:
+            {
+              resolve(true);
+              break;
+            }
+
+          case ZWAVE_EXCLUSION_STATUS.TIMEOUT:
+            {
+              resolve(false);
+              break;
+            }
+
+          case ZWAVE_EXCLUSION_STATUS.CANCEL:
+            {
+              resolve(false);
+              break;
+            }
+
+          default:
+            {
+              reject(new Error('Wrong exclusion status'));
+              break;
+            }
+        }
+      } else {
+        reject(new Error('Wrong exclusion status'));
+      }
+    }).catch(error => {
+      console.error('Error in askZwaveExclusionStatusPromise: ', error);
+      reject(error);
+    });
+  }
+  /**
+   * Start zwave exclusion on given hub
+   * @param {string} hubId
+   * @return {Promise} that resolves true if device found and false if not
+   */
+
+
+  async function doZwaveExclusion(hubId) {
+    return new Promise((resolve, reject) => {
+      exclusionStopped[hubId] = false;
+      startZwaveExclusion(hubId).then(state => {
+        if (state && state.status === ZWAVE_EXCLUSION_STATUS.RUNNING) {
+          new Promise((r, j) => {
+            askZwaveExclusionStatusPromise(hubId, r, j);
+          }).then(result => {
+            resolve(result);
+          }).catch(error => {
+            reject(error);
+          });
+        } else {
+          reject(new Error('Wrong exclusion status'));
+        }
+      }).catch(error => {
+        console.error('Error in doZwaveExclusion: ', error);
+        reject(error);
+      });
+    });
+  }
+  /**
+   * Stop zwave exclusion on given hub
+   * @param {string} hubId
+   * @return {Promise}
+   */
+
+  async function stopZwaveExclusion(hubId) {
+    return new Promise((resolve, reject) => {
+      if (stopExclusionInAction[hubId]) {
+        reject(new Error('stopExclusionById already stopping'));
+        return;
+      }
+
+      stopExclusionInAction[hubId] = true;
+      const {
+        authKey
+      } = storedUser$2();
+      const hub = getHubs$1()[hubId];
+      const {
+        hubKey
+      } = hub;
+      send({
+        command: COMMANDS.ZWAVE_STOP_EXCLUSION,
+        hubId,
+        authKey,
+        hubKey,
+        localUrl: hub.url,
+        data: []
+      }).then(status => {
+        console.debug('SDK: stopZwaveExclusion: Ok , status: ', status);
+        exclusionStopped[hubId] = true;
+        stopExclusionInAction[hubId] = false;
+        resolve('ok');
+      }).catch(error => {
+        console.error('SDK: stopZwaveExclusion error: ', error.message);
+        stopExclusionInAction[hubId] = false;
+        reject(error);
+      });
+    });
+  }
+  /**
+   * Test if zwave of given hub is enabled
+   * @param {string} hubId
+   * @return {Promise} that resolves true if zwave is enabled
+   */
+
+  async function isZwaveEnabled(hubId) {
+    return new Promise((resolve, reject) => {
+      askZwaveExclusionStatus(hubId).then(state => {
+        if (state) {
+          if (state.status !== ZWAVE_EXCLUSION_STATUS.NO_ZWAVE) {
+            resolve(true);
+          } else {
+            resolve(false);
+          }
+        } else {
+          resolve(false);
+        }
+      }).catch(error => {
+        console.error('Error in isZwaveEnabled: ', error);
+        reject(error);
+      });
+    });
+  }
+  /*
+  **
+  ** Z-wave healing
+  **
+   */
+
+  const healingInAction = {};
+  /**
+   * Start healing of Zwave network
+   * @param {string} hubId
+   * @return {Promise} that resolves true when done
+   */
+
+  async function healZwave(hubId) {
+    return new Promise((resolve, reject) => {
+      if (healingInAction[hubId]) {
+        reject(new Error('healingInAction already in action'));
+        return;
+      }
+
+      healingInAction[hubId] = true;
+      const {
+        authKey
+      } = storedUser$2();
+      const hub = getHubs$1()[hubId];
+      const {
+        hubKey
+      } = hub;
+      send({
+        command: COMMANDS.ZWAVE_HEAL,
+        hubId,
+        authKey,
+        hubKey,
+        localUrl: hub.url,
+        data: []
+      }).then(status => {
+        console.debug('SDK: healZwave: Ok , status: ', status);
+        healingInAction[hubId] = false;
+        resolve('ok');
+      }).catch(error => {
+        console.error('SDK: healZwave error: ', error.message);
+        healingInAction[hubId] = false;
+        reject(error);
+      });
+    });
+  }
 
   /** `Object#toString` result references. */
   var symbolTag = '[object Symbol]';
@@ -10107,13 +11170,136 @@
     });
   }
 
+  //      
+  /**
+   * Set plans
+   * @return {PLANS_TYPE}
+   */
+
+  function setPlans(plans) {
+    store.dispatch(plansState.actions.setPlansState(plans));
+  }
+  /**
+   * Get plans
+   * @return {PLANS_TYPE}
+   */
+
+  function getPlans() {
+    const stateNow = store.getState();
+    return plansState.selectors.getPlans(stateNow);
+  }
+  function addLocationNode(parentId, newNode) {
+    store.dispatch(plansState.actions.addLocationNode({
+      parentId,
+      newNode
+    }));
+  }
+  function setLocationNode(nodeToBeSet) {
+    store.dispatch(plansState.actions.setLocationNode(nodeToBeSet));
+  }
+  function removeLocationNode(nodeId) {
+    store.dispatch(plansState.actions.removeLocationNode(nodeId));
+  }
+  /**
+   * Load plans
+   * @return {PLANS_TYPE}
+   */
+
+  async function loadPlans() {
+    return new Promise((resolve, reject) => {
+      const stateNow = store.getState();
+      const user = userState.selectors.getUser(stateNow);
+
+      if (!user || !user.authKey) {
+        console.error('SDK loadPlans error: No userKey!');
+        reject(new Error('Load plans error: No userKey!'));
+        return;
+      }
+
+      const {
+        authKey
+      } = user;
+
+      if (!authKey) {
+        console.error('SDK loadPlans error: No authKey!');
+        reject(new Error('Load plans error: No authKey!'));
+        return;
+      }
+
+      send({
+        command: COMMANDS.CMD_GET_PLANS,
+        authKey,
+        url: 'http://localhost:3001/plans'
+      }).then(plans => {
+        console.debug('SDK loadPlans ok', plans);
+        setPlans(plans);
+        resolve(getPlans());
+      }).catch(error => {
+        console.error('SDK loadPlans error:', error);
+        reject(error);
+      });
+    });
+  }
+  /**
+   * Save plans
+   * @return {PLANS_TYPE}
+   */
+
+  async function savePlans() {
+    return new Promise((resolve, reject) => {
+      const stateNow = store.getState();
+      const user = userState.selectors.getUser(stateNow);
+
+      if (!user || !user.authKey) {
+        console.error('SDK savePlans error: No userKey!');
+        reject(new Error('Save plans error: No userKey!'));
+        return;
+      }
+
+      const {
+        authKey
+      } = user;
+
+      if (!authKey) {
+        console.error('SDK savePlans error: No authKey!');
+        reject(new Error('Save plans error: No authKey!'));
+        return;
+      }
+
+      const plansToBeSaved = getPlans();
+      const data = {
+        templates: plansToBeSaved.templates,
+        installations: plansToBeSaved.installations,
+        locations: plansToBeSaved.locations
+      };
+      send({
+        command: COMMANDS.CMD_SAVE_PLANS,
+        authKey,
+        data,
+        url: 'http://localhost:3001/plans'
+      }).then(status => {
+        debugger;
+        console.debug('SDK savePlans ok', status); // store.dispatch(setPlans(plans));
+
+        resolve(status);
+      }).catch(error => {
+        debugger;
+        console.error('SDK savePlans error:', error);
+        reject(error);
+      });
+    });
+  }
+
   exports.CLOUD_CONNECTION_STATES = CLOUD_CONNECTION_STATES;
   exports.HUB_CONNECTION_STATES = HUB_CONNECTION_STATES;
   exports.HUB_STATES = HUB_STATES;
   exports.LANGUAGES = LANGUAGES;
   exports.ROLES = ROLES;
   exports.USER_STATES = USER_STATES;
+  exports.ZWAVE_EXCLUSION_STATUS = ZWAVE_EXCLUSION_STATUS;
+  exports.ZWAVE_INCLUSION_STATUS = ZWAVE_INCLUSION_STATUS;
   exports.acceptEula = acceptEula;
+  exports.addLocationNode = addLocationNode;
   exports.addRoom = addRoom;
   exports.changeLanguage = changeLanguage;
   exports.closeAlarm = closeAlarm;
@@ -10124,6 +11310,8 @@
   exports.doPoll = doPoll;
   exports.doPwLogin = doPwLogin;
   exports.doRemoteIdQuery = doRemoteIdQuery;
+  exports.doZwaveExclusion = doZwaveExclusion;
+  exports.doZwaveInclusion = doZwaveInclusion;
   exports.editRoom = editRoom;
   exports.getAlarms = getAlarms;
   exports.getCloudConnectionState = getCloudConnectionState;
@@ -10135,19 +11323,28 @@
   exports.getHubRooms = getHubRooms;
   exports.getHubs = getHubs;
   exports.getPairingDevices = getPairingDevices;
+  exports.getPlans = getPlans;
   exports.getRooms = getRooms;
   exports.getUserState = getUserState;
+  exports.healZwave = healZwave;
   exports.hubsState = hubsState;
   exports.identifyDevice = identifyDevice;
   exports.ignorePairingByIds = ignorePairingByIds;
+  exports.isZwaveEnabled = isZwaveEnabled;
+  exports.loadPlans = loadPlans;
+  exports.lockAndBackup = lockAndBackup;
   exports.removeAlarm = removeAlarm;
+  exports.removeLocationNode = removeLocationNode;
   exports.removeRoom = removeRoom;
+  exports.savePlans = savePlans;
   exports.selectHubById = selectHubById;
   exports.sendDeviceCmd = sendDeviceCmd;
   exports.sendDeviceStateCmd = sendDeviceStateCmd;
   exports.setAuthenticated = setAuthenticated;
   exports.setDeviceMeta = setDeviceMeta;
   exports.setDevices = setDevices;
+  exports.setLocationNode = setLocationNode;
+  exports.setPlans = setPlans;
   exports.startDiscoveringHubs = startDiscoveringHubs;
   exports.startPairingById = startPairingById;
   exports.startPollingById = startPollingById;
@@ -10155,6 +11352,8 @@
   exports.stopPairingById = stopPairingById;
   exports.stopPairings = stopPairings;
   exports.stopPollingById = stopPollingById;
+  exports.stopZwaveExclusion = stopZwaveExclusion;
+  exports.stopZwaveInclusion = stopZwaveInclusion;
   exports.store = store;
   exports.unSelectHubById = unSelectHubById;
   exports.unSelectHubs = unSelectHubs;

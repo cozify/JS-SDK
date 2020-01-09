@@ -57,6 +57,7 @@ export const COMMANDS = Object.freeze({
     method: 'POST', url: 'user/login', params: ['password', 'email'], config: { responseType: isNode ? 'blob' : 'stream', timeout: 15000 },
   },
   HUB_KEYS: { method: 'GET', url: 'user/hubkeys', timeout: 15000 },
+  HUB_LOCK_BACKUP: { method: 'POST', url: 'hub/remote/cc/$API_VER/hub/lockconfig' },
   REFRESH_AUTHKEY: { method: 'GET', url: 'user/refreshsession' },
   CLOUD_IP: { method: 'GET', url: 'hub/lan_ip' },
   CLOUD_META: { method: 'GET', url: 'hub/remote/hub' },
@@ -86,6 +87,19 @@ export const COMMANDS = Object.freeze({
   CMD_GET_ALARMS: { method: 'GET', url: 'hub/remote/cc/$API_VER/alarms' },
   CMD_CLOSE_ALARM: { method: 'PUT', url: 'hub/remote/cc/$API_VER/alarms/close', urlParams: ['alarmId'] },
   CMD_REMOVE_ALARM: { method: 'DELETE', url: 'hub/remote/cc/$API_VER/alarms', urlParams: ['roomId'] },
+  ZWAVE_START_INCLUSION: { method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'ZWAVE_START_INCLUSION' },
+  ZWAVE_STOP_INCLUSION: { method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'ZWAVE_CANCEL_INCLUSION' },
+  ZWAVE_START_EXCLUSION: { method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'ZWAVE_START_EXCLUSION' },
+  ZWAVE_STOP_EXCLUSION: { method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'ZWAVE_CANCEL_EXCLUSION' },
+  ZWAVE_INCLUSION_STATUS: { method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'GET_ZWAVE_INCLUSION_STATUS' },
+  ZWAVE_EXCLUSION_STATUS: { method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'GET_ZWAVE_EXCLUSION_STATUS' },
+  ZWAVE_HEAL: { method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'ZWAVE_HEAL' },
+  CMD_GET_PLANS: {
+    method: 'GET', url: 'plans',
+  },
+  CMD_SAVE_PLANS: {
+    method: 'PUT', url: 'plans', params: ['plans'],
+  },
 });
 
 

@@ -84,6 +84,30 @@ window.esdocSearchIndex = [
     "variable"
   ],
   [
+    "cozify-sdk/src/hubs/constants.js~zwave_exclusion_interval_ms",
+    "variable/index.html#static-variable-ZWAVE_EXCLUSION_INTERVAL_MS",
+    "<span>ZWAVE_EXCLUSION_INTERVAL_MS</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/constants.js</span>",
+    "variable"
+  ],
+  [
+    "cozify-sdk/src/hubs/constants.js~zwave_exclusion_status",
+    "variable/index.html#static-variable-ZWAVE_EXCLUSION_STATUS",
+    "<span>ZWAVE_EXCLUSION_STATUS</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/constants.js</span>",
+    "variable"
+  ],
+  [
+    "cozify-sdk/src/hubs/constants.js~zwave_inclusion_interval_ms",
+    "variable/index.html#static-variable-ZWAVE_INCLUSION_INTERVAL_MS",
+    "<span>ZWAVE_INCLUSION_INTERVAL_MS</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/constants.js</span>",
+    "variable"
+  ],
+  [
+    "cozify-sdk/src/hubs/constants.js~zwave_inclusion_status",
+    "variable/index.html#static-variable-ZWAVE_INCLUSION_STATUS",
+    "<span>ZWAVE_INCLUSION_STATUS</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/constants.js</span>",
+    "variable"
+  ],
+  [
     "cozify-sdk/src/user/user.js~accepteula",
     "function/index.html#static-function-acceptEula",
     "<span>acceptEula</span> <span class=\"search-result-import-path\">cozify-sdk/src/user/user.js</span>",
@@ -180,6 +204,18 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
+    "cozify-sdk/src/hubs/zwave.js~dozwaveexclusion",
+    "function/index.html#static-function-doZwaveExclusion",
+    "<span>doZwaveExclusion</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/zwave.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/hubs/zwave.js~dozwaveinclusion",
+    "function/index.html#static-function-doZwaveInclusion",
+    "<span>doZwaveInclusion</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/zwave.js</span>",
+    "function"
+  ],
+  [
     "cozify-sdk/src/rooms/rooms.js~editroom",
     "function/index.html#static-function-editRoom",
     "<span>editRoom</span> <span class=\"search-result-import-path\">cozify-sdk/src/rooms/rooms.js</span>",
@@ -258,9 +294,21 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
+    "cozify-sdk/src/hubs/zwave.js~gethubs",
+    "function/index.html#static-function-getHubs",
+    "<span>getHubs</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/zwave.js</span>",
+    "function"
+  ],
+  [
     "cozify-sdk/src/devices/devices.js~getpairingdevices",
     "function/index.html#static-function-getPairingDevices",
     "<span>getPairingDevices</span> <span class=\"search-result-import-path\">cozify-sdk/src/devices/devices.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/plans/plans.js~getplans",
+    "function/index.html#static-function-getPlans",
+    "<span>getPlans</span> <span class=\"search-result-import-path\">cozify-sdk/src/plans/plans.js</span>",
     "function"
   ],
   [
@@ -279,6 +327,12 @@ window.esdocSearchIndex = [
     "cozify-sdk/src/user/user.js~getuserstate",
     "function/index.html#static-function-getUserState",
     "<span>getUserState</span> <span class=\"search-result-import-path\">cozify-sdk/src/user/user.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/hubs/zwave.js~healzwave",
+    "function/index.html#static-function-healZwave",
+    "<span>healZwave</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/zwave.js</span>",
     "function"
   ],
   [
@@ -312,6 +366,24 @@ window.esdocSearchIndex = [
     "variable"
   ],
   [
+    "cozify-sdk/src/hubs/zwave.js~iszwaveenabled",
+    "function/index.html#static-function-isZwaveEnabled",
+    "<span>isZwaveEnabled</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/zwave.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/plans/plans.js~loadplans",
+    "function/index.html#static-function-loadPlans",
+    "<span>loadPlans</span> <span class=\"search-result-import-path\">cozify-sdk/src/plans/plans.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/hubs/hubs.js~lockandbackup",
+    "function/index.html#static-function-lockAndBackup",
+    "<span>lockAndBackup</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/hubs.js</span>",
+    "function"
+  ],
+  [
     "cozify-sdk/src/devices/devices.js~pairingdevicesdeltahandler",
     "function/index.html#static-function-pairingDevicesDeltaHandler",
     "<span>pairingDevicesDeltaHandler</span> <span class=\"search-result-import-path\">cozify-sdk/src/devices/devices.js</span>",
@@ -321,6 +393,12 @@ window.esdocSearchIndex = [
     "cozify-sdk/src/reducers/pairings.js~pairingsstate",
     "variable/index.html#static-variable-pairingsState",
     "<span>pairingsState</span> <span class=\"search-result-import-path\">cozify-sdk/src/reducers/pairings.js</span>",
+    "variable"
+  ],
+  [
+    "cozify-sdk/src/reducers/plans.js~plansstate",
+    "variable/index.html#static-variable-plansState",
+    "<span>plansState</span> <span class=\"search-result-import-path\">cozify-sdk/src/reducers/plans.js</span>",
     "variable"
   ],
   [
@@ -364,6 +442,12 @@ window.esdocSearchIndex = [
     "variable/index.html#static-variable-rootReducer",
     "<span>rootReducer</span> <span class=\"search-result-import-path\">cozify-sdk/src/reducers/index.js</span>",
     "variable"
+  ],
+  [
+    "cozify-sdk/src/plans/plans.js~saveplans",
+    "function/index.html#static-function-savePlans",
+    "<span>savePlans</span> <span class=\"search-result-import-path\">cozify-sdk/src/plans/plans.js</span>",
+    "function"
   ],
   [
     "cozify-sdk/src/hubs/hubs.js~selecthubbyid",
@@ -456,9 +540,21 @@ window.esdocSearchIndex = [
     "variable"
   ],
   [
+    "cozify-sdk/src/plans/plans.js~setplans",
+    "function/index.html#static-function-setPlans",
+    "<span>setPlans</span> <span class=\"search-result-import-path\">cozify-sdk/src/plans/plans.js</span>",
+    "function"
+  ],
+  [
     "cozify-sdk/src/reducers/rooms.js~setrooms",
     "variable/index.html#static-variable-setRooms",
     "<span>setRooms</span> <span class=\"search-result-import-path\">cozify-sdk/src/reducers/rooms.js</span>",
+    "variable"
+  ],
+  [
+    "cozify-sdk/src/reducers/plans.js~settemplates",
+    "variable/index.html#static-variable-setTemplates",
+    "<span>setTemplates</span> <span class=\"search-result-import-path\">cozify-sdk/src/reducers/plans.js</span>",
     "variable"
   ],
   [
@@ -501,6 +597,18 @@ window.esdocSearchIndex = [
     "cozify-sdk/src/hubs/hubs.js~stoppollingbyid",
     "function/index.html#static-function-stopPollingById",
     "<span>stopPollingById</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/hubs.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/hubs/zwave.js~stopzwaveexclusion",
+    "function/index.html#static-function-stopZwaveExclusion",
+    "<span>stopZwaveExclusion</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/zwave.js</span>",
+    "function"
+  ],
+  [
+    "cozify-sdk/src/hubs/zwave.js~stopzwaveinclusion",
+    "function/index.html#static-function-stopZwaveInclusion",
+    "<span>stopZwaveInclusion</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/zwave.js</span>",
     "function"
   ],
   [
@@ -942,9 +1050,27 @@ window.esdocSearchIndex = [
     "file"
   ],
   [
+    "src/hubs/zwave.js",
+    "file/src/hubs/zwave.js.html",
+    "src/hubs/zwave.js",
+    "file"
+  ],
+  [
     "src/index.js",
     "file/src/index.js.html",
     "src/index.js",
+    "file"
+  ],
+  [
+    "src/plans/constants.js",
+    "file/src/plans/constants.js.html",
+    "src/plans/constants.js",
+    "file"
+  ],
+  [
+    "src/plans/plans.js",
+    "file/src/plans/plans.js.html",
+    "src/plans/plans.js",
     "file"
   ],
   [
@@ -981,6 +1107,12 @@ window.esdocSearchIndex = [
     "src/reducers/pairings.js",
     "file/src/reducers/pairings.js.html",
     "src/reducers/pairings.js",
+    "file"
+  ],
+  [
+    "src/reducers/plans.js",
+    "file/src/reducers/plans.js.html",
+    "src/reducers/plans.js",
     "file"
   ],
   [

@@ -13,19 +13,25 @@ export { store, watchChanges } from './store';
 
 export { CLOUD_CONNECTION_STATES, HUB_CONNECTION_STATES, useTestcloud } from './connection/constants';
 export { LANGUAGES, USER_STATES, ROLES } from './user/constants';
-export { HUB_STATES } from './hubs/constants';
+export { HUB_STATES, ZWAVE_INCLUSION_STATUS, ZWAVE_EXCLUSION_STATUS } from './hubs/constants';
 
 export { getCloudConnectionState, getHubConnectionState } from './connection/state';
 export {
   changeLanguage, doPwLogin, setAuthenticated, acceptEula, getUserState,
 } from './user/user';
+
 export {
   getHubs, selectHubById, unSelectHubById, unSelectHubs, connectHubByTokens,
+  lockAndBackup,
   startDiscoveringHubs, stopDiscoveringHubs,
   startPollingById, stopPollingById,
   startPairingById, stopPairingById, ignorePairingByIds, stopPairings,
   doPoll, doRemoteIdQuery,
 } from './hubs/hubs';
+export {
+  isZwaveEnabled, doZwaveInclusion, stopZwaveInclusion, doZwaveExclusion, stopZwaveExclusion, healZwave,
+} from './hubs/zwave';
+
 export {
   getDevices, getHubDevices,
   getPairingDevices, getHubPairingDevices,
@@ -34,6 +40,7 @@ export {
   sendDeviceStateCmd, sendDeviceCmd,
   unpairDevice, identifyDevice, setDeviceMeta,
 } from './devices/device';
+
 export {
   getRooms, getHubRooms,
   addRoom, editRoom, removeRoom,
@@ -43,6 +50,11 @@ export {
   getAlarms, getHubAlarms,
   closeAlarm, removeAlarm,
 } from './alarms/alarms';
+
+export {
+  getPlans, setPlans,
+  loadPlans, savePlans,
+} from './plans/plans';
 
 export {
   urlBase64Decode,

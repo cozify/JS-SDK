@@ -1,7 +1,7 @@
 {
-  "coverage": "64.82%",
-  "expectCount": 145,
-  "actualCount": 94,
+  "coverage": "62.5%",
+  "expectCount": 184,
+  "actualCount": 115,
   "files": {
     "src/alarms/alarms.js": {
       "expectCount": 7,
@@ -66,32 +66,55 @@
       "undocumentLines": []
     },
     "src/hubs/constants.js": {
-      "expectCount": 6,
+      "expectCount": 10,
       "actualCount": 1,
       "undocumentLines": [
-        22,
-        28,
-        34,
-        36,
-        37
+        17,
+        29,
+        46,
+        52,
+        57,
+        62,
+        63,
+        65,
+        66
       ]
     },
     "src/hubs/hubs.js": {
-      "expectCount": 36,
-      "actualCount": 25,
+      "expectCount": 37,
+      "actualCount": 26,
       "undocumentLines": [
         20,
-        297,
-        298,
-        299,
-        300,
-        405,
-        461,
-        462,
-        463,
-        464,
-        465
+        315,
+        316,
+        317,
+        318,
+        423,
+        479,
+        480,
+        481,
+        482,
+        483
       ]
+    },
+    "src/hubs/zwave.js": {
+      "expectCount": 23,
+      "actualCount": 15,
+      "undocumentLines": [
+        35,
+        36,
+        37,
+        38,
+        279,
+        280,
+        281,
+        516
+      ]
+    },
+    "src/plans/plans.js": {
+      "expectCount": 4,
+      "actualCount": 4,
+      "undocumentLines": []
     },
     "src/reducers/alarms.js": {
       "expectCount": 3,
@@ -136,6 +159,18 @@
       "undocumentLines": [
         69,
         82
+      ]
+    },
+    "src/reducers/plans.js": {
+      "expectCount": 7,
+      "actualCount": 1,
+      "undocumentLines": [
+        12,
+        21,
+        27,
+        35,
+        319,
+        332
       ]
     },
     "src/reducers/rooms.js": {

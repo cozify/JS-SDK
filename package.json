@@ -1,6 +1,6 @@
 {
   "name": "cozify-sdk",
-  "version": "1.0.27",
+  "version": "1.0.28",
   "description": "JavaScript SDK for Cozify REST API",
   "author": "tech-admin",
   "license": "MIT",
@@ -32,7 +32,8 @@
     "prepare": "npm run build",
     "predeploy": "cd example && npm install && npm run build",
     "precommit": "npm run flow && npm run lint && npm run test",
-    "prepublish": "npm run flow && npm run test && npm run docs && npm run build"
+    "prepublish": "npm run flow && npm run test && npm run docs && npm run build",
+    "db": "npx json-server --port=3001 --watch db.json"
   },
   "peerDependencies": {},
   "devDependencies": {

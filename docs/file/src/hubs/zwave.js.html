@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">src/hubs/zwave.js | Cozify SDK</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Cozify UI SDK for REST aPI"><meta property="og:type" content="website"><meta property="og:url" content="http://my-library.org"><meta property="og:site_name" content="Cozify SDK"><meta property="og:title" content="Cozify SDK"><meta property="og:image" content="http://my-library.org/logo.png"><meta property="og:description" content="Cozify UI SDK for REST aPI"><meta property="og:author" content="https://twitter.com/foo"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="Cozify SDK"><meta property="twitter:description" content="Cozify UI SDK for REST aPI"><meta property="twitter:image" content="http://my-library.org/logo.png"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./" style="display: flex; align-items: center;"><img src="./image/brand_logo.png" style="width:34px;"></a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/foo/bar"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-watchChanges">watchChanges</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-b64DecodeUnicode">b64DecodeUnicode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getTextFromNode">getTextFromNode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-urlBase64Decode">urlBase64Decode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-store">store</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-isNode">isNode</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#alarms">alarms</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-alarmsDeltaHandler">alarmsDeltaHandler</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-closeAlarm">closeAlarm</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getAlarms">getAlarms</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubAlarms">getHubAlarms</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-removeAlarm">removeAlarm</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sendAlarmCmd">sendAlarmCmd</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#connection">connection</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getCloudHost">getCloudHost</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getCloudURL">getCloudURL</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-useTestcloud">useTestcloud</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-resetRetry">resetRetry</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-retryCondition">retryCondition</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-cloudErrorState">cloudErrorState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getAPIversion">getAPIversion</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hubErrorState">hubErrorState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-testSSLCertificate">testSSLCertificate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-send">send</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sendAll">sendAll</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getCloudConnectionState">getCloudConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubConnectionState">getHubConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setCloudConnectionState">setCloudConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setHubConnectionState">setHubConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_API_VERSION">CLOUD_API_VERSION</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_FINGERPRINTS_SHA1">CLOUD_FINGERPRINTS_SHA1</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-MAX_API_VERSION">MAX_API_VERSION</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-CLOUD_CONNECTION_STATE_TYPE">CLOUD_CONNECTION_STATE_TYPE</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-COMMANDS_TYPE">COMMANDS_TYPE</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-COMMANDS_TYPE">COMMANDS_TYPE</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-HUB_CONNECTION_STATE_TYPE">HUB_CONNECTION_STATE_TYPE</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#devices">devices</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-identifyDevice">identifyDevice</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sendDeviceCmd">sendDeviceCmd</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sendDeviceStateCmd">sendDeviceStateCmd</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setDeviceMeta">setDeviceMeta</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-unpairDevice">unpairDevice</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-devicesDeltaHandler">devicesDeltaHandler</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDevices">getDevices</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubDevices">getHubDevices</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubPairingDevices">getHubPairingDevices</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getPairingDevices">getPairingDevices</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-pairingDevicesDeltaHandler">pairingDevicesDeltaHandler</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#hubs">hubs</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-connectHubByTokens">connectHubByTokens</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-doPoll">doPoll</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-doRemoteIdQuery">doRemoteIdQuery</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubs">getHubs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ignorePairingByIds">ignorePairingByIds</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-lockAndBackup">lockAndBackup</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-selectHubById">selectHubById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-startDiscoveringHubs">startDiscoveringHubs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-startPairingById">startPairingById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-startPollingById">startPollingById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-stopDiscoveringHubs">stopDiscoveringHubs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-stopPairingById">stopPairingById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-stopPairings">stopPairings</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-stopPollingById">stopPollingById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-unSelectHubById">unSelectHubById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-unSelectHubs">unSelectHubs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-doZwaveExclusion">doZwaveExclusion</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-doZwaveInclusion">doZwaveInclusion</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubs">getHubs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-healZwave">healZwave</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isZwaveEnabled">isZwaveEnabled</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-stopZwaveExclusion">stopZwaveExclusion</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-stopZwaveInclusion">stopZwaveInclusion</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-DISCOVERY_INTERVAL_MS">DISCOVERY_INTERVAL_MS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-HUB_PORT">HUB_PORT</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-HUB_PROTOCOL">HUB_PROTOCOL</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-HUB_STATES">HUB_STATES</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-PAIRING_POLL_INTERVAL_MS">PAIRING_POLL_INTERVAL_MS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-POLL_INTERVAL_MS">POLL_INTERVAL_MS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ZWAVE_EXCLUSION_INTERVAL_MS">ZWAVE_EXCLUSION_INTERVAL_MS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ZWAVE_EXCLUSION_STATUS">ZWAVE_EXCLUSION_STATUS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ZWAVE_INCLUSION_INTERVAL_MS">ZWAVE_INCLUSION_INTERVAL_MS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ZWAVE_INCLUSION_STATUS">ZWAVE_INCLUSION_STATUS</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#plans">plans</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getPlans">getPlans</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-loadPlans">loadPlans</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-savePlans">savePlans</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setPlans">setPlans</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#reducers">reducers</a><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-alarmsState">alarmsState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setAlarms">setAlarms</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-connectionsState">connectionsState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setCloudConnectionState">setCloudConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-devicesState">devicesState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setDevices">setDevices</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-hubsState">hubsState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-updateHubs">updateHubs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-rootReducer">rootReducer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-pairingsState">pairingsState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setPairingDevices">setPairingDevices</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-plansState">plansState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setTemplates">setTemplates</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-roomsState">roomsState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setRooms">setRooms</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-changeState">changeState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-userState">userState</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#rooms">rooms</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-addRoom">addRoom</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-editRoom">editRoom</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubRooms">getHubRooms</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getRooms">getRooms</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-removeRoom">removeRoom</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-roomsDeltaHandler">roomsDeltaHandler</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sendRoomCmd">sendRoomCmd</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ROOMS_EN">ROOMS_EN</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ROOMS_FI">ROOMS_FI</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#user">user</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-acceptEula">acceptEula</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-changeLanguage">changeLanguage</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-doPwLogin">doPwLogin</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getUserState">getUserState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setAuthenticated">setAuthenticated</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-LANGUAGES">LANGUAGES</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ROLES">ROLES</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-USER_STATES">USER_STATES</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/hubs/zwave.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">
+// 
+// import isEmpty from &apos;lodash/isEmpty&apos;;
+import {
+  ZWAVE_INCLUSION_STATUS, ZWAVE_EXCLUSION_STATUS, ZWAVE_INCLUSION_INTERVAL_MS, ZWAVE_EXCLUSION_INTERVAL_MS,
+} from &apos;./constants&apos;;
+// import { USER_STATES, ROLES } from &apos;../user/constants&apos;;
+import { HUB_CONNECTION_STATES } from &apos;../connection/constants&apos;;
+import { COMMANDS, send } from &apos;../connection/send&apos;;
+import { store } from &apos;../store&apos;;
+import { hubsState } from &apos;../reducers/hubs&apos;;
+import { userState } from &apos;../reducers/user&apos;;
+
+
+
+/**
+ * Helper to get current user from state
+ */
+function storedUser() {
+  return userState.selectors.getUser(store.getState());
+}
+
+/**
+ * Helper to get current hubs from state
+ * @return {HUBS_MAP_TYPE} - hubs
+ */
+export function getHubs() {
+  return hubsState.selectors.getHubs(store.getState());
+}
+
+/*
+** Z-wave inclusion
+ */
+
+const inclusionStopped = {};
+const inclusionInAction = {};
+const stopInclusionInAction = {};
+const inclusionState = {};
+
+
+/*
+ * Start inclusion of given hub if hub connection is ok
+ * @param {string} hubId
+ * @return {Promise}
+ */
+function startZwaveInclusion(hubId) {
+  return new Promise((resolve, reject) =&gt; {
+    if (inclusionStopped[hubId]) {
+      console.debug(&apos;startZwaveInclusion: inclusion stopped&apos;);
+      reject(new Error(&apos;inclusion stopped&apos;));
+      return;
+    }
+    const hub = getHubs()[hubId];
+    const { authKey } = storedUser();
+    const { hubKey } = hub;
+
+    console.debug(&apos;startZwaveInclusion connection state: &apos;, hub.connectionState);
+    if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL &amp;&amp; hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
+      console.warn(&apos;SDK startZwaveInclusion: no Hub connection&apos;);
+      reject(new Error(&apos;no hub connection&apos;));
+      return;
+    }
+
+    if (inclusionInAction[hubId]) {
+      reject(new Error(&apos;inclusion already in action&apos;));
+      return;
+    }
+    inclusionInAction[hubId] = true;
+
+    send({
+      command: COMMANDS.ZWAVE_START_INCLUSION, hubId, authKey, hubKey, localUrl: hub.url, data: [],
+    })
+      .then((state) =&gt; {
+        inclusionState[hubId] = state;
+        inclusionInAction[hubId] = false;
+        if (state) {
+          if (state.status === ZWAVE_INCLUSION_STATUS.RUNNING) {
+            resolve(state);
+          } else {
+            reject(state);
+          }
+        } else {
+          reject(new Error(&apos;No inclusion state received&apos;));
+        }
+      })
+      .catch((error) =&gt; {
+      // store.dispatch(hubsState.actions.hubPollFailed())
+        console.error(&apos;SDK: startZwaveInclusion error: &apos;, error.message);
+        inclusionInAction[hubId] = false;
+        reject(error);
+      });
+  });
+}
+
+/*
+ * Ask inclusion status of given hub if hub connection is ok
+ * @param {string} hubId
+ * @return {Promise}
+ */
+function askZwaveInclusionStatus(hubId) {
+  return new Promise((resolve, reject) =&gt; {
+    if (inclusionStopped[hubId]) {
+      console.debug(&apos;askZwaveInclusionStatus: inclusion stopped&apos;);
+      reject(new Error(&apos;inclusion stopped&apos;));
+      return;
+    }
+    const hub = getHubs()[hubId];
+    const { authKey } = storedUser();
+    const { hubKey } = hub;
+
+    console.debug(&apos;askZwaveInclusionStatus connection state: &apos;, hub.connectionState);
+    if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL &amp;&amp; hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
+      console.warn(&apos;SDK askZwaveInclusionStatus: no Hub connection&apos;);
+      reject(new Error(&apos;no hub connection&apos;));
+      return;
+    }
+
+    if (inclusionInAction[hubId]) {
+      reject(new Error(&apos;inclusion already in action&apos;));
+      return;
+    }
+    inclusionInAction[hubId] = true;
+
+    send({
+      command: COMMANDS.ZWAVE_INCLUSION_STATUS, hubId, authKey, hubKey, localUrl: hub.url, data: [],
+    })
+      .then((state) =&gt; {
+        inclusionState[hubId] = state;
+        inclusionInAction[hubId] = false;
+        resolve(state);
+      })
+      .catch((error) =&gt; {
+      // store.dispatch(hubsState.actions.hubPollFailed())
+        console.error(&apos;SDK: askZwaveInclusionStatus error: &apos;, error.message);
+        inclusionInAction[hubId] = false;
+        reject(error);
+      });
+  });
+}
+
+
+function askZwaveInclusionStatusPromise(hubId, resolve, reject) {
+  askZwaveInclusionStatus(hubId)
+    .then((state) =&gt; {
+      if (state &amp;&amp; state.status) {
+        switch (state.status) {
+          case ZWAVE_INCLUSION_STATUS.RUNNING: {
+            // sleep 5s and try again
+            setTimeout(() =&gt; {
+              askZwaveInclusionStatusPromise(hubId, resolve, reject);
+            }, ZWAVE_INCLUSION_INTERVAL_MS);
+            break;
+          }
+          case ZWAVE_INCLUSION_STATUS.SUCCESS: {
+            resolve(true);
+            break;
+          }
+          case ZWAVE_INCLUSION_STATUS.TIMEOUT: {
+            resolve(false);
+            break;
+          }
+          case ZWAVE_INCLUSION_STATUS.CANCEL: {
+            resolve(false);
+            break;
+          }
+          default: {
+            reject(new Error(&apos;Invalid inclusion state&apos;));
+            break;
+          }
+        }
+      } else {
+        reject(new Error(&apos;Invalid inclusion state&apos;));
+      }
+    })
+    .catch((error) =&gt; {
+      console.error(&apos;Error in askZwaveInclusionStatusPromise: &apos;, error);
+      reject(error);
+    });
+}
+
+
+/**
+ * Start zwave inclusion on given hub
+ * @param {string} hubId
+ * @return {Promise} that resolves true if device found and false if not
+ */
+export async function doZwaveInclusion(hubId) {
+  return new Promise((resolve, reject) =&gt; {
+    inclusionStopped[hubId] = false;
+
+    startZwaveInclusion(hubId)
+      .then((state) =&gt; {
+        if (state &amp;&amp; state.status === ZWAVE_INCLUSION_STATUS.RUNNING) {
+          new Promise((r, j) =&gt; {
+            askZwaveInclusionStatusPromise(hubId, r, j);
+          }).then((result) =&gt; {
+            resolve(result);
+          }).catch((error) =&gt; {
+            reject(error);
+          });
+        } else {
+          reject(new Error(&apos;Wrong inclusion status&apos;));
+        }
+      })
+      .catch((error) =&gt; {
+        console.error(&apos;Error in doZwavePairing: &apos;, error);
+        reject(error);
+      });
+  });
+}
+
+
+/**
+ * Stop zwave inclusion on given hub
+ * @param {string} hubId
+ * @return {Promise}
+ */
+export async function stopZwaveInclusion(hubId) {
+  return new Promise((resolve, reject) =&gt; {
+    if (stopInclusionInAction[hubId]) {
+      reject(new Error(&apos;stopInclusionById already stopping&apos;));
+      return;
+    }
+    stopInclusionInAction[hubId] = true;
+
+    const { authKey } = storedUser();
+    const hub = getHubs()[hubId];
+    const { hubKey } = hub;
+
+    send({
+      command: COMMANDS.ZWAVE_STOP_INCLUSION, hubId, authKey, hubKey, localUrl: hub.url, data: [],
+    })
+      .then((status) =&gt; {
+        console.debug(&apos;SDK: stopZwavePairing: Ok , status: &apos;, status);
+        inclusionStopped[hubId] = true;
+        stopInclusionInAction[hubId] = false;
+        resolve(&apos;ok&apos;);
+      })
+      .catch((error) =&gt; {
+        console.error(&apos;SDK: stopZwavePairing error: &apos;, error.message);
+        stopInclusionInAction[hubId] = false;
+        reject(error);
+      });
+  });
+}
+
+/**
+ * Test if zwave of given hub is enabled
+ * @param {string} hubId
+ * @return {Promise} that resolves true if zwave is enabled
+
+export async function isZwaveEnabled(hubId: string): Promise&lt;Object&gt; {
+  return new Promise((resolve, reject) =&gt; {
+    askZwaveInclusionStatus(hubId)
+      .then((state) =&gt; {
+        if (state !== ZWAVE_INCLUSION_STATES.NO_ZWAVE) {
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      })
+      .catch((error) =&gt; {
+        console.error(&apos;Error in isZwaveById: &apos;, error);
+        reject(error);
+      });
+  });
+}
+*/
+
+
+/*
+**
+** Z-wave exclusion
+**
+ */
+
+
+const exclusionStopped = {};
+const exclusionInAction = {};
+const stopExclusionInAction = {};
+const exclusionState = {};
+
+/*
+ * Start exclusion of given hub if hub connection is ok
+ * @param {string} hubId
+ * @return {Promise}
+ */
+function startZwaveExclusion(hubId) {
+  return new Promise((resolve, reject) =&gt; {
+    if (exclusionStopped[hubId]) {
+      console.debug(&apos;startZwaveExclusion: exclusion stopped&apos;);
+      reject(new Error(&apos;exclusion stopped&apos;));
+      return;
+    }
+    const hub = getHubs()[hubId];
+    const { authKey } = storedUser();
+    const { hubKey } = hub;
+
+    console.debug(&apos;startZwaveExclusion connection state: &apos;, hub.connectionState);
+    if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL &amp;&amp; hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
+      console.warn(&apos;SDK startZwaveExclusion: no Hub connection&apos;);
+      reject(new Error(&apos;no hub connection&apos;));
+      return;
+    }
+
+    if (exclusionInAction[hubId]) {
+      reject(new Error(&apos;exclusion already in action&apos;));
+      return;
+    }
+    exclusionInAction[hubId] = true;
+    send({
+      command: COMMANDS.ZWAVE_START_EXCLUSION, hubId, authKey, hubKey, localUrl: hub.url, data: [],
+    })
+      .then((state) =&gt; {
+        exclusionState[hubId] = state;
+        exclusionInAction[hubId] = false;
+        if (state.status === ZWAVE_EXCLUSION_STATUS.RUNNING) {
+          resolve(state);
+        } else {
+          console.error(&apos;SDK: doExclusionById - wrong state: &apos;, state);
+          reject(state);
+        }
+      })
+      .catch((error) =&gt; {
+        // store.dispatch(hubsState.actions.hubPollFailed())
+        console.error(&apos;SDK: doExclusionById error: &apos;, error.message);
+        exclusionInAction[hubId] = false;
+        reject(error);
+      });
+  });
+}
+
+/*
+ * Ask exclusion status of given hub if hub connection is ok
+ * @param {string} hubId
+ * @return {Promise}
+ */
+function askZwaveExclusionStatus(hubId) {
+  return new Promise((resolve, reject) =&gt; {
+    if (exclusionStopped[hubId]) {
+      console.debug(&apos;askZwaveExclusionStatus: exclusion stopped&apos;);
+      reject(new Error(&apos;exclusion stopped&apos;));
+      return;
+    }
+    const hub = getHubs()[hubId];
+    const { authKey } = storedUser();
+    const { hubKey } = hub;
+
+    console.debug(&apos;askZwaveExclusionStatus connection state: &apos;, hub.connectionState);
+    if (hub.connectionState !== HUB_CONNECTION_STATES.LOCAL &amp;&amp; hub.connectionState !== HUB_CONNECTION_STATES.REMOTE) {
+      console.warn(&apos;SDK askZwaveExclusionStatus: no Hub connection&apos;);
+      reject(new Error(&apos;no hub connection&apos;));
+      return;
+    }
+    if (exclusionInAction[hubId]) {
+      reject(new Error(&apos;exclusion already in action&apos;));
+      return;
+    }
+    exclusionInAction[hubId] = true;
+    send({
+      command: COMMANDS.ZWAVE_EXCLUSION_STATUS, hubId, authKey, hubKey, localUrl: hub.url, data: [],
+    })
+      .then((state) =&gt; {
+        exclusionState[hubId] = state;
+        exclusionInAction[hubId] = false;
+        resolve(state);
+      })
+      .catch((error) =&gt; {
+        // store.dispatch(hubsState.actions.hubPollFailed())
+        console.error(&apos;SDK: askZwaveExclusionStatus error: &apos;, error.message);
+        exclusionInAction[hubId] = false;
+        reject(error);
+      });
+  });
+}
+
+
+function askZwaveExclusionStatusPromise(hubId, resolve, reject) {
+  askZwaveExclusionStatus(hubId)
+    .then((state) =&gt; {
+      if (state &amp;&amp; state.status) {
+        switch (state.status) {
+          case ZWAVE_EXCLUSION_STATUS.RUNNING: {
+            // sleep 5s and try again
+            setTimeout(() =&gt; {
+              askZwaveExclusionStatusPromise(hubId, resolve, reject);
+            }, ZWAVE_EXCLUSION_INTERVAL_MS);
+            break;
+          }
+          case ZWAVE_EXCLUSION_STATUS.SUCCESS: {
+            resolve(true);
+            break;
+          }
+          case ZWAVE_EXCLUSION_STATUS.TIMEOUT: {
+            resolve(false);
+            break;
+          }
+          case ZWAVE_EXCLUSION_STATUS.CANCEL: {
+            resolve(false);
+            break;
+          }
+          default: {
+            reject(new Error(&apos;Wrong exclusion status&apos;));
+            break;
+          }
+        }
+      } else {
+        reject(new Error(&apos;Wrong exclusion status&apos;));
+      }
+    })
+    .catch((error) =&gt; {
+      console.error(&apos;Error in askZwaveExclusionStatusPromise: &apos;, error);
+      reject(error);
+    });
+}
+
+
+/**
+ * Start zwave exclusion on given hub
+ * @param {string} hubId
+ * @return {Promise} that resolves true if device found and false if not
+ */
+export async function doZwaveExclusion(hubId) {
+  return new Promise((resolve, reject) =&gt; {
+    exclusionStopped[hubId] = false;
+
+    startZwaveExclusion(hubId)
+      .then((state) =&gt; {
+        if (state &amp;&amp; state.status === ZWAVE_EXCLUSION_STATUS.RUNNING) {
+          new Promise((r, j) =&gt; {
+            askZwaveExclusionStatusPromise(hubId, r, j);
+          }).then((result) =&gt; {
+            resolve(result);
+          }).catch((error) =&gt; {
+            reject(error);
+          });
+        } else {
+          reject(new Error(&apos;Wrong exclusion status&apos;));
+        }
+      })
+      .catch((error) =&gt; {
+        console.error(&apos;Error in doZwaveExclusion: &apos;, error);
+        reject(error);
+      });
+  });
+}
+
+
+/**
+ * Stop zwave exclusion on given hub
+ * @param {string} hubId
+ * @return {Promise}
+ */
+export async function stopZwaveExclusion(hubId) {
+  return new Promise((resolve, reject) =&gt; {
+    if (stopExclusionInAction[hubId]) {
+      reject(new Error(&apos;stopExclusionById already stopping&apos;));
+      return;
+    }
+    stopExclusionInAction[hubId] = true;
+
+    const { authKey } = storedUser();
+    const hub = getHubs()[hubId];
+    const { hubKey } = hub;
+
+    send({
+      command: COMMANDS.ZWAVE_STOP_EXCLUSION, hubId, authKey, hubKey, localUrl: hub.url, data: [],
+    })
+      .then((status) =&gt; {
+        console.debug(&apos;SDK: stopZwaveExclusion: Ok , status: &apos;, status);
+        exclusionStopped[hubId] = true;
+        stopExclusionInAction[hubId] = false;
+        resolve(&apos;ok&apos;);
+      })
+      .catch((error) =&gt; {
+        console.error(&apos;SDK: stopZwaveExclusion error: &apos;, error.message);
+        stopExclusionInAction[hubId] = false;
+        reject(error);
+      });
+  });
+}
+
+/**
+ * Test if zwave of given hub is enabled
+ * @param {string} hubId
+ * @return {Promise} that resolves true if zwave is enabled
+ */
+export async function isZwaveEnabled(hubId) {
+  return new Promise((resolve, reject) =&gt; {
+    askZwaveExclusionStatus(hubId)
+      .then((state) =&gt; {
+        if (state) {
+          if (state.status !== ZWAVE_EXCLUSION_STATUS.NO_ZWAVE) {
+            resolve(true);
+          } else {
+            resolve(false);
+          }
+        } else {
+          resolve(false);
+        }
+      })
+      .catch((error) =&gt; {
+        console.error(&apos;Error in isZwaveEnabled: &apos;, error);
+        reject(error);
+      });
+  });
+}
+
+
+/*
+**
+** Z-wave healing
+**
+ */
+
+const healingInAction = {};
+
+
+/**
+ * Start healing of Zwave network
+ * @param {string} hubId
+ * @return {Promise} that resolves true when done
+ */
+export async function healZwave(hubId) {
+  return new Promise((resolve, reject) =&gt; {
+    if (healingInAction[hubId]) {
+      reject(new Error(&apos;healingInAction already in action&apos;));
+      return;
+    }
+    healingInAction[hubId] = true;
+
+    const { authKey } = storedUser();
+    const hub = getHubs()[hubId];
+    const { hubKey } = hub;
+
+    send({
+      command: COMMANDS.ZWAVE_HEAL, hubId, authKey, hubKey, localUrl: hub.url, data: [],
+    })
+      .then((status) =&gt; {
+        console.debug(&apos;SDK: healZwave: Ok , status: &apos;, status);
+        healingInAction[hubId] = false;
+        resolve(&apos;ok&apos;);
+      })
+      .catch((error) =&gt; {
+        console.error(&apos;SDK: healZwave error: &apos;, error.message);
+        healingInAction[hubId] = false;
+        reject(error);
+      });
+  });
+}
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

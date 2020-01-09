@@ -52,6 +52,12 @@ export {
 } from './alarms/alarms';
 
 export {
+  getPlans, setPlans,
+  loadPlans, savePlans,
+  addLocationNode, setLocationNode, removeLocationNode,
+} from './plans/plans';
+
+export {
   urlBase64Decode,
 } from './utils';
 

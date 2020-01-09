@@ -119,7 +119,7 @@ export const userState = createSlice({
       const stateToSet = state;
       stateToSet.authKey = action.payload;
       stateToSet.state = USER_STATES.KEYED;
-    }
+    },
 
   },
 });
