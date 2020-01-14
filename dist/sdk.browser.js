@@ -5980,7 +5980,11 @@
       locations: {
         root: {
           id: 'root',
-          childIds: []
+          childIds: [],
+          data: {
+            name: 'root'
+          },
+          open: false
         }
       }
     },
@@ -6234,7 +6238,23 @@
           node.childIds = [];
         }
 
-        if (node && node.id && stateToSet.locations[node.id]) {
+        const parentTempId = node.id.substr(0, node.id.lastIndexOf(':'));
+
+        if (node.data && node.data.name) {
+          const oldId = node.id;
+          node.id = parentTempId.concat(':').concat(node.data.name.replace(/\s+/g, '').replace(/\./g, '').replace(/:/g, ''));
+
+          if (oldId !== node.id && stateToSet.locations[oldId]) {
+            stateToSet.locations[parentTempId].childIds = stateToSet.locations[parentTempId].childIds.filter(id => id !== oldId);
+            stateToSet.locations[parentTempId].childIds.push(node.id);
+            delete stateToSet.locations[oldId];
+            stateToSet.locations[node.id] = _objectSpread$6({}, node);
+          } else if (node && node.id && stateToSet.locations[node.id]) {
+            stateToSet.locations[node.id] = _objectSpread$6({}, node);
+          } else {
+            throw new Error(`SDK setLocationNode - node ${node.id} could not be set`);
+          }
+        } else {
           stateToSet.locations[node.id] = _objectSpread$6({}, node);
         }
       },
@@ -6252,21 +6272,18 @@
 
         if (!stateToSet.locations[nodeId]) {
           throw new Error(`SDK removeLocationNode - node ${nodeId} doesnt exist`);
-        }
+        } // console.info('removeLocationNode ', nodeId);
 
-        console.info('removeLocationNode ', nodeId);
 
         if (nodeId && nodeId !== 'root') {
-          const descendantIds = getAllDescendantIds(stateToSet.locations, nodeId);
-          console.info('descendantIds', descendantIds);
-          const parent = findChild(stateToSet.locations, nodeId);
-          console.info('PARENT', JSON.stringify(parent));
+          const descendantIds = getAllDescendantIds(stateToSet.locations, nodeId); // console.info('descendantIds', descendantIds);
+
+          const parent = findChild(stateToSet.locations, nodeId); // console.info('PARENT', JSON.stringify(parent));
 
           if (parent && parent.id) {
-            stateToSet.locations = deleteMany(stateToSet.locations, [nodeId, ...descendantIds]);
-            console.info('child not yet removed', JSON.stringify(stateToSet.locations[parent.id].childIds));
-            stateToSet.locations[parent.id].childIds = stateToSet.locations[parent.id].childIds.filter(id => id !== nodeId);
-            console.info('child removed', JSON.stringify(stateToSet.locations[parent.id].childIds));
+            stateToSet.locations = deleteMany(stateToSet.locations, [nodeId, ...descendantIds]); // console.info('child not yet removed', JSON.stringify(stateToSet.locations[parent.id].childIds));
+
+            stateToSet.locations[parent.id].childIds = stateToSet.locations[parent.id].childIds.filter(id => id !== nodeId); // console.info('child removed', JSON.stringify(stateToSet.locations[parent.id].childIds));
           } else {
             throw new Error(`SDK removeLocationNode - node ${nodeId} parent does not exist`);
           }
@@ -7461,13 +7478,20 @@
         'Content-Type': sendType,
         Authorization: sendAuthKey || null,
         'X-Hub-Key': sendHubKey || null,
-        'Accept-Language': user.language && user.language !== LANGUAGES.NONE ? user.language : null
+        'Accept-Language': null
       },
       crossDomain: true,
       responseType: 'application/json',
       url: sendUrl,
       data: isEmpty_1(bodyString) ? null : bodyString
     };
+
+    if (user.language && user.language !== LANGUAGES.NONE) {
+      reqConf.headers['Accept-Language'] = user.language;
+    } else {
+      delete reqConf.headers['Accept-Language'];
+    }
+
     Object.assign(reqConf, sendConfig);
     return new Promise((resolve, reject) => {
       if (command || sendUrl) {
@@ -11278,7 +11302,6 @@
         data,
         url: 'http://localhost:3001/plans'
       }).then(status => {
-        debugger;
         console.debug('SDK savePlans ok', status); // store.dispatch(setPlans(plans));
 
         resolve(status);

@@ -103,7 +103,6 @@ export async function savePlans(): Promise<PLANS_TYPE> {
       command: COMMANDS.CMD_SAVE_PLANS, authKey, data, url: 'http://localhost:3001/plans',
     })
       .then((status) => {
-        debugger;
         console.debug('SDK savePlans ok', status);
         // store.dispatch(setPlans(plans));
         resolve(status);

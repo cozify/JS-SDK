@@ -6,30 +6,64 @@
       "root": {
         "id": "root",
         "childIds": [
-          "root:country-1",
-          "root:country-3"
+          "root:SWE",
+          "root:FI"
         ]
       },
-      "root:country-1": {
-        "id": "root:country-1",
+      "root:SWE": {
+        "id": "root:SWE",
+        "data": {
+          "name": "SWE"
+        },
+        "childIds": []
+      },
+      "root:FI": {
+        "id": "root:FI",
         "data": {
           "name": "FI"
         },
         "childIds": [
-          "root:country-1:city1"
+          "root:FI:ESPOO",
+          "root:FI:HELSINKI",
+          "root:FI:Vantaa"
         ]
       },
-      "root:country-1:city1": {
-        "id": "root:country-1:city1",
+      "root:FI:ESPOO": {
+        "id": "root:FI:ESPOO",
         "data": {
-          "name": "HEL"
+          "name": "ESPOO"
+        },
+        "childIds": [
+          "root:FI:ESPOO:Suvikummuntie"
+        ]
+      },
+      "root:FI:HELSINKI": {
+        "id": "root:FI:HELSINKI",
+        "data": {
+          "name": "HELSINKI"
         },
         "childIds": []
       },
-      "root:country-3": {
-        "id": "root:country-3",
+      "root:FI:ESPOO:Suvikummuntie": {
+        "id": "root:FI:ESPOO:Suvikummuntie",
         "data": {
-          "name": "NOR"
+          "name": "Suvikummuntie"
+        },
+        "childIds": [
+          "root:FI:ESPOO:Suvikummuntie:1"
+        ]
+      },
+      "root:FI:ESPOO:Suvikummuntie:1": {
+        "id": "root:FI:ESPOO:Suvikummuntie:1",
+        "data": {
+          "name": "1"
+        },
+        "childIds": []
+      },
+      "root:FI:Vantaa": {
+        "id": "root:FI:Vantaa",
+        "data": {
+          "name": "Vantaa"
         },
         "childIds": []
       }

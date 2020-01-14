@@ -259,7 +259,6 @@ export function send({
   }
 
   const bodyString = JSON.stringify(body);
-
   const reqConf = {
     timeout: sendTimeout || 15000,
     method: sendMethod,
@@ -269,13 +268,19 @@ export function send({
       'Content-Type': sendType,
       Authorization: sendAuthKey || null,
       'X-Hub-Key': sendHubKey || null,
-      'Accept-Language': (user.language && user.language !== LANGUAGES.NONE) ? user.language : null,
+      'Accept-Language': null,
     },
     crossDomain: true,
     responseType: 'application/json',
     url: sendUrl,
     data: isEmpty(bodyString) ? null : bodyString,
   };
+
+  if (user.language && user.language !== LANGUAGES.NONE) {
+    reqConf.headers['Accept-Language'] = user.language;
+  } else {
+    delete reqConf.headers['Accept-Language']
+  }
 
   Object.assign(reqConf, sendConfig);
 
