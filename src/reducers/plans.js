@@ -192,10 +192,15 @@ export const plansState = createSlice({
      */
     removeTemplate(state, action) {
       const stateToSet = state;
-      const template = action.payload;
-      if (template.id && stateToSet.templates[template.id]) {
-        delete stateToSet.templates[template.id];
+
+      const templateId = action.payload;
+      if (!templateId) {
+        throw new Error('SDK removeLocationNode - no templateId given');
       }
+      if (!stateToSet.templates[templateId]) {
+        throw new Error(`SDK removeLocationNode - template ${templateId} doesnt exist`);
+      }
+      delete stateToSet.templates[templateId];
     },
 
     /*

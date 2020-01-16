@@ -79,7 +79,7 @@ describe('Templates ', () => {
       id: 'TEMPLATE:112',
       name: 'testiIII',
     };
-    store.dispatch(plansState.actions.removeTemplate(template));
+    store.dispatch(plansState.actions.removeTemplate(template.id));
     const stateNow = store.getState();
     const storedPlans = plansState.selectors.getPlans(stateNow);
     // console.log('Plans after removeTemplate', storedPlans);
