@@ -54,8 +54,11 @@ export {
 export {
   getPlans, setPlans,
   loadPlans, savePlans,
+  addTemplate, setTemplate, removeTemplate,
   addLocationNode, setLocationNode, removeLocationNode,
 } from './plans/plans';
+
+export { PLAN_NODES } from './plans/constants';
 
 export {
   urlBase64Decode,

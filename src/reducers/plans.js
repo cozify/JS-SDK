@@ -4,11 +4,13 @@
 // This actionreducer uses internally https://github.com/mweststrate/immer, so it's safe to modify given state directly
 import { createSlice } from 'redux-starter-kit';
 import isArray from 'lodash/isArray';
+import { PLAN_NODES } from '../plans/constants';
 
 /*
 * Helpers
 */
 
+/*
 const setId = (idObj: Object) => {
   const givenObject = idObj;
   if (!givenObject.id) {
@@ -16,7 +18,19 @@ const setId = (idObj: Object) => {
   }
   return givenObject;
 };
+*/
 
+const setId = (parentTempId: string, newItem: Object) => {
+  const item = { ...newItem };
+  if (item.id) {
+    item.id = parentTempId.concat(':').concat(item.id);
+  } else if (item.data && item.data.name) {
+    item.id = parentTempId.concat(':').concat(item.data.name.replace(/\s+/g, '').replace(/\./g, '').replace(/:/g, ''));
+  } else {
+    item.id = parentTempId.concat(':?');
+  }
+  return item;
+};
 
 const getAllDescendantIds = (state, nodeId) => (
   state[nodeId].childIds.reduce((acc, childId) => (
@@ -89,7 +103,7 @@ export const plansState = createSlice({
       const stateToSet = state;
       const newState = action.payload;
       const oldState = stateToSet.plansState;
-      console.log(`PLANS state ${oldState} -> ${newState}`);
+      console.log(`SDK setPlansState: PLANS state ${oldState} -> ${newState}`);
       stateToSet.templates = { ...newState.templates };
       stateToSet.installations = { ...newState.installations };
       stateToSet.locations = { ...newState.locations };
@@ -99,20 +113,21 @@ export const plansState = createSlice({
      * Reducer action of setting all templates state
      * @param {Object} state
      * @param {Object} action
-     */
+    */
     setTemplates(state, action) {
       const stateToSet = state;
 
       const { templates } = action.payload;
       const newTemplates = {};
 
-      Object.entries(templates).forEach((entry) => {
-        setId(entry);
-        const [id, template] = entry;
-        newTemplates[id] = { ...template };
+      Object.values(templates).forEach((entry) => {
+        const newTemplate = setId(PLAN_NODES.TEMPLATE, entry);
+        // console.log(JSON.stringify(newTemplate));
+        newTemplates[newTemplate.id] = { ...newTemplate };
       });
       stateToSet.templates = { ...newTemplates };
     },
+
 
     /*
      * Reducer action of adding template state
@@ -121,11 +136,17 @@ export const plansState = createSlice({
      */
     addTemplate(state, action) {
       const stateToSet = state;
-      const template = action.payload;
-      setId(template);
-      if (template.id) {
-        stateToSet.templates[template.id] = { ...template };
+      const parentTempId = PLAN_NODES.TEMPLATE;
+      const newTemplate = setId(parentTempId, action.payload);
+
+      // Check that node doesn't already exist
+      if (!newTemplate || !newTemplate.id) {
+        throw new Error('SDK addTemplate - no new template given');
       }
+      if (stateToSet.templates[newTemplate.id]) {
+        throw new Error(`SDK addTemplate - template ${newTemplate.id} already exist`);
+      }
+      stateToSet.templates[newTemplate.id] = { ...newTemplate };
     },
 
 
@@ -137,9 +158,30 @@ export const plansState = createSlice({
     setTemplate(state, action) {
       const stateToSet = state;
       const template = action.payload;
-      setId(template);
-      if (template.id && stateToSet.templates[template.id]) {
+      if (!template || !template.id) {
+        throw new Error('SDK setTemplate - no template given');
+      }
+      if (!stateToSet.templates[template.id]) {
+        throw new Error(`SDK setTemplate - template ${template.id} does not exist`);
+      }
+      const parentTempId = PLAN_NODES.TEMPLATE;
+      if (template.data && template.data.name) {
+        const oldId = template.id;
+        const templateToBeSet = { ...template };
+        templateToBeSet.id = null;
+        const setNode = setId(parentTempId, templateToBeSet);
+        if (setNode && oldId !== setNode.id && stateToSet.templates[oldId]) {
+          delete stateToSet.templates[oldId];
+          stateToSet.templates[setNode.id] = { ...setNode };
+        } else if (setNode && setNode.id && stateToSet.templates[setNode.id]) {
+          stateToSet.templates[setNode.id] = { ...setNode };
+        } else {
+          throw new Error(`SDK setLocationNode - template ${template.id} could not be set`);
+        }
+      } else if (template.id && stateToSet.templates[template.id]) {
         stateToSet.templates[template.id] = { ...template };
+      } else {
+        throw new Error(`SDK setLocationNode - template ${template.id} could not be set`);
       }
     },
 
@@ -151,112 +193,8 @@ export const plansState = createSlice({
     removeTemplate(state, action) {
       const stateToSet = state;
       const template = action.payload;
-      setId(template);
       if (template.id && stateToSet.templates[template.id]) {
         delete stateToSet.templates[template.id];
-      }
-    },
-
-    /*
-     * Reducer action of setting installations state
-     * @param {Object} state
-     * @param {Object} action
-     */
-    setInstallations(state, action) {
-      const stateToSet = state;
-
-      const { installations } = action.payload;
-      const newInstallations = {};
-
-      Object.entries(installations).forEach((entry) => {
-        setId(entry);
-        const [id, installation] = entry;
-        newInstallations[id] = { ...installation };
-      });
-      stateToSet.installations = { ...newInstallations };
-    },
-
-    /*
-     * Reducer action of adding installation state
-     * @param {Object} state
-     * @param {Object} action
-     */
-    addInstallation(state, action) {
-      const stateToSet = state;
-      const installation = action.payload;
-      setId(installation);
-      if (installation.id) {
-        stateToSet.installations[installation.id] = { ...installation };
-      }
-    },
-
-    /*
-     * Reducer action of setting plan state
-     * @param {Object} state
-     * @param {Object} action
-     */
-    setInstallation(state, action) {
-      const stateToSet = state;
-      const installation = action.payload;
-      setId(installation);
-      if (stateToSet.installations[installation.id]) {
-        stateToSet.installations[installation.id] = { ...installation };
-      }
-    },
-
-    /*
-     * Reducer action of removing plan state
-     * @param {Object} state
-     * @param {Object} action
-     */
-    removeInstallation(state, action) {
-      const stateToSet = state;
-      const installation = action.payload;
-      setId(installation);
-      if (installation.id && stateToSet.installations[installation.id]) {
-        delete stateToSet.installations[installation.id];
-      }
-    },
-
-    /*
-     * Reducer action of adding country state
-     * @param {Object} state
-     * @param {Object} action
-     */
-    addLocationCountry(state, action) {
-      const stateToSet = state;
-      const country = action.payload;
-      setId(country);
-      if (country.id) {
-        stateToSet.locations[country.id] = { ...country };
-      }
-    },
-
-    /*
-     * Reducer action of setting country state
-     * @param {Object} state
-     * @param {Object} action
-     */
-    setLocationCountry(state, action) {
-      const stateToSet = state;
-      const country = action.payload;
-      setId(country);
-      if (stateToSet.locations[country.id]) {
-        stateToSet.locations[country.id] = { ...country };
-      }
-    },
-
-    /*
-     * Reducer action of removing country state
-     * @param {Object} state
-     * @param {Object} action
-     */
-    removeLocationCountry(state, action) {
-      const stateToSet = state;
-      const country = action.payload;
-      setId(country);
-      if (country.id && stateToSet.locations[country.id]) {
-        delete stateToSet.locations[country.id];
       }
     },
 
@@ -270,15 +208,9 @@ export const plansState = createSlice({
      */
     addLocationNode(state, action) {
       const stateToSet = state;
-      const { parentId, newNode } = action.payload;
+      const { parentId } = action.payload;
       const parentTempId = parentId || 'root';
-      if (newNode.id) {
-        newNode.id = parentTempId.concat(':').concat(newNode.id);
-      } else if (newNode.data && newNode.data.name) {
-        newNode.id = parentTempId.concat(':').concat(newNode.data.name.replace(/\s+/g, '').replace(/\./g, '').replace(/:/g, ''));
-      } else {
-        newNode.id = parentTempId.concat(':?');
-      }
+      const newNode = setId(parentTempId, action.payload.newNode);
 
       // Check that node doesn't already exist
       if (!newNode || !newNode.id) {
@@ -322,14 +254,16 @@ export const plansState = createSlice({
       const parentTempId = node.id.substr(0, node.id.lastIndexOf(':'));
       if (node.data && node.data.name) {
         const oldId = node.id;
-        node.id = parentTempId.concat(':').concat(node.data.name.replace(/\s+/g, '').replace(/\./g, '').replace(/:/g, ''));
-        if (oldId !== node.id && stateToSet.locations[oldId]) {
+        const nodeToBeSet = { ...node };
+        nodeToBeSet.id = null;
+        const setNode = setId(parentTempId, nodeToBeSet);
+        if (setNode && oldId !== setNode.id && stateToSet.locations[oldId]) {
           stateToSet.locations[parentTempId].childIds = stateToSet.locations[parentTempId].childIds.filter((id) => id !== oldId);
-          stateToSet.locations[parentTempId].childIds.push(node.id);
+          stateToSet.locations[parentTempId].childIds.push(setNode.id);
           delete stateToSet.locations[oldId];
-          stateToSet.locations[node.id] = { ...node };
-        } else if (node && node.id && stateToSet.locations[node.id]) {
-          stateToSet.locations[node.id] = { ...node };
+          stateToSet.locations[setNode.id] = { ...setNode };
+        } else if (setNode && setNode.id && stateToSet.locations[setNode.id]) {
+          stateToSet.locations[setNode.id] = { ...setNode };
         } else {
           throw new Error(`SDK setLocationNode - node ${node.id} could not be set`);
         }

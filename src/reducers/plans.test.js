@@ -24,44 +24,59 @@ describe('Pure plansReducer', () => {
   });
 });
 
+/*
+** Templates
+*/
 
-describe('Store plansReducer', () => {
-  it('setTemplates and addTemplate will add template', () => {
-    const template1 = { id: 111, name: 'testiI' };
+describe('Templates ', () => {
+  it('setTemplates and addTemplate will add templates with id', () => {
+    const template1 = {
+      id: '111',
+      data: {
+        name: 'testiI',
+      },
+    };
     const templates = { templates: { 111: template1 } };
+    const template1ToBe = {
+      id: 'TEMPLATE:111',
+      data: {
+        name: 'testiI',
+      },
+    };
 
     store.dispatch(plansState.actions.setTemplates(templates));
     const stateNow = store.getState();
     const storedPlans = plansState.selectors.getPlans(stateNow);
 
     // console.log('Plans after setTemplates', storedPlans);
-    expect(storedPlans.templates['111']).toEqual(template1);
+    expect(storedPlans.templates['TEMPLATE:111']).toEqual(template1ToBe);
 
 
-    const template2 = { id: 112, name: 'testiII' };
+    const template2 = { id: 112, other: 'testiII' };
+    const template2ToBe = { id: 'TEMPLATE:112', other: 'testiII' };
     store.dispatch(plansState.actions.addTemplate(template2));
     const stateNowII = store.getState();
     const storedPlansII = plansState.selectors.getPlans(stateNowII);
 
     // console.log('Plans after addTemplate', storedPlansII);
-    expect(storedPlansII.templates['112']).toEqual(template2);
+    expect(storedPlansII.templates['TEMPLATE:112']).toEqual(template2ToBe);
   });
 
-  it('setPlan will modify existing template', () => {
+  it('setTemplate will modify existing template', () => {
     const template = {
-      id: '112',
+      id: 'TEMPLATE:112',
       name: 'testiIII',
     };
     store.dispatch(plansState.actions.setTemplate(template));
     const stateNow = store.getState();
     const storedPlans = plansState.selectors.getPlans(stateNow);
     // console.log('Plans after setTemplate', JSON.stringify(storedPlans.templates));
-    expect(storedPlans.templates['112']).toEqual(template);
+    expect(storedPlans.templates['TEMPLATE:112']).toEqual(template);
   });
 
-  it('removePlan will remove template', () => {
+  it('removeTemplate will remove template', () => {
     const template = {
-      id: '112',
+      id: 'TEMPLATE:112',
       name: 'testiIII',
     };
     store.dispatch(plansState.actions.removeTemplate(template));
@@ -69,63 +84,26 @@ describe('Store plansReducer', () => {
     const storedPlans = plansState.selectors.getPlans(stateNow);
     // console.log('Plans after removeTemplate', storedPlans);
     expect(storedPlans.templates['112']).not.toBeDefined();
-    expect(storedPlans.templates['root:112']).not.toBeDefined();
+    expect(storedPlans.templates['TEMPLATE:112']).not.toBeDefined();
   });
 
-  it('setInstallations and addinstallation will add installation', () => {
-    const installation1 = { id: 111, name: 'testiI' };
-    const installations = { installations: { 111: installation1 } };
-
-    store.dispatch(plansState.actions.setInstallations(installations));
-    const stateNow = store.getState();
-    const storedPlans = plansState.selectors.getPlans(stateNow);
-    // console.log('Plans after setInstallations', storedPlans);
-    expect(storedPlans.installations['111']).toEqual(installation1);
-    const installation2 = { id: 112, name: 'testiII' };
-    store.dispatch(plansState.actions.addInstallation(installation2));
-    const stateNowII = store.getState();
-    const storedPlansII = plansState.selectors.getPlans(stateNowII);
-
-    // console.log('Plans after addInstallation', storedPlansII);
-    expect(storedPlansII.installations['112']).toEqual(installation2);
-  });
-
-  it('setInstallation will modify existing INSTALLATION', () => {
-    const installation = {
-      id: '112',
-      name: 'testiIII',
-    };
-    store.dispatch(plansState.actions.setInstallation(installation));
-    const stateNow = store.getState();
-    const storedPlans = plansState.selectors.getPlans(stateNow);
-    // console.log('Plans after setInstallation', storedPlans);
-    expect(storedPlans.installations['112']).toEqual(installation);
-  });
-
-  it('removeinstallation will remove installation', () => {
-    const installation = {
-      id: '112',
-      name: 'testiIII',
-    };
-    store.dispatch(plansState.actions.removeInstallation(installation));
-    const stateNow = store.getState();
-    const storedPlans = plansState.selectors.getPlans(stateNow);
-    // console.log('Plans after removeInstallation', storedPlans);
-    expect(storedPlans.installations['112']).not.toBeDefined();
-  });
-});
-
-describe('Templates ', () => {
-  it('addTemplate will add template to empty plan', () => {
+  it('addTemplate will add template without id', () => {
     const template = {
-      id: 'template-1',
-      name: '1H + K',
+      data: {
+        name: '1H + K',
+      },
+    };
+    const templateToBe = {
+      id: 'TEMPLATE:1H+K',
+      data: {
+        name: '1H + K',
+      },
     };
     store.dispatch(plansState.actions.addTemplate(template));
     const stateNow = store.getState();
     const storedPlans = plansState.selectors.getPlans(stateNow);
     // console.log('Templates after addTemplate', storedPlans);
-    expect(storedPlans.templates['template-1']).toEqual(template);
+    expect(storedPlans.templates['TEMPLATE:1H+K']).toEqual(templateToBe);
   });
 });
 

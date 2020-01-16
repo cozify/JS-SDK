@@ -5,8 +5,21 @@
 import { store } from '../store';
 import { userState } from '../reducers/user';
 import { plansState } from '../reducers/plans';
-import type { NODE_TYPE, PLANS_TYPE } from './constants';
+import type { TEMPLATE_TYPE, NODE_TYPE, PLANS_TYPE } from './constants';
 import { send, COMMANDS } from '../connection/send';
+
+
+export function addTemplate(newTemplate: TEMPLATE_TYPE) {
+  store.dispatch(plansState.actions.addTemplate(newTemplate));
+}
+
+export function setTemplate(template: TEMPLATE_TYPE) {
+  store.dispatch(plansState.actions.setTemplate(template));
+}
+
+export function removeTemplate(template: TEMPLATE_TYPE) {
+  store.dispatch(plansState.actions.removeTemplate(template));
+}
 
 /**
  * Set plans
