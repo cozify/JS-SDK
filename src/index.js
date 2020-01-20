@@ -54,6 +54,7 @@ export {
 export {
   getPlans, setPlans,
   loadPlans, savePlans,
+  addRoomName, removeRoomName,
   addTemplate, setTemplate, removeTemplate,
   addLocationNode, setLocationNode, removeLocationNode,
 } from './plans/plans';

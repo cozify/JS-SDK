@@ -84,6 +84,7 @@ const findChild = (state: NODE_MAP_TYPE, id) => {
 export const plansState = createSlice({
   slice: 'plans',
   initialState: {
+    roomNames: [],
     templates: {},
     installations: {},
     locations: {
@@ -107,7 +108,32 @@ export const plansState = createSlice({
       stateToSet.templates = { ...newState.templates };
       stateToSet.installations = { ...newState.installations };
       stateToSet.locations = { ...newState.locations };
+      stateToSet.roomNames = [...newState.roomNames || []];
     },
+
+    /*
+     * Reducer action of adding room name
+     * @param {Object} state
+     * @param {Object} action
+    */
+    addRoomName(state, action) {
+      const stateToSet = state;
+      const newName = action.payload;
+      if (!stateToSet.roomNames.includes(newName)) {
+        stateToSet.roomNames.push(newName);
+      }
+    },
+
+    /*
+     * Reducer action of removing room name
+     * @param {Object} state
+     * @param {Object} action
+    */
+    removeRoomName(state, action) {
+      const stateToSet = state;
+      stateToSet.roomNames = stateToSet.roomNames.filter((room) => room !== action.payload);
+    },
+
 
     /*
      * Reducer action of setting all templates state
@@ -324,6 +350,7 @@ console.log(addDevice({ id: 123, name: 'Unnamed device' }))
 {type : "devices/addDevice", payload : {id : 123, name: 'Unnamed device' }}
 */
 export const {
+  addRoomName, removeRoomName,
   setTemplates, addTemplate, setTemplate, removeTemplate,
   setInstallations, addInstallation, setInstallation, removeInstallation,
   addLocationCountry, setLocationCountry, removeLocationCountry,

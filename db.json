@@ -1,71 +1,12 @@
 {
   "plans": {
+    "roomNames": ["$LIVINGROOM", "$BEDROOM"],
     "templates": {},
     "installations": {},
     "locations": {
       "root": {
         "id": "root",
-        "childIds": [
-          "root:SWE",
-          "root:FI"
-        ]
-      },
-      "root:SWE": {
-        "id": "root:SWE",
-        "data": {
-          "name": "SWE"
-        },
-        "childIds": []
-      },
-      "root:FI": {
-        "id": "root:FI",
-        "data": {
-          "name": "FI"
-        },
-        "childIds": [
-          "root:FI:ESPOO",
-          "root:FI:HELSINKI",
-          "root:FI:Vantaa"
-        ]
-      },
-      "root:FI:ESPOO": {
-        "id": "root:FI:ESPOO",
-        "data": {
-          "name": "ESPOO"
-        },
-        "childIds": [
-          "root:FI:ESPOO:Suvikummuntie"
-        ]
-      },
-      "root:FI:HELSINKI": {
-        "id": "root:FI:HELSINKI",
-        "data": {
-          "name": "HELSINKI"
-        },
-        "childIds": []
-      },
-      "root:FI:ESPOO:Suvikummuntie": {
-        "id": "root:FI:ESPOO:Suvikummuntie",
-        "data": {
-          "name": "Suvikummuntie"
-        },
-        "childIds": [
-          "root:FI:ESPOO:Suvikummuntie:1"
-        ]
-      },
-      "root:FI:ESPOO:Suvikummuntie:1": {
-        "id": "root:FI:ESPOO:Suvikummuntie:1",
-        "data": {
-          "name": "1"
-        },
-        "childIds": []
-      },
-      "root:FI:Vantaa": {
-        "id": "root:FI:Vantaa",
-        "data": {
-          "name": "Vantaa"
-        },
-        "childIds": []
+        "childIds":[]
       }
     }
   }

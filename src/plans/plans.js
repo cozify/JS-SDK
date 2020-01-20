@@ -8,6 +8,13 @@ import { plansState } from '../reducers/plans';
 import type { TEMPLATE_TYPE, NODE_TYPE, PLANS_TYPE } from './constants';
 import { send, COMMANDS } from '../connection/send';
 
+export function addRoomName(newName: string) {
+  store.dispatch(plansState.actions.addRoomName(newName));
+}
+
+export function removeRoomName(newName: string) {
+  store.dispatch(plansState.actions.removeRoomName(newName));
+}
 
 export function addTemplate(newTemplate: TEMPLATE_TYPE) {
   store.dispatch(plansState.actions.addTemplate(newTemplate));

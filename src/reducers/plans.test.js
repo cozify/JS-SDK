@@ -7,6 +7,7 @@ import { store } from '../store';
 describe('Pure plansReducer', () => {
   it('should handle initial state', () => {
     const initialState = {
+      roomNames: [],
       templates: {},
       installations: {},
       locations: {
@@ -23,6 +24,51 @@ describe('Pure plansReducer', () => {
     expect(plansReducer(undefined, {})).toEqual(initialState);
   });
 });
+
+/*
+**
+*/
+
+describe('Room names ', () => {
+  it('will be initally empty', () => {
+    const stateNow = store.getState();
+    const storedPlans = plansState.selectors.getPlans(stateNow);
+    expect(storedPlans.roomNames).toEqual([]);
+  });
+  it('addRoomName will add room name', () => {
+    store.dispatch(plansState.actions.addRoomName('$TEST1'));
+    const stateNow = store.getState();
+    const storedPlans = plansState.selectors.getPlans(stateNow);
+
+    // console.log('Plans after setTemplates', storedPlans);
+    expect(storedPlans.roomNames).toEqual(['$TEST1']);
+  });
+  it('addRoomName will not add room name twice', () => {
+    store.dispatch(plansState.actions.addRoomName('$TEST1'));
+    const stateNow = store.getState();
+    const storedPlans = plansState.selectors.getPlans(stateNow);
+
+    // console.log('Plans after setTemplates', storedPlans);
+    expect(storedPlans.roomNames).toEqual(['$TEST1']);
+  });
+  it('removeRoomName will not fail if room is not there', () => {
+    store.dispatch(plansState.actions.removeRoomName('$TEST11'));
+    const stateNow = store.getState();
+    const storedPlans = plansState.selectors.getPlans(stateNow);
+
+    // console.log('Plans after setTemplates', storedPlans);
+    expect(storedPlans.roomNames).toEqual(['$TEST1']);
+  });
+  it('removeRoomName will not remove room', () => {
+    store.dispatch(plansState.actions.removeRoomName('$TEST1'));
+    const stateNow = store.getState();
+    const storedPlans = plansState.selectors.getPlans(stateNow);
+
+    // console.log('Plans after setTemplates', storedPlans);
+    expect(storedPlans.roomNames).toEqual([]);
+  });
+});
+
 
 /*
 ** Templates
