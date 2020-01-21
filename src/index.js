@@ -53,7 +53,7 @@ export {
 
 export {
   getPlans, setPlans,
-  loadPlans, savePlans,
+  loadPlans, savePlans, simplifyPlans,
   addRoomName, removeRoomName,
   addTemplate, setTemplate, removeTemplate,
   addLocationNode, setLocationNode, removeLocationNode,

@@ -1,6 +1,9 @@
 {
   "plans": {
     "roomNames": ["$LIVINGROOM", "$BEDROOM"],
+    "sceneTypes": [],
+    "deviceTypes": [],
+    "ruleTypes": [],
     "templates": {},
     "installations": {},
     "locations": {

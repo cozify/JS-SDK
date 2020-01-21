@@ -1,12 +1,98 @@
 {
   "plans": {
-    "roomNames": ["$LIVINGROOM", "$BEDROOM"],
-    "templates": {},
-    "installations": {},
+    "sceneTypes": [],
+    "deviceTypes": [],
+    "ruleTypes": [],
+    "roomNames": [
+      "$BEDROOM"
+    ],
+    "templates": {
+      "TEMPLATE:3H+K": {
+        "id": "TEMPLATE:3H+K",
+        "data": {
+          "type": "TEMPLATE",
+          "rooms": [
+            "$LIVINGROOM",
+            "$BEDROOM",
+            "$TEST2"
+          ],
+          "devices": [],
+          "rules": [],
+          "scenes": [],
+          "name": "3H+K"
+        }
+      }
+    },
     "locations": {
       "root": {
         "id": "root",
-        "childIds":[]
+        "childIds": [
+          "root:FI"
+        ],
+        "roomNames": [
+          "$BEDROOM"
+        ]
+      },
+      "root:FI": {
+        "data": {
+          "name": "FI",
+          "type": "LOCATION"
+        },
+        "id": "root:FI",
+        "childIds": [
+          "root:FI:HUBI",
+          "root:FI:STENIUKSENKUMPU"
+        ],
+        "roomNames": [
+          "$BEDROOM"
+        ]
+      },
+      "root:FI:HEL:HUB": {
+        "data": {
+          "rooms": [
+            "$BEDROOM"
+          ],
+          "devices": [],
+          "rules": [],
+          "scenes": [],
+          "type": "HUB",
+          "name": "HUB"
+        },
+        "id": "root:FI:HEL:HUB",
+        "childIds": [],
+        "roomNames": [
+          "$BEDROOM"
+        ]
+      },
+      "root:FI:HUBI": {
+        "data": {
+          "rooms": [
+            "$LIVINGROOM"
+          ],
+          "devices": [],
+          "rules": [],
+          "scenes": [],
+          "type": "HUB",
+          "name": "HUBI"
+        },
+        "id": "root:FI:HUBI",
+        "childIds": [],
+        "roomNames": [
+          "$BEDROOM"
+        ]
+      },
+      "root:FI:STENIUKSENKUMPU": {
+        "data": {
+          "type": "LOCATION",
+          "name": "STENIUKSENKUMPU"
+        },
+        "id": "root:FI:STENIUKSENKUMPU",
+        "childIds": [
+          "root:FI:HEL:HUB"
+        ],
+        "roomNames": [
+          "$BEDROOM"
+        ]
       }
     }
   }

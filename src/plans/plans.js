@@ -92,6 +92,38 @@ export async function loadPlans(): Promise<PLANS_TYPE> {
   });
 }
 
+export function simplifyPlans(): Object {
+  const nodes = getPlans();
+  const nodesCopy = {};
+  // nodesCopy.roomNames = { ...nodes.roomNames };
+  // nodesCopy.templates = { ...nodes.templates };
+
+  function simplifyNode(childNode: Object): Object {
+    console.log('simply id', childNode.id);
+    console.log('simply data', childNode.data);
+    const nodesTree = [];
+    for (let i = 0; i < childNode.childIds.length; i += 1) {
+      const { childIds } = childNode;
+      const hasChildren = childIds !== undefined && childIds.length > 0;
+      nodesTree[i] = { ...nodes.locations[childNode.childIds[i]].data };
+      nodesTree[i].id = childNode.childIds[i];
+      nodesTree[i].child = hasChildren ? simplifyNode(nodes.locations[childNode.childIds[i]]) : undefined;
+      /*
+      if (nodesCopy2[i].data.type === 'HUB'){}
+      nodesCopy2[i] = {
+        id: childNode.childIds[i],
+        data: childNode.data || null,
+        childs: hasChildren ? simplifyNode(nodes.locations[childNode.childIds[i]]) : undefined,
+      };
+      */
+    }
+    console.log(`simply ${childNode.id} return`, nodesTree);
+    return nodesTree;
+  }
+  nodesCopy.locations = simplifyNode(nodes.locations.root);
+  return nodesCopy;
+}
+
 /**
  * Save plans
  * @return {PLANS_TYPE}
@@ -114,8 +146,11 @@ export async function savePlans(): Promise<PLANS_TYPE> {
 
     const plansToBeSaved = getPlans();
     const data = {
+      sceneTypes: plansToBeSaved.sceneTypes,
+      deviceTypes: plansToBeSaved.deviceTypes,
+      ruleTypes: plansToBeSaved.ruleTypes,
+      roomNames: plansToBeSaved.roomNames,
       templates: plansToBeSaved.templates,
-      installations: plansToBeSaved.installations,
       locations: plansToBeSaved.locations,
     };
 

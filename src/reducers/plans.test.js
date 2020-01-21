@@ -8,8 +8,10 @@ describe('Pure plansReducer', () => {
   it('should handle initial state', () => {
     const initialState = {
       roomNames: [],
+      sceneTypes: [],
+      deviceTypes: [],
+      ruleTypes: [],
       templates: {},
-      installations: {},
       locations: {
         root: {
           id: 'root',

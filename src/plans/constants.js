@@ -21,9 +21,16 @@ export type NODE_TYPE = {
   childIds: Array<string>,
 }
 
-export type PLANS_TYPE = {
-  templates: Object,
-  installations: Object,
-  locations: NODE_TYPE,
+export type ROOT_NODE_TYPE = {
+  root: NODE_TYPE,
 }
 
+export type PLANS_TYPE = {
+	sceneTypes: Array<Object>,
+	deviceTypes: Array<Object>,
+	ruleTypes: Array<Object>,
+	roomNames: Array<string>,
+  templates: Object,
+  installations: Object,
+  locations: ROOT_NODE_TYPE,
+}

@@ -85,8 +85,10 @@ export const plansState = createSlice({
   slice: 'plans',
   initialState: {
     roomNames: [],
+    sceneTypes: [],
+    deviceTypes: [],
+    ruleTypes: [],
     templates: {},
-    installations: {},
     locations: {
       root: {
         id: 'root',
@@ -106,9 +108,11 @@ export const plansState = createSlice({
       const oldState = stateToSet.plansState;
       console.log(`SDK setPlansState: PLANS state ${oldState} -> ${newState}`);
       stateToSet.templates = { ...newState.templates };
-      stateToSet.installations = { ...newState.installations };
       stateToSet.locations = { ...newState.locations };
       stateToSet.roomNames = [...newState.roomNames || []];
+      stateToSet.sceneTypes = [...newState.sceneTypes || []];
+      stateToSet.deviceTypes = [...newState.deviceTypes || []];
+      stateToSet.ruleTypes = [...newState.ruleTypes || []];
     },
 
     /*
@@ -202,12 +206,12 @@ export const plansState = createSlice({
         } else if (setNode && setNode.id && stateToSet.templates[setNode.id]) {
           stateToSet.templates[setNode.id] = { ...setNode };
         } else {
-          throw new Error(`SDK setLocationNode - template ${template.id} could not be set`);
+          throw new Error(`SDK setTemplate - template ${template.id} could not be set`);
         }
       } else if (template.id && stateToSet.templates[template.id]) {
         stateToSet.templates[template.id] = { ...template };
       } else {
-        throw new Error(`SDK setLocationNode - template ${template.id} could not be set`);
+        throw new Error(`SDK setTemplate - template ${template.id} could not be set`);
       }
     },
 
