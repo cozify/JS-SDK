@@ -1,8 +1,17 @@
 {
   "plans": {
-    "sceneTypes": [],
-    "deviceTypes": [],
-    "ruleTypes": [],
+    "sceneTypes": [
+      "$HOME",
+      "$AWAY"
+    ],
+    "deviceTypes": [
+      "Fibaro dimmer",
+      "Philips Hue Light"
+    ],
+    "ruleTypes": [
+      "Automate lights",
+      "Turn device off"
+    ],
     "roomNames": [
       "$LIVINGROOM",
       "$BEDROOM"
@@ -91,3 +100,6 @@
           "root:FI:STENIUKSENKUMPU1:A2:HUB123"
         ]
       }
+    }
+  }
+}

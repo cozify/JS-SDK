@@ -1,8 +1,18 @@
 {
   "plans": {
-    "sceneTypes": [],
-    "deviceTypes": [],
-    "ruleTypes": [],
+    "sceneTypes": [
+      "$HOME",
+      "$AWAY",
+      "$NIGHT"
+    ],
+    "deviceTypes": [
+      "Fibaro dimmer",
+      "Philips Hue Light"
+    ],
+    "ruleTypes": [
+      "Automate lights",
+      "Turn device off"
+    ],
     "roomNames": [
       "$LIVINGROOM",
       "$BEDROOM"
@@ -18,7 +28,18 @@
           "devices": [],
           "rules": [],
           "scenes": [],
-          "name": "1H + K"
+          "name": "1H + K",
+          "deviceTypes": [
+            "Fibaro dimmer"
+          ],
+          "sceneTypes": [
+            "$HOME",
+            "$AWAY"
+          ],
+          "ruleTypes": [
+            "Automate lights",
+            "Turn device off"
+          ]
         }
       }
     },
@@ -72,9 +93,15 @@
           "rooms": [
             "$LIVINGROOM"
           ],
-          "devices": [],
-          "rules": [],
-          "scenes": [],
+          "devices": [
+            "Fibaro dimmer"
+          ],
+          "rules": [
+            "Turn device off"
+          ],
+          "scenes": [
+            "$HOME"
+          ],
           "type": "HUB",
           "name": "HUB 123"
         },
