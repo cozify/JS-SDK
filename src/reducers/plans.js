@@ -335,7 +335,6 @@ export const plansState = createSlice({
             return true;
           });
           // own childs
-          debugger
           setNode.childIds = setNode.childIds.map((id) => id.replace(oldId, setNode.id));
 
           // parent

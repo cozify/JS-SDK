@@ -48,7 +48,7 @@
         "childIds": [
           "root:FI:STENIUKSENKUMPU1:A1",
           "root:FI:STENIUKSENKUMPU1:A3",
-          "root:FI:STENIUKSENKUMPU1:A"
+          "root:FI:STENIUKSENKUMPU1:A2"
         ]
       },
       "root:FI:STENIUKSENKUMPU1:A1": {
@@ -67,7 +67,7 @@
         "id": "root:FI:STENIUKSENKUMPU1:A3",
         "childIds": []
       },
-      "root:FI:STENIUKSENKUMPU1:A:HUB123": {
+      "root:FI:STENIUKSENKUMPU1:A2:HUB123": {
         "data": {
           "rooms": [
             "$LIVINGROOM"
@@ -78,17 +78,17 @@
           "type": "HUB",
           "name": "HUB 123"
         },
-        "id": "root:FI:STENIUKSENKUMPU1:A:HUB123",
+        "id": "root:FI:STENIUKSENKUMPU1:A2:HUB123",
         "childIds": []
       },
-      "root:FI:STENIUKSENKUMPU1:A": {
+      "root:FI:STENIUKSENKUMPU1:A2": {
         "data": {
           "type": "LOCATION",
-          "name": "A"
+          "name": "A2"
         },
-        "id": "root:FI:STENIUKSENKUMPU1:A",
+        "id": "root:FI:STENIUKSENKUMPU1:A2",
         "childIds": [
-          "root:FI:STENIUKSENKUMPU1:A:HUB123"
+          "root:FI:STENIUKSENKUMPU1:A2:HUB123"
         ]
       }
     }
