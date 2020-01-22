@@ -16,6 +16,30 @@ export function removeRoomName(newName: string) {
   store.dispatch(plansState.actions.removeRoomName(newName));
 }
 
+export function addDeviceType(newName: string) {
+  store.dispatch(plansState.actions.addDeviceType(newName));
+}
+
+export function removeDeviceType(newName: string) {
+  store.dispatch(plansState.actions.removeDeviceType(newName));
+}
+
+export function addSceneType(newName: string) {
+  store.dispatch(plansState.actions.addSceneType(newName));
+}
+
+export function removeSceneType(newName: string) {
+  store.dispatch(plansState.actions.removeSceneType(newName));
+}
+
+export function addRuleType(newName: string) {
+  store.dispatch(plansState.actions.addRuleType(newName));
+}
+
+export function removeRuleType(newName: string) {
+  store.dispatch(plansState.actions.removeRuleType(newName));
+}
+
 export function addTemplate(newTemplate: TEMPLATE_TYPE) {
   store.dispatch(plansState.actions.addTemplate(newTemplate));
 }

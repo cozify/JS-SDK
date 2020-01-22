@@ -54,6 +54,9 @@ export {
 export {
   getPlans, setPlans,
   loadPlans, savePlans, simplifyPlans,
+  addDeviceType, removeDeviceType,
+  addSceneType, removeSceneType,
+  addRuleType, removeRuleType,
   addRoomName, removeRoomName,
   addTemplate, setTemplate, removeTemplate,
   addLocationNode, setLocationNode, removeLocationNode,

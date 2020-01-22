@@ -71,6 +71,72 @@ describe('Room names ', () => {
   });
 });
 
+describe('Device types  ', () => {
+  it('will be initally empty', () => {
+    const stateNow = store.getState();
+    const storedPlans = plansState.selectors.getPlans(stateNow);
+    expect(storedPlans.deviceTypes).toEqual([]);
+  });
+  it('addDeviceType will add device object', () => {
+    store.dispatch(plansState.actions.addDeviceType({ id: 1, a: 2 }));
+    const stateNow = store.getState();
+    const storedPlans = plansState.selectors.getPlans(stateNow);
+    // console.log('Plans after setTemplates', storedPlans);
+    expect(storedPlans.deviceTypes).toEqual([{ id: 1, a: 2 }]);
+  });
+  it('removeDevice type will remove room', () => {
+    store.dispatch(plansState.actions.removeDeviceType(1));
+    const stateNow = store.getState();
+    const storedPlans = plansState.selectors.getPlans(stateNow);
+    // console.log('Plans after setTemplates', storedPlans);
+    expect(storedPlans.deviceTypes).toEqual([]);
+  });
+});
+
+describe('Scene types  ', () => {
+  it('will be initally empty', () => {
+    const stateNow = store.getState();
+    const storedPlans = plansState.selectors.getPlans(stateNow);
+    expect(storedPlans.sceneTypes).toEqual([]);
+  });
+  it('addDeviceType will add device object', () => {
+    store.dispatch(plansState.actions.addSceneType({ id: 2, a: 3 }));
+    const stateNow = store.getState();
+    const storedPlans = plansState.selectors.getPlans(stateNow);
+    // console.log('Plans after setTemplates', storedPlans);
+    expect(storedPlans.sceneTypes).toEqual([{ id: 2, a: 3 }]);
+  });
+  it('removeDevice type will remove room', () => {
+    store.dispatch(plansState.actions.removeSceneType(2));
+    const stateNow = store.getState();
+    const storedPlans = plansState.selectors.getPlans(stateNow);
+    // console.log('Plans after setTemplates', storedPlans);
+    expect(storedPlans.sceneTypes).toEqual([]);
+  });
+});
+
+describe('Rule types  ', () => {
+  it('will be initally empty', () => {
+    const stateNow = store.getState();
+    const storedPlans = plansState.selectors.getPlans(stateNow);
+    expect(storedPlans.ruleTypes).toEqual([]);
+  });
+  it('addDeviceType will add device object', () => {
+    store.dispatch(plansState.actions.addRuleType({ id: 3, a: 4 }));
+    const stateNow = store.getState();
+    const storedPlans = plansState.selectors.getPlans(stateNow);
+    // console.log('Plans after setTemplates', storedPlans);
+    expect(storedPlans.ruleTypes).toEqual([{ id: 3, a: 4 }]);
+  });
+  it('removeDevice type will remove room', () => {
+    store.dispatch(plansState.actions.removeRuleType(3));
+    const stateNow = store.getState();
+    const storedPlans = plansState.selectors.getPlans(stateNow);
+    // console.log('Plans after setTemplates', storedPlans);
+    expect(storedPlans.ruleTypes).toEqual([]);
+  });
+});
+
 
 /*
 ** Templates

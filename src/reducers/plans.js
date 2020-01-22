@@ -139,7 +139,7 @@ export const plansState = createSlice({
     },
 
     /*
-     * Reducer action of adding room name
+     * Reducer action of adding device type
      * @param {Object} state
      * @param {Object} action
     */
@@ -147,19 +147,62 @@ export const plansState = createSlice({
       const stateToSet = state;
       const newDevice = action.payload;
       // todo check
-      stateToSet.addDeviceTypes.push(newDevice);
+      stateToSet.deviceTypes.push(newDevice);
     },
 
     /*
-     * Reducer action of removing room name
+     * Reducer action of removing device type
      * @param {Object} state
      * @param {Object} action
     */
     removeDeviceType(state, action) {
       const stateToSet = state;
-      stateToSet.addDeviceTypes = stateToSet.addDeviceTypes.filter((deviceType) => deviceType.id !== action.payload);
+      stateToSet.deviceTypes = stateToSet.sceneTypes.filter((deviceType) => deviceType.id !== action.payload);
     },
 
+    /*
+     * Reducer action of adding scene type
+     * @param {Object} state
+     * @param {Object} action
+    */
+    addSceneType(state, action) {
+      const stateToSet = state;
+      const newScene = action.payload;
+      // todo check
+      stateToSet.sceneTypes.push(newScene);
+    },
+
+    /*
+     * Reducer action of removing scene type
+     * @param {Object} state
+     * @param {Object} action
+    */
+    removeSceneType(state, action) {
+      const stateToSet = state;
+      stateToSet.sceneTypes = stateToSet.sceneTypes.filter((sceneType) => sceneType.id !== action.payload);
+    },
+
+    /*
+     * Reducer action of adding scene type
+     * @param {Object} state
+     * @param {Object} action
+    */
+    addRuleType(state, action) {
+      const stateToSet = state;
+      const newRule = action.payload;
+      // todo check
+      stateToSet.ruleTypes.push(newRule);
+    },
+
+    /*
+     * Reducer action of removing scene type
+     * @param {Object} state
+     * @param {Object} action
+    */
+    removeRuleType(state, action) {
+      const stateToSet = state;
+      stateToSet.ruleTypes = stateToSet.ruleTypes.filter((ruleType) => ruleType.id !== action.payload);
+    },
 
     /*
      * Reducer action of setting all templates state
