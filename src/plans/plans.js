@@ -105,9 +105,11 @@ export function simplifyPlans(): Object {
     for (let i = 0; i < childNode.childIds.length; i += 1) {
       const { childIds } = childNode;
       const hasChildren = childIds !== undefined && childIds.length > 0;
-      nodesTree[i] = { ...nodes.locations[childNode.childIds[i]].data };
-      nodesTree[i].id = childNode.childIds[i];
-      nodesTree[i].child = hasChildren ? simplifyNode(nodes.locations[childNode.childIds[i]]) : undefined;
+      if (nodes.locations[childNode.childIds[i]] && nodes.locations[childNode.childIds[i]].data) {
+        nodesTree[i] = { ...nodes.locations[childNode.childIds[i]].data };
+        nodesTree[i].id = childNode.childIds[i];
+        nodesTree[i].child = hasChildren ? simplifyNode(nodes.locations[childNode.childIds[i]]) : undefined;
+      }
       /*
       if (nodesCopy2[i].data.type === 'HUB'){}
       nodesCopy2[i] = {

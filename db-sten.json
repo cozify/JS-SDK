@@ -7,21 +7,7 @@
       "$LIVINGROOM",
       "$BEDROOM"
     ],
-    "templates": {
-      "TEMPLATE:1H+K": {
-        "id": "TEMPLATE:1H+K",
-        "data": {
-          "type": "TEMPLATE",
-          "rooms": [
-            "$LIVINGROOM"
-          ],
-          "devices": [],
-          "rules": [],
-          "scenes": [],
-          "name": "1H + K"
-        }
-      }
-    },
+    "templates": {},
     "locations": {
       "root": {
         "id": "root",
@@ -47,8 +33,8 @@
         "id": "root:FI:STENIUKSENKUMPU1",
         "childIds": [
           "root:FI:STENIUKSENKUMPU1:A1",
-          "root:FI:STENIUKSENKUMPU1:A3",
-          "root:FI:STENIUKSENKUMPU1:A"
+          "root:FI:STENIUKSENKUMPU1:A2",
+          "root:FI:STENIUKSENKUMPU1:A3"
         ]
       },
       "root:FI:STENIUKSENKUMPU1:A1": {
@@ -59,6 +45,14 @@
         "id": "root:FI:STENIUKSENKUMPU1:A1",
         "childIds": []
       },
+      "root:FI:STENIUKSENKUMPU1:A2": {
+        "data": {
+          "type": "LOCATION",
+          "name": "A2"
+        },
+        "id": "root:FI:STENIUKSENKUMPU1:A2",
+        "childIds": []
+      },
       "root:FI:STENIUKSENKUMPU1:A3": {
         "data": {
           "type": "LOCATION",
@@ -66,30 +60,6 @@
         },
         "id": "root:FI:STENIUKSENKUMPU1:A3",
         "childIds": []
-      },
-      "root:FI:STENIUKSENKUMPU1:A:HUB123": {
-        "data": {
-          "rooms": [
-            "$LIVINGROOM"
-          ],
-          "devices": [],
-          "rules": [],
-          "scenes": [],
-          "type": "HUB",
-          "name": "HUB 123"
-        },
-        "id": "root:FI:STENIUKSENKUMPU1:A:HUB123",
-        "childIds": []
-      },
-      "root:FI:STENIUKSENKUMPU1:A": {
-        "data": {
-          "type": "LOCATION",
-          "name": "A"
-        },
-        "id": "root:FI:STENIUKSENKUMPU1:A",
-        "childIds": [
-          "root:FI:STENIUKSENKUMPU1:A:HUB123"
-        ]
       }
     }
   }

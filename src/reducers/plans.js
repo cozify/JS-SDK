@@ -33,9 +33,9 @@ const setId = (parentTempId: string, newItem: Object) => {
 };
 
 const getAllDescendantIds = (state, nodeId) => (
-  state[nodeId].childIds.reduce((acc, childId) => (
+  (state[nodeId] && state[nodeId].childIds) ? state[nodeId].childIds.reduce((acc, childId) => (
     [...acc, childId, ...getAllDescendantIds(state, childId)]
-  ), [])
+  ), []) : []
 );
 
 const deleteMany = (givenState, ids) => {
@@ -136,6 +136,28 @@ export const plansState = createSlice({
     removeRoomName(state, action) {
       const stateToSet = state;
       stateToSet.roomNames = stateToSet.roomNames.filter((room) => room !== action.payload);
+    },
+
+    /*
+     * Reducer action of adding room name
+     * @param {Object} state
+     * @param {Object} action
+    */
+    addDeviceType(state, action) {
+      const stateToSet = state;
+      const newDevice = action.payload;
+      // todo check
+      stateToSet.addDeviceTypes.push(newDevice);
+    },
+
+    /*
+     * Reducer action of removing room name
+     * @param {Object} state
+     * @param {Object} action
+    */
+    removeDeviceType(state, action) {
+      const stateToSet = state;
+      stateToSet.addDeviceTypes = stateToSet.addDeviceTypes.filter((deviceType) => deviceType.id !== action.payload);
     },
 
 
@@ -286,15 +308,42 @@ export const plansState = createSlice({
         node.childIds = [];
       }
 
+      let descendantIds = [];
+      if (stateToSet.locations[node.id]) {
+        descendantIds = getAllDescendantIds(stateToSet.locations, node.id);
+      }
       const parentTempId = node.id.substr(0, node.id.lastIndexOf(':'));
       if (node.data && node.data.name) {
         const oldId = node.id;
         const nodeToBeSet = { ...node };
+
         nodeToBeSet.id = null;
         const setNode = setId(parentTempId, nodeToBeSet);
         if (setNode && oldId !== setNode.id && stateToSet.locations[oldId]) {
+          // all child nodes
+          descendantIds.map((childId) => {
+            if (childId.indexOf(oldId) !== -1) {
+              const newId = childId.replace(oldId, setNode.id);
+              const child = { ...stateToSet.locations[childId] };
+              child.id = newId;
+              // and it's childs
+              child.childIds = child.childIds.map((id) => id.replace(oldId, setNode.id));
+
+              delete stateToSet.locations[childId];
+              stateToSet.locations[newId] = { ...child };
+            }
+            return true;
+          });
+          // own childs
+          debugger
+          setNode.childIds = setNode.childIds.map((id) => id.replace(oldId, setNode.id));
+
+          // parent
           stateToSet.locations[parentTempId].childIds = stateToSet.locations[parentTempId].childIds.filter((id) => id !== oldId);
           stateToSet.locations[parentTempId].childIds.push(setNode.id);
+
+
+          // current
           delete stateToSet.locations[oldId];
           stateToSet.locations[setNode.id] = { ...setNode };
         } else if (setNode && setNode.id && stateToSet.locations[setNode.id]) {
