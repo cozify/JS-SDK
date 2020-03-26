@@ -279,7 +279,7 @@ export function send({
   if (user.language && user.language !== LANGUAGES.NONE) {
     reqConf.headers['Accept-Language'] = user.language;
   } else {
-    delete reqConf.headers['Accept-Language']
+    delete reqConf.headers['Accept-Language'];
   }
 
   Object.assign(reqConf, sendConfig);
