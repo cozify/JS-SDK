@@ -31,7 +31,9 @@ export {
 export {
   isZwaveEnabled, doZwaveInclusion, stopZwaveInclusion, doZwaveExclusion, stopZwaveExclusion, healZwave,
 } from './hubs/zwave';
-
+export {
+  getModbusDevicePairings, setModbusDevicePairings,
+} from './hubs/modbus';
 export {
   getDevices, getHubDevices,
   getPairingDevices, getHubPairingDevices,

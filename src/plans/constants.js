@@ -1,12 +1,15 @@
 // @flow
-//
 export const PLAN_NODES = Object.freeze({
   LOCATION: 'LOCATION',
   TEMPLATE: 'TEMPLATE',
   HUB: 'HUB',
 });
+
 export type PLAN_NODES_TYPE = $Values<typeof PLAN_NODES>;
 
+export const DUMMY = Object.freeze({
+  DUMMY: 'DUMMY',
+});
 
 export type TEMPLATE_TYPE = {
   id: ?string,
@@ -26,10 +29,10 @@ export type ROOT_NODE_TYPE = {
 }
 
 export type PLANS_TYPE = {
-	sceneTypes: Array<Object>,
-	deviceTypes: Array<Object>,
-	ruleTypes: Array<Object>,
-	roomNames: Array<string>,
+  sceneTypes: Array<Object>,
+  deviceTypes: Array<Object>,
+  ruleTypes: Array<Object>,
+  roomNames: Array<string>,
   templates: Object,
   installations: Object,
   locations: ROOT_NODE_TYPE,

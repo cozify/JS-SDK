@@ -40,6 +40,23 @@ export const ZWAVE_EXCLUSION_STATUS = Object.freeze({
 export type ZWAVE_EXCLUSION_STATUS_TYPE = $Values<typeof ZWAVE_EXCLUSION_STATUS>;
 
 
+export type MODBUS_DEVICE_PAIRING_TYPE = {
+  address?: ?number,
+  deviceType?: ?string,
+  manufacturer?: ?string,
+  name?: ?string,
+  readDeviceIdSupported: boolean,
+  register?: ?number,
+  registerRequired?: ?boolean,
+  registerType?: ?number,
+  type?: ?string,
+};
+
+export type MODBUS_DEVICE_PAIRING_TYPES = Array<MODBUS_DEVICE_PAIRING_TYPE>
+export type MODBUS_DEVICE_PAIRING_MAP_TYPE = {[deviceId: string]: MODBUS_DEVICE_PAIRING_TYPE}
+
+export type HUB_MODBUS_DEVICE_PAIRING_MAP_TYPE = {[hubId: string]: {[deviceId: string]: MODBUS_DEVICE_PAIRING_TYPE}}
+
 export type ZWAVE_INCLUSION_STATES_TYPE = {status: ZWAVE_INCLUSION_STATUS_TYPE, nodeId: string, type: string}
 export type ZWAVE_EXCLUSION_STATES_TYPE = {status: ZWAVE_EXCLUSION_STATUS_TYPE, nodeId: string, type: string}
 

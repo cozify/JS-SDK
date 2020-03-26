@@ -87,6 +87,8 @@ export const COMMANDS = Object.freeze({
   CMD_GET_ALARMS: { method: 'GET', url: 'hub/remote/cc/$API_VER/alarms' },
   CMD_CLOSE_ALARM: { method: 'PUT', url: 'hub/remote/cc/$API_VER/alarms/close', urlParams: ['alarmId'] },
   CMD_REMOVE_ALARM: { method: 'DELETE', url: 'hub/remote/cc/$API_VER/alarms', urlParams: ['roomId'] },
+  GET_MODBUS_DEVICE_PAIRINGS: { method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'GET_MODBUS_PAIRINGS' },
+  SET_MODBUS_DEVICE_PAIRINGS: { method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'PAIR_MODBUS' },
   ZWAVE_START_INCLUSION: { method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'ZWAVE_START_INCLUSION' },
   ZWAVE_STOP_INCLUSION: { method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'ZWAVE_CANCEL_INCLUSION' },
   ZWAVE_START_EXCLUSION: { method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'ZWAVE_START_EXCLUSION' },

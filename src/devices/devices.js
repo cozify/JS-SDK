@@ -107,6 +107,22 @@ export function pairingDevicesDeltaHandler(hubId: string, reset: boolean, pairin
     devices: {},
   };
   pairingDevices.map((device) => {
+    const deviceProps = { ...device.status };
+
+
+    // TODO: Start of remove when hub 'device.status.state.state'-bug fixed
+    /*
+    let deviceState = { ...device.status.state };
+    if (device.status.state.state){
+      deviceState = { ...device.status.state.state}
+      delete device.status.state.state
+    }
+    deviceProps.status.state ={ ...deviceState}
+    */
+    // TODO: end of remove when hub bug fixed
+
+    delete device.status
+    device = {...device, ...deviceProps}
     statePairingDevices.devices[device.id] = device;
     return true;
   });
