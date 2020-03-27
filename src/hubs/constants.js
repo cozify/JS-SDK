@@ -48,6 +48,7 @@ export type MODBUS_DEVICE_PAIRING_TYPE = {
   readDeviceIdSupported: boolean,
   register?: ?number,
   registerRequired?: ?boolean,
+  normallyOff: ?boolean,
   registerType?: ?number,
   type?: ?string,
 };

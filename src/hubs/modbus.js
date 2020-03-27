@@ -95,9 +95,10 @@ export async function setModbusDevicePairings(hubId: string, modbusDevices: MODB
         deviceType: device.deviceType,
         name: device.name || '',
         readDeviceIdSupported: device.readDeviceIdSupported,
-        registerRequired: device.false,
+        registerRequired: device.registerRequired,
         register: undefined,
         registerType: undefined,
+        normallyOff: false,
         type: 'PAIR_MODBUS',
       };
       if (device.deviceType === 'RELAY' || device.deviceType === 'SIGNAL') {
