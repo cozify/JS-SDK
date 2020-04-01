@@ -1,21 +1,22 @@
 // @flow
 
 // This actionreducer uses internally https://github.com/mweststrate/immer, so it's safe to modify given state directly
-import { createSlice } from 'redux-starter-kit';
+import { createSlice, createSelector, createEntityAdapter } from '@reduxjs/toolkit';
 import { HUB_CONNECTION_STATES } from '../connection/constants';
+
 
 /**
  * Hubs action creators object
- * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
+ * @see  https://github.com/reduxjs/@reduxjs/toolkit/blob/master/docs/api/createSlice.md
  * @return { {
- *   slice : string,
+ *   name : string,
  *   reducer : ReducerFunction,
  *   actions : Object<string, ActionCreator},
  *   selectors : Object<string, Selector>
  *   }}
  */
 export const hubsState = createSlice({
-  slice: 'hubs',
+  name: 'hubs',
   initialState: {},
   reducers: {
     /*
@@ -83,6 +84,21 @@ export const hubsState = createSlice({
   },
 });
 
+const adapter = createEntityAdapter();
+export const {
+  selectById: selectHubById,
+  selectIds: selectHubIds,
+  selectEntities: selectHubEntities,
+  selectAll: selectAllHubs,
+  selectTotal: selectTotalHubs,
+} = adapter.getSelectors((state) => state.hubs);
+
+hubsState.selectors = adapter.getSelectors((state) => state.hubs);
+hubsState.selectors.getHubs = createSelector(
+  [(state) => state.hubs],
+  (hubs) => hubs,
+);
+// console.log("hubsState.selectors", hubsState.selectors );
 
 // console.log('hubsState ', hubsState)
 const { actions, reducer } = hubsState;

@@ -121,8 +121,8 @@ export function pairingDevicesDeltaHandler(hubId: string, reset: boolean, pairin
     */
     // TODO: end of remove when hub bug fixed
 
-    delete device.status
-    device = {...device, ...deviceProps}
+    delete device.status;
+    device = { ...device, ...deviceProps };
     statePairingDevices.devices[device.id] = device;
     return true;
   });

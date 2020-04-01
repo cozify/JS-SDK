@@ -55,7 +55,7 @@ export {
 
 export {
   getPlans, setPlans,
-  loadPlans, savePlans, simplifyPlans,
+  listPlans, savePlans, simplifyPlans,
   addDeviceType, removeDeviceType,
   addSceneType, removeSceneType,
   addRuleType, removeRuleType,

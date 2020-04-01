@@ -1,14 +1,13 @@
 // @flow
 
-// This actionreducer uses internally https://github.com/mweststrate/immer, so it's safe to modify given state directly
-import { createSlice } from 'redux-starter-kit';
+import { createSlice, createSelector, createEntityAdapter } from '@reduxjs/toolkit';
 import isEmpty from 'lodash/isEmpty';
 import { LANGUAGES, USER_STATES, ROLES } from '../user/constants';
 
 
 /**
  * User action creators object
- * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
+ * @see  https://github.com/reduxjs/@reduxjs/toolkit/blob/master/docs/api/createSlice.md
  * @return { {
  *   slice : string,
  *   reducer : ReducerFunction,
@@ -17,7 +16,7 @@ import { LANGUAGES, USER_STATES, ROLES } from '../user/constants';
  *   }}
  */
 export const userState = createSlice({
-  slice: 'user',
+  name: 'user',
   initialState: {
     firstName: '',
     lastName: '',
@@ -134,6 +133,12 @@ console.log(user)
 }
 */
 
+const adapter = createEntityAdapter();
+userState.selectors = adapter.getSelectors((state) => state.user);
+userState.selectors.getUser = createSelector(
+  [(state) => state.user],
+  (user) => user,
+);
 
 const { actions, reducer } = userState;
 

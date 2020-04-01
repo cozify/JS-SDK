@@ -8,6 +8,9 @@ import { plansState } from '../reducers/plans';
 import type { TEMPLATE_TYPE, NODE_TYPE, PLANS_TYPE } from './constants';
 import { send, COMMANDS } from '../connection/send';
 
+// const plansUrl = "http://localhost:3001/plans"
+const plansUrl = 'https://localhost:8449/cc/0.1/partner/plans';
+
 export function addRoomName(newName: string) {
   store.dispatch(plansState.actions.addRoomName(newName));
 }
@@ -82,9 +85,45 @@ export function removeLocationNode(nodeId: string) {
 }
 
 /**
- * Load plans
+ * List plans
  * @return {PLANS_TYPE}
  */
+export async function listPlans(): Promise<PLANS_TYPE> {
+  return new Promise((resolve, reject) => {
+    const stateNow = store.getState();
+    const user = userState.selectors.getUser(stateNow);
+    if (!user || !user.authKey) {
+      console.error('SDK listPlans error: No userKey!');
+      reject(new Error('List plans error: No userKey!'));
+      return;
+    }
+    const { authKey } = user;
+    if (!authKey) {
+      console.error('SDK listPlans error: No authKey!');
+      reject(new Error('List plans error: No authKey!'));
+      return;
+    }
+
+    send({
+      command: COMMANDS.CMD_LIST_PLANS, authKey, url: plansUrl,
+    })
+      .then((plans) => {
+        console.debug('SDK listPlans ok', plans);
+        setPlans(plans);
+        resolve(getPlans());
+      })
+      .catch((error) => {
+        console.error('SDK listPlans error:', error);
+        reject(error);
+      });
+  });
+}
+
+
+/**
+ * Load plan
+ * @return {PLANS_TYPE}
+
 export async function loadPlans(): Promise<PLANS_TYPE> {
   return new Promise((resolve, reject) => {
     const stateNow = store.getState();
@@ -102,7 +141,7 @@ export async function loadPlans(): Promise<PLANS_TYPE> {
     }
 
     send({
-      command: COMMANDS.CMD_GET_PLANS, authKey, url: 'http://localhost:3001/plans',
+      command: COMMANDS.CMD_GET_PLAN, authKey, url: plansUrl,
     })
       .then((plans) => {
         console.debug('SDK loadPlans ok', plans);
@@ -115,6 +154,7 @@ export async function loadPlans(): Promise<PLANS_TYPE> {
       });
   });
 }
+*/
 
 export function simplifyPlans(): Object {
   const nodes = getPlans();
@@ -181,7 +221,7 @@ export async function savePlans(): Promise<PLANS_TYPE> {
     };
 
     send({
-      command: COMMANDS.CMD_SAVE_PLANS, authKey, data, url: 'http://localhost:3001/plans',
+      command: COMMANDS.CMD_SAVE_PLAN, authKey, data, url: plansUrl,
     })
       .then((status) => {
         console.debug('SDK savePlans ok', status);
@@ -189,6 +229,7 @@ export async function savePlans(): Promise<PLANS_TYPE> {
         resolve(status);
       })
       .catch((error) => {
+        // eslint-disable-next-line
         debugger;
         console.error('SDK savePlans error:', error);
         reject(error);

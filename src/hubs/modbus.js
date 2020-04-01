@@ -133,10 +133,8 @@ export async function setModbusDevicePairings(hubId: string, modbusDevices: MODB
           console.info('SDK: setModbusDevicePairings success: ', reply);
           if (reply && reply === true) {
             return resolve(reply);
-          } else {
-            return reject(new Error(reply ? reply.message : 'unknown error'));
           }
-
+          return reject(new Error(reply ? reply.message : 'unknown error'));
         })
         .catch((error) => {
           console.error('SDK: setModbusDevicePairings error: ', error.message);

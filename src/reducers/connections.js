@@ -1,14 +1,13 @@
 // @flow
 
-// This actionreducer uses internally https://github.com/mweststrate/immer, so it's safe to modify given state directly
-import { createSlice } from 'redux-starter-kit';
+import { createSlice, createSelector, createEntityAdapter } from '@reduxjs/toolkit';
 import { CLOUD_CONNECTION_STATES } from '../connection/constants';
 // import type { CLOUD_CONNECTION_STATE_TYPE } from '../connection/constants';
 
 
 /**
  * Connections action creators object
- * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
+ * @see  https://github.com/reduxjs/@reduxjs/toolkit/blob/master/docs/api/createSlice.md
  * @return { {
  *   slice : string,
  *   reducer : ReducerFunction,
@@ -17,7 +16,7 @@ import { CLOUD_CONNECTION_STATES } from '../connection/constants';
  *   }}
  */
 export const connectionsState = createSlice({
-  slice: 'connections',
+  name: 'connections',
   initialState: {
     cloudState: CLOUD_CONNECTION_STATES.UNCONNECTED,
   },
@@ -43,6 +42,20 @@ export const connectionsState = createSlice({
   },
 });
 
+const adapter = createEntityAdapter();
+export const {
+  selectById: selectConnectionById,
+  selectIds: selectConnectionIds,
+  selectEntities: selectConnectionEntities,
+  selectAll: selectAllConnections,
+  selectTotal: selectTotalConnections,
+} = adapter.getSelectors((state) => state.hubs);
+
+connectionsState.selectors = adapter.getSelectors((state) => state.connections);
+connectionsState.selectors.getConnections = createSelector(
+  [(state) => state.connections],
+  (connections) => connections,
+);
 
 const { actions, reducer } = connectionsState;
 /**

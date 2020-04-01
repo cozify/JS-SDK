@@ -1,5 +1,5 @@
 /** @test {connections} */
-// import { configureStore } from 'redux-starter-kit';
+// import { configureStore } from '@reduxjs/toolkit';
 // import deepFreeze from 'deep-freeze';
 import { CLOUD_CONNECTION_STATES } from '../connection/constants';
 
@@ -16,7 +16,7 @@ describe('Pure connectionsReducer', () => {
 
 
 describe('Store connectionsReducer', () => {
-  it('sinitial value is correct', () => {
+  it('initial value is correct', () => {
     const stateNow = store.getState();
     const storedConnection = connectionsState.selectors.getConnections(stateNow);
 

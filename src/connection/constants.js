@@ -96,10 +96,13 @@ export const COMMANDS = Object.freeze({
   ZWAVE_INCLUSION_STATUS: { method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'GET_ZWAVE_INCLUSION_STATUS' },
   ZWAVE_EXCLUSION_STATUS: { method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'GET_ZWAVE_EXCLUSION_STATUS' },
   ZWAVE_HEAL: { method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'ZWAVE_HEAL' },
-  CMD_GET_PLANS: {
+  CMD_LIST_PLANS: {
     method: 'GET', url: 'plans',
   },
-  CMD_SAVE_PLANS: {
+  CMD_GET_PLAN: {
+    method: 'GET', url: 'plans',
+  },
+  CMD_SAVE_PLAN: {
     method: 'POST', url: 'plans', params: ['templates', 'installations', 'locations'],
   },
 });

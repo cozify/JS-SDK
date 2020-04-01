@@ -1,8 +1,7 @@
 
 // @flow
 
-// This actionreducer uses internally https://github.com/mweststrate/immer, so it's safe to modify given state directly
-import { createSlice } from 'redux-starter-kit';
+import { createSlice, createSelector, createEntityAdapter } from '@reduxjs/toolkit';
 import isArray from 'lodash/isArray';
 import { PLAN_NODES } from '../plans/constants';
 
@@ -73,16 +72,16 @@ const findChild = (state: NODE_MAP_TYPE, id) => {
 
 /**
  * Plans action creators object
- * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
+ * @see  https://github.com/reduxjs/@reduxjs/toolkit/blob/master/docs/api/createSlice.md
  * @return { {
- *   slice : string,
+ *   name : string,
  *   reducer : ReducerFunction,
  *   actions : Object<string, ActionCreator},
  *   selectors : Object<string, Selector>
  *   }}
  */
 export const plansState = createSlice({
-  slice: 'plans',
+  name: 'plans',
   initialState: {
     roomNames: [],
     sceneTypes: [],
@@ -430,6 +429,21 @@ export const plansState = createSlice({
   },
 });
 
+
+const adapter = createEntityAdapter();
+export const {
+  selectById: selectPlanById,
+  selectIds: selectPlanIds,
+  selectEntities: selectPlanEntities,
+  selectAll: selectAllPlans,
+  selectTotal: selectTotalPlans,
+} = adapter.getSelectors((state) => state.plans);
+
+plansState.selectors = adapter.getSelectors((state) => state.plans);
+plansState.selectors.getPlans = createSelector(
+  [(state) => state.plans],
+  (plans) => plans,
+);
 
 const { actions, reducer } = plansState;
 

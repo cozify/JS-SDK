@@ -1,5 +1,5 @@
 
-import { configureStore } from 'redux-starter-kit';
+import { configureStore } from '@reduxjs/toolkit';
 import get from 'get-value';
 import rootReducer from './reducers';
 
