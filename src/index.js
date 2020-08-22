@@ -29,7 +29,17 @@ export {
   doPoll, doRemoteIdQuery,
 } from './hubs/hubs';
 export {
-  isZwaveEnabled, doZwaveInclusion, stopZwaveInclusion, doZwaveExclusion, stopZwaveExclusion, healZwave,
+  isZwaveEnabled,
+  doZwaveInclusion,
+  stopZwaveInclusion,
+  doZwaveExclusion,
+  stopZwaveExclusion,
+  healZwave,
+  getZwaveNodes,
+  checkIsFailedZWaveNode,
+  removeFailedZWaveNode,
+  getZWaveNodeParameter,
+  setZWaveNodeParameter,
 } from './hubs/zwave';
 export {
   getModbusDevicePairings, setModbusDevicePairings,
@@ -54,8 +64,9 @@ export {
 } from './alarms/alarms';
 
 export {
-  getPlans, setPlans,
-  listPlans, savePlans, simplifyPlans,
+  fetchPlans,
+  fetchPlanDocuments,
+  simplifyPlans,
   addDeviceType, removeDeviceType,
   addSceneType, removeSceneType,
   addRuleType, removeRuleType,
@@ -63,6 +74,35 @@ export {
   addTemplate, setTemplate, removeTemplate,
   addLocationNode, setLocationNode, removeLocationNode,
 } from './plans/plans';
+
+export {
+  reactSelectAllPlans,
+  reactSubscribePlans,
+  reactFetchPlans,
+  reactInsertPlan,
+  reactUpdatePlan,
+  reactRemovePlan,
+} from './reducers/plans';
+
+export {
+  reactSelectAllDocuments,
+  reactSubscribePlanDocuments,
+  reactSelectPlanDocuments,
+  reactFetchPlanDocuments,
+  reactInsertPlanDocument,
+  reactUpdatePlanDocument,
+  reactRemovePlanDocument,
+} from './reducers/planDocuments';
+
+export {
+  reactSelectAllDocumentNodes,
+  reactSubscribePlanDocumentNodes,
+  reactSelectPlanDocumentNodes,
+  reactFetchPlanDocumentNodes,
+  reactInsertPlanDocumentNode,
+  reactUpdatePlanDocumentNode,
+  reactRemovePlanDocumentNode,
+} from './reducers/planDocumentNodes';
 
 export { PLAN_NODES } from './plans/constants';
 

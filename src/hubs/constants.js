@@ -58,6 +58,51 @@ export type MODBUS_DEVICE_PAIRING_MAP_TYPE = {[deviceId: string]: MODBUS_DEVICE_
 
 export type HUB_MODBUS_DEVICE_PAIRING_MAP_TYPE = {[hubId: string]: {[deviceId: string]: MODBUS_DEVICE_PAIRING_TYPE}}
 
+
+export type ZWAVE_NODE_TYPE = {
+  nodeId?: ?number,
+  status?: ?number,
+  ageMs?: ?number,
+  deviceId?: ?string,
+  securityKeys?: ?number,
+  basicDeviceClass?: ?number,
+  genericDeviceClass: ?number,
+  genericClassName?: ?string,
+  specificClassName?: ?string,
+  listening: boolean,
+  type?: ?string,
+};
+
+export type ZWAVE_NODE_TYPES = Array<ZWAVE_NODE_TYPE>
+export type ZWAVE_NODE_MAP_TYPE = {[deviceId: string]: ZWAVE_NODE_TYPES}
+
+export type HUB_ZWAVE_NODE_MAP_TYPE = {[hubId: string]: {[deviceId: string]: ZWAVE_NODE_TYPES}}
+
+
+export type ZWAVE_CHECK_FAILED_REPLY = {
+  nodeId?: ?number,
+  isFailed: boolean,
+  // Operation status
+  // 0x00 = Failed check succeeded
+  // 0xFF = Processing failed on hub
+  status?: ?number,
+  reason?: ?number,
+  type?: ?string,
+}
+
+export type ZWAVE_REMOVE_FAILED_REPLY = {
+  nodeId?: ?number,
+  isFailed: boolean,
+  // Remove operation status
+  // STATUS_DONE = 0x01
+  // STATUS_NODE_NOT_FOUND = 0x00    # The NodeID was not found in the controller list of failing nodes.
+  // STATUS_NODE_REMOVE_FAIL = 0x02  # The requested process failed.
+  // STATUS_FAIL = 0xFF              # Processing failed on hub.
+  status?: ?number,
+  reason?: ?number,
+  type?: ?string,
+}
+
 export type ZWAVE_INCLUSION_STATES_TYPE = {status: ZWAVE_INCLUSION_STATUS_TYPE, nodeId: string, type: string}
 export type ZWAVE_EXCLUSION_STATES_TYPE = {status: ZWAVE_EXCLUSION_STATUS_TYPE, nodeId: string, type: string}
 

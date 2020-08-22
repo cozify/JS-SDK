@@ -96,6 +96,11 @@ export const COMMANDS = Object.freeze({
   ZWAVE_INCLUSION_STATUS: { method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'GET_ZWAVE_INCLUSION_STATUS' },
   ZWAVE_EXCLUSION_STATUS: { method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'GET_ZWAVE_EXCLUSION_STATUS' },
   ZWAVE_HEAL: { method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'ZWAVE_HEAL' },
+  ZWAVE_GET_NODES: { method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'ZWAVE_GET_NODES' },
+  ZWAVE_CHECK_IS_FAILED_NODE: { method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'ZWAVE_CHECK_FAILED', params: ['nodeId'],  timeout: 30000  },
+  ZWAVE_REMOVE_FAILED_NODE: { method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'ZWAVE_REMOVE_FAILED', params: ['nodeId'], timeout: 30000  },
+  ZWAVE_GET_NODE_CONFIGURATION: { method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'ZWAVE_UI_GET_CONFIGURATION', params: ['nodeId', 'parameter'], timeout: 30000  },
+  ZWAVE_SET_NODE_CONFIGURATION: { method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'ZWAVE_UI_SET_CONFIGURATION', params: ['nodeId', 'parameter', 'size', 'default', 'value'], timeout: 30000  },
   CMD_LIST_PLANS: {
     method: 'GET', url: 'plans',
   },
