@@ -16,6 +16,16 @@
       let fixedDeviceId = 'abcd-efgh'
       let fixedDeviceName = 'Windpow'
 
+      fixedUsername = 'alpha.cozify@outlook.com'
+      fixedPassword = 'Test1234!'
+      fixedHubId = 'cd3bd9e4-7943-11e5-a567-544a168673f2'
+      fixedDeviceId = 'd5e47b95-56c6-493f-898c-635a41ad820f'
+      fixedDeviceName = 'Windpow' // Windpow
+
+      const cozifyCloudToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImRvbSI6ImlrIn0.eyJraWQiOiJmOTE4N2FkZC1mYTlhLTQ3MjQtYWViYi1lMzFlNjQxZDVjNjciLCJpc3MiOiJDbG91ZCBwYXJ0bmVyIHNlcnZpY2UiLCJpYXQiOjE1NzEzMTc2NTIsImV4cCI6MTU3MzUwNDE5NCwic2VydmljZSI6MTY3LCJzdWJfZG9tYWluIjoidWsiLCJlbnRpdHlfaWQiOiI3ZDRiYTQzMC02NjBkLTQxMjktODgwZi0wNjNiNzJlOTYwNGEifQ.E7a2xaQvVOcOhdqcMu0mrdONtPy4nH5fxDMMfXuv8Zr626bXNHGdRgGMmjd19dKHrKdbKns15QjrZ6hQ-lP7PA"
+
+      const cozifyHubKey = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImRvbSI6InZrIn0.eyJraWQiOiJjZDNiZDllNC03OTQzLTExZTUtYTU2Ny01NDRhMTY4NjczZjIiLCJpc3MiOiJDbG91ZCBwYXJ0bmVyIHNlcnZpY2UiLCJpYXQiOjE1NzEzMTc2NTMsImV4cCI6MTU3MzUwNDE5NSwiaHViX2lkIjoiY2QzYmQ5ZTQtNzk0My0xMWU1LWE1NjctNTQ0YTE2ODY3M2YyIiwiaHViX25hbWUiOiJWZXNhIHRlc3RpIiwidXNlcl9pZCI6IjdkNGJhNDMwLTY2MGQtNDEyOS04ODBmLTA2M2I3MmU5NjA0YSIsImVtYWlsIjoiMTcxMjIwMTguZm9ydHVtX2ZpbmxhbmRAY296aXBvYy5mb3J0dW0uY29tIiwibmlja25hbWUiOiIxNzEyMjAxOCIsInJvbGUiOjMyLCJvd25lciI6dHJ1ZX0.oFqXNlhyNftXqA0Lsl1KsAb-sRAIof9m458SxlCSMbDWNjo_u-BY7XF4tmKlZwsdXu1qXnwMKPhQQrfHQsZBaQ"
+
 
       //
       let LANGUAGES = CozifySDK.LANGUAGES;
@@ -42,9 +52,103 @@
 
       CozifySDK.setAuthenticated( cozifyCloudToken )
 
+      CozifySDK.watchChanges('plans', (newPlansState, oldPlansState) => {
+        console.log('plans state', newPlansState);
+        console.log('loaded docs', CozifySDK.getPlanDocuments("05bc4415-557b-4364-8a31-6ddeb8d5302f"));
+      });
+      CozifySDK.fetchPlans().then(() => {
+        console.log('plans fetched');
+      });
+      /*
+      CozifySDK.loadPlans().then((status)=>{
+        const address = {
+          data: {
+            name: 'Erottaja',
+            type: 'LOCATION'
+          },
+        };
+        try {
+          CozifySDK.addLocationNode(null, address)
+        } catch (e){
+          console.log(e)
+        }
 
+        const country = {
+          data: {
+            name: 'FI',
+            type: 'LOCATION'
+          },
+        };
+        try {
+          CozifySDK.addLocationNode(null, country)
+        } catch (e){
+          console.log(e)
+        }
+
+        const country2 = {
+          data: {
+            name: 'SWE',
+            type: 'LOCATION'
+          },
+        };
+        try {
+          CozifySDK.addLocationNode(null, country2)
+        } catch (e){
+          console.log(e)
+        }
+
+        const city1 = {
+          data: {
+            name: 'HEL',
+            type: 'LOCATION'
+          },
+        };
+        try {
+          CozifySDK.addLocationNode('root:FI', city1)
+        } catch (e){
+          console.log(e)
+        }
+
+        const country3 = {
+          id: 'root:SWE',
+          data: {
+            name: 'NOR',
+            type: 'LOCATION'
+          },
+        };
+        try {
+          CozifySDK.setLocationNode(country3)
+        } catch (e){
+          console.log(e)
+        }
+
+        try {
+          const simplyfied = CozifySDK.simplifyPlans()
+          const json = JSON.stringify(simplyfied)
+          debugger
+
+        } catch (e){
+          console.log(e)
+        }
+
+
+        try {
+          CozifySDK.removeLocationNode('root:country-2')
+        } catch (e){
+          console.log(e)
+        }
+
+
+        try {
+          CozifySDK.savePlans()
+        } catch (e){
+          console.log(e)
+        }
+      }).catch((error)=>{console.error(error)})
+      */
       // Example of use when doing one poll and scanning;
       //
+      /*
       CozifySDK.connectHubByTokens(fixedHubId, cozifyHubKey, false)
       CozifySDK.watchChanges('hubs', (newHubsState, oldHubsState) => {
         if (newHubsState[fixedHubId] && newHubsState[fixedHubId].selected && !oldHubsState[fixedHubId].selected) {
@@ -70,9 +174,11 @@
         }
 
       });
+      */
+
       /*
 
-      // Example of doing full discory and starting to poll
+       // Example of doing full discory and starting to poll
       CozifySDK.startDiscoveringHubs(fixedHubId);
 
       // POLLINGS
@@ -192,6 +298,12 @@
       });
 
 
+      // PLANS
+      let plansStateChanged = false;
+      CozifySDK.watchChanges('plans', (newPlansState, oldPlansState) => {
+        console.log("Plans ", newPlansState)
+      });
+
       /** Listener for store changes like React will internally do */
       CozifySDK.store.subscribe(() => {
         const storeNow = CozifySDK.store.getState()
@@ -200,6 +312,7 @@
         console.info("Devices:", CozifySDK.getDevices()[fixedHubId])
         console.info("Pairings:", CozifySDK.getPairingDevices()[fixedHubId])
         console.info("Rooms:", CozifySDK.getRooms()[fixedHubId])
+        console.info("Plans:", CozifySDK.getPlans())
       })
 
     </script>
