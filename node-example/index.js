@@ -8,10 +8,6 @@ let fixedPassword = 'xxx'
 let fixedHubId = 'xxxx-xxxx'
 let fixedDeviceId = 'abcd-efgh'
 
-fixedUsername = ''
-fixedPassword = ''
-fixedHubId = ''
-fixedDeviceId = ''
 
 let LANGUAGES = CozifySDK.LANGUAGES;
 let USER_STATES = CozifySDK.USER_STATES;
