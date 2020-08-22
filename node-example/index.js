@@ -8,10 +8,10 @@ let fixedPassword = 'xxx'
 let fixedHubId = 'xxxx-xxxx'
 let fixedDeviceId = 'abcd-efgh'
 
-fixedUsername = 'alpha.cozify@outlook.com'
-fixedPassword = 'Test1234!'
-fixedHubId = 'cd3bd9e4-7943-11e5-a567-544a168673f2'
-fixedDeviceId = '53d59fdc-bd8d-4231-a4a0-d6c6ee51d30e'
+fixedUsername = ''
+fixedPassword = ''
+fixedHubId = ''
+fixedDeviceId = ''
 
 let LANGUAGES = CozifySDK.LANGUAGES;
 let USER_STATES = CozifySDK.USER_STATES;
