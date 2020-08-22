@@ -1,9 +1,10 @@
-
 import { configureStore } from '@reduxjs/toolkit';
 import get from 'get-value';
 import rootReducer from './reducers';
 
 
+
+console.log('Store rootReducer: ', rootReducer);
 /**
  * store as a redux state store
  * @type {Object}

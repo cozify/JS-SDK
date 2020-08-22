@@ -1,0 +1,161 @@
+{
+  "templates": [
+    {
+      "id": 489,
+      "building": "b",
+      "stair": "s",
+      "floor": "f",
+      "area": "2",
+      "haName": "HA Name 1",
+      "haAddress": "HA Address 1",
+      "city": "c",
+      "country": "c",
+      "connectionDeliverySite": "s",
+      "areaType": "PRIVATE"
+    }
+  ],
+  "locations":{
+    1: {
+      parent: null,
+      id: 1,
+      type: 'COUNTRY',
+      value: {
+        name: 'fi',
+      },
+      nodes: {
+        2:{
+          parent: 1,
+          id: 2,
+          type: 'CITY',
+          value: {
+            name: 'Espoo',
+          },
+          nodes: {
+            3:{
+              parent: 2,
+              id: 3,
+              type: 'ADDRESS',
+              value: {
+                name: 'Merituulentie',
+              },
+              nodes: {
+                4:{
+                  parent: 3,
+                  id: 4,
+                  type: 'BUILDING',
+                  value: {
+                    name: '1',
+                  },
+                  nodes: {
+                    5:{
+                      parent: 4,
+                      id: 5,
+                      type: 'STAIR',
+                      value: {
+                        name: 'A',
+                      },
+                      nodes: {
+                        6:{
+                          parent: 5,
+                          id: 6,
+                          type: 'FLOOR',
+                          value: {
+                            name: '1',
+                          },
+                          nodes: {
+                            7:{
+                              parent: 6,
+                              id: 7,
+                              type: 'AREA',
+                              value: {
+                                name: '1',
+                              },
+                              nodes: {
+                                8:{
+                                  parent: 7,
+                                  id: 8,
+                                  type: 'TEMPLATE',
+                                  value: {
+                                    name: '1H+K',
+                                  },
+                                  nodes: {
+                                    9:{
+                                      parent: 8,
+                                      id: 9,
+                                      type: 'COZIFY_HUB',
+                                      value: {
+                                        name: 'Cozify HUB',
+                                      },
+                                      nodes: {
+                                        10:{
+                                          parent: 9,
+                                          id: 10,
+                                          type: 'ROOM',
+                                          value: {
+                                            name: 'Livingroom',
+                                          },
+                                          nodes: {
+                                            11:{
+                                              parent: 11,
+                                              id: 11,
+                                              type: 'DEVICE',
+                                              value: {
+                                                name: 'Fibaro dimmer',
+                                                installation: {
+                                                  userId: null,
+                                                  date: null,
+                                                  notes:[]
+                                                },
+                                                testing:{
+                                                  userId: null,
+                                                  date: null,
+                                                  notes:[]
+                                                },
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "plans":{
+    1: {
+      "id": 1,
+      "name": "",
+      "description": "",
+      "contractId": {
+        "id": "17122018",
+        "companyId": "Fortum Finland"
+      },
+      "location": {
+        "id": null,
+        "building": "1",
+        "stair": "B",
+        "floor": "5",
+        "area": "36",
+        "areaType": "PRIVATE",
+        "haName": "As Oy Steniuksenkumpu 1",
+        "haAddress": "Merituulentie 1",
+        "city": "Espoo",
+        "country": "Finland",
+        "connectionDeliverySite": "000000000000"
+      }
+    }
+  }
+}

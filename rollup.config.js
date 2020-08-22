@@ -8,7 +8,9 @@ import json from 'rollup-plugin-json';
 import replace from 'rollup-plugin-replace';
 import pkg from './package.json';
 
+
 export default [
+  /*
   {
     input: 'src/index.js',
     output: {
@@ -47,6 +49,7 @@ export default [
 
     ],
   },
+  */
   // Browser
   {
     input: 'src/index.js',
@@ -68,7 +71,7 @@ export default [
       }),
       flow(),
       flowEntry(),
-      resolve(),
+      resolve({browser: true}),
       commonjs(),
       babel({
         exclude: 'node_modules/**',
@@ -77,7 +80,8 @@ export default [
     ],
     external: ['axios'],
   },
-
+  /*
+  // Browser minified
   {
     input: 'src/index.js',
     output: {
@@ -97,7 +101,7 @@ export default [
       }),
       flow(),
       flowEntry(),
-      resolve(),
+      resolve({browser: true}),
       commonjs(),
       babel({
         exclude: 'node_modules/**',
@@ -107,7 +111,9 @@ export default [
     ],
     external: ['axios'],
   },
+  */
   // ES6 modules
+  /*
   {
     input: 'src/index.js',
     output: {
@@ -141,4 +147,5 @@ export default [
     ],
     external: ['axios'],
   },
+  */
 ];

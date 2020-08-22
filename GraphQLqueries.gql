@@ -1,0 +1,375 @@
+Building Real-Time Charts With GraphQL And Postgres
+https://www.smashingmagazine.com/2019/03/realtime-charts-graphql-postgres/
+
+https://www.howtographql.com/
+https://www.apollographql.com/docs
+
+https://github.com/graphql-editor/graphql-editor
+
+https://github.com/hasura/graphql-engine/blob/master/architecture/live-queries.md
+
+
+https://hasura.io/blog/postgres-json-and-jsonb-type-support-on-graphql-41f586e47536/
+
+Live query params: https://github.com/hasura/graphql-engine/issues/2735
+Live query architecture: https://github.com/hasura/graphql-engine/blob/master/architecture/live-queries.md#implementing-graphql-live-queries
+
+----
+
+Lisää relatio documentteihin: data > t_plan > Relationship
+
+documents:
+t_plan_document . plan_id  → t_plan . uid
+
+Ja toiseen suuntaan: t_plan_document >  Relationships
+plan:
+t_plan_document . plan_id  → t_plan . uid
+
+Ja vielä t_plan_document_nodes
+
+
+----
+query ListPlans {
+  t_plan {
+    name
+    created_at
+    changed_at
+    documents {
+      nodes {
+        changed_at
+        created_at
+        data
+      }
+      changed_at
+      created_at
+    }
+    uid
+  }
+}
+
+----
+
+query ListDocuments {
+  t_plan_document {
+    created_at
+    changed_at
+    plan {
+      changed_at
+      created_at
+      name
+    }
+    uid
+  }
+}
+
+----
+
+query ListDocuments($plan_id: String) {
+  t_plan_document(where: {plan_id: {_eq: $plan_id}}) {
+    uid
+    created_at
+    changed_at
+    plan_id
+  }
+}
+
+--
+
+{
+  "plan_id": "05bc4415-557b-4364-8a31-6ddeb8d5302f"
+}
+
+----
+
+mutation InsertSinglePlan($object: t_plan_insert_input!) {
+  insert_t_plan_one(object: $object) {
+    changed_at
+    created_at
+    uid
+  }
+}
+
+-
+
+{
+  "object": {
+    "name": "uusi"
+  }
+}
+
+
+
+----
+
+
+
+mutation UpdatePlanName($uid: String, $changes: t_plan_set_input) {
+  update_t_plan(where: {uid: {_eq: $uid}}, _set: $changes) {
+    affected_rows
+    returning {
+      uid
+      name
+      created_at
+      changed_at
+    }
+  }
+}
+
+-
+
+{
+  "uid": "1ff1578e-5f0e-433e-9f2b-6784dd78df9a",
+  "changes": {
+    "name": "lorem ipsum"
+}
+
+
+----
+
+mutation InsertPlanWithDocumentNode($object: t_plan_insert_input!) {
+  insert_t_plan_one(object: $object) {
+    changed_at
+    created_at
+    uid
+    documents {
+      uid
+      changed_at
+      created_at
+      nodes {
+        changed_at
+        created_at
+        data
+      }
+    }
+  }
+}
+
+-
+
+{
+  "object": {
+    "name": "uusi",
+    "documents": {
+      "data": [
+        {
+          "nodes": {
+            "data": [
+              {
+                "data": {
+                  "rooms": [
+                  "$LIVINGROOM"
+                ],
+                "devices": [],
+                "rules": [],
+                "scenes": [],
+                "type": "HUB",
+                "name": "HUB 123"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
+
+----
+
+mutation InsertDocumentToPlan($object: t_plan_document_insert_input!) {
+  insert_t_plan_document_one(object: $object) {
+    uid
+    changed_at
+    created_at
+    nodes {
+      changed_at
+      created_at
+      data
+    }
+  }
+}
+
+
+-
+
+{
+  "object": {
+    "plan_id": "437e1688-1ec7-4472-9009-615f44e706ef",
+    "nodes": {
+      "data": [
+        {
+          "data": {
+            "rooms": [
+            "$LIVINGROOM"
+          ],
+          "devices": [],
+          "rules": [],
+          "scenes": [],
+          "type": "HUB",
+          "name": "HUB 123"
+          }
+        }
+      ]
+    }
+  }
+}
+
+
+----
+mutation InsertNode($object: t_plan_document_node_insert_input!) {
+  insert_t_plan_document_node_one(object: $object) {
+    data
+  }
+}
+
+-
+alinode
+{
+  "object": {
+    "document_id": "d39e6ddc-6220-4c20-8c7d-9d01e65192de",
+    "parent_id": "0d62e0bc-1c29-4cb9-bc79-a39a9b59768f",
+    "data": {
+      "type": "TEST0.1"
+    }
+  }
+}
+
+päätason
+{
+  "object": {
+    "document_id": "d39e6ddc-6220-4c20-8c7d-9d01e65192de",
+    "parent_id": null,
+    "data": {
+      "type": "TEST2"
+    }
+  }
+}
+
+
+
+---
+mutation DeleteDocumentAndAllNodes($uid: String!) {
+  delete_t_plan_document_node(where: {document_id: {_eq: $uid}}) {
+    affected_rows
+  }
+  delete_t_plan_document(where: {uid: {_eq: $uid}}){
+    affected_rows
+  }
+}
+
+
+-
+
+{
+  "uid": "a16a4fc9-7467-416f-a83c-f73ff545f404"
+}
+
+
+---
+mutation DeletePlan($uid: String!) {
+  delete_t_plan_by_pk(uid: $uid) {
+    name
+  }
+}
+
+-
+
+{
+  "uid": "fa5111ef-8075-454c-add2-6df4354e7731"
+}
+
+
+
+----
+
+mutation UpdateDocument($room_types: jsonb, $rule_types: jsonb, $uid: String) {
+  update_t_plan_document(where: {uid: {_eq: $uid}}, _set: {room_types: $room_types, rule_types: $rule_types}) {
+    affected_rows
+    returning {
+      uid
+      room_types
+      rule_types
+      scene_types
+      template_types
+      device_types
+    }
+  }
+}
+
+-
+
+{
+    "room_types": [
+      "$LIVINGROOM",
+      "$BEDROOM"
+  ],
+  "rule_types": [
+    "Automate lights",
+    "Turn device off"
+  ],
+  "uid": "348c88ab-ece8-4b30-9c9b-7ba925473660"
+}
+
+
+---
+
+
+mutation UpdateDocumentNode($uid: String, $changes: t_plan_document_node_set_input) {
+  update_t_plan_document_node(where: {uid: {_eq: $uid}}, _set: $changes) {
+    returning {
+      data
+      changed_at
+      created_at
+    }
+    affected_rows
+  }
+}
+
+
+-
+
+{
+  "uid": "e1727bae-cd29-4a77-8234-a6528fda48fc",
+  "changes": {
+    "data": {
+      "name": "HUB 2.0"
+    }
+  }
+}
+
+----
+
+
+----
+
+mutation DeletePlanDocumentNode($uid: String!) {
+  delete_t_plan_document_node_by_pk(uid: $uid) {
+    uid
+  }
+}
+
+-
+
+{
+  "uid": "e1727bae-cd29-4a77-8234-a6528fda48fc"
+}
+
+----
+
+----
+-
+----
+
+HUOM! cloud databasessa:
+
+Kun update sqlalchemyssä:
+DROP TABLE t_plan_document CASCADE; DROP TABLE t_plan CASCADE;
+
+Kun update tietokannassa:
+GRANT ALL ON ALL TABLES IN SCHEMA public TO hasura;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO hasura;
+
+Jos mikään ei auta, niin:
+DROP SCHEMA hdb_views;
+DROP SCHEMA hdb_catalog CASCADE;
+

@@ -5,7 +5,9 @@ import { devicesReducer } from './devices';
 import { hubsReducer } from './hubs';
 import { userReducer } from './user';
 import { roomsReducer } from './rooms';
-import { plansReducer } from './plans';
+import { plansReducer } from './plans'
+import { planDocumentsReducer } from './planDocuments'
+import { planDocumentNodesReducer } from './planDocumentNodes'
 
 /**
  * Root reducer
@@ -20,6 +22,8 @@ const rootReducer = {
   user: userReducer,
   rooms: roomsReducer,
   plans: plansReducer,
+  documents: planDocumentsReducer,
+  nodes: planDocumentNodesReducer,
 };
 
 export default rootReducer;

@@ -4,12 +4,107 @@
 // import pick from 'lodash/pick';
 import { store } from '../store';
 import { userState } from '../reducers/user';
-import { plansState } from '../reducers/plans';
-import type { TEMPLATE_TYPE, NODE_TYPE, PLANS_TYPE } from './constants';
+import { plansState, reactFetchPlans } from '../reducers/plans';
+import { planDocumentsState, reactFetchPlanDocuments } from '../reducers/planDocuments';
+import type { TEMPLATE_TYPE, NODE_TYPE, PLAN_TYPE, PLANS_TYPE } from './constants';
 import { send, COMMANDS } from '../connection/send';
+import isEmpty from 'lodash/isEmpty';
+// import uuid from 'uuid'
 
+
+export async function fetchPlans() {
+  return new Promise((resolve, reject) => {
+    try{
+      store.dispatch(reactFetchPlans());
+      const stateNow = store.getState();
+      resolve(getPlans());
+    } catch (e) {
+      reject(error);
+    }
+  });
+}
+
+export async function fetchPlanDocuments(planId) {
+  return new Promise((resolve, reject) => {
+    try{
+      store.dispatch(reactFetchDocuments(planId));
+      const stateNow = store.getState();
+      resolve(getPlanDocuments());
+    } catch (e) {
+      reject(error);
+    }
+  });
+}
+export async function insertPlan(): Promise<PLANS_TYPE> {
+  return new Promise((resolve, reject) => {
+
+    client.mutate({
+      variables: {
+        "object": {
+          "name": "uusi",
+          "documents": {
+            "data": [
+              {
+                "nodes": {
+                  "data": [
+                    {
+                      "data": {
+                        "rooms": [
+                          "$LIVINGROOM"
+                        ],
+                        "devices": [],
+                        "rules": [],
+                        "scenes": [],
+                        "type": "HUB",
+                        "name": "HUB 123"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      },
+      mutation: INSERT_PLAN
+    })
+    .then((result) => {
+        debugger;
+        console.log(result.data.insert_t_plan_one)
+        resolve(getPlanDocuments());
+      }).catch((error) => {
+        debugger;
+        console.error('SDK listPlans error:', error);
+        reject(error);
+      });
+  });
+}
 // const plansUrl = "http://localhost:3001/plans"
-const plansUrl = 'https://localhost:8449/cc/0.1/partner/plans';
+// const plansUrl = 'https://localhost:8449/cc/0.1/partner/plans';
+
+
+export function getPlans(): PLANS_TYPE {
+  const stateNow = store.getState();
+  return plansState.selectors.getPlans(stateNow);
+}
+export function setPlans(plans: PLANS_TYPE) {
+  store.dispatch(plansState.actions.setPlansState(plans));
+}
+
+export function getPlanDocuments(planId): PLANS_TYPE {
+  const stateNow = store.getState();
+  // const array = planDocumentsState.selectors.selectAll(stateNow);
+  // const entities = planDocumentsState.selectors.selectEntities(stateNow);
+  // const id = planDocumentsState.selectors.selectById(stateNow, "d39e6ddc-6220-4c20-8c7d-9d01e65192de");
+  // const idsAndEntities = planDocumentsState.selectors.getDocuments(stateNow);
+  debugger;
+  return planDocumentsState.selectors.selectByPlanId(stateNow, planId);
+}
+export function setPlanDocuments(plans: PLANS_TYPE) {
+  store.dispatch(planDocumentsState.actions.setPlanDocumentsState(plans));
+}
+
+
 
 export function addRoomName(newName: string) {
   store.dispatch(plansState.actions.addRoomName(newName));
@@ -55,22 +150,6 @@ export function removeTemplate(template: TEMPLATE_TYPE) {
   store.dispatch(plansState.actions.removeTemplate(template));
 }
 
-/**
- * Set plans
- * @return {PLANS_TYPE}
- */
-export function setPlans(plans: PLANS_TYPE) {
-  store.dispatch(plansState.actions.setPlansState(plans));
-}
-
-/**
- * Get plans
- * @return {PLANS_TYPE}
- */
-export function getPlans(): PLANS_TYPE {
-  const stateNow = store.getState();
-  return plansState.selectors.getPlans(stateNow);
-}
 
 export function addLocationNode(parentId: string, newNode: NODE_TYPE) {
   store.dispatch(plansState.actions.addLocationNode({ parentId, newNode }));
@@ -84,77 +163,6 @@ export function removeLocationNode(nodeId: string) {
   store.dispatch(plansState.actions.removeLocationNode(nodeId));
 }
 
-/**
- * List plans
- * @return {PLANS_TYPE}
- */
-export async function listPlans(): Promise<PLANS_TYPE> {
-  return new Promise((resolve, reject) => {
-    const stateNow = store.getState();
-    const user = userState.selectors.getUser(stateNow);
-    if (!user || !user.authKey) {
-      console.error('SDK listPlans error: No userKey!');
-      reject(new Error('List plans error: No userKey!'));
-      return;
-    }
-    const { authKey } = user;
-    if (!authKey) {
-      console.error('SDK listPlans error: No authKey!');
-      reject(new Error('List plans error: No authKey!'));
-      return;
-    }
-
-    send({
-      command: COMMANDS.CMD_LIST_PLANS, authKey, url: plansUrl,
-    })
-      .then((plans) => {
-        console.debug('SDK listPlans ok', plans);
-        setPlans(plans);
-        resolve(getPlans());
-      })
-      .catch((error) => {
-        console.error('SDK listPlans error:', error);
-        reject(error);
-      });
-  });
-}
-
-
-/**
- * Load plan
- * @return {PLANS_TYPE}
-
-export async function loadPlans(): Promise<PLANS_TYPE> {
-  return new Promise((resolve, reject) => {
-    const stateNow = store.getState();
-    const user = userState.selectors.getUser(stateNow);
-    if (!user || !user.authKey) {
-      console.error('SDK loadPlans error: No userKey!');
-      reject(new Error('Load plans error: No userKey!'));
-      return;
-    }
-    const { authKey } = user;
-    if (!authKey) {
-      console.error('SDK loadPlans error: No authKey!');
-      reject(new Error('Load plans error: No authKey!'));
-      return;
-    }
-
-    send({
-      command: COMMANDS.CMD_GET_PLAN, authKey, url: plansUrl,
-    })
-      .then((plans) => {
-        console.debug('SDK loadPlans ok', plans);
-        setPlans(plans);
-        resolve(getPlans());
-      })
-      .catch((error) => {
-        console.error('SDK loadPlans error:', error);
-        reject(error);
-      });
-  });
-}
-*/
 
 export function simplifyPlans(): Object {
   const nodes = getPlans();
@@ -194,6 +202,7 @@ export function simplifyPlans(): Object {
  * Save plans
  * @return {PLANS_TYPE}
  */
+/*
 export async function savePlans(): Promise<PLANS_TYPE> {
   return new Promise((resolve, reject) => {
     const stateNow = store.getState();
@@ -235,4 +244,4 @@ export async function savePlans(): Promise<PLANS_TYPE> {
         reject(error);
       });
   });
-}
+} */

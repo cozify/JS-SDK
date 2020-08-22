@@ -2,8 +2,7 @@
   "plans": {
     "sceneTypes": [
       "$HOME",
-      "$AWAY",
-      "$NIGHT"
+      "$AWAY"
     ],
     "deviceTypes": [
       "Fibaro dimmer",
@@ -15,108 +14,34 @@
     ],
     "roomNames": [
       "$LIVINGROOM",
-      "$BEDROOM"
+      "$BEDROOM",
+      "$TOILET"
     ],
     "templates": {
-      "TEMPLATE:1H+K": {
-        "id": "TEMPLATE:1H+K",
+      "TEMPLATE:1": {
+        "id": "TEMPLATE:1",
         "data": {
           "type": "TEMPLATE",
           "rooms": [
             "$LIVINGROOM"
           ],
-          "devices": [],
-          "rules": [],
-          "scenes": [],
-          "name": "1H + K",
           "deviceTypes": [
             "Fibaro dimmer"
           ],
-          "sceneTypes": [
-            "$HOME",
-            "$AWAY"
-          ],
           "ruleTypes": [
-            "Automate lights",
-            "Turn device off"
-          ]
+            "Automate lights"
+          ],
+          "sceneTypes": [
+            "$HOME"
+          ],
+          "name": "1"
         }
       }
     },
     "locations": {
       "root": {
         "id": "root",
-        "childIds": [
-          "root:FI"
-        ]
-      },
-      "root:FI": {
-        "data": {
-          "name": "FI",
-          "type": "LOCATION"
-        },
-        "id": "root:FI",
-        "childIds": [
-          "root:FI:STENIUKSENKUMPU1"
-        ]
-      },
-      "root:FI:STENIUKSENKUMPU1": {
-        "data": {
-          "type": "LOCATION",
-          "name": "STENIUKSENKUMPU 1"
-        },
-        "id": "root:FI:STENIUKSENKUMPU1",
-        "childIds": [
-          "root:FI:STENIUKSENKUMPU1:A1",
-          "root:FI:STENIUKSENKUMPU1:A3",
-          "root:FI:STENIUKSENKUMPU1:A2"
-        ]
-      },
-      "root:FI:STENIUKSENKUMPU1:A1": {
-        "data": {
-          "type": "LOCATION",
-          "name": "A1"
-        },
-        "id": "root:FI:STENIUKSENKUMPU1:A1",
         "childIds": []
-      },
-      "root:FI:STENIUKSENKUMPU1:A3": {
-        "data": {
-          "type": "LOCATION",
-          "name": "A3"
-        },
-        "id": "root:FI:STENIUKSENKUMPU1:A3",
-        "childIds": []
-      },
-      "root:FI:STENIUKSENKUMPU1:A2:HUB123": {
-        "data": {
-          "rooms": [
-            "$LIVINGROOM"
-          ],
-          "devices": [
-            "Fibaro dimmer"
-          ],
-          "rules": [
-            "Turn device off"
-          ],
-          "scenes": [
-            "$HOME"
-          ],
-          "type": "HUB",
-          "name": "HUB 123"
-        },
-        "id": "root:FI:STENIUKSENKUMPU1:A2:HUB123",
-        "childIds": []
-      },
-      "root:FI:STENIUKSENKUMPU1:A2": {
-        "data": {
-          "type": "LOCATION",
-          "name": "A2"
-        },
-        "id": "root:FI:STENIUKSENKUMPU1:A2",
-        "childIds": [
-          "root:FI:STENIUKSENKUMPU1:A2:HUB123"
-        ]
       }
     }
   }
