@@ -61,6 +61,10 @@ export type HUB_MODBUS_DEVICE_PAIRING_MAP_TYPE = {[hubId: string]: {[deviceId: s
 
 export type ZWAVE_NODE_TYPE = {
   nodeId?: ?number,
+  // Status of the node
+  // 0x00 STATUS_OK               The requested NodeID could be found and up-to-date information is returned.
+  // 0x01 STATUS_NOT_RESPONDING   The requested NodeID could be found but fresh information could not be retrieved.
+  // 0x02 STATUS_UNKNOWN          The NodeID is unknown.
   status?: ?number,
   ageMs?: ?number,
   deviceId?: ?string,
@@ -86,7 +90,7 @@ export type ZWAVE_CHECK_FAILED_REPLY = {
   // 0x00 = Failed check succeeded
   // 0xFF = Processing failed on hub
   status?: ?number,
-  reason?: ?number,
+  reason?: ?string,
   type?: ?string,
 }
 
@@ -99,9 +103,42 @@ export type ZWAVE_REMOVE_FAILED_REPLY = {
   // STATUS_NODE_REMOVE_FAIL = 0x02  # The requested process failed.
   // STATUS_FAIL = 0xFF              # Processing failed on hub.
   status?: ?number,
-  reason?: ?number,
+  reason?: ?string,
   type?: ?string,
 }
+
+export type ZWAVE_PARAM_GET_REPLY = {
+  nodeId?: ?number,
+  parameter?: ?number,
+  size?: ?number,
+  value?: ?number,
+  // Get param operation status
+  // 0x00 = Configuration Get succeeded
+  // 0x01 = Configuration Get timed out
+  // 0x02 = Configuration not supported by device
+  // 0xFF = Processing failed on hub
+  status?: ?number,
+  reason?: ?string,
+  type?: ?string,
+}
+
+export type ZWAVE_PARAM_SET_REPLY = {
+  nodeId?: ?number,
+  parameter?: ?number,
+  size?: ?number,
+  value?: ?number,
+  // Set param operation status
+  // 0x00 = Configuration Set sent to device.
+  // Device does not necessarily accept the configuration.
+  // 0x01 = Configuration Set timed out
+  // 0x02 = Configuration not supported by device
+  // 0x03 = Hub is currently setting this parameter value. No parallel settings allowed.
+  // 0xFF = Processing failed on hub
+  status?: ?number,
+  reason?: ?string,
+  type?: ?string,
+}
+
 
 export type ZWAVE_INCLUSION_STATES_TYPE = {status: ZWAVE_INCLUSION_STATUS_TYPE, nodeId: string, type: string}
 export type ZWAVE_EXCLUSION_STATES_TYPE = {status: ZWAVE_EXCLUSION_STATUS_TYPE, nodeId: string, type: string}

@@ -264,7 +264,7 @@ function makeHubsMap(tokens: HUB_KEYS_TYPE, doCloudDicovery: boolean = true, doS
 /*
  * Fetch Hub keys by user authKey and start fetching hub meta datas
  */
-function fetchHubs(): Promise<Object> {
+export function fetchHubs(): Promise<Object> {
   const { authKey } = storedUser();
   return new Promise((resolve, reject) => {
     if (!authKey) {

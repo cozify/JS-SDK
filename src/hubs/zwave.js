@@ -12,7 +12,12 @@ import { hubsState } from '../reducers/hubs';
 import { userState } from '../reducers/user';
 
 import type {
-  HUB_TYPE, HUBS_MAP_TYPE, ZWAVE_INCLUSION_STATUS_TYPE, ZWAVE_INCLUSION_STATES_TYPE, ZWAVE_EXCLUSION_STATUS_TYPE, ZWAVE_EXCLUSION_STATES_TYPE, ZWAVE_NODE_TYPES
+  HUB_TYPE, HUBS_MAP_TYPE,
+  ZWAVE_INCLUSION_STATUS_TYPE, ZWAVE_INCLUSION_STATES_TYPE,
+  ZWAVE_EXCLUSION_STATUS_TYPE, ZWAVE_EXCLUSION_STATES_TYPE,
+  ZWAVE_NODE_TYPES,
+  ZWAVE_CHECK_FAILED_REPLY, ZWAVE_REMOVE_FAILED_REPLY,
+  ZWAVE_PARAM_GET_REPLY, ZWAVE_PARAM_SET_REPLY,
 } from './constants';
 
 
@@ -599,6 +604,7 @@ export async function getZwaveNodes(hubId: string): Promise<Object> {
 /**
  * Get Z-Wave nodes
  * @param {string} hubId
+ * @param {string} nodeId
  * @return {Promise} that resolves node list when done
  */
 export async function checkIsFailedZWaveNode(hubId: string, nodeId: string): Promise<Object> {
@@ -619,8 +625,19 @@ export async function checkIsFailedZWaveNode(hubId: string, nodeId: string): Pro
     })
       .then((data: ZWAVE_CHECK_FAILED_REPLY) => {
         console.debug('SDK: checkIsFailedZWaveNode: Ok , data: ', data);
-        nodesInAction[hubId] = false;
-        resolve(data);
+        if (data && data.status === 0) {
+          nodesInAction[hubId] = false;
+          if (data.isFailed){
+            resolve(true);
+          } else {
+            resolve(false);
+          }
+
+        } else {
+          console.error('SDK: checkIsFailedZWaveNode error: ', data ? data.status : 'unknown');
+          nodesInAction[hubId] = false;
+          reject(data.status);
+        }
       })
       .catch((error) => {
         debugger
@@ -635,6 +652,7 @@ export async function checkIsFailedZWaveNode(hubId: string, nodeId: string): Pro
 /**
  * Get Z-Wave nodes
  * @param {string} hubId
+ * @param {string} nodeId
  * @return {Promise} that resolves node list when done
  */
 export async function removeFailedZWaveNode(hubId: string, nodeId: string): Promise<Object> {
@@ -655,8 +673,14 @@ export async function removeFailedZWaveNode(hubId: string, nodeId: string): Prom
     })
       .then((data: ZWAVE_REMOVE_FAILED_REPLY) => {
         console.debug('SDK: removeFailedZWaveNode: Ok , data: ', data);
-        nodesInAction[hubId] = false;
-        resolve(data);
+        if (data && data.status === 1) {
+          nodesInAction[hubId] = false;
+          resolve(true);
+        } else {
+          console.error('SDK: removeFailedZWaveNode error: ', data ? data.status : 'unknown');
+          nodesInAction[hubId] = false;
+          reject(data.status);
+        }
       })
       .catch((error) => {
         debugger
@@ -690,15 +714,22 @@ export async function getZWaveNodeParameter(hubId: string, nodeId: string, param
     send({
       command: COMMANDS.ZWAVE_GET_NODE_CONFIGURATION, hubId, authKey, hubKey, localUrl: hub.url, data: [{nodeId: nodeId, parameter: parameter}],
     })
-      .then((data: ZWAVE_REMOVE_FAILED_REPLY) => {
-        console.debug('SDK: getZWaveNodeParameter: Ok , data: ', data);
-        nodesInAction[hubId] = false;
-        resolve(data);
+      .then((data: ZWAVE_PARAM_GET_REPLY) => {
+        if (data && data.status === 0){
+          console.debug('SDK: getZWaveNodeParameter: Ok , data: ', data);
+          //nodesInAction[hubId] = false;
+          resolve(data);
+        } else{
+          debugger
+          console.error('SDK: getZWaveNodeParameter error: ', data ? data.status : 'unknown');
+          //nodesInAction[hubId] = false;
+          reject(null);
+        }
       })
       .catch((error) => {
         debugger
         console.error('SDK: getZWaveNodeParameter error: ', error.message);
-        nodesInAction[hubId] = false;
+        //nodesInAction[hubId] = false;
         reject(error);
       });
   });
@@ -734,15 +765,24 @@ export async function setZWaveNodeParameter(hubId: string, nodeId: string, param
     send({
       command: COMMANDS.ZWAVE_SET_NODE_CONFIGURATION, hubId, authKey, hubKey, localUrl: hub.url, data: [{nodeId: nodeId, parameter: parameter, size: size, default: def, value: value}],
     })
-      .then((data: ZWAVE_REMOVE_FAILED_REPLY) => {
-        console.debug('SDK: setZWaveNodeParameter: Ok , data: ', data);
-        nodesInAction[hubId] = false;
+      .then((data: ZWAVE_PARAM_SET_REPLY) => {
+        if (data && data.status === 0){
+          console.debug('SDK: setZWaveNodeParameter: Ok , data: ', data);
+          //nodesInAction[hubId] = false;
+          resolve(data);
+        } else{
+          debugger
+          console.error('SDK: setZWaveNodeParameter error: ', data ? data.status : 'unknown');
+          //nodesInAction[hubId] = false;
+          reject(null);
+        }
+        //nodesInAction[hubId] = false;
         resolve(data);
       })
       .catch((error) => {
         debugger
         console.error('SDK: setZWaveNodeParameter error: ', error.message);
-        nodesInAction[hubId] = false;
+        //nodesInAction[hubId] = false;
         reject(error);
       });
   });

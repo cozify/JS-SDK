@@ -21,6 +21,7 @@ export {
 } from './user/user';
 
 export {
+  fetchHubs,
   getHubs, selectHubById, unSelectHubById, unSelectHubs, connectHubByTokens,
   lockAndBackup,
   startDiscoveringHubs, stopDiscoveringHubs,
