@@ -12,6 +12,8 @@ const qqlSubscriptionClient = new SubscriptionClient('ws://localhost:8080/v1/gra
 });
 */
 
+/* 
+Commented out as graphql not used 
 const httpLink = new HttpLink({
   uri: 'http://localhost:8080/v1/graphql'
 });
@@ -75,6 +77,16 @@ export const { normalize } = new GraphQLNormalizr(
       t_plan_document_node: 'nodes',
     }
 });
+*/
+
+// Fake client
+export const qqlClient = {
+  query: () => {},
+  subscribe: () => {},
+  mutate: () => {}
+}
+export const { normalize } =  () => {};
+export const isAuth = (state) => {};
 
 
 export const GET_PLAN_DOCUMENTs_AND_NODES = gql`
@@ -219,23 +231,23 @@ export const INSERT_PLAN_DOCUMENT = gql`
   }
 `;
 
-/*
-export const UPDATE_PLAN_DOCUMENT = gql`
-  mutation UpdateDocument($room_types: jsonb, $rule_types: jsonb, $uid: String) {
-    update_t_plan_document(where: {uid: {_eq: $uid}}, _set: {room_types: $room_types, rule_types: $rule_types}) {
-      affected_rows
-      returning {
-        uid
-        room_types
-        rule_types
-        scene_types
-        template_types
-        device_types
-      }
-    }
-  }
-`;
-*/
+// 
+// export const UPDATE_PLAN_DOCUMENT = gql`
+//   mutation UpdateDocument($room_types: jsonb, $rule_types: jsonb, $uid: String) {
+//     update_t_plan_document(where: {uid: {_eq: $uid}}, _set: {room_types: $room_types, rule_types: $rule_types}) {
+//       affected_rows
+//       returning {
+//         uid
+//         room_types
+//         rule_types
+//         scene_types
+//         template_types
+//         device_types
+//       }
+//     }
+//   }
+// `;
+// 
 export const UPDATE_PLAN_DOCUMENT = gql`
   mutation UpdatePlanDocument($uid: String, $changes: t_plan_document_set_input) {
     update_t_plan_document(where: {uid: {_eq: $uid}}, _set: $changes) {
@@ -305,18 +317,18 @@ export const INSERT_PLAN_DOCUMENT_NODE = gql`
 `;
 
 
-/*
-export const UPDATE_PLAN_DOCUMENT_NODE = gql`
-  mutation UpdateDocument($room_types: jsonb, $rule_types: jsonb, $uid: String) {
-    update_t_plan_document_node(where: {uid: {_eq: $uid}}, _set: {room_types: $room_types, rule_types: $rule_types}) {
-      affected_rows
-      returning {
-        uid
-      }
-    }
-  }
-`;
-*/
+
+// export const UPDATE_PLAN_DOCUMENT_NODE = gql`
+//   mutation UpdateDocument($room_types: jsonb, $rule_types: jsonb, $uid: String) {
+//     update_t_plan_document_node(where: {uid: {_eq: $uid}}, _set: {room_types: $room_types, rule_types: $rule_types}) {
+//       affected_rows
+//       returning {
+//         uid
+//       }
+//     }
+//   }
+// `;
+
 export const UPDATE_PLAN_DOCUMENT_NODE = gql`
   mutation UpdateDocumentNode($uid: String, $changes: t_plan_document_node_set_input) {
     update_t_plan_document_node(where: {uid: {_eq: $uid}}, _set: $changes) {
