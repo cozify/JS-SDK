@@ -28,22 +28,30 @@ function extractHubInfo(HUBKeys: HUB_KEYS_TYPE): HUBS_MAP_TYPE {
   const hubs: HUBS_MAP_TYPE = {};
   if (HUBKeys) {
     Object.keys(HUBKeys).forEach((hubKey) => {
-      const coded = HUBKeys[hubKey].split('.')[1];
-      const decoded = urlBase64Decode(coded);
-      const payload = JSON.parse(decoded);
-      const info = {};
-      info.id = payload.hubId || payload.hub_id;
-      info.name = payload.hubName || payload.hub_name;
-      info.hubKey = HUBKeys[hubKey];
-      info.connectionState = HUB_CONNECTION_STATES.UNCONNECTED;
-      if (payload.role) {
-        info.role = payload.role;
-        info.roleString = '';
-        Object.keys(ROLES).forEach((roleKey) => {
-          if (ROLES[roleKey] === info.role) info.roleString = roleKey;
-        });
+      if (HUBKeys[hubKey]){
+        const coded = HUBKeys[hubKey].split('.')[1];
+        const decoded = urlBase64Decode(coded);
+        const payload = JSON.parse(decoded);
+        const info = {};
+        info.id = payload.hubId || payload.hub_id;
+        info.name = payload.hubName || payload.hub_name;
+        info.hubKey = HUBKeys[hubKey];
+        info.connectionState = HUB_CONNECTION_STATES.UNCONNECTED;
+        if (payload.role) {
+          info.role = payload.role;
+          info.roleString = '';
+          Object.keys(ROLES).forEach((roleKey) => {
+            if (ROLES[roleKey] === info.role) info.roleString = roleKey;
+          });
+        }
+        hubs[info.id] = info;
+      } else {
+        hubs[hubKey] = {
+          id: hubKey,
+          connectionState: HUB_CONNECTION_STATES.UNCONNECTED,
+        };
       }
-      hubs[info.id] = info;
+
     });
   }
   return hubs;
@@ -95,7 +103,7 @@ export function lockAndBackup(hubId: string, authKey: string, hubKey: string): P
         resolve(status);
       })
       .catch((error) => {
-        console.log(`doRemoteIdQuery ${hubId} error `, error.message);
+        console.log(`lockAndBackup ${hubId} error `, error.message);
         reject(error);
       });
   });
@@ -202,9 +210,9 @@ function fetchCloudMetaData(hubs: HUBS_MAP_TYPE, authKey: string): Promise<Objec
   return new Promise((resolve) => {
     const queries = [];
     (Object.values(hubs): any).forEach((hub: HUB_TYPE) => {
-      if (hub.hubKey) {
-        queries.push(doRemoteIdQuery(hub.id, authKey, hub.hubKey));
-      }
+      // if (hub.hubKey) {
+      queries.push(doRemoteIdQuery(hub.id, authKey, hub.hubKey));
+      //}
     });
     sendAll(queries)
       .then((values) => {
@@ -230,7 +238,7 @@ function storedUser(): Object {
 /*
  * Make hubsMap by fetching hub meta data from cloud and local
  */
-function makeHubsMap(tokens: HUB_KEYS_TYPE, doCloudDicovery: boolean = true, doSynchnonously: boolean = false): Promise<Object> {
+function makeHubsMap(tokens: HUB_KEYS_TYPE, doCloudDiscovery: boolean = true, doSynchnonously: boolean = false): Promise<Object> {
   const { authKey } = storedUser();
   return new Promise((resolve) => {
     hubsMap = extractHubInfo(tokens);
@@ -240,7 +248,7 @@ function makeHubsMap(tokens: HUB_KEYS_TYPE, doCloudDicovery: boolean = true, doS
         // Hubs map may be changed during fetching cloud metadata
         store.dispatch(hubsState.actions.updateHubs(hubsMap));
         if (doSynchnonously) {
-          if (doCloudDicovery) {
+          if (doCloudDiscovery) {
             doCloudDiscovery()
               .then(() => {
                 resolve(getHubs());
@@ -252,7 +260,7 @@ function makeHubsMap(tokens: HUB_KEYS_TYPE, doCloudDicovery: boolean = true, doS
             resolve(getHubs());
           }
         } else {
-          if (doCloudDicovery) {
+          if (doCloudDiscovery) {
             doCloudDiscovery();
           }
           resolve(getHubs());
@@ -641,13 +649,8 @@ export function selectHubById(hubId: string, poll: boolean = false): Promise<Obj
       (Object.values(hubs)).every((hub: any) => {
         if (hubId === hub.id) {
           store.dispatch(hubsState.actions.selectHub({ hubId: hub.id }));
-          if (hub.hubKey && poll) {
+          if (poll) {
             pollingHub = startPollingById(hub.id);
-            return false; // break
-          }
-          if (!hub.hubKey) {
-            console.error('SDK selectHubById: No hub key error');
-            error = (new Error('no hubKey'));
             return false; // break
           }
           console.debug('SDK selectHubById: Ready to start polling');
@@ -715,7 +718,6 @@ export function connectHubByTokens(hubId: string, hubKey: string, discovery: boo
     if (!hubKey) reject(new Error('No hubKey'));
     if (!authKey) reject(new Error('No AuthKey'));
     const tokens = {};
-    tokens[hubId] = hubKey;
     makeHubsMap(tokens, discovery, sync).then(() => {
       selectHubById(hubId, false).then(() => {
         resolve(getHubs());
@@ -724,6 +726,20 @@ export function connectHubByTokens(hubId: string, hubKey: string, discovery: boo
   });
 }
 
+export function connectHubBySite(hubId: string, siteId: string, discovery: boolean = false, sync: boolean = true): Promise<Object> {
+  return new Promise((resolve, reject) => {
+    const { authKey } = storedUser();
+    if (!hubId) reject(new Error('No Hub Id'));
+    if (!authKey) reject(new Error('No AuthKey'));
+    const tokens = {};
+    tokens[hubId] = null;
+    makeHubsMap(tokens, discovery, sync).then(() => {
+      selectHubById(hubId, false).then(() => {
+        resolve(getHubs());
+      }).catch((error) => reject(error));
+    }).catch((error) => reject(error));
+  });
+}
 /*
  * Listener of User state changes
  * Hub discovery is started when user's new state is AUTHENTICATED

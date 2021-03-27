@@ -139,6 +139,7 @@ export function send({
   let sendUrl = url;
   let sendTimeout = timeout;
   let sendAuthKey = authKey;
+  let sendHubId = hubId;
   let sendHubKey = hubKey;
   let sendConfig = config;
   let sendType = type;
@@ -175,7 +176,8 @@ export function send({
       // command with Hub API version
       if (command.url.indexOf('$API_VER') !== -1) {
         const hubs = hubsState.selectors.getHubs(stateNow);
-        if (!hubs[hubId] || !hubs[hubId].hubKey) {
+
+        if (!hubs[hubId] || (!hubs[hubId].hubKey && getCloudURL().indexOf('https://directory')===-1)) {
           return new Promise((resolve, reject) => {
             reject(new Error('SDK Error: Send - Hub or hubKey not found error'));
           });
@@ -191,6 +193,12 @@ export function send({
       } else {
         sendUrl = getCloudURL().concat(command.url);
       }
+      if (hubId && sendUrl.indexOf('https://directory')!==-1 && sendUrl.indexOf('hub/remote')!==-1){
+          const index = sendUrl.indexOf('hub/remote')
+          const lastPart = sendUrl.substring(index+10)
+          const firstPart = sendUrl.substring(0,index)
+          sendUrl =firstPart.concat('hub/').concat(hubId).concat('/remote').concat(lastPart);
+      }
     }
 
     if (sendUrl) {
@@ -203,6 +211,8 @@ export function send({
             sendHubKey = null;
           }
         }
+      } else {
+        sendHubId = false;
       }
     }
 
@@ -267,7 +277,6 @@ export function send({
       Accept: 'application/json, application/binary, text/plain, */*',
       'Content-Type': sendType,
       Authorization: sendAuthKey || null,
-      'X-Hub-Key': sendHubKey || null,
       'Accept-Language': null,
     },
     crossDomain: true,
@@ -281,6 +290,14 @@ export function send({
   } else {
     delete reqConf.headers['Accept-Language'];
   }
+  if (sendHubKey){
+    reqConf.headers['X-Hub-Key'] = sendHubKey;
+  }
+  /* VLi: not needed now
+  if (sendHubId){
+    reqConf.headers['X-Hub-Id'] = sendHubId;
+  }
+  */
 
   Object.assign(reqConf, sendConfig);
 
@@ -310,17 +327,16 @@ export function send({
       //  retries: 3, shouldResetTimeout: false, retryDelay: axiosRetry.exponentialDelay, retryCondition,
       // });
       //
-
-      testSSLCertificate(remoteConnection)
+      testSSLCertificate(remoteConnection && (sendUrl.indexOf('https://directory')===-1))
         .then((status) => {
         // Cancel request if SSL Certificate status is invalid
           if (!status || permanentSSLFailure) {
             permanentSSLFailure = true;
             reject(new Error('SDK Error: SSL failure.'));
           } else {
-          // SSL is ok,
+            // SSL is ok,
             // check if auth Key needs to be refreshed
-            if (sendAuthKey) {
+            if (sendAuthKey && (sendUrl.indexOf('https://directory')===-1)) {
               testAndRefreshToken(sendAuthKey);
             }
 

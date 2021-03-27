@@ -8,7 +8,7 @@ import { send, COMMANDS } from '../connection/send';
 import { store } from '../store';
 import { userState } from '../reducers/user';
 import { hubsState } from '../reducers/hubs';
-import { HUB_CONNECTION_STATES } from '../connection/constants';
+import { HUB_CONNECTION_STATES, getCloudURL } from '../connection/constants';
 // import type { COMMAND_TYPE } from '../connection/constants';
 
 /**
@@ -30,7 +30,7 @@ export function sendDeviceStateCmd(hubId: string, deviceId: string, state: Objec
     }
 
     const hubs = hubsState.selectors.getHubs(stateNow);
-    if (!hubs[hubId] || !hubs[hubId].hubKey) {
+    if (!hubs[hubId] || (!hubs[hubId].hubKey && getCloudURL().indexOf('https://directory')===-1)) {
       console.error('SDK sendDeviceStateCmd error: No hubKey!');
       reject(new Error('Device command error: No hubKey!'));
       return;
@@ -79,7 +79,7 @@ export function sendDeviceCmd(hubId: string, deviceId: string, commandType: any,
     const hubs = hubsState.selectors.getHubs(stateNow);
     const hub = hubs[hubId];
     const { hubKey } = hubs[hubId];
-    if (!hub || !hubKey) {
+    if (!hub || (!hubKey && getCloudURL().indexOf('https://directory')===-1)) {
       console.error('SDK sendDeviceCmd error: No hubKey!');
       reject(new Error('Device command error: No hubKey!'));
       return;
@@ -95,7 +95,7 @@ export function sendDeviceCmd(hubId: string, deviceId: string, commandType: any,
     const { authKey } = user;
     if (!authKey) {
       console.error('SDK sendDeviceCmd error: No authKey!');
-      reject(new Error('Device command error: No hubKey!'));
+      reject(new Error('Device command error: No authKey!'));
       return;
     }
 

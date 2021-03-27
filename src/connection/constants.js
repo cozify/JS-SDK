@@ -18,7 +18,6 @@ export const CLOUD_FINGERPRINTS_SHA1: Array<string> = [
 const CLOUD_HOST: string = 'https://api.cozify.fi';
 const CLOUD_HOST_TEST: string = 'https://testapi.cozify.fi';
 
-
 /* Cloud API VERSION */
 export const CLOUD_API_VERSION: string = 'ui/0.2/';
 
@@ -36,12 +35,21 @@ export function useTestcloud() {
   cloudHost = CLOUD_HOST_TEST;
 }
 
+export function selectCloud(host) {
+  cloudHost = host;
+}
+
 export function getCloudHost() {
   return cloudHost;
 }
 
 export function getCloudURL() {
-  return `${cloudHost}/${CLOUD_API_VERSION}`;
+  if(cloudHost.indexOf('/site/') === -1){
+    return `${cloudHost}/${CLOUD_API_VERSION}`;
+  } else {
+    return `${cloudHost}`;
+  }
+
 }
 
 export const MAX_API_VERSION: string = '1.13';

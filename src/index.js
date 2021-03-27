@@ -11,7 +11,7 @@ export { store, watchChanges } from './store';
 // import logger from 'redux-logger'
 // const middleware = [...getDefaultMiddleware(), logger]
 
-export { CLOUD_CONNECTION_STATES, HUB_CONNECTION_STATES, useTestcloud } from './connection/constants';
+export { CLOUD_CONNECTION_STATES, HUB_CONNECTION_STATES, useTestcloud, selectCloud } from './connection/constants';
 export { LANGUAGES, USER_STATES, ROLES } from './user/constants';
 export { HUB_STATES, ZWAVE_INCLUSION_STATUS, ZWAVE_EXCLUSION_STATUS } from './hubs/constants';
 
@@ -22,7 +22,7 @@ export {
 
 export {
   fetchHubs,
-  getHubs, selectHubById, unSelectHubById, unSelectHubs, connectHubByTokens,
+  getHubs, selectHubById, unSelectHubById, unSelectHubs, connectHubByTokens, connectHubBySite,
   lockAndBackup,
   startDiscoveringHubs, stopDiscoveringHubs,
   startPollingById, stopPollingById,
