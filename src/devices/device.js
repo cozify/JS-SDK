@@ -78,7 +78,10 @@ export function sendDeviceCmd(hubId: string, deviceId: string, commandType: any,
 
     const hubs = hubsState.selectors.getHubs(stateNow);
     const hub = hubs[hubId];
-    const { hubKey } = hubs[hubId];
+    let hubKey = undefined
+    if (hub && hub.hubKey) {
+      hubKey = hub.hubKey;
+    }
     if (!hub || (!hubKey && getCloudURL().indexOf('https://directory')===-1)) {
       console.error('SDK sendDeviceCmd error: No hubKey!');
       reject(new Error('Device command error: No hubKey!'));
@@ -119,6 +122,15 @@ export function sendDeviceCmd(hubId: string, deviceId: string, commandType: any,
   });
 }
 
+export function setDeviceVisibility(hubId: string, deviceId: string, visible: boolean): Promise<Object> {
+  return sendDeviceCmd(hubId, deviceId, COMMANDS.CMD_DEVICE_VISIBILITY, { id: deviceId, visible:visible });
+}
+export function setDeviceLocked(hubId: string, deviceId: string, locked: boolean): Promise<Object> {
+  return sendDeviceCmd(hubId, deviceId, COMMANDS.CMD_DEVICE_LOCK, { id: deviceId, locked:locked });
+}
+export function setDeviceHotWater(hubId: string, deviceId: string, hotWater: boolean): Promise<Object> {
+  return sendDeviceCmd(hubId, deviceId, COMMANDS.CMD_DEVICE_HOT_WATER, { id: deviceId, hotWater:hotWater });
+}
 /**
  * Unpair device
  * @param  {string} hubId

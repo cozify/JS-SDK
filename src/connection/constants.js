@@ -81,6 +81,15 @@ export const COMMANDS = Object.freeze({
   CMD_DEVICE_IGNORE: {
     method: 'PUT', url: 'hub/remote/cc/$API_VER/devices/command', type: 'CMD_IGNORE_DEVICE', params: ['id'],
   },
+  CMD_DEVICE_VISIBILITY:{
+    method: 'PUT', url: 'hub/remote/cc/$API_VER/devices/command', type: 'CMD_DEVICE_VISIBLE', params: ['id', 'visible'],
+  },
+  CMD_DEVICE_LOCK:{
+    method: 'PUT', url: 'hub/remote/cc/$API_VER/devices/command', type: 'CMD_DEVICE_LOCK', params: ['id', 'locked'],
+  },
+   CMD_DEVICE_HOT_WATER:{
+    method: 'PUT', url: 'hub/remote/cc/$API_VER/devices/command', type: 'CMD_DEVICE_META', params: ['id', 'locked'],
+  },
   CMD_DEVICE_IDENTIFY: {
     method: 'PUT', url: 'hub/remote/cc/$API_VER/devices/command', type: 'CMD_IDENTIFY', params: ['id'],
   },

@@ -78,6 +78,7 @@ function updateFoundHub(hubURL: ?string, hub: HUB_TYPE) {
       name: foundHub.name || '',
     };
   }
+  hubsMap[foundHub.id].name = foundHub.name;
   hubsMap[foundHub.id].connected = foundHub.connected;
   hubsMap[foundHub.id].features = foundHub.features;
   hubsMap[foundHub.id].state = foundHub.state;

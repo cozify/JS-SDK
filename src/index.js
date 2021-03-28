@@ -52,6 +52,8 @@ export {
 export {
   sendDeviceStateCmd, sendDeviceCmd,
   unpairDevice, identifyDevice, setDeviceMeta,
+  setDeviceVisibility, setDeviceLocked,
+  setDeviceHotWater,
 } from './devices/device';
 
 export {
