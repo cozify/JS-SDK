@@ -9,7 +9,7 @@ import { COMMANDS, send, sendAll } from '../connection/send';
 
 import { devicesDeltaHandler, pairingDevicesDeltaHandler } from '../devices/devices';
 import { roomsDeltaHandler } from '../rooms/rooms';
-import { alarmsDeltaHandler } from '../alarms/alarms';
+import { alarmsDeltaHandler, alertsDeltaHandler } from '../alarms/alarms';
 import { urlBase64Decode } from '../utils';
 import { store, watchChanges } from '../store';
 import { hubsState } from '../reducers/hubs';
@@ -582,6 +582,7 @@ export function doPoll(hubId: string, reset: boolean = false): Promise<Object> {
                 break;
               }
               case 'USER_ALERTS': {
+                alertsDeltaHandler(hubId, doReset, delta.alerts);
                 break;
               }
               case 'ALARM_DELTA': {

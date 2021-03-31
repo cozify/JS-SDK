@@ -12,6 +12,8 @@ import { HUB_CONNECTION_STATES, getCloudURL } from '../connection/constants';
 import type { COMMANDS_TYPE } from '../connection/constants';
 import type { ALARM_TYPE, ALARMS_MAP_TYPE, HUB_ALARMS_MAP_TYPE } from './constants';
 
+
+
 const initAlarm = (alarm: Object) => {
   const givenAlarm = alarm;
   if (alarm.message) {
@@ -199,3 +201,58 @@ export function alarmsDeltaHandler(hubId: string, reset: boolean, alarms: ALARMS
     });
   }
 }
+
+const initAlert = (alert: Object) => {
+  const givenAlert = alert;
+  if(alert.error){
+    alert.level = 'err';
+  }
+  if(alert.cleared){
+    alert.closed = true;
+  }
+  if (alert.message) {
+    givenAlert.title = getTextFromNode(givenAlert.message);
+  }
+  return givenAlert;
+};
+
+export function alertsDeltaHandler(hubId: string, reset: boolean, alerts: ALERTS_MAP_TYPE) {
+  let oldHubAlerts: ALERTS_MAP_TYPE = {};
+  const storedAlerts: HUB_ALERTS_MAP_TYPE = getAlarms();
+  if (storedAlerts && storedAlerts[hubId]) {
+    oldHubAlerts = storedAlerts[hubId];
+  }
+  /*
+  if (reset) {
+    // If reset then set alerts as they are received
+    const alertsToBeSet = {};
+    if (!isEmpty(alerts)) {
+      Object.entries(alerts).forEach(([key, alert:ALERTS_MAP_TYPE]) => {
+        alertsToBeSet[key] = initAlert(alert); //?
+      });
+    }
+    const stateAlert = {
+      hubId,
+      alarms: alertsToBeSet,
+    };
+    store.dispatch(alarmsState.actions.setAlarms(stateAlert));
+  } else
+  */
+  if (!isEmpty(alerts)) {
+    // Loop alerts to check could it be added or should be removed
+    Object.entries(alerts).forEach(([key, alert]) => {
+      if (key && alert) {
+        const stateAlert = {
+          hubId,
+          alarm: initAlert(alert),
+        };
+        store.dispatch(alarmsState.actions.setAlarm(stateAlert));
+      } else if (key && oldHubAlerts[key]) {
+        // console.info(`Remove Alert ${key}`);
+        store.dispatch(alarmsState.actions.removeAlarm({ hubId, alarmId: key }));
+      }
+    });
+  }
+
+}
+

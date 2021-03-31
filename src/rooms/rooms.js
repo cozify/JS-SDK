@@ -7,7 +7,7 @@ import { roomsState } from '../reducers/rooms';
 import { hubsState } from '../reducers/hubs';
 import { userState } from '../reducers/user';
 import { send, COMMANDS } from '../connection/send';
-import { HUB_CONNECTION_STATES } from '../connection/constants';
+import { HUB_CONNECTION_STATES, getCloudURL } from '../connection/constants';
 import type { COMMANDS_TYPE } from '../connection/constants';
 import type { ROOM_TYPE, ROOMS_MAP_TYPE, HUB_ROOMS_MAP_TYPE } from './constants';
 
@@ -108,6 +108,7 @@ export function sendRoomCmd(hubId: string, commandType: COMMANDS_TYPE, data: Obj
  */
 export async function addRoom(hubId: string, room: ROOM_TYPE): Promise<ROOMS_MAP_TYPE> {
   return new Promise((resolve, reject) => {
+    debugger
     sendRoomCmd(hubId, COMMANDS.CMD_SET_ROOM, [room])
       .then((rooms) => {
         resolve(rooms);
