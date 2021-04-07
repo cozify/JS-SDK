@@ -582,7 +582,7 @@ export function doPoll(hubId: string, reset: boolean = false): Promise<Object> {
                 break;
               }
               case 'USER_ALERTS': {
-                alertsDeltaHandler(hubId, doReset, delta.alerts);
+                // alertsDeltaHandler(hubId, doReset, delta.alerts);
                 break;
               }
               case 'ALARM_DELTA': {
