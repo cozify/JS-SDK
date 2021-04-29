@@ -108,7 +108,6 @@ export function sendRoomCmd(hubId: string, commandType: COMMANDS_TYPE, data: Obj
  */
 export async function addRoom(hubId: string, room: ROOM_TYPE): Promise<ROOMS_MAP_TYPE> {
   return new Promise((resolve, reject) => {
-    debugger
     sendRoomCmd(hubId, COMMANDS.CMD_SET_ROOM, [room])
       .then((rooms) => {
         resolve(rooms);

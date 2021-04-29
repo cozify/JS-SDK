@@ -57,8 +57,14 @@ function testAndRefreshToken(key: string) {
 
   if (key) {
     const tokenParts = key.split('.');
-    header = JSON.parse(urlBase64Decode(tokenParts[0]));
-    payload = JSON.parse(urlBase64Decode(tokenParts[1]));
+
+      if (tokenParts[0]){
+        tokenParts[0] = tokenParts[0].replace('Bearer ', '');
+        header = JSON.parse(urlBase64Decode(tokenParts[0]));
+      }
+      if (tokenParts[1]){
+        payload = JSON.parse(urlBase64Decode(tokenParts[1]));
+      }
   }
 
   if ((header && header.exp) || (payload != null && payload.exp)) {
