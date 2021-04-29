@@ -183,7 +183,7 @@ export function send({
       if (command.url.indexOf('$API_VER') !== -1) {
         const hubs = hubsState.selectors.getHubs(stateNow);
 
-        if (!hubs[hubId] || (!hubs[hubId].hubKey && getCloudURL().indexOf('https://directory')===-1)) {
+        if (!hubs[hubId] || (!hubs[hubId].hubKey && getCloudURL().indexOf('https://one.cozify.fi')===-1)) {
           return new Promise((resolve, reject) => {
             reject(new Error('SDK Error: Send - Hub or hubKey not found error'));
           });
@@ -199,7 +199,7 @@ export function send({
       } else {
         sendUrl = getCloudURL().concat(command.url);
       }
-      if (hubId && sendUrl.indexOf('https://directory')!==-1 && sendUrl.indexOf('hub/remote')!==-1){
+      if (hubId && sendUrl.indexOf('https://one.cozify.fi')!==-1 && sendUrl.indexOf('hub/remote')!==-1){
           const index = sendUrl.indexOf('hub/remote')
           const lastPart = sendUrl.substring(index+10)
           const firstPart = sendUrl.substring(0,index)
@@ -333,7 +333,7 @@ export function send({
       //  retries: 3, shouldResetTimeout: false, retryDelay: axiosRetry.exponentialDelay, retryCondition,
       // });
       //
-      testSSLCertificate(remoteConnection && (sendUrl.indexOf('https://directory')===-1))
+      testSSLCertificate(remoteConnection && (sendUrl.indexOf('https://one.cozify.fi')===-1))
         .then((status) => {
         // Cancel request if SSL Certificate status is invalid
           if (!status || permanentSSLFailure) {
@@ -342,7 +342,7 @@ export function send({
           } else {
             // SSL is ok,
             // check if auth Key needs to be refreshed
-            if (sendAuthKey && (sendUrl.indexOf('https://directory')===-1)) {
+            if (sendAuthKey && (sendUrl.indexOf('https://one.cozify.fi')===-1)) {
               testAndRefreshToken(sendAuthKey);
             }
 

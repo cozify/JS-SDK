@@ -67,7 +67,7 @@ export function sendAlarmCmd(hubId: string, commandType: COMMANDS_TYPE, data: Ob
     const hubs = hubsState.selectors.getHubs(stateNow);
     const hub = hubs[hubId];
     const { hubKey } = hubs[hubId];
-    if (!hub || (!hubKey && getCloudURL().indexOf('https://directory')===-1)) {
+    if (!hub || (!hubKey && getCloudURL().indexOf('https://one.cozify.fi')===-1)) {
       console.error('SDK closeAlarm error: No hubKey!');
       reject(new Error('Alarm command error: No hubKey!'));
       return;

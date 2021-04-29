@@ -30,7 +30,7 @@ export function sendDeviceStateCmd(hubId: string, deviceId: string, state: Objec
     }
 
     const hubs = hubsState.selectors.getHubs(stateNow);
-    if (!hubs[hubId] || (!hubs[hubId].hubKey && getCloudURL().indexOf('https://directory')===-1)) {
+    if (!hubs[hubId] || (!hubs[hubId].hubKey && getCloudURL().indexOf('https://one.cozify.fi')===-1)) {
       console.error('SDK sendDeviceStateCmd error: No hubKey!');
       reject(new Error('Device command error: No hubKey!'));
       return;
@@ -82,7 +82,7 @@ export function sendDeviceCmd(hubId: string, deviceId: string, commandType: any,
     if (hub && hub.hubKey) {
       hubKey = hub.hubKey;
     }
-    if (!hub || (!hubKey && getCloudURL().indexOf('https://directory')===-1)) {
+    if (!hub || (!hubKey && getCloudURL().indexOf('https://one.cozify.fi')===-1)) {
       console.error('SDK sendDeviceCmd error: No hubKey!');
       reject(new Error('Device command error: No hubKey!'));
       return;
