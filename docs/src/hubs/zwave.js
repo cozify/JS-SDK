@@ -548,3 +548,233 @@ export async function healZwave(hubId) {
       });
   });
 }
+
+/*
+**
+** Z-wave nodes
+**
+ */
+
+const nodesInAction = {};
+
+
+/**
+ * Get Z-Wave nodes
+ * @param {string} hubId
+ * @return {Promise} that resolves node list when done
+ */
+export async function getZwaveNodes(hubId) {
+  return new Promise((resolve, reject) => {
+    if (nodesInAction[hubId]) {
+      reject(new Error('nodesInAction already in action'));
+      return;
+    }
+    nodesInAction[hubId] = true;
+
+    const { authKey } = storedUser();
+    const hub = getHubs()[hubId];
+    const { hubKey } = hub;
+
+    send({
+      command: COMMANDS.ZWAVE_GET_NODES, hubId, authKey, hubKey, localUrl: hub.url, data: [],
+    })
+      .then((data) => {
+        console.debug('SDK: getZwaveNodes: Ok , data: ', data);
+        nodesInAction[hubId] = false;
+        resolve(data);
+      })
+      .catch((error) => {
+        console.error('SDK: getZwaveNodes error: ', error.message);
+        nodesInAction[hubId] = false;
+        reject(error);
+      });
+  });
+}
+
+
+/**
+ * Get Z-Wave nodes
+ * @param {string} hubId
+ * @param {string} nodeId
+ * @return {Promise} that resolves node list when done
+ */
+export async function checkIsFailedZWaveNode(hubId, nodeId) {
+  return new Promise((resolve, reject) => {
+    /*
+    if (nodesInActionNode[hubId]) {
+      reject(new Error('nodesInAction already in action'));
+      return;
+    }
+    nodesInAction[hubId] = true;
+    */
+    const { authKey } = storedUser();
+    const hub = getHubs()[hubId];
+    const { hubKey } = hub;
+
+    send({
+      command: COMMANDS.ZWAVE_CHECK_IS_FAILED_NODE, hubId, authKey, hubKey, localUrl: hub.url, data: [{ nodeId }],
+    })
+      .then((data) => {
+        console.debug('SDK: checkIsFailedZWaveNode: Ok , data: ', data);
+        if (data && data.status === 0) {
+          nodesInAction[hubId] = false;
+          if (data.isFailed) {
+            resolve(true);
+          } else {
+            resolve(false);
+          }
+        } else {
+          console.error('SDK: checkIsFailedZWaveNode error: ', data ? data.status : 'unknown');
+          nodesInAction[hubId] = false;
+          reject(data.status);
+        }
+      })
+      .catch((error) => {
+        console.error('SDK: checkIsFailedZWaveNode error: ', error.message);
+        nodesInAction[hubId] = false;
+        reject(error);
+      });
+  });
+}
+
+
+/**
+ * Get Z-Wave nodes
+ * @param {string} hubId
+ * @param {string} nodeId
+ * @return {Promise} that resolves node list when done
+ */
+export async function removeFailedZWaveNode(hubId, nodeId) {
+  return new Promise((resolve, reject) => {
+    /*
+    if (nodesInAction[hubId]) {
+      reject(new Error('nodesInAction already in action'));
+      return;
+    }
+    nodesInAction[hubId] = true;
+    */
+    const { authKey } = storedUser();
+    const hub = getHubs()[hubId];
+    const { hubKey } = hub;
+
+    send({
+      command: COMMANDS.ZWAVE_REMOVE_FAILED_NODE, hubId, authKey, hubKey, localUrl: hub.url, data: [{ nodeId }],
+    })
+      .then((data) => {
+        console.debug('SDK: removeFailedZWaveNode: Ok , data: ', data);
+        if (data && data.status === 1) {
+          nodesInAction[hubId] = false;
+          resolve(true);
+        } else {
+          console.error('SDK: removeFailedZWaveNode error: ', data ? data.status : 'unknown');
+          nodesInAction[hubId] = false;
+          reject(data.status);
+        }
+      })
+      .catch((error) => {
+        console.error('SDK: removeFailedZWaveNode error: ', error.message);
+        nodesInAction[hubId] = false;
+        reject(error);
+      });
+  });
+}
+
+/**
+ * Get Z-Wave node parameter
+ * @param {string} hubId
+ * @param {string} nodeId
+ * @param {number} parameter
+ * @return {Promise} that resolves node list when done
+ */
+export async function getZWaveNodeParameter(hubId, nodeId, parameter) {
+  return new Promise((resolve, reject) => {
+    /*
+    if (nodesInAction[hubId]) {
+      reject(new Error('nodesInAction already in action'));
+      return;
+    }
+    nodesInAction[hubId] = true;
+    */
+    const { authKey } = storedUser();
+    const hub = getHubs()[hubId];
+    const { hubKey } = hub;
+
+    send({
+      command: COMMANDS.ZWAVE_GET_NODE_CONFIGURATION, hubId, authKey, hubKey, localUrl: hub.url, data: [{ nodeId, parameter }],
+    })
+      .then((data) => {
+        if (data && data.status === 0) {
+          console.debug('SDK: getZWaveNodeParameter: Ok , data: ', data);
+          // nodesInAction[hubId] = false;
+          resolve(data);
+        } else {
+          console.error('SDK: getZWaveNodeParameter error: ', data ? data.status : 'unknown');
+          // nodesInAction[hubId] = false;
+          reject(new Error(`Getting ZWave node parem failed`));
+        }
+      })
+      .catch((error) => {
+        console.error('SDK: getZWaveNodeParameter error: ', error.message);
+        // nodesInAction[hubId] = false;
+        reject(error);
+      });
+  });
+}
+
+/**
+ * Set Z-Wave node parameter
+ * @param {string} hubId
+ * @param {string} nodeId
+ * @param {number} parameter
+ * @param {size} parameter
+ * @param {boolean} default
+ * @param {number} value
+ * @return {Promise} that resolves node list when done
+ */
+export async function setZWaveNodeParameter(hubId, nodeId, parameter, size, def, val) {
+  return new Promise((resolve, reject) => {
+    /*
+    if (nodesInAction[hubId]) {
+      reject(new Error('nodesInAction already in action'));
+      return;
+    }
+    nodesInAction[hubId] = true;
+    */
+    const { authKey } = storedUser();
+    const hub = getHubs()[hubId];
+    const { hubKey } = hub;
+    let value = val;
+    if (def) {
+      value = null;
+    }
+
+    send({
+      command: COMMANDS.ZWAVE_SET_NODE_CONFIGURATION,
+      hubId,
+      authKey,
+      hubKey,
+      localUrl: hub.url,
+      data: [{
+        nodeId, parameter, size, default: def, value,
+      }],
+    })
+      .then((data) => {
+        if (data && data.status === 0) {
+          console.debug('SDK: setZWaveNodeParameter: Ok , data: ', data);
+          // nodesInAction[hubId] = false;
+          resolve(data);
+        } else {
+          console.error('SDK: setZWaveNodeParameter error: ', data ? data.status : 'unknown');
+          // nodesInAction[hubId] = false;
+          reject(new Error(`Setting ZWave node parem failed`));
+        }
+        // nodesInAction[hubId] = false;
+        resolve(data);
+      })
+      .catch((error) => {
+        console.error('SDK: setZWaveNodeParameter error: ', error.message);
+        // nodesInAction[hubId] = false;
+        reject(error);
+      });
+  });
+}

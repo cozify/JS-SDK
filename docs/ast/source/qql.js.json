@@ -1,0 +1,354 @@
+{
+  "type": "File",
+  "start": 0,
+  "end": 7320,
+  "loc": {
+    "start": {
+      "line": 1,
+      "column": 0
+    },
+    "end": {
+      "line": 355,
+      "column": 0
+    }
+  },
+  "program": {
+    "type": "Program",
+    "start": 0,
+    "end": 7320,
+    "loc": {
+      "start": {
+        "line": 1,
+        "column": 0
+      },
+      "end": {
+        "line": 355,
+        "column": 0
+      }
+    },
+    "sourceType": "module",
+    "body": [],
+    "directives": [],
+    "leadingComments": null,
+    "innerComments": [
+      {
+        "type": "CommentLine",
+        "value": " Whole file was just for qql testing",
+        "start": 1,
+        "end": 39,
+        "loc": {
+          "start": {
+            "line": 2,
+            "column": 0
+          },
+          "end": {
+            "line": 2,
+            "column": 38
+          }
+        }
+      },
+      {
+        "type": "CommentBlock",
+        "value": "\nimport { ApolloClient, split, HttpLink, InMemoryCache } from '@apollo/client';\nimport {GraphQLNormalizr} from 'graphql-normalizr'\nimport { gql } from '@apollo/client';\nimport { getMainDefinition } from '@apollo/client/utilities';\nimport { WebSocketLink } from '@apollo/link-ws';\n",
+        "start": 40,
+        "end": 324,
+        "loc": {
+          "start": {
+            "line": 3,
+            "column": 0
+          },
+          "end": {
+            "line": 9,
+            "column": 2
+          }
+        }
+      },
+      {
+        "type": "CommentBlock",
+        "value": "\nimport { SubscriptionClient } from 'graphql-subscriptions-client';\n// set up the client, which can be reused\nconst qqlSubscriptionClient = new SubscriptionClient('ws://localhost:8080/v1/graphql', {\n  reconnect: true,\n});\n",
+        "start": 326,
+        "end": 552,
+        "loc": {
+          "start": {
+            "line": 11,
+            "column": 0
+          },
+          "end": {
+            "line": 17,
+            "column": 2
+          }
+        }
+      },
+      {
+        "type": "CommentBlock",
+        "value": "\nCommented out as graphql not used\nconst httpLink = new HttpLink({\n  uri: 'http://localhost:8080/v1/graphql'\n});\n\nconst wsLink = new WebSocketLink({\n  uri: `ws://localhost:8080/v1/graphql`,\n  options: {\n    reconnect: true\n  }\n});\n\n\n// The split function takes three parameters:\n//\n// * A function that's called for each operation to execute\n// * The Link to use for an operation if the function returns a \"truthy\" value\n// * The Link to use for an operation if the function returns a \"falsy\" value\nconst splitLink = split(\n  ({ query }) => {\n    const definition = getMainDefinition(query);\n    return (\n      definition.kind === 'OperationDefinition' &&\n      definition.operation === 'subscription'\n    );\n  },\n  wsLink,\n  httpLink,\n);\n\nexport const isAuth = (state) => {\n  const { user } = state\n  const { authKey } = user;\n  if (!user || !user.authKey) {\n    // Already fetched or in progress, don't need to re-fetch\n    console.error('SDK listPlans error: No userKey!');\n    return false;\n  }\n  return true;\n}\n\nconst createApolloClient = (authToken) => {\n  if (window && window.location && window.location.hostname === 'localhost') {\n    return new ApolloClient({\n      link: splitLink,\n      cache: new InMemoryCache(),\n    });\n  }\n  return null;\n};\n\nexport const qqlClient = createApolloClient(null);\n\n\nexport const { normalize } = new GraphQLNormalizr(\n  {\n    idKey: 'uid',\n    exclude: { t_plan_document_node: [ 'data' ] },\n    typeMap: {\n      t_plan: 'plans',\n      t_plan_document: 'documents',\n      t_plan_document_node: 'nodes',\n    }\n});\n",
+        "start": 554,
+        "end": 2114,
+        "loc": {
+          "start": {
+            "line": 19,
+            "column": 0
+          },
+          "end": {
+            "line": 84,
+            "column": 2
+          }
+        }
+      },
+      {
+        "type": "CommentLine",
+        "value": " Fake client",
+        "start": 2116,
+        "end": 2130,
+        "loc": {
+          "start": {
+            "line": 86,
+            "column": 0
+          },
+          "end": {
+            "line": 86,
+            "column": 14
+          }
+        }
+      },
+      {
+        "type": "CommentBlock",
+        "value": "\nexport const qqlClient = {\n  query: () => {},\n  subscribe: () => {},\n  mutate: () => {}\n}\nexport const { normalize } =  () => {};\nexport const isAuth = (state) => {};\n\n\nexport const GET_PLAN_DOCUMENTs_AND_NODES = gql`\n  query ListPlansDocumentAndNodes {\n    t_plan {\n      uid\n      name\n      created_at\n      changed_at\n      documents {\n        uid\n        plan_id\n        changed_at\n        created_at\n        device_types\n        scene_types\n        template_types\n        room_types\n        rule_types\n        nodes {\n          uid\n          data\n          parent_id\n          child {\n            uid\n            parent_id\n          }\n        }\n      }\n    }\n  }\n`;\n\nexport const SUBS_PLANS = gql`\n  subscription SubsPlans {\n     t_plan {\n      uid\n      name\n      created_at\n      changed_at\n    }\n  }\n`;\n\n\nexport const GET_PLANS = gql`\n  query ListPlans {\n    t_plan {\n      uid\n      name\n      created_at\n      changed_at\n    }\n  }\n`;\n\n\nexport const INSERT_PLAN = gql`\n mutation InsertPlanWithDocument($object: t_plan_insert_input!) {\n  insert_t_plan_one(object: $object) {\n    changed_at\n    created_at\n    uid\n    documents {\n      uid\n      name\n      nodes {\n        uid\n      }\n      changed_at\n      created_at\n    }\n  }\n}\n`;\n\n\nexport const UPDATE_PLAN = gql`\n  mutation UpdatePlan($uid: String, $changes: t_plan_set_input) {\n    update_t_plan(where: {uid: {_eq: $uid}}, _set: $changes) {\n      affected_rows\n      returning {\n        uid\n        name\n        created_at\n        changed_at\n      }\n    }\n  }\n`;\n\nexport const REMOVE_PLAN = gql`\n  mutation DeletePlan($uid: String!) {\n    delete_t_plan_by_pk(uid: $uid) {\n      name\n    }\n  }\n`;\n\n\nexport const GET_PLAN_DOCUMENTS = gql`\n  query ListDocuments($plan_id: String) {\n    t_plan_document(where: {plan_id: {_eq: $plan_id}}) {\n      uid\n      author\n      name\n      created_at\n      changed_at\n      plan_id\n    }\n  }\n`;\n\nexport const SUBS_PLAN_DOCUMENTS = gql`\n  subscription SubsPlanDocuments($plan_id: String)  {\n    t_plan_document(where: {plan_id: {_eq: $plan_id}}) {\n      uid\n      author\n      name\n      created_at\n      changed_at\n      plan_id\n    }\n  }\n`;\nexport const INSERT_PLAN_DOCUMENT = gql`\n  mutation InsertDocumentToPlan($object: t_plan_document_insert_input!) {\n    insert_t_plan_document_one(object: $object) {\n      uid\n      name\n      author\n      changed_at\n      created_at\n      nodes {\n        changed_at\n        created_at\n        data\n      }\n    }\n  }\n`;\n\n//\n// export const UPDATE_PLAN_DOCUMENT = gql`\n//   mutation UpdateDocument($room_types: jsonb, $rule_types: jsonb, $uid: String) {\n//     update_t_plan_document(where: {uid: {_eq: $uid}}, _set: {room_types: $room_types, rule_types: $rule_types}) {\n//       affected_rows\n//       returning {\n//         uid\n//         room_types\n//         rule_types\n//         scene_types\n//         template_types\n//         device_types\n//       }\n//     }\n//   }\n// `;\n//\nexport const UPDATE_PLAN_DOCUMENT = gql`\n  mutation UpdatePlanDocument($uid: String, $changes: t_plan_document_set_input) {\n    update_t_plan_document(where: {uid: {_eq: $uid}}, _set: $changes) {\n      affected_rows\n      returning {\n        uid\n        name\n        author\n        created_at\n        changed_at\n      }\n    }\n  }\n`;\n\nexport const REMOVE_PLAN_DOCUMENT = gql`\n  mutation DeleteDocumentAndAllNodes($uid: String!) {\n    delete_t_plan_document_node(where: {document_id: {_eq: $uid}}) {\n      affected_rows\n    }\n    delete_t_plan_document(where: {uid: {_eq: $uid}}){\n      affected_rows\n    }\n  }\n`;\n\n// Nodes\nexport const GET_PLAN_DOCUMENT_NODES = gql`\n  query ListNodess($document_id: String) {\n    t_plan_document_node(where: {document_id: {_eq: $document_id}}) {\n      uid\n      created_at\n      changed_at\n      document_id\n      data\n    }\n  }\n`;\n\nexport const SUBS_PLAN_DOCUMENT_NODES = gql`\n  subscription SubsPlanDocuments($document_id: String)  {\n    t_plan_document_node(where: {document_id: {_eq: $document_id}}) {\n      uid\n      parent_id\n      child{\n        uid\n      }\n      created_at\n      changed_at\n      document_id\n      data\n    }\n  }\n`;\n\n\nexport const INSERT_PLAN_DOCUMENT_NODE = gql`\n  mutation InsertNode($object: t_plan_document_node_insert_input!) {\n    insert_t_plan_document_node_one(object: $object) {\n      uid\n      changed_at\n      created_at\n      data\n    }\n  }\n`;\n\n\n// export const UPDATE_PLAN_DOCUMENT_NODE = gql`\n//   mutation UpdateDocument($room_types: jsonb, $rule_types: jsonb, $uid: String) {\n//     update_t_plan_document_node(where: {uid: {_eq: $uid}}, _set: {room_types: $room_types, rule_types: $rule_types}) {\n//       affected_rows\n//       returning {\n//         uid\n//       }\n//     }\n//   }\n// `;\n\nexport const UPDATE_PLAN_DOCUMENT_NODE = gql`\n  mutation UpdateDocumentNode($uid: String, $changes: t_plan_document_node_set_input) {\n    update_t_plan_document_node(where: {uid: {_eq: $uid}}, _set: $changes) {\n      returning {\n        data\n        changed_at\n        created_at\n      }\n      affected_rows\n    }\n  }\n`;\n\nexport const REMOVE_PLAN_DOCUMENT_NODE = gql`\n  mutation DeletePlanDocumentNode($uid: String!) {\n    delete_t_plan_document_node_by_pk(uid: $uid) {\n      uid\n    }\n  }\n`;\n\n",
+        "start": 2131,
+        "end": 7319,
+        "loc": {
+          "start": {
+            "line": 87,
+            "column": 0
+          },
+          "end": {
+            "line": 354,
+            "column": 2
+          }
+        }
+      }
+    ]
+  },
+  "comments": [
+    {
+      "type": "CommentLine",
+      "value": " Whole file was just for qql testing",
+      "start": 1,
+      "end": 39,
+      "loc": {
+        "start": {
+          "line": 2,
+          "column": 0
+        },
+        "end": {
+          "line": 2,
+          "column": 38
+        }
+      }
+    },
+    {
+      "type": "CommentBlock",
+      "value": "\nimport { ApolloClient, split, HttpLink, InMemoryCache } from '@apollo/client';\nimport {GraphQLNormalizr} from 'graphql-normalizr'\nimport { gql } from '@apollo/client';\nimport { getMainDefinition } from '@apollo/client/utilities';\nimport { WebSocketLink } from '@apollo/link-ws';\n",
+      "start": 40,
+      "end": 324,
+      "loc": {
+        "start": {
+          "line": 3,
+          "column": 0
+        },
+        "end": {
+          "line": 9,
+          "column": 2
+        }
+      }
+    },
+    {
+      "type": "CommentBlock",
+      "value": "\nimport { SubscriptionClient } from 'graphql-subscriptions-client';\n// set up the client, which can be reused\nconst qqlSubscriptionClient = new SubscriptionClient('ws://localhost:8080/v1/graphql', {\n  reconnect: true,\n});\n",
+      "start": 326,
+      "end": 552,
+      "loc": {
+        "start": {
+          "line": 11,
+          "column": 0
+        },
+        "end": {
+          "line": 17,
+          "column": 2
+        }
+      }
+    },
+    {
+      "type": "CommentBlock",
+      "value": "\nCommented out as graphql not used\nconst httpLink = new HttpLink({\n  uri: 'http://localhost:8080/v1/graphql'\n});\n\nconst wsLink = new WebSocketLink({\n  uri: `ws://localhost:8080/v1/graphql`,\n  options: {\n    reconnect: true\n  }\n});\n\n\n// The split function takes three parameters:\n//\n// * A function that's called for each operation to execute\n// * The Link to use for an operation if the function returns a \"truthy\" value\n// * The Link to use for an operation if the function returns a \"falsy\" value\nconst splitLink = split(\n  ({ query }) => {\n    const definition = getMainDefinition(query);\n    return (\n      definition.kind === 'OperationDefinition' &&\n      definition.operation === 'subscription'\n    );\n  },\n  wsLink,\n  httpLink,\n);\n\nexport const isAuth = (state) => {\n  const { user } = state\n  const { authKey } = user;\n  if (!user || !user.authKey) {\n    // Already fetched or in progress, don't need to re-fetch\n    console.error('SDK listPlans error: No userKey!');\n    return false;\n  }\n  return true;\n}\n\nconst createApolloClient = (authToken) => {\n  if (window && window.location && window.location.hostname === 'localhost') {\n    return new ApolloClient({\n      link: splitLink,\n      cache: new InMemoryCache(),\n    });\n  }\n  return null;\n};\n\nexport const qqlClient = createApolloClient(null);\n\n\nexport const { normalize } = new GraphQLNormalizr(\n  {\n    idKey: 'uid',\n    exclude: { t_plan_document_node: [ 'data' ] },\n    typeMap: {\n      t_plan: 'plans',\n      t_plan_document: 'documents',\n      t_plan_document_node: 'nodes',\n    }\n});\n",
+      "start": 554,
+      "end": 2114,
+      "loc": {
+        "start": {
+          "line": 19,
+          "column": 0
+        },
+        "end": {
+          "line": 84,
+          "column": 2
+        }
+      }
+    },
+    {
+      "type": "CommentLine",
+      "value": " Fake client",
+      "start": 2116,
+      "end": 2130,
+      "loc": {
+        "start": {
+          "line": 86,
+          "column": 0
+        },
+        "end": {
+          "line": 86,
+          "column": 14
+        }
+      }
+    },
+    {
+      "type": "CommentBlock",
+      "value": "\nexport const qqlClient = {\n  query: () => {},\n  subscribe: () => {},\n  mutate: () => {}\n}\nexport const { normalize } =  () => {};\nexport const isAuth = (state) => {};\n\n\nexport const GET_PLAN_DOCUMENTs_AND_NODES = gql`\n  query ListPlansDocumentAndNodes {\n    t_plan {\n      uid\n      name\n      created_at\n      changed_at\n      documents {\n        uid\n        plan_id\n        changed_at\n        created_at\n        device_types\n        scene_types\n        template_types\n        room_types\n        rule_types\n        nodes {\n          uid\n          data\n          parent_id\n          child {\n            uid\n            parent_id\n          }\n        }\n      }\n    }\n  }\n`;\n\nexport const SUBS_PLANS = gql`\n  subscription SubsPlans {\n     t_plan {\n      uid\n      name\n      created_at\n      changed_at\n    }\n  }\n`;\n\n\nexport const GET_PLANS = gql`\n  query ListPlans {\n    t_plan {\n      uid\n      name\n      created_at\n      changed_at\n    }\n  }\n`;\n\n\nexport const INSERT_PLAN = gql`\n mutation InsertPlanWithDocument($object: t_plan_insert_input!) {\n  insert_t_plan_one(object: $object) {\n    changed_at\n    created_at\n    uid\n    documents {\n      uid\n      name\n      nodes {\n        uid\n      }\n      changed_at\n      created_at\n    }\n  }\n}\n`;\n\n\nexport const UPDATE_PLAN = gql`\n  mutation UpdatePlan($uid: String, $changes: t_plan_set_input) {\n    update_t_plan(where: {uid: {_eq: $uid}}, _set: $changes) {\n      affected_rows\n      returning {\n        uid\n        name\n        created_at\n        changed_at\n      }\n    }\n  }\n`;\n\nexport const REMOVE_PLAN = gql`\n  mutation DeletePlan($uid: String!) {\n    delete_t_plan_by_pk(uid: $uid) {\n      name\n    }\n  }\n`;\n\n\nexport const GET_PLAN_DOCUMENTS = gql`\n  query ListDocuments($plan_id: String) {\n    t_plan_document(where: {plan_id: {_eq: $plan_id}}) {\n      uid\n      author\n      name\n      created_at\n      changed_at\n      plan_id\n    }\n  }\n`;\n\nexport const SUBS_PLAN_DOCUMENTS = gql`\n  subscription SubsPlanDocuments($plan_id: String)  {\n    t_plan_document(where: {plan_id: {_eq: $plan_id}}) {\n      uid\n      author\n      name\n      created_at\n      changed_at\n      plan_id\n    }\n  }\n`;\nexport const INSERT_PLAN_DOCUMENT = gql`\n  mutation InsertDocumentToPlan($object: t_plan_document_insert_input!) {\n    insert_t_plan_document_one(object: $object) {\n      uid\n      name\n      author\n      changed_at\n      created_at\n      nodes {\n        changed_at\n        created_at\n        data\n      }\n    }\n  }\n`;\n\n//\n// export const UPDATE_PLAN_DOCUMENT = gql`\n//   mutation UpdateDocument($room_types: jsonb, $rule_types: jsonb, $uid: String) {\n//     update_t_plan_document(where: {uid: {_eq: $uid}}, _set: {room_types: $room_types, rule_types: $rule_types}) {\n//       affected_rows\n//       returning {\n//         uid\n//         room_types\n//         rule_types\n//         scene_types\n//         template_types\n//         device_types\n//       }\n//     }\n//   }\n// `;\n//\nexport const UPDATE_PLAN_DOCUMENT = gql`\n  mutation UpdatePlanDocument($uid: String, $changes: t_plan_document_set_input) {\n    update_t_plan_document(where: {uid: {_eq: $uid}}, _set: $changes) {\n      affected_rows\n      returning {\n        uid\n        name\n        author\n        created_at\n        changed_at\n      }\n    }\n  }\n`;\n\nexport const REMOVE_PLAN_DOCUMENT = gql`\n  mutation DeleteDocumentAndAllNodes($uid: String!) {\n    delete_t_plan_document_node(where: {document_id: {_eq: $uid}}) {\n      affected_rows\n    }\n    delete_t_plan_document(where: {uid: {_eq: $uid}}){\n      affected_rows\n    }\n  }\n`;\n\n// Nodes\nexport const GET_PLAN_DOCUMENT_NODES = gql`\n  query ListNodess($document_id: String) {\n    t_plan_document_node(where: {document_id: {_eq: $document_id}}) {\n      uid\n      created_at\n      changed_at\n      document_id\n      data\n    }\n  }\n`;\n\nexport const SUBS_PLAN_DOCUMENT_NODES = gql`\n  subscription SubsPlanDocuments($document_id: String)  {\n    t_plan_document_node(where: {document_id: {_eq: $document_id}}) {\n      uid\n      parent_id\n      child{\n        uid\n      }\n      created_at\n      changed_at\n      document_id\n      data\n    }\n  }\n`;\n\n\nexport const INSERT_PLAN_DOCUMENT_NODE = gql`\n  mutation InsertNode($object: t_plan_document_node_insert_input!) {\n    insert_t_plan_document_node_one(object: $object) {\n      uid\n      changed_at\n      created_at\n      data\n    }\n  }\n`;\n\n\n// export const UPDATE_PLAN_DOCUMENT_NODE = gql`\n//   mutation UpdateDocument($room_types: jsonb, $rule_types: jsonb, $uid: String) {\n//     update_t_plan_document_node(where: {uid: {_eq: $uid}}, _set: {room_types: $room_types, rule_types: $rule_types}) {\n//       affected_rows\n//       returning {\n//         uid\n//       }\n//     }\n//   }\n// `;\n\nexport const UPDATE_PLAN_DOCUMENT_NODE = gql`\n  mutation UpdateDocumentNode($uid: String, $changes: t_plan_document_node_set_input) {\n    update_t_plan_document_node(where: {uid: {_eq: $uid}}, _set: $changes) {\n      returning {\n        data\n        changed_at\n        created_at\n      }\n      affected_rows\n    }\n  }\n`;\n\nexport const REMOVE_PLAN_DOCUMENT_NODE = gql`\n  mutation DeletePlanDocumentNode($uid: String!) {\n    delete_t_plan_document_node_by_pk(uid: $uid) {\n      uid\n    }\n  }\n`;\n\n",
+      "start": 2131,
+      "end": 7319,
+      "loc": {
+        "start": {
+          "line": 87,
+          "column": 0
+        },
+        "end": {
+          "line": 354,
+          "column": 2
+        }
+      }
+    }
+  ],
+  "tokens": [
+    {
+      "type": "CommentLine",
+      "value": " Whole file was just for qql testing",
+      "start": 1,
+      "end": 39,
+      "loc": {
+        "start": {
+          "line": 2,
+          "column": 0
+        },
+        "end": {
+          "line": 2,
+          "column": 38
+        }
+      }
+    },
+    {
+      "type": "CommentBlock",
+      "value": "\nimport { ApolloClient, split, HttpLink, InMemoryCache } from '@apollo/client';\nimport {GraphQLNormalizr} from 'graphql-normalizr'\nimport { gql } from '@apollo/client';\nimport { getMainDefinition } from '@apollo/client/utilities';\nimport { WebSocketLink } from '@apollo/link-ws';\n",
+      "start": 40,
+      "end": 324,
+      "loc": {
+        "start": {
+          "line": 3,
+          "column": 0
+        },
+        "end": {
+          "line": 9,
+          "column": 2
+        }
+      }
+    },
+    {
+      "type": "CommentBlock",
+      "value": "\nimport { SubscriptionClient } from 'graphql-subscriptions-client';\n// set up the client, which can be reused\nconst qqlSubscriptionClient = new SubscriptionClient('ws://localhost:8080/v1/graphql', {\n  reconnect: true,\n});\n",
+      "start": 326,
+      "end": 552,
+      "loc": {
+        "start": {
+          "line": 11,
+          "column": 0
+        },
+        "end": {
+          "line": 17,
+          "column": 2
+        }
+      }
+    },
+    {
+      "type": "CommentBlock",
+      "value": "\nCommented out as graphql not used\nconst httpLink = new HttpLink({\n  uri: 'http://localhost:8080/v1/graphql'\n});\n\nconst wsLink = new WebSocketLink({\n  uri: `ws://localhost:8080/v1/graphql`,\n  options: {\n    reconnect: true\n  }\n});\n\n\n// The split function takes three parameters:\n//\n// * A function that's called for each operation to execute\n// * The Link to use for an operation if the function returns a \"truthy\" value\n// * The Link to use for an operation if the function returns a \"falsy\" value\nconst splitLink = split(\n  ({ query }) => {\n    const definition = getMainDefinition(query);\n    return (\n      definition.kind === 'OperationDefinition' &&\n      definition.operation === 'subscription'\n    );\n  },\n  wsLink,\n  httpLink,\n);\n\nexport const isAuth = (state) => {\n  const { user } = state\n  const { authKey } = user;\n  if (!user || !user.authKey) {\n    // Already fetched or in progress, don't need to re-fetch\n    console.error('SDK listPlans error: No userKey!');\n    return false;\n  }\n  return true;\n}\n\nconst createApolloClient = (authToken) => {\n  if (window && window.location && window.location.hostname === 'localhost') {\n    return new ApolloClient({\n      link: splitLink,\n      cache: new InMemoryCache(),\n    });\n  }\n  return null;\n};\n\nexport const qqlClient = createApolloClient(null);\n\n\nexport const { normalize } = new GraphQLNormalizr(\n  {\n    idKey: 'uid',\n    exclude: { t_plan_document_node: [ 'data' ] },\n    typeMap: {\n      t_plan: 'plans',\n      t_plan_document: 'documents',\n      t_plan_document_node: 'nodes',\n    }\n});\n",
+      "start": 554,
+      "end": 2114,
+      "loc": {
+        "start": {
+          "line": 19,
+          "column": 0
+        },
+        "end": {
+          "line": 84,
+          "column": 2
+        }
+      }
+    },
+    {
+      "type": "CommentLine",
+      "value": " Fake client",
+      "start": 2116,
+      "end": 2130,
+      "loc": {
+        "start": {
+          "line": 86,
+          "column": 0
+        },
+        "end": {
+          "line": 86,
+          "column": 14
+        }
+      }
+    },
+    {
+      "type": "CommentBlock",
+      "value": "\nexport const qqlClient = {\n  query: () => {},\n  subscribe: () => {},\n  mutate: () => {}\n}\nexport const { normalize } =  () => {};\nexport const isAuth = (state) => {};\n\n\nexport const GET_PLAN_DOCUMENTs_AND_NODES = gql`\n  query ListPlansDocumentAndNodes {\n    t_plan {\n      uid\n      name\n      created_at\n      changed_at\n      documents {\n        uid\n        plan_id\n        changed_at\n        created_at\n        device_types\n        scene_types\n        template_types\n        room_types\n        rule_types\n        nodes {\n          uid\n          data\n          parent_id\n          child {\n            uid\n            parent_id\n          }\n        }\n      }\n    }\n  }\n`;\n\nexport const SUBS_PLANS = gql`\n  subscription SubsPlans {\n     t_plan {\n      uid\n      name\n      created_at\n      changed_at\n    }\n  }\n`;\n\n\nexport const GET_PLANS = gql`\n  query ListPlans {\n    t_plan {\n      uid\n      name\n      created_at\n      changed_at\n    }\n  }\n`;\n\n\nexport const INSERT_PLAN = gql`\n mutation InsertPlanWithDocument($object: t_plan_insert_input!) {\n  insert_t_plan_one(object: $object) {\n    changed_at\n    created_at\n    uid\n    documents {\n      uid\n      name\n      nodes {\n        uid\n      }\n      changed_at\n      created_at\n    }\n  }\n}\n`;\n\n\nexport const UPDATE_PLAN = gql`\n  mutation UpdatePlan($uid: String, $changes: t_plan_set_input) {\n    update_t_plan(where: {uid: {_eq: $uid}}, _set: $changes) {\n      affected_rows\n      returning {\n        uid\n        name\n        created_at\n        changed_at\n      }\n    }\n  }\n`;\n\nexport const REMOVE_PLAN = gql`\n  mutation DeletePlan($uid: String!) {\n    delete_t_plan_by_pk(uid: $uid) {\n      name\n    }\n  }\n`;\n\n\nexport const GET_PLAN_DOCUMENTS = gql`\n  query ListDocuments($plan_id: String) {\n    t_plan_document(where: {plan_id: {_eq: $plan_id}}) {\n      uid\n      author\n      name\n      created_at\n      changed_at\n      plan_id\n    }\n  }\n`;\n\nexport const SUBS_PLAN_DOCUMENTS = gql`\n  subscription SubsPlanDocuments($plan_id: String)  {\n    t_plan_document(where: {plan_id: {_eq: $plan_id}}) {\n      uid\n      author\n      name\n      created_at\n      changed_at\n      plan_id\n    }\n  }\n`;\nexport const INSERT_PLAN_DOCUMENT = gql`\n  mutation InsertDocumentToPlan($object: t_plan_document_insert_input!) {\n    insert_t_plan_document_one(object: $object) {\n      uid\n      name\n      author\n      changed_at\n      created_at\n      nodes {\n        changed_at\n        created_at\n        data\n      }\n    }\n  }\n`;\n\n//\n// export const UPDATE_PLAN_DOCUMENT = gql`\n//   mutation UpdateDocument($room_types: jsonb, $rule_types: jsonb, $uid: String) {\n//     update_t_plan_document(where: {uid: {_eq: $uid}}, _set: {room_types: $room_types, rule_types: $rule_types}) {\n//       affected_rows\n//       returning {\n//         uid\n//         room_types\n//         rule_types\n//         scene_types\n//         template_types\n//         device_types\n//       }\n//     }\n//   }\n// `;\n//\nexport const UPDATE_PLAN_DOCUMENT = gql`\n  mutation UpdatePlanDocument($uid: String, $changes: t_plan_document_set_input) {\n    update_t_plan_document(where: {uid: {_eq: $uid}}, _set: $changes) {\n      affected_rows\n      returning {\n        uid\n        name\n        author\n        created_at\n        changed_at\n      }\n    }\n  }\n`;\n\nexport const REMOVE_PLAN_DOCUMENT = gql`\n  mutation DeleteDocumentAndAllNodes($uid: String!) {\n    delete_t_plan_document_node(where: {document_id: {_eq: $uid}}) {\n      affected_rows\n    }\n    delete_t_plan_document(where: {uid: {_eq: $uid}}){\n      affected_rows\n    }\n  }\n`;\n\n// Nodes\nexport const GET_PLAN_DOCUMENT_NODES = gql`\n  query ListNodess($document_id: String) {\n    t_plan_document_node(where: {document_id: {_eq: $document_id}}) {\n      uid\n      created_at\n      changed_at\n      document_id\n      data\n    }\n  }\n`;\n\nexport const SUBS_PLAN_DOCUMENT_NODES = gql`\n  subscription SubsPlanDocuments($document_id: String)  {\n    t_plan_document_node(where: {document_id: {_eq: $document_id}}) {\n      uid\n      parent_id\n      child{\n        uid\n      }\n      created_at\n      changed_at\n      document_id\n      data\n    }\n  }\n`;\n\n\nexport const INSERT_PLAN_DOCUMENT_NODE = gql`\n  mutation InsertNode($object: t_plan_document_node_insert_input!) {\n    insert_t_plan_document_node_one(object: $object) {\n      uid\n      changed_at\n      created_at\n      data\n    }\n  }\n`;\n\n\n// export const UPDATE_PLAN_DOCUMENT_NODE = gql`\n//   mutation UpdateDocument($room_types: jsonb, $rule_types: jsonb, $uid: String) {\n//     update_t_plan_document_node(where: {uid: {_eq: $uid}}, _set: {room_types: $room_types, rule_types: $rule_types}) {\n//       affected_rows\n//       returning {\n//         uid\n//       }\n//     }\n//   }\n// `;\n\nexport const UPDATE_PLAN_DOCUMENT_NODE = gql`\n  mutation UpdateDocumentNode($uid: String, $changes: t_plan_document_node_set_input) {\n    update_t_plan_document_node(where: {uid: {_eq: $uid}}, _set: $changes) {\n      returning {\n        data\n        changed_at\n        created_at\n      }\n      affected_rows\n    }\n  }\n`;\n\nexport const REMOVE_PLAN_DOCUMENT_NODE = gql`\n  mutation DeletePlanDocumentNode($uid: String!) {\n    delete_t_plan_document_node_by_pk(uid: $uid) {\n      uid\n    }\n  }\n`;\n\n",
+      "start": 2131,
+      "end": 7319,
+      "loc": {
+        "start": {
+          "line": 87,
+          "column": 0
+        },
+        "end": {
+          "line": 354,
+          "column": 2
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "eof",
+        "beforeExpr": false,
+        "startsExpr": false,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null,
+        "updateContext": null
+      },
+      "start": 7320,
+      "end": 7320,
+      "loc": {
+        "start": {
+          "line": 355,
+          "column": 0
+        },
+        "end": {
+          "line": 355,
+          "column": 0
+        }
+      }
+    }
+  ]
+}

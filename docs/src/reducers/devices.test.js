@@ -1,4 +1,4 @@
-// import { configureStore } from 'redux-starter-kit';
+// import { configureStore } from '@reduxjs/toolkit';
 // import deepFreeze from 'deep-freeze';
 import { devicesState, devicesReducer } from './devices';
 import { store } from '../store';

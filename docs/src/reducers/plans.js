@@ -1,337 +1,351 @@
-
 // 
+import {
+  createSlice,
+  createEntityAdapter,
+  createAsyncThunk,
+  // createSelector,
+} from '@reduxjs/toolkit';
 
-// This actionreducer uses internally https://github.com/mweststrate/immer, so it's safe to modify given state directly
-import { createSlice } from 'redux-starter-kit';
-import isArray from 'lodash/isArray';
+
+// Was just test implementation of qql
+// import { GET_PLANS, SUBS_PLANS, INSERT_PLAN, UPDATE_PLAN, REMOVE_PLAN, qqlClient, normalize, isAuth } from '../qql.js'
 
 /*
-* Helpers
+** addOne: accepts a single entity, and adds it.
+** addMany: accepts an array of entities or an object in the shape of Record<EntityId, T>, and adds them.
+** setAll: accepts an array of entities or an object in the shape of Record<EntityId, T>,
+** and replaces the existing entity contents with the values in the array.
+** removeOne: accepts a single entity ID value, and removes the entity with that ID if it exists.
+** removeMany: accepts an array of entity ID values, and removes each entity with those IDs if they exist.
+** updateOne: accepts an "update object" containing an entity ID and an object containing one or
+** more new field values to update inside a changes field, and performs a shallow update on the corresponding entity.
+** updateMany: accepts an array of update objects, and performs shallow updates on all corresponding entities.
+** upsertOne: accepts a single entity. If an entity with that ID exists, it will perform a shallow update
+** and the specified fields will be merged into the existing entity, with any matching fields overwriting the existing values.
+** If the entity does not exist, it will be added.
+** upsertMany: accepts an array of entities or an object in the shape of Record<EntityId, T> that will be shallowly upserted.
 */
+const plansAdapter = createEntityAdapter({
+  // Assume IDs are stored in a field uid
+  selectId: (plan) => {
+    console.log('SDK plansAdapter: ', plan);
+    return plan.uid;
+  },
+  // Keep the "all IDs" array sorted based on plan names
+  sortComparer: (a, b) => b.changed_at.localeCompare(a.changed_at),
+});
 
-const setId = (idObj) => {
-  const givenObject = idObj;
-  if (!givenObject.id) {
-    givenObject.id = Date.now();
-  }
-  return givenObject;
-};
-
-
-const getAllDescendantIds = (state, nodeId) => (
-  state[nodeId].childIds.reduce((acc, childId) => (
-    [...acc, childId, ...getAllDescendantIds(state, childId)]
-  ), [])
-);
-
-const deleteMany = (givenState, ids) => {
-  const state = { ...givenState };
-  ids.forEach((id) => delete state[id]);
-  return state;
-};
-
-
-
-const findChild = (state, id) => {
-  let found;
-  (Object.values(state)).forEach((node) => {
-    if (!found) {
-      if (node && node.childIds) {
-        // console.error(`FIND ${id} in ${JSON.stringify(node.childIds)} when node ${JSON.stringify(node)}`);
-        if (isArray(node.childIds)) {
-          if (node.childIds.includes(id)) {
-            found = node;
-          }
-        }
-      }
-    }
+// Fetch all plans
+async function fetchPlans() {
+  return new Promise((resolve, reject) => {
+    reject(new Error('fetchPlans TBD'));
+    /*  Was just test implementation of qql
+    qqlClient.query({
+      query: GET_PLANS
+    })
+    .then((result) => {
+      const queryResults = normalize(result);
+      console.debug('SDK fetchPlans ok', queryResults);
+      resolve(queryResults.plans);
+    }).catch((error) => {
+      debugger;
+      console.error('SDK fetchPlans error:', error);
+      reject(error);
+    });
+    */
   });
-  // console.error(`FOUND ${id} => ${JSON.stringify(found)}`);
-  return found;
-};
+}
 
-/**
- * Plans action creators object
- * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
- * @return { {
- *   slice : string,
- *   reducer : ReducerFunction,
- *   actions : Object<string, ActionCreator},
- *   selectors : Object<string, Selector>
- *   }}
- */
-export const plansState = createSlice({
-  slice: 'plans',
-  initialState: {
-    templates: {},
-    installations: {},
-    locations: {
-      childIds: [],
+
+export const reactFetchPlans = createAsyncThunk(
+  'plans/fetchPlans',
+  async (params, ThunkAPI) => {
+    // if (isAuth(ThunkAPI.getState())) {
+    console.debug('reactFetchPlans state', ThunkAPI.getState());
+    return fetchPlans();
+    // }
+  },
+  {
+    condition: (params, { getState, extra }) => {
+      const state = getState();
+      console.debug('reactFetchPlans condition state: ', state);
+      console.debug('reactFetchPlans condition extra: ', extra);
     },
   },
+);
+
+
+// Subscribe
+export const reactSubscribePlans = createAsyncThunk(
+  'plans/subscribePlans',
+  async (params, ThunkAPI) => new Promise((resolve, reject) => {
+    console.debug('reactSubscribePlans state: ', ThunkAPI.getState());
+    console.debug('reactSubscribePlans params: ', params);
+    reject(new Error('subscribePlans TBD'));
+    /*  Was just test implementation of qql
+      if (isAuth(ThunkAPI.getState())) {
+        const subsHandle = qqlClient.subscribe({
+          query: SUBS_PLANS,
+          //variables: { },
+        }).subscribe({
+          next(data) {
+            try {
+              if (data && data.data && data.data.t_plan &&data.data.t_plan.length > 0) {
+                const results = normalize(data);
+                // plansAdapter.setAll(ThunkAPI.getState(), results.plans)
+                ThunkAPI.dispatch(plansState.actions.setPlansState(results.plans));
+              } else {
+                ThunkAPI.dispatch(plansState.actions.setPlansState({plans:{}}));
+              }
+              resolve()
+            } catch(e) {
+              reject(e)
+              debugger
+              console.error('reactSubscribePlans exception', e);
+            }
+          },
+          error(err) {
+            reject(err)
+            debugger
+            console.error('reactSubscribePlans err', err);
+          }
+        })
+      } else {
+        reject()
+      }
+    })
+    */
+  }),
+);
+
+// Insert plan
+async function insertPlan(name) {
+  return new Promise((resolve, reject) => {
+    console.debug('SDK insertPlan name', name);
+    reject(new Error('insertPlans TBD'));
+    /*  Was just test implementation of qql
+    qqlClient.mutate({
+      variables: {
+        object: {
+          name: name,
+          documents: {
+            data: [
+              {
+                name: "?"
+              }
+            ]
+          }
+        }
+      },
+      mutation: INSERT_PLAN
+    })
+    .then((result) => {
+      const queryResults = normalize(result);
+      console.debug('SDK insertPlan ok', queryResults);
+      resolve(queryResults.plans);
+    }).catch((error) => {
+      debugger;
+      console.error('SDK insertPlan error:', error);
+      reject(error);
+    });
+    */
+  });
+}
+
+
+export const reactInsertPlan = createAsyncThunk(
+  'plans/insertPlan',
+  async (params, ThunkAPI) => {
+    // if (isAuth(ThunkAPI.getState())) {
+    console.debug('reactInsertPlan state: ', ThunkAPI.getState());
+    const { name } = params;
+    return insertPlan(name);
+    // }
+  },
+);
+
+
+// Update Plan
+async function updatePlan(uid, changes) {
+  return new Promise((resolve, reject) => {
+    reject(new Error(`updatePlan uid: ${uid} TBD, changes: ${changes}`));
+    /*  Was just test implementation of qql
+    qqlClient.mutate({
+      variables: {
+        uid: uid,
+        changes: changes
+      },
+      mutation: UPDATE_PLAN
+    })
+    .then((result) => {
+      const queryResults = normalize(result);
+      console.debug('SDK updatePlan ok', queryResults);
+      resolve(queryResults.plans);
+    }).catch((error) => {
+      debugger;
+      console.error('SDK updatePlan error:', error);
+      reject(error);
+    });
+    */
+  });
+}
+
+
+export const reactUpdatePlan = createAsyncThunk(
+  'plans/updatePlan',
+  async (params, ThunkAPI) => {
+    // if (isAuth(ThunkAPI.getState())) {
+    console.debug('reactUpdatePlan state: ', ThunkAPI.getState());
+    const { uid, changes } = params;
+    return updatePlan(uid, changes);
+    // }
+  },
+);
+
+// Remove Plan
+async function removePlan(uid) {
+  return new Promise((resolve, reject) => {
+    reject(new Error(`removePlan  uid: ${uid} TBD`));
+    /*  Was just test implementation of qql
+    qqlClient.mutate({
+      variables: {
+        "uid": uid,
+      },
+      mutation: REMOVE_PLAN
+    })
+    .then((result) => {
+      console.debug('SDK removePlan ok', result);
+      resolve(result);
+    }).catch((error) => {
+      debugger;
+      console.error('SDK removePlan error:', error);
+      reject(error);
+    });
+    */
+  });
+}
+
+
+export const reactRemovePlan = createAsyncThunk(
+  'plans/removePlan',
+  async (params, ThunkAPI) => {
+    // if (isAuth(ThunkAPI.getState())) {
+    console.debug('reactRemovePlan state: ', ThunkAPI.getState());
+    const { uid } = params;
+    return removePlan(uid);
+    // }
+  },
+);
+
+// Slice
+export const plansState = createSlice({
+  name: 'plans',
+  initialState: plansAdapter.getInitialState(),
   reducers: {
-
     setPlansState(state, action) {
-      const stateToSet = state;
+      // const stateToSet = state;
+      // const oldState = stateToSet.plansState;
       const newState = action.payload;
-      const oldState = state.cloudState;
-      console.log(`PLANS state ${oldState} -> ${newState}`);
-      stateToSet.plansState = newState;
-    },
+      plansAdapter.setAll(state, newState);
+      // console.log(`SDK setPlansState: PLANS state ${oldState} -> ${newState}`);
+      // console.info('plans.js setPlansState: newState', newState)
 
-    /*
-     * Reducer action of setting all templates state
-     * @param {Object} state
-     * @param {Object} action
-     */
-    setTemplates(state, action) {
-      const stateToSet = state;
+      /*
+      const normalized = normalize(newState, plansEntity);
+      console.info('plans.js setPlansState: normalized plans', normalized)//.entities.plans)
 
-      const { templates } = action.payload;
-      const newTemplates = {};
+      Object.entries(normalized.entities.plans).forEach(([id, plan]) => {
 
-      Object.entries(templates).forEach((entry) => {
-        setId(entry);
-        const [id, template] = entry;
-        newTemplates[id] = { ...template };
+        console.info('plans.js document from plan:', JSON.stringify(plan.document));
+
+        const locations = getLocationsFromDocument(plan.document)
+        console.info('plans.js locations tree:', JSON.stringify(locations));
+        plan.locations = locations;
+
+        const document = getDocumentFromLocations(plan.locations)
+        console.info('plans.js document from tree:', JSON.stringify(document))
       });
-      stateToSet.templates = { ...newTemplates };
-    },
+      plansAdapter.setAll(state, normalized.entities.plans)
+      */
 
-    /*
-     * Reducer action of adding template state
-     * @param {Object} state
-     * @param {Object} action
-     */
-    addTemplate(state, action) {
-      const stateToSet = state;
-      const template = action.payload;
-      setId(template);
-      if (template.id) {
-        stateToSet.templates[template.id] = { ...template };
-      }
-    },
+      // const normalized = normalize(newState, plansEntity);
+      // console.info('plans.js setPlansState: normalized plans', normalized)
+      /*
+      Object.entries(normalized.entities.plans).forEach(([id, plan]) => {
+        //const documents = normalize(plan, sEntity);
+        //const normalizedDocuments = normalize(documents, documentsEntity);
+        //Object.entries(normalizedDocuments.entities.documents).forEach(([id, docuement]) => {
+          debugger
+        //});
 
-
-    /*
-     * Reducer action of setting template state
-     * @param {Object} state
-     * @param {Object} action
-     */
-    setTemplate(state, action) {
-      const stateToSet = state;
-      const template = action.payload;
-      setId(template);
-      if (template.id && stateToSet.templates[template.id]) {
-        stateToSet.templates[template.id] = { ...template };
-      }
-    },
-
-    /*
-     * Reducer action of removing plan state
-     * @param {Object} state
-     * @param {Object} action
-     */
-    removeTemplate(state, action) {
-      const stateToSet = state;
-      const template = action.payload;
-      setId(template);
-      if (template.id && stateToSet.templates[template.id]) {
-        delete stateToSet.templates[template.id];
-      }
-    },
-
-    /*
-     * Reducer action of setting installations state
-     * @param {Object} state
-     * @param {Object} action
-     */
-    setInstallations(state, action) {
-      const stateToSet = state;
-
-      const { installations } = action.payload;
-      const newInstallations = {};
-
-      Object.entries(installations).forEach((entry) => {
-        setId(entry);
-        const [id, installation] = entry;
-        newInstallations[id] = { ...installation };
       });
-      stateToSet.installations = { ...newInstallations };
+      plansAdapter.setAll(state, normalized.entities.plans)
+      */
     },
+    // listPlans: listPlans,
 
-    /*
-     * Reducer action of adding installation state
-     * @param {Object} state
-     * @param {Object} action
-     */
-    addInstallation(state, action) {
-      const stateToSet = state;
-      const installation = action.payload;
-      setId(installation);
-      if (installation.id) {
-        stateToSet.installations[installation.id] = { ...installation };
-      }
+  },
+  extraReducers: {
+    // Add reducers for additional action types here, and handle loading state as needed
+    [reactFetchPlans.fulfilled]: (state, action) => {
+      plansAdapter.upsertMany(state, action.payload);
     },
-
-    /*
-     * Reducer action of setting plan state
-     * @param {Object} state
-     * @param {Object} action
-     */
-    setInstallation(state, action) {
-      const stateToSet = state;
-      const installation = action.payload;
-      setId(installation);
-      if (stateToSet.installations[installation.id]) {
-        stateToSet.installations[installation.id] = { ...installation };
-      }
+    [reactFetchPlans.rejected]: (state, action) => {
+      console.error('SDK reactFetchPlans rejected state: ', state);
+      console.error('SDK reactFetchPlans rejected action: ', action);
     },
-
-    /*
-     * Reducer action of removing plan state
-     * @param {Object} state
-     * @param {Object} action
-     */
-    removeInstallation(state, action) {
-      const stateToSet = state;
-      const installation = action.payload;
-      setId(installation);
-      if (installation.id && stateToSet.installations[installation.id]) {
-        delete stateToSet.installations[installation.id];
-      }
+    [reactInsertPlan.fulfilled]: (state, action) => {
+      plansAdapter.updateOne(state, action.payload);
     },
-
-    /*
-     * Reducer action of adding country state
-     * @param {Object} state
-     * @param {Object} action
-     */
-    addLocationCountry(state, action) {
-      const stateToSet = state;
-      const country = action.payload;
-      setId(country);
-      if (country.id) {
-        stateToSet.locations[country.id] = { ...country };
-      }
+    [reactInsertPlan.rejected]: (state, action) => {
+      console.error('SDK reactInsertPlan rejected state: ', state);
+      console.error('SDK reactInsertPlan rejected action: ', action);
     },
-
-    /*
-     * Reducer action of setting country state
-     * @param {Object} state
-     * @param {Object} action
-     */
-    setLocationCountry(state, action) {
-      const stateToSet = state;
-      const country = action.payload;
-      setId(country);
-      if (stateToSet.locations[country.id]) {
-        stateToSet.locations[country.id] = { ...country };
-      }
+    [reactUpdatePlan.fulfilled]: (state, action) => {
+      plansAdapter.updateOne(state, action.payload);
     },
-
-    /*
-     * Reducer action of removing country state
-     * @param {Object} state
-     * @param {Object} action
-     */
-    removeLocationCountry(state, action) {
-      const stateToSet = state;
-      const country = action.payload;
-      setId(country);
-      if (country.id && stateToSet.locations[country.id]) {
-        delete stateToSet.locations[country.id];
-      }
+    [reactUpdatePlan.rejected]: (state, action) => {
+      console.error('SDK reactFetchPlans rejected state: ', state);
+      console.error('SDK reactFetchPlans rejected action: ', action);
     },
-
-    /*
-     * Reducer action of adding location node state
-     *
-     * addLocationNode({parentId: parent, data:{}})
-     *
-     * addLocationNode({ parentId: null, newNode: country }));
-     *
-     */
-    addLocationNode(state, action) {
-      const stateToSet = state;
-      const { parentId, newNode } = action.payload;
-      setId(newNode);
-      if (!newNode.childIds) {
-        newNode.childIds = [];
-      }
-
-      if (!parentId) {
-        stateToSet.locations.childIds = [...stateToSet.locations.childIds, newNode.id];
-        stateToSet.locations[newNode.id] = { ...newNode };
-      } else if (stateToSet.locations[parentId] && newNode && newNode.id) {
-        if (!stateToSet.locations[parentId].childIds) {
-          stateToSet.locations[parentId].childIds = [];
-        }
-        stateToSet.locations[parentId].childIds = [...stateToSet.locations[parentId].childIds, newNode.id];
-        stateToSet.locations[newNode.id] = { ...newNode };
-      }
+    [reactRemovePlan.fulfilled]: (state, action) => {
+      plansAdapter.updateOne(state, action.payload);
     },
-
-    /*
-     * setLocationNode(node)
-     */
-    setLocationNode(state, action) {
-      const stateToSet = state;
-      const node = action.payload;
-      if (!node.childIds) {
-        node.childIds = [];
-      }
-      if (node && node.id && stateToSet.locations[node.id]) {
-        stateToSet.locations[node.id] = { ...node };
-      }
-    },
-
-
-    /*
-     * removeLocationNode
-     */
-    removeLocationNode(state, action) {
-      const stateToSet = state;
-      const nodeId = action.payload;
-      if (nodeId) {
-        const descendantIds = getAllDescendantIds(stateToSet.locations, nodeId);
-        // console.debug('descendantIds', descendantIds);
-        const parent = findChild(stateToSet.locations, nodeId);
-        if (parent) {
-          // console.debug('PARENT', JSON.stringify(parent));
-          stateToSet.locations = deleteMany(stateToSet.locations, [nodeId, ...descendantIds]);
-          // console.debug('child not yet removed', JSON.stringify(stateToSet.locations[parent.id].childIds));
-          stateToSet.locations[parent.id].childIds = stateToSet.locations[parent.id].childIds.filter((id) => id !== nodeId);
-          // console.debug('child removed', JSON.stringify(stateToSet.locations[parent.id].childIds));
-        } else {
-          // console.debug('ROOT PARENT', nodeId);
-          stateToSet.locations = deleteMany(stateToSet.locations, [nodeId, ...descendantIds]);
-          // console.debug('root child not yet removed', JSON.stringify(stateToSet.locations.childIds));
-          stateToSet.locations.childIds = stateToSet.locations.childIds.filter((id) => id !== nodeId);
-          // console.debug('root child removed', JSON.stringify(stateToSet.locations.childIds));
-        }
-      }
+    [reactRemovePlan.rejected]: (state, action) => {
+      console.error('SDK reactRemovePlan rejected state: ', state);
+      console.error('SDK reactRemovePlan rejected action: ', action);
     },
   },
 });
 
 
-const { actions, reducer } = plansState;
+plansState.selectors = plansAdapter.getSelectors((state) => state.plans);
+plansState.selectors.getPlans = plansState.selectors.selectEntities;
+
+
+const { reducer } = plansState;
+// const { actions, reducer } = plansState;
+// console.info('plans.js: actions', actions)
+// console.info('plans.js: reducer', reducer)
+// console.info('plans.js: plansState', plansState)
 
 /**
- * Devices reducer
+ * Plans reducer
  * @type {function} reducer
  */
 export { reducer as plansReducer };
 
 // Extract and export each action creator by name
 /*
-console.log(addDevice({ id: 123, name: 'Unnamed device' }))
-{type : "devices/addDevice", payload : {id : 123, name: 'Unnamed device' }}
-*/
 export const {
-  setTemplates, addTemplate, setTemplate, removeTemplate,
-  setInstallations, addInstallation, setInstallation, removeInstallation,
-  addLocationCountry, setLocationCountry, removeLocationCountry,
-  addLocationNode, setLocationNode, removeLocationNode,
+  updateHubs, selectHub, unSelectHub, setHubConnectionState,
 } = actions;
+*/
+
+export const {
+  selectById: reactSelectPlanById,
+  selectIds: reactSelectPlanIds,
+  selectEntities: reactSelectPlanEntities,
+  selectAll: reactSelectAllPlans,
+  selectTotal: reactSelectTotalPlans,
+} = plansAdapter.getSelectors((state) => state.plans);

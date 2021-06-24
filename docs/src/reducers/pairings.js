@@ -1,20 +1,19 @@
 // 
 
-// This actionreducer uses internally https://github.com/mweststrate/immer, so it's safe to modify given state directly
-import { createSlice } from 'redux-starter-kit';
+import { createSlice, createSelector, createEntityAdapter } from '@reduxjs/toolkit';
 
 /**
  * Devices action creators object
- * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
+ * @see  https://github.com/reduxjs/@reduxjs/toolkit/blob/master/docs/api/createSlice.md
  * @return { {
- *   slice : string,
+ *   name : string,
  *   reducer : ReducerFunction,
  *   actions : Object<string, ActionCreator},
  *   selectors : Object<string, Selector>
  *   }}
  */
 export const pairingsState = createSlice({
-  slice: 'pairings',
+  name: 'pairings',
   initialState: {},
   reducers: {
     /*
@@ -66,6 +65,20 @@ export const pairingsState = createSlice({
   },
 });
 
+const adapter = createEntityAdapter();
+export const {
+  selectById: selectPairingById,
+  selectIds: selectPairingIds,
+  selectEntities: selectPairingEntities,
+  selectAll: selectAllPairings,
+  selectTotal: selectTotalPairings,
+} = adapter.getSelectors((state) => state.hubs);
+
+pairingsState.selectors = adapter.getSelectors((state) => state.pairings);
+pairingsState.selectors.getPairings = createSelector(
+  [(state) => state.pairings],
+  (pairings) => pairings,
+);
 const { actions, reducer } = pairingsState;
 
 /**

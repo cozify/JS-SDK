@@ -7,7 +7,7 @@ import { roomsState } from '../reducers/rooms';
 import { hubsState } from '../reducers/hubs';
 import { userState } from '../reducers/user';
 import { send, COMMANDS } from '../connection/send';
-import { HUB_CONNECTION_STATES } from '../connection/constants';
+import { HUB_CONNECTION_STATES, getCloudURL } from '../connection/constants';
 
 
 // import { ROOMS_FI, ROOMS_EN } from './constants';
@@ -50,7 +50,7 @@ export function sendRoomCmd(hubId, commandType, data) {
     const hubs = hubsState.selectors.getHubs(stateNow);
     const hub = hubs[hubId];
     const { hubKey } = hubs[hubId];
-    if (!hub || !hubKey) {
+    if (!hub || (!hubKey && getCloudURL().indexOf('https://one.cozify.fi') === -1)) {
       console.error('SDK sendRoomCmd error: No hubKey!');
       reject(new Error('Room command error: No hubKey!'));
       return;

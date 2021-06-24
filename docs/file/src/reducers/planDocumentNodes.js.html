@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">src/reducers/planDocumentNodes.js | Cozify SDK</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Cozify UI SDK for REST aPI"><meta property="og:type" content="website"><meta property="og:url" content="http://my-library.org"><meta property="og:site_name" content="Cozify SDK"><meta property="og:title" content="Cozify SDK"><meta property="og:image" content="http://my-library.org/logo.png"><meta property="og:description" content="Cozify UI SDK for REST aPI"><meta property="og:author" content="https://twitter.com/foo"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="Cozify SDK"><meta property="twitter:description" content="Cozify UI SDK for REST aPI"><meta property="twitter:image" content="http://my-library.org/logo.png"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./" style="display: flex; align-items: center;"><img src="./image/brand_logo.png" style="width:34px;"></a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/foo/bar"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-watchChanges">watchChanges</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-b64DecodeUnicode">b64DecodeUnicode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getTextFromNode">getTextFromNode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-urlBase64Decode">urlBase64Decode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-store">store</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-isNode">isNode</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#alarms">alarms</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-alarmsDeltaHandler">alarmsDeltaHandler</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-alertsDeltaHandler">alertsDeltaHandler</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-closeAlarm">closeAlarm</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getAlarms">getAlarms</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubAlarms">getHubAlarms</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-removeAlarm">removeAlarm</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sendAlarmCmd">sendAlarmCmd</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#connection">connection</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getCloudHost">getCloudHost</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getCloudURL">getCloudURL</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-selectCloud">selectCloud</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-useTestcloud">useTestcloud</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-resetRetry">resetRetry</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-retryCondition">retryCondition</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-cloudErrorState">cloudErrorState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getAPIversion">getAPIversion</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hubErrorState">hubErrorState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-testSSLCertificate">testSSLCertificate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-send">send</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sendAll">sendAll</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getCloudConnectionState">getCloudConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubConnectionState">getHubConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setCloudConnectionState">setCloudConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setHubConnectionState">setHubConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_API_VERSION">CLOUD_API_VERSION</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_FINGERPRINTS_SHA1">CLOUD_FINGERPRINTS_SHA1</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-MAX_API_VERSION">MAX_API_VERSION</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-CLOUD_CONNECTION_STATE_TYPE">CLOUD_CONNECTION_STATE_TYPE</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-COMMANDS_TYPE">COMMANDS_TYPE</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-COMMANDS_TYPE">COMMANDS_TYPE</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-HUB_CONNECTION_STATE_TYPE">HUB_CONNECTION_STATE_TYPE</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#devices">devices</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-identifyDevice">identifyDevice</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sendDeviceCmd">sendDeviceCmd</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sendDeviceStateCmd">sendDeviceStateCmd</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setDeviceHotWater">setDeviceHotWater</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setDeviceLocked">setDeviceLocked</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setDeviceMeta">setDeviceMeta</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setDeviceVisibility">setDeviceVisibility</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-unpairDevice">unpairDevice</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-devicesDeltaHandler">devicesDeltaHandler</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDevices">getDevices</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubDevices">getHubDevices</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubPairingDevices">getHubPairingDevices</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getPairingDevices">getPairingDevices</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-pairingDevicesDeltaHandler">pairingDevicesDeltaHandler</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#hubs">hubs</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-connectHubBySite">connectHubBySite</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-connectHubByTokens">connectHubByTokens</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-doPoll">doPoll</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-doRemoteIdQuery">doRemoteIdQuery</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-fetchHubs">fetchHubs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubs">getHubs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ignorePairingByIds">ignorePairingByIds</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-lockAndBackup">lockAndBackup</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-selectHubById">selectHubById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-startDiscoveringHubs">startDiscoveringHubs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-startPairingById">startPairingById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-startPollingById">startPollingById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-stopDiscoveringHubs">stopDiscoveringHubs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-stopPairingById">stopPairingById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-stopPairings">stopPairings</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-stopPollingById">stopPollingById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-unSelectHubById">unSelectHubById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-unSelectHubs">unSelectHubs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubs">getHubs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getModbusDevicePairings">getModbusDevicePairings</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setModbusDevicePairings">setModbusDevicePairings</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-checkIsFailedZWaveNode">checkIsFailedZWaveNode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-doZwaveExclusion">doZwaveExclusion</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-doZwaveInclusion">doZwaveInclusion</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubs">getHubs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getZWaveNodeParameter">getZWaveNodeParameter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getZwaveNodes">getZwaveNodes</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-healZwave">healZwave</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isZwaveEnabled">isZwaveEnabled</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-removeFailedZWaveNode">removeFailedZWaveNode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setZWaveNodeParameter">setZWaveNodeParameter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-stopZwaveExclusion">stopZwaveExclusion</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-stopZwaveInclusion">stopZwaveInclusion</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-DISCOVERY_INTERVAL_MS">DISCOVERY_INTERVAL_MS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-HUB_PORT">HUB_PORT</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-HUB_PROTOCOL">HUB_PROTOCOL</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-HUB_STATES">HUB_STATES</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-PAIRING_POLL_INTERVAL_MS">PAIRING_POLL_INTERVAL_MS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-POLL_INTERVAL_MS">POLL_INTERVAL_MS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ZWAVE_EXCLUSION_INTERVAL_MS">ZWAVE_EXCLUSION_INTERVAL_MS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ZWAVE_EXCLUSION_STATUS">ZWAVE_EXCLUSION_STATUS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ZWAVE_INCLUSION_INTERVAL_MS">ZWAVE_INCLUSION_INTERVAL_MS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ZWAVE_INCLUSION_STATUS">ZWAVE_INCLUSION_STATUS</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#plans">plans</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-addDeviceType">addDeviceType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-addLocationNode">addLocationNode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-addRoomName">addRoomName</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-addRuleType">addRuleType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-addSceneType">addSceneType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-addTemplate">addTemplate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-fetchPlanDocuments">fetchPlanDocuments</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-fetchPlans">fetchPlans</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getPlanDocuments">getPlanDocuments</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getPlans">getPlans</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-insertPlan">insertPlan</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-removeDeviceType">removeDeviceType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-removeLocationNode">removeLocationNode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-removeRoomName">removeRoomName</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-removeRuleType">removeRuleType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-removeSceneType">removeSceneType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-removeTemplate">removeTemplate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setLocationNode">setLocationNode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setPlanDocuments">setPlanDocuments</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setPlans">setPlans</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setTemplate">setTemplate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-simplifyPlans">simplifyPlans</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-DUMMY">DUMMY</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-PLAN_NODES">PLAN_NODES</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#reducers">reducers</a><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-alarmsState">alarmsState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-selectById">selectById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setAlarms">setAlarms</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-connectionsState">connectionsState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-selectById">selectById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setCloudConnectionState">setCloudConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-devicesState">devicesState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-selectById">selectById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setDevices">setDevices</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-hubsState">hubsState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-selectById">selectById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-updateHubs">updateHubs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-addRoomName">addRoomName</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-plansState">plansState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-selectById">selectById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-rootReducer">rootReducer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-pairingsState">pairingsState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-selectById">selectById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setPairingDevices">setPairingDevices</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-planDocumentNodesState">planDocumentNodesState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reactFetchPlanDocumentNodes">reactFetchPlanDocumentNodes</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reactInsertPlanDocumentNode">reactInsertPlanDocumentNode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reactRemovePlanDocumentNode">reactRemovePlanDocumentNode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reactSelectPlanDocumentNodes">reactSelectPlanDocumentNodes</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reactSubscribePlanDocumentNodes">reactSubscribePlanDocumentNodes</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reactUpdatePlanDocumentNode">reactUpdatePlanDocumentNode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-selectById">selectById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-planDocumentsState">planDocumentsState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reactFetchPlanDocuments">reactFetchPlanDocuments</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reactInsertPlanDocument">reactInsertPlanDocument</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reactRemovePlanDocument">reactRemovePlanDocument</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reactSelectPlanDocuments">reactSelectPlanDocuments</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reactSubscribePlanDocuments">reactSubscribePlanDocuments</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reactUpdatePlanDocument">reactUpdatePlanDocument</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-selectById">selectById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-plansState">plansState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reactFetchPlans">reactFetchPlans</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reactInsertPlan">reactInsertPlan</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reactRemovePlan">reactRemovePlan</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reactSubscribePlans">reactSubscribePlans</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reactUpdatePlan">reactUpdatePlan</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-selectById">selectById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-roomsState">roomsState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-selectById">selectById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setRooms">setRooms</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-changeState">changeState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-userState">userState</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#rooms">rooms</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-addRoom">addRoom</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-editRoom">editRoom</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubRooms">getHubRooms</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getRooms">getRooms</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-removeRoom">removeRoom</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-roomsDeltaHandler">roomsDeltaHandler</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sendRoomCmd">sendRoomCmd</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ROOMS_EN">ROOMS_EN</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ROOMS_FI">ROOMS_FI</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#schemas">schemas</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDocumentsFromPlan">getDocumentsFromPlan</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-documentEntity">documentEntity</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-documentsEntity">documentsEntity</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-planEntity">planEntity</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-plansEntity">plansEntity</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#user">user</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-acceptEula">acceptEula</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-changeLanguage">changeLanguage</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-doPwLogin">doPwLogin</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getUserState">getUserState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setAuthenticated">setAuthenticated</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-LANGUAGES">LANGUAGES</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ROLES">ROLES</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-USER_STATES">USER_STATES</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/reducers/planDocumentNodes.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">// 
+import {
+  createSlice,
+  createEntityAdapter,
+  createAsyncThunk,
+  createSelector,
+} from &apos;@reduxjs/toolkit&apos;;
+
+
+/* import {
+  GET_PLAN_DOCUMENT_NODES,
+  SUBS_PLAN_DOCUMENT_NODES,
+  INSERT_PLAN_DOCUMENT_NODE,
+  UPDATE_PLAN_DOCUMENT_NODE,
+  REMOVE_PLAN_DOCUMENT_NODE,
+  qqlClient,
+  normalize,
+  isAuth
+} from &apos;../qql.js&apos;
+*/
+
+const planDocumentNodesAdapter = createEntityAdapter({
+  // Assume IDs are stored in a field uid
+  selectId: (node) =&gt; node.uid,
+  // Keep the &quot;all IDs&quot; array sorted based on document
+  sortComparer: (a, b) =&gt; a.document_id.localeCompare(b.document_id),
+});
+
+// Fetch
+async function fetchPlanDocumentNodes(documentId) {
+  return new Promise((resolve, reject) =&gt; {
+    reject(new Error(`fetchPlanDocuments documentId: ${documentId} TBD`));
+    /*  Was just test implementation of qql
+    qqlClient.query({
+      variables: {
+        &quot;document_id&quot;: documentId
+      },
+      query: GET_PLAN_DOCUMENT_NODES
+    })
+    .then((result) =&gt; {
+      const queryResults = normalize(result);
+      console.debug(&apos;SDK fetchPlanDocumentNodes ok&apos;, queryResults);
+      resolve(queryResults.nodes);
+    }).catch((error) =&gt; {
+      debugger;
+      console.error(&apos;SDK fetchPlanDocumentNodes error:&apos;, error);
+      reject(error);
+    });
+    */
+  });
+}
+
+export const reactFetchPlanDocumentNodes = createAsyncThunk(
+  &apos;plans/fetchPlanDocumentNodes&apos;,
+  async (documentId, ThunkAPI) =&gt; {
+    // if (isAuth(ThunkAPI.getState())) {
+    console.debug(&apos;fetchPlanDocuments state: &apos;, ThunkAPI.getState());
+    return fetchPlanDocumentNodes(documentId);
+  },
+
+);
+
+// Subscribe
+export const reactSubscribePlanDocumentNodes = createAsyncThunk(
+  &apos;plans/subscribePlanDocumentNodes&apos;,
+  async (params, ThunkAPI) =&gt; new Promise((resolve, reject) =&gt; {
+    console.debug(&apos;reactSubscribePlanDocumentNodes state: &apos;, ThunkAPI.getState());
+    reject(new Error(&apos;reactSubscribePlanDocumentNodes TBD&apos;));
+    /*  Was just test implementation of qql
+      if (isAuth(ThunkAPI.getState())) {
+        const {documentId} = params;
+        const subsHandle = qqlClient.subscribe({
+          query: SUBS_PLAN_DOCUMENT_NODES,
+          variables: {&quot;document_id&quot;: documentId },
+        }).subscribe({
+          next(data) {
+            try {
+              if (data &amp;&amp; data.data &amp;&amp; data.data.t_plan_document_node &amp;&amp; data.data.t_plan_document_node.length &gt; 0) {
+                const results = normalize(data);
+                ThunkAPI.dispatch(planDocumentNodesState.actions.setPlanDocumentNodesState(results.nodes));
+              } else {
+                ThunkAPI.dispatch(planDocumentNodesState.actions.setPlanDocumentNodesState({nodes:{}}));
+              }
+              resolve()
+            } catch(e) {
+              reject(e)
+              debugger
+              console.error(&apos;reactSubscribePlanDocumentNodes exception&apos;, e);
+            }
+          },
+          error(err) {
+            reject(err)
+            debugger
+            console.error(&apos;reactSubscribePlanDocumentNodes err&apos;, err);
+          }
+        })
+      } else {
+        reject()
+      }
+    }
+    */
+  }),
+);
+
+
+/*
+alinode
+{
+  &quot;object&quot;: {
+    &quot;document_id&quot;: &quot;d39e6ddc-6220-4c20-8c7d-9d01e65192de&quot;,
+    &quot;parent_id&quot;: &quot;0d62e0bc-1c29-4cb9-bc79-a39a9b59768f&quot;,
+    &quot;data&quot;: {
+      &quot;type&quot;: &quot;TEST0.1&quot;
+    }
+  }
+}
+
+p&#xE4;&#xE4;tason
+{
+  &quot;object&quot;: {
+    &quot;document_id&quot;: &quot;d39e6ddc-6220-4c20-8c7d-9d01e65192de&quot;,
+    &quot;parent_id&quot;: null,
+    &quot;data&quot;: {
+      &quot;type&quot;: &quot;TEST2&quot;
+    }
+  }
+}
+ */
+// Insert
+async function insertPlanDocumentNode(documentId, parentId, changes) {
+  const changesToBeMade = changes;
+  if (changes &amp;&amp; changes.type) {
+    // eslint-disable-next-line
+    changesToBeMade.__typename = changes.type;
+  }
+  return new Promise((resolve, reject) =&gt; {
+    reject(new Error(`insertPlanDocumentNode docId: ${documentId}, parentId: ${parentId} TBD, changes: ${changesToBeMade}`));
+    /*  Was just test implementation of qql
+    qqlClient.mutate({
+      variables: {
+        object: {
+          document_id: documentId,
+          parent_id: parentId,
+          data: changesToBeMade
+        }
+      },
+      mutation: INSERT_PLAN_DOCUMENT_NODE
+    })
+    .then((result) =&gt; {
+      const queryResults = normalize(result);
+      console.debug(&apos;SDK insertPlanDocumentNode ok&apos;, queryResults);
+      resolve(queryResults.nodes);
+    }).catch((error) =&gt; {
+      debugger;
+      console.error(&apos;SDK insertPlanDocumentNode error:&apos;, error);
+      reject(error);
+    });
+    */
+  });
+}
+
+export const reactInsertPlanDocumentNode = createAsyncThunk(
+  &apos;plans/insertPlanDocumentNode&apos;,
+  async (params, ThunkAPI) =&gt; {
+    // if (isAuth(ThunkAPI.getState())) {
+    console.debug(&apos;reactInsertPlanDocumentNode state:&apos;, ThunkAPI.getState());
+    const { documentId, parentId, changes } = params;
+    return insertPlanDocumentNode(documentId, parentId, changes);
+    // }
+  },
+);
+
+/* {
+  &quot;uid&quot;: &quot;e1727bae-cd29-4a77-8234-a6528fda48fc&quot;,
+  &quot;changes&quot;: {
+    &quot;data&quot;: {
+      &quot;name&quot;: &quot;HUB 2.0&quot;
+    }
+  }
+} */
+// Update
+async function updatePlanDocumentNode(uid, changes) {
+  return new Promise((resolve, reject) =&gt; {
+    reject(new Error(`updatePlanDocumentNode uid: ${uid} TBD, changes: ${changes}`));
+    /*  Was just test implementation of qql
+    qqlClient.mutate({
+      variables: {
+        uid: uid,
+        changes: changes
+      },
+      mutation: UPDATE_PLAN_DOCUMENT_NODE
+    })
+    .then((result) =&gt; {
+      debugger
+      const queryResults = normalize(result);
+      console.debug(&apos;SDK updatePlanDocumentNode ok&apos;, queryResults);
+      resolve(queryResults.nodes);
+    }).catch((error) =&gt; {
+      debugger;
+      console.error(&apos;SDK updatePlanDocumentNode error:&apos;, error);
+      reject(error);
+    });
+    */
+  });
+}
+
+
+export const reactUpdatePlanDocumentNode = createAsyncThunk(
+  &apos;plans/updatePlanDocumentNode&apos;,
+  async (params, ThunkAPI) =&gt; {
+    // if (isAuth(ThunkAPI.getState())) {
+    console.debug(&apos;reactUpdatePlanDocumentNode state: &apos;, ThunkAPI.getState());
+    const { uid, changes } = params;
+    return updatePlanDocumentNode(uid, changes);
+    // }
+  },
+);
+
+// Remove Plan
+async function removePlanDocumentNode(uid) {
+  return new Promise((resolve, reject) =&gt; {
+    reject(new Error(`removePlanDocumentNode uid: ${uid} TBD`));
+    /*  Was just test implementation of qql
+    qqlClient.mutate({
+      variables: {
+        &quot;uid&quot;: uid,
+      },
+      mutation: REMOVE_PLAN_DOCUMENT_NODE
+    })
+    .then((result) =&gt; {
+      debugger
+      console.debug(&apos;SDK removePlanDocumentNode ok&apos;, result);
+      resolve(result);
+    }).catch((error) =&gt; {
+      debugger;
+      console.error(&apos;SDK removePlanDocumentNode error:&apos;, error);
+      reject(error);
+    });
+    */
+  });
+}
+
+
+export const reactRemovePlanDocumentNode = createAsyncThunk(
+  &apos;plans/removePlanDocumentNode&apos;,
+  async (params, ThunkAPI) =&gt; {
+    // if (isAuth(ThunkAPI.getState())) {
+    console.debug(&apos;reactRemovePlanDocumentNode state: &apos;, ThunkAPI.getState());
+    const { uid } = params;
+    return removePlanDocumentNode(uid);
+    // }
+  },
+);
+
+export const planDocumentNodesState = createSlice({
+  name: &apos;nodes&apos;,
+  initialState: planDocumentNodesAdapter.getInitialState(),
+  reducers: {
+    setPlanDocumentNodesState(state, action) {
+      const stateToSet = state;
+      const newState = action.payload;
+      planDocumentNodesAdapter.setAll(stateToSet, newState);
+    },
+  },
+  extraReducers: {
+    // Add reducers for additional action types here, and handle loading state as needed
+    [reactFetchPlanDocumentNodes.fulfilled]: (state, action) =&gt; {
+      planDocumentNodesAdapter.upsertMany(state, action.payload);
+    },
+    [reactFetchPlanDocumentNodes.rejected]: (state, action) =&gt; {
+      console.error(&apos;SDK reactFetchPlanDocumentNodes rejected state: &apos;, state);
+      console.error(&apos;SDK reactFetchPlanDocumentNodes rejected action: &apos;, action);
+    },
+    [reactInsertPlanDocumentNode.fulfilled]: (state, action) =&gt; {
+      planDocumentNodesAdapter.updateOne(state, action.payload);
+    },
+    [reactInsertPlanDocumentNode.rejected]: (state, action) =&gt; {
+      console.error(&apos;SDK reactInsertPlanDocumentNode rejected state: &apos;, state);
+      console.error(&apos;SDK reactInsertPlanDocumentNode rejected action: &apos;, action);
+    },
+    [reactUpdatePlanDocumentNode.fulfilled]: (state, action) =&gt; {
+      planDocumentNodesAdapter.updateOne(state, action.payload);
+    },
+    [reactUpdatePlanDocumentNode.rejected]: (state, action) =&gt; {
+      console.error(&apos;SDK reactUpdatePlanDocumentNode rejected state: &apos;, state);
+      console.error(&apos;SDK reactUpdatePlanDocumentNode rejected action: &apos;, action);
+    },
+    [reactRemovePlanDocumentNode.fulfilled]: (state, action) =&gt; {
+      planDocumentNodesAdapter.updateOne(state, action.payload);
+    },
+    [reactRemovePlanDocumentNode.rejected]: (state, action) =&gt; {
+      console.error(&apos;SDK reactRemovePlanDocumentNode rejected state: &apos;, state);
+      console.error(&apos;SDK reactRemovePlanDocumentNode rejected action: &apos;, action);
+    },
+  },
+});
+
+
+planDocumentNodesState.selectors = planDocumentNodesAdapter.getSelectors((state) =&gt; state.nodes);
+planDocumentNodesState.selectors.selectPlanDocumentNodes = createSelector(
+  [(state) =&gt; state.nodes, (state, documentId) =&gt; documentId],
+  (nodes, documentId) =&gt; {
+    const ids = nodes.ids.filter((id) =&gt; nodes.entities[id].document_id === documentId);
+    const entities = [];
+    ids.forEach((id) =&gt; {
+      entities.push(nodes.entities[id]);
+    });
+    return entities;
+  },
+);
+
+export const {
+  selectById: reactSelectDocumentNodeById,
+  selectIds: reactSelectDocumentNodeIds,
+  selectEntities: reactSelectDocumentNodeEntities,
+  selectAll: reactSelectAllDocumentNodes,
+  selectTotal: reactSelectTotalDocumentNodes,
+} = planDocumentNodesAdapter.getSelectors((state) =&gt; state.nodes);
+export const reactSelectPlanDocumentNodes = planDocumentNodesState.selectors.selectPlanDocumentNodes;
+
+
+// const { actions, reducer } = planDocumentNodesState;
+const { reducer } = planDocumentNodesState;
+
+/**
+ * Plan Documents reducer
+ * @type {function} reducer
+ */
+export { reducer as planDocumentNodesReducer };
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

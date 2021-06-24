@@ -40,6 +40,19 @@ export const ZWAVE_EXCLUSION_STATUS = Object.freeze({
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*
  * Intervall defining how often hubkeys and metadatas are fetched
  */

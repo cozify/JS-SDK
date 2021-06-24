@@ -18,7 +18,6 @@ export const CLOUD_FINGERPRINTS_SHA1 = [
 const CLOUD_HOST = 'https://api.cozify.fi';
 const CLOUD_HOST_TEST = 'https://testapi.cozify.fi';
 
-
 /* Cloud API VERSION */
 export const CLOUD_API_VERSION = 'ui/0.2/';
 
@@ -36,12 +35,19 @@ export function useTestcloud() {
   cloudHost = CLOUD_HOST_TEST;
 }
 
+export function selectCloud(host) {
+  cloudHost = host;
+}
+
 export function getCloudHost() {
   return cloudHost;
 }
 
 export function getCloudURL() {
-  return `${cloudHost}/${CLOUD_API_VERSION}`;
+  if (cloudHost.indexOf('/site/') === -1) {
+    return `${cloudHost}/${CLOUD_API_VERSION}`;
+  }
+  return `${cloudHost}`;
 }
 
 export const MAX_API_VERSION = '1.13';
@@ -73,6 +79,15 @@ export const COMMANDS = Object.freeze({
   CMD_DEVICE_IGNORE: {
     method: 'PUT', url: 'hub/remote/cc/$API_VER/devices/command', type: 'CMD_IGNORE_DEVICE', params: ['id'],
   },
+  CMD_DEVICE_VISIBILITY: {
+    method: 'PUT', url: 'hub/remote/cc/$API_VER/devices', type: 'CMD_DEVICE_VISIBLE', params: ['id', 'visible'],
+  },
+  CMD_DEVICE_LOCK: {
+    method: 'PUT', url: 'hub/remote/cc/$API_VER/devices', type: 'CMD_DEVICE_LOCK', params: ['id', 'locked'],
+  },
+  CMD_DEVICE_HOT_WATER: {
+    method: 'PUT', url: 'hub/remote/cc/$API_VER/devices/command', type: 'CMD_DEVICE_META', params: ['id', 'locked'],
+  },
   CMD_DEVICE_IDENTIFY: {
     method: 'PUT', url: 'hub/remote/cc/$API_VER/devices/command', type: 'CMD_IDENTIFY', params: ['id'],
   },
@@ -87,6 +102,8 @@ export const COMMANDS = Object.freeze({
   CMD_GET_ALARMS: { method: 'GET', url: 'hub/remote/cc/$API_VER/alarms' },
   CMD_CLOSE_ALARM: { method: 'PUT', url: 'hub/remote/cc/$API_VER/alarms/close', urlParams: ['alarmId'] },
   CMD_REMOVE_ALARM: { method: 'DELETE', url: 'hub/remote/cc/$API_VER/alarms', urlParams: ['roomId'] },
+  GET_MODBUS_DEVICE_PAIRINGS: { method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'GET_MODBUS_PAIRINGS' },
+  SET_MODBUS_DEVICE_PAIRINGS: { method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'PAIR_MODBUS' },
   ZWAVE_START_INCLUSION: { method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'ZWAVE_START_INCLUSION' },
   ZWAVE_STOP_INCLUSION: { method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'ZWAVE_CANCEL_INCLUSION' },
   ZWAVE_START_EXCLUSION: { method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'ZWAVE_START_EXCLUSION' },
@@ -94,11 +111,31 @@ export const COMMANDS = Object.freeze({
   ZWAVE_INCLUSION_STATUS: { method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'GET_ZWAVE_INCLUSION_STATUS' },
   ZWAVE_EXCLUSION_STATUS: { method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'GET_ZWAVE_EXCLUSION_STATUS' },
   ZWAVE_HEAL: { method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'ZWAVE_HEAL' },
-  CMD_GET_PLANS: {
+  ZWAVE_GET_NODES: { method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'ZWAVE_GET_NODES' },
+  ZWAVE_CHECK_IS_FAILED_NODE: {
+    method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'ZWAVE_CHECK_FAILED', params: ['nodeId'], timeout: 30000,
+  },
+  ZWAVE_REMOVE_FAILED_NODE: {
+    method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'ZWAVE_REMOVE_FAILED', params: ['nodeId'], timeout: 30000,
+  },
+  ZWAVE_GET_NODE_CONFIGURATION: {
+    method: 'POST', url: 'hub/remote/cc/$API_VER/hub/protocolconfig', type: 'ZWAVE_UI_GET_CONFIGURATION', params: ['nodeId', 'parameter'], timeout: 30000,
+  },
+  ZWAVE_SET_NODE_CONFIGURATION: {
+    method: 'POST',
+    url: 'hub/remote/cc/$API_VER/hub/protocolconfig',
+    type: 'ZWAVE_UI_SET_CONFIGURATION',
+    params: ['nodeId', 'parameter', 'size', 'default', 'value'],
+    timeout: 30000,
+  },
+  CMD_LIST_PLANS: {
     method: 'GET', url: 'plans',
   },
-  CMD_SAVE_PLANS: {
-    method: 'PUT', url: 'plans', params: ['plans'],
+  CMD_GET_PLAN: {
+    method: 'GET', url: 'plans',
+  },
+  CMD_SAVE_PLAN: {
+    method: 'POST', url: 'plans', params: ['templates', 'installations', 'locations'],
   },
 });
 

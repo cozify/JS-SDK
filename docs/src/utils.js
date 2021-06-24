@@ -60,7 +60,7 @@ export function b64DecodeUnicode(encoded) {
     // eslint-disable-next-line
     return decodeURIComponent(Array.prototype.map.call(atobC(encoded), function(c) {
       // eslint-disable-next-line
-      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).name(-2);
     }).join(''));
   } catch (error) {
     console.error('b64DecodeUnicode: trying atob failed');

@@ -1,28 +1,28 @@
 {
   "type": "File",
   "start": 0,
-  "end": 641,
+  "end": 831,
   "loc": {
     "start": {
       "line": 1,
       "column": 0
     },
     "end": {
-      "line": 26,
+      "line": 30,
       "column": 0
     }
   },
   "program": {
     "type": "Program",
     "start": 0,
-    "end": 641,
+    "end": 831,
     "loc": {
       "start": {
         "line": 1,
         "column": 0
       },
       "end": {
-        "line": 26,
+        "line": 30,
         "column": 0
       }
     },
@@ -730,20 +730,196 @@
             "raw": "'./plans'"
           },
           "value": "./plans"
+        }
+      },
+      {
+        "type": "ImportDeclaration",
+        "start": 340,
+        "end": 395,
+        "loc": {
+          "start": {
+            "line": 9,
+            "column": 0
+          },
+          "end": {
+            "line": 9,
+            "column": 55
+          }
+        },
+        "specifiers": [
+          {
+            "type": "ImportSpecifier",
+            "start": 349,
+            "end": 369,
+            "loc": {
+              "start": {
+                "line": 9,
+                "column": 9
+              },
+              "end": {
+                "line": 9,
+                "column": 29
+              }
+            },
+            "imported": {
+              "type": "Identifier",
+              "start": 349,
+              "end": 369,
+              "loc": {
+                "start": {
+                  "line": 9,
+                  "column": 9
+                },
+                "end": {
+                  "line": 9,
+                  "column": 29
+                },
+                "identifierName": "planDocumentsReducer"
+              },
+              "name": "planDocumentsReducer"
+            },
+            "importKind": null,
+            "local": {
+              "type": "Identifier",
+              "start": 349,
+              "end": 369,
+              "loc": {
+                "start": {
+                  "line": 9,
+                  "column": 9
+                },
+                "end": {
+                  "line": 9,
+                  "column": 29
+                },
+                "identifierName": "planDocumentsReducer"
+              },
+              "name": "planDocumentsReducer"
+            }
+          }
+        ],
+        "importKind": "value",
+        "source": {
+          "type": "StringLiteral",
+          "start": 377,
+          "end": 394,
+          "loc": {
+            "start": {
+              "line": 9,
+              "column": 37
+            },
+            "end": {
+              "line": 9,
+              "column": 54
+            }
+          },
+          "extra": {
+            "rawValue": "./planDocuments",
+            "raw": "'./planDocuments'"
+          },
+          "value": "./planDocuments"
+        }
+      },
+      {
+        "type": "ImportDeclaration",
+        "start": 396,
+        "end": 459,
+        "loc": {
+          "start": {
+            "line": 10,
+            "column": 0
+          },
+          "end": {
+            "line": 10,
+            "column": 63
+          }
+        },
+        "specifiers": [
+          {
+            "type": "ImportSpecifier",
+            "start": 405,
+            "end": 429,
+            "loc": {
+              "start": {
+                "line": 10,
+                "column": 9
+              },
+              "end": {
+                "line": 10,
+                "column": 33
+              }
+            },
+            "imported": {
+              "type": "Identifier",
+              "start": 405,
+              "end": 429,
+              "loc": {
+                "start": {
+                  "line": 10,
+                  "column": 9
+                },
+                "end": {
+                  "line": 10,
+                  "column": 33
+                },
+                "identifierName": "planDocumentNodesReducer"
+              },
+              "name": "planDocumentNodesReducer"
+            },
+            "importKind": null,
+            "local": {
+              "type": "Identifier",
+              "start": 405,
+              "end": 429,
+              "loc": {
+                "start": {
+                  "line": 10,
+                  "column": 9
+                },
+                "end": {
+                  "line": 10,
+                  "column": 33
+                },
+                "identifierName": "planDocumentNodesReducer"
+              },
+              "name": "planDocumentNodesReducer"
+            }
+          }
+        ],
+        "importKind": "value",
+        "source": {
+          "type": "StringLiteral",
+          "start": 437,
+          "end": 458,
+          "loc": {
+            "start": {
+              "line": 10,
+              "column": 41
+            },
+            "end": {
+              "line": 10,
+              "column": 62
+            }
+          },
+          "extra": {
+            "rawValue": "./planDocumentNodes",
+            "raw": "'./planDocumentNodes'"
+          },
+          "value": "./planDocumentNodes"
         },
         "trailingComments": [
           {
             "type": "CommentBlock",
             "value": "*\n * Root reducer\n * @type {Object}\n ",
-            "start": 341,
-            "end": 382,
+            "start": 461,
+            "end": 502,
             "loc": {
               "start": {
-                "line": 10,
+                "line": 12,
                 "column": 0
               },
               "end": {
-                "line": 13,
+                "line": 15,
                 "column": 3
               }
             }
@@ -752,44 +928,44 @@
       },
       {
         "type": "Identifier",
-        "start": 383,
-        "end": 611,
+        "start": 503,
+        "end": 801,
         "loc": {
           "start": {
-            "line": 14,
+            "line": 16,
             "column": 0
           },
           "end": {
-            "line": 23,
+            "line": 27,
             "column": 2
           }
         },
         "declarations": [
           {
             "type": "VariableDeclarator",
-            "start": 389,
-            "end": 610,
+            "start": 509,
+            "end": 800,
             "loc": {
               "start": {
-                "line": 14,
+                "line": 16,
                 "column": 6
               },
               "end": {
-                "line": 23,
+                "line": 27,
                 "column": 1
               }
             },
             "id": {
               "type": "Identifier",
-              "start": 389,
-              "end": 400,
+              "start": 509,
+              "end": 520,
               "loc": {
                 "start": {
-                  "line": 14,
+                  "line": 16,
                   "column": 6
                 },
                 "end": {
-                  "line": 14,
+                  "line": 16,
                   "column": 17
                 },
                 "identifierName": "rootReducer"
@@ -799,30 +975,30 @@
             },
             "init": {
               "type": "ObjectExpression",
-              "start": 403,
-              "end": 610,
+              "start": 523,
+              "end": 800,
               "loc": {
                 "start": {
-                  "line": 14,
+                  "line": 16,
                   "column": 20
                 },
                 "end": {
-                  "line": 23,
+                  "line": 27,
                   "column": 1
                 }
               },
               "properties": [
                 {
                   "type": "ObjectProperty",
-                  "start": 407,
-                  "end": 428,
+                  "start": 527,
+                  "end": 548,
                   "loc": {
                     "start": {
-                      "line": 15,
+                      "line": 17,
                       "column": 2
                     },
                     "end": {
-                      "line": 15,
+                      "line": 17,
                       "column": 23
                     }
                   },
@@ -831,15 +1007,15 @@
                   "computed": false,
                   "key": {
                     "type": "Identifier",
-                    "start": 407,
-                    "end": 413,
+                    "start": 527,
+                    "end": 533,
                     "loc": {
                       "start": {
-                        "line": 15,
+                        "line": 17,
                         "column": 2
                       },
                       "end": {
-                        "line": 15,
+                        "line": 17,
                         "column": 8
                       },
                       "identifierName": "alarms"
@@ -848,15 +1024,15 @@
                   },
                   "value": {
                     "type": "Identifier",
-                    "start": 415,
-                    "end": 428,
+                    "start": 535,
+                    "end": 548,
                     "loc": {
                       "start": {
-                        "line": 15,
+                        "line": 17,
                         "column": 10
                       },
                       "end": {
-                        "line": 15,
+                        "line": 17,
                         "column": 23
                       },
                       "identifierName": "alarmsReducer"
@@ -866,15 +1042,15 @@
                 },
                 {
                   "type": "ObjectProperty",
-                  "start": 432,
-                  "end": 463,
+                  "start": 552,
+                  "end": 583,
                   "loc": {
                     "start": {
-                      "line": 16,
+                      "line": 18,
                       "column": 2
                     },
                     "end": {
-                      "line": 16,
+                      "line": 18,
                       "column": 33
                     }
                   },
@@ -883,15 +1059,15 @@
                   "computed": false,
                   "key": {
                     "type": "Identifier",
-                    "start": 432,
-                    "end": 443,
+                    "start": 552,
+                    "end": 563,
                     "loc": {
                       "start": {
-                        "line": 16,
+                        "line": 18,
                         "column": 2
                       },
                       "end": {
-                        "line": 16,
+                        "line": 18,
                         "column": 13
                       },
                       "identifierName": "connections"
@@ -900,15 +1076,15 @@
                   },
                   "value": {
                     "type": "Identifier",
-                    "start": 445,
-                    "end": 463,
+                    "start": 565,
+                    "end": 583,
                     "loc": {
                       "start": {
-                        "line": 16,
+                        "line": 18,
                         "column": 15
                       },
                       "end": {
-                        "line": 16,
+                        "line": 18,
                         "column": 33
                       },
                       "identifierName": "connectionsReducer"
@@ -918,15 +1094,15 @@
                 },
                 {
                   "type": "ObjectProperty",
-                  "start": 467,
-                  "end": 492,
+                  "start": 587,
+                  "end": 612,
                   "loc": {
                     "start": {
-                      "line": 17,
+                      "line": 19,
                       "column": 2
                     },
                     "end": {
-                      "line": 17,
+                      "line": 19,
                       "column": 27
                     }
                   },
@@ -935,15 +1111,15 @@
                   "computed": false,
                   "key": {
                     "type": "Identifier",
-                    "start": 467,
-                    "end": 475,
+                    "start": 587,
+                    "end": 595,
                     "loc": {
                       "start": {
-                        "line": 17,
+                        "line": 19,
                         "column": 2
                       },
                       "end": {
-                        "line": 17,
+                        "line": 19,
                         "column": 10
                       },
                       "identifierName": "pairings"
@@ -952,15 +1128,15 @@
                   },
                   "value": {
                     "type": "Identifier",
-                    "start": 477,
-                    "end": 492,
+                    "start": 597,
+                    "end": 612,
                     "loc": {
                       "start": {
-                        "line": 17,
+                        "line": 19,
                         "column": 12
                       },
                       "end": {
-                        "line": 17,
+                        "line": 19,
                         "column": 27
                       },
                       "identifierName": "pairingsReducer"
@@ -970,15 +1146,15 @@
                 },
                 {
                   "type": "ObjectProperty",
-                  "start": 496,
-                  "end": 519,
+                  "start": 616,
+                  "end": 639,
                   "loc": {
                     "start": {
-                      "line": 18,
+                      "line": 20,
                       "column": 2
                     },
                     "end": {
-                      "line": 18,
+                      "line": 20,
                       "column": 25
                     }
                   },
@@ -987,15 +1163,15 @@
                   "computed": false,
                   "key": {
                     "type": "Identifier",
-                    "start": 496,
-                    "end": 503,
+                    "start": 616,
+                    "end": 623,
                     "loc": {
                       "start": {
-                        "line": 18,
+                        "line": 20,
                         "column": 2
                       },
                       "end": {
-                        "line": 18,
+                        "line": 20,
                         "column": 9
                       },
                       "identifierName": "devices"
@@ -1004,15 +1180,15 @@
                   },
                   "value": {
                     "type": "Identifier",
-                    "start": 505,
-                    "end": 519,
+                    "start": 625,
+                    "end": 639,
                     "loc": {
                       "start": {
-                        "line": 18,
+                        "line": 20,
                         "column": 11
                       },
                       "end": {
-                        "line": 18,
+                        "line": 20,
                         "column": 25
                       },
                       "identifierName": "devicesReducer"
@@ -1022,15 +1198,15 @@
                 },
                 {
                   "type": "ObjectProperty",
-                  "start": 523,
-                  "end": 540,
+                  "start": 643,
+                  "end": 660,
                   "loc": {
                     "start": {
-                      "line": 19,
+                      "line": 21,
                       "column": 2
                     },
                     "end": {
-                      "line": 19,
+                      "line": 21,
                       "column": 19
                     }
                   },
@@ -1039,15 +1215,15 @@
                   "computed": false,
                   "key": {
                     "type": "Identifier",
-                    "start": 523,
-                    "end": 527,
+                    "start": 643,
+                    "end": 647,
                     "loc": {
                       "start": {
-                        "line": 19,
+                        "line": 21,
                         "column": 2
                       },
                       "end": {
-                        "line": 19,
+                        "line": 21,
                         "column": 6
                       },
                       "identifierName": "hubs"
@@ -1056,15 +1232,15 @@
                   },
                   "value": {
                     "type": "Identifier",
-                    "start": 529,
-                    "end": 540,
+                    "start": 649,
+                    "end": 660,
                     "loc": {
                       "start": {
-                        "line": 19,
+                        "line": 21,
                         "column": 8
                       },
                       "end": {
-                        "line": 19,
+                        "line": 21,
                         "column": 19
                       },
                       "identifierName": "hubsReducer"
@@ -1074,15 +1250,15 @@
                 },
                 {
                   "type": "ObjectProperty",
-                  "start": 544,
-                  "end": 561,
+                  "start": 664,
+                  "end": 681,
                   "loc": {
                     "start": {
-                      "line": 20,
+                      "line": 22,
                       "column": 2
                     },
                     "end": {
-                      "line": 20,
+                      "line": 22,
                       "column": 19
                     }
                   },
@@ -1091,15 +1267,15 @@
                   "computed": false,
                   "key": {
                     "type": "Identifier",
-                    "start": 544,
-                    "end": 548,
+                    "start": 664,
+                    "end": 668,
                     "loc": {
                       "start": {
-                        "line": 20,
+                        "line": 22,
                         "column": 2
                       },
                       "end": {
-                        "line": 20,
+                        "line": 22,
                         "column": 6
                       },
                       "identifierName": "user"
@@ -1108,15 +1284,15 @@
                   },
                   "value": {
                     "type": "Identifier",
-                    "start": 550,
-                    "end": 561,
+                    "start": 670,
+                    "end": 681,
                     "loc": {
                       "start": {
-                        "line": 20,
+                        "line": 22,
                         "column": 8
                       },
                       "end": {
-                        "line": 20,
+                        "line": 22,
                         "column": 19
                       },
                       "identifierName": "userReducer"
@@ -1126,15 +1302,15 @@
                 },
                 {
                   "type": "ObjectProperty",
-                  "start": 565,
-                  "end": 584,
+                  "start": 685,
+                  "end": 704,
                   "loc": {
                     "start": {
-                      "line": 21,
+                      "line": 23,
                       "column": 2
                     },
                     "end": {
-                      "line": 21,
+                      "line": 23,
                       "column": 21
                     }
                   },
@@ -1143,15 +1319,15 @@
                   "computed": false,
                   "key": {
                     "type": "Identifier",
-                    "start": 565,
-                    "end": 570,
+                    "start": 685,
+                    "end": 690,
                     "loc": {
                       "start": {
-                        "line": 21,
+                        "line": 23,
                         "column": 2
                       },
                       "end": {
-                        "line": 21,
+                        "line": 23,
                         "column": 7
                       },
                       "identifierName": "rooms"
@@ -1160,15 +1336,15 @@
                   },
                   "value": {
                     "type": "Identifier",
-                    "start": 572,
-                    "end": 584,
+                    "start": 692,
+                    "end": 704,
                     "loc": {
                       "start": {
-                        "line": 21,
+                        "line": 23,
                         "column": 9
                       },
                       "end": {
-                        "line": 21,
+                        "line": 23,
                         "column": 21
                       },
                       "identifierName": "roomsReducer"
@@ -1178,15 +1354,15 @@
                 },
                 {
                   "type": "ObjectProperty",
-                  "start": 588,
-                  "end": 607,
+                  "start": 708,
+                  "end": 727,
                   "loc": {
                     "start": {
-                      "line": 22,
+                      "line": 24,
                       "column": 2
                     },
                     "end": {
-                      "line": 22,
+                      "line": 24,
                       "column": 21
                     }
                   },
@@ -1195,15 +1371,15 @@
                   "computed": false,
                   "key": {
                     "type": "Identifier",
-                    "start": 588,
-                    "end": 593,
+                    "start": 708,
+                    "end": 713,
                     "loc": {
                       "start": {
-                        "line": 22,
+                        "line": 24,
                         "column": 2
                       },
                       "end": {
-                        "line": 22,
+                        "line": 24,
                         "column": 7
                       },
                       "identifierName": "plans"
@@ -1212,20 +1388,124 @@
                   },
                   "value": {
                     "type": "Identifier",
-                    "start": 595,
-                    "end": 607,
+                    "start": 715,
+                    "end": 727,
                     "loc": {
                       "start": {
-                        "line": 22,
+                        "line": 24,
                         "column": 9
                       },
                       "end": {
-                        "line": 22,
+                        "line": 24,
                         "column": 21
                       },
                       "identifierName": "plansReducer"
                     },
                     "name": "plansReducer"
+                  }
+                },
+                {
+                  "type": "ObjectProperty",
+                  "start": 731,
+                  "end": 762,
+                  "loc": {
+                    "start": {
+                      "line": 25,
+                      "column": 2
+                    },
+                    "end": {
+                      "line": 25,
+                      "column": 33
+                    }
+                  },
+                  "method": false,
+                  "shorthand": false,
+                  "computed": false,
+                  "key": {
+                    "type": "Identifier",
+                    "start": 731,
+                    "end": 740,
+                    "loc": {
+                      "start": {
+                        "line": 25,
+                        "column": 2
+                      },
+                      "end": {
+                        "line": 25,
+                        "column": 11
+                      },
+                      "identifierName": "documents"
+                    },
+                    "name": "documents"
+                  },
+                  "value": {
+                    "type": "Identifier",
+                    "start": 742,
+                    "end": 762,
+                    "loc": {
+                      "start": {
+                        "line": 25,
+                        "column": 13
+                      },
+                      "end": {
+                        "line": 25,
+                        "column": 33
+                      },
+                      "identifierName": "planDocumentsReducer"
+                    },
+                    "name": "planDocumentsReducer"
+                  }
+                },
+                {
+                  "type": "ObjectProperty",
+                  "start": 766,
+                  "end": 797,
+                  "loc": {
+                    "start": {
+                      "line": 26,
+                      "column": 2
+                    },
+                    "end": {
+                      "line": 26,
+                      "column": 33
+                    }
+                  },
+                  "method": false,
+                  "shorthand": false,
+                  "computed": false,
+                  "key": {
+                    "type": "Identifier",
+                    "start": 766,
+                    "end": 771,
+                    "loc": {
+                      "start": {
+                        "line": 26,
+                        "column": 2
+                      },
+                      "end": {
+                        "line": 26,
+                        "column": 7
+                      },
+                      "identifierName": "nodes"
+                    },
+                    "name": "nodes"
+                  },
+                  "value": {
+                    "type": "Identifier",
+                    "start": 773,
+                    "end": 797,
+                    "loc": {
+                      "start": {
+                        "line": 26,
+                        "column": 9
+                      },
+                      "end": {
+                        "line": 26,
+                        "column": 33
+                      },
+                      "identifierName": "planDocumentNodesReducer"
+                    },
+                    "name": "planDocumentNodesReducer"
                   }
                 }
               ]
@@ -1240,29 +1520,29 @@
       },
       {
         "type": "Identifier",
-        "start": 613,
-        "end": 640,
+        "start": 803,
+        "end": 830,
         "loc": {
           "start": {
-            "line": 25,
+            "line": 29,
             "column": 0
           },
           "end": {
-            "line": 25,
+            "line": 29,
             "column": 27
           }
         },
         "declaration": {
           "type": "Identifier",
-          "start": 628,
-          "end": 639,
+          "start": 818,
+          "end": 829,
           "loc": {
             "start": {
-              "line": 25,
+              "line": 29,
               "column": 15
             },
             "end": {
-              "line": 25,
+              "line": 29,
               "column": 26
             },
             "identifierName": "rootReducer"
@@ -1275,58 +1555,58 @@
       },
       {
         "type": "ExportDefaultDeclaration",
-        "start": 613,
-        "end": 640,
+        "start": 803,
+        "end": 830,
         "loc": {
           "start": {
-            "line": 25,
+            "line": 29,
             "column": 0
           },
           "end": {
-            "line": 25,
+            "line": 29,
             "column": 27
           }
         },
         "declaration": {
           "type": "VariableDeclaration",
-          "start": 383,
-          "end": 611,
+          "start": 503,
+          "end": 801,
           "loc": {
             "start": {
-              "line": 14,
+              "line": 16,
               "column": 0
             },
             "end": {
-              "line": 23,
+              "line": 27,
               "column": 2
             }
           },
           "declarations": [
             {
               "type": "VariableDeclarator",
-              "start": 389,
-              "end": 610,
+              "start": 509,
+              "end": 800,
               "loc": {
                 "start": {
-                  "line": 14,
+                  "line": 16,
                   "column": 6
                 },
                 "end": {
-                  "line": 23,
+                  "line": 27,
                   "column": 1
                 }
               },
               "id": {
                 "type": "Identifier",
-                "start": 389,
-                "end": 400,
+                "start": 509,
+                "end": 520,
                 "loc": {
                   "start": {
-                    "line": 14,
+                    "line": 16,
                     "column": 6
                   },
                   "end": {
-                    "line": 14,
+                    "line": 16,
                     "column": 17
                   },
                   "identifierName": "rootReducer"
@@ -1336,30 +1616,30 @@
               },
               "init": {
                 "type": "ObjectExpression",
-                "start": 403,
-                "end": 610,
+                "start": 523,
+                "end": 800,
                 "loc": {
                   "start": {
-                    "line": 14,
+                    "line": 16,
                     "column": 20
                   },
                   "end": {
-                    "line": 23,
+                    "line": 27,
                     "column": 1
                   }
                 },
                 "properties": [
                   {
                     "type": "ObjectProperty",
-                    "start": 407,
-                    "end": 428,
+                    "start": 527,
+                    "end": 548,
                     "loc": {
                       "start": {
-                        "line": 15,
+                        "line": 17,
                         "column": 2
                       },
                       "end": {
-                        "line": 15,
+                        "line": 17,
                         "column": 23
                       }
                     },
@@ -1368,15 +1648,15 @@
                     "computed": false,
                     "key": {
                       "type": "Identifier",
-                      "start": 407,
-                      "end": 413,
+                      "start": 527,
+                      "end": 533,
                       "loc": {
                         "start": {
-                          "line": 15,
+                          "line": 17,
                           "column": 2
                         },
                         "end": {
-                          "line": 15,
+                          "line": 17,
                           "column": 8
                         },
                         "identifierName": "alarms"
@@ -1385,15 +1665,15 @@
                     },
                     "value": {
                       "type": "Identifier",
-                      "start": 415,
-                      "end": 428,
+                      "start": 535,
+                      "end": 548,
                       "loc": {
                         "start": {
-                          "line": 15,
+                          "line": 17,
                           "column": 10
                         },
                         "end": {
-                          "line": 15,
+                          "line": 17,
                           "column": 23
                         },
                         "identifierName": "alarmsReducer"
@@ -1403,15 +1683,15 @@
                   },
                   {
                     "type": "ObjectProperty",
-                    "start": 432,
-                    "end": 463,
+                    "start": 552,
+                    "end": 583,
                     "loc": {
                       "start": {
-                        "line": 16,
+                        "line": 18,
                         "column": 2
                       },
                       "end": {
-                        "line": 16,
+                        "line": 18,
                         "column": 33
                       }
                     },
@@ -1420,15 +1700,15 @@
                     "computed": false,
                     "key": {
                       "type": "Identifier",
-                      "start": 432,
-                      "end": 443,
+                      "start": 552,
+                      "end": 563,
                       "loc": {
                         "start": {
-                          "line": 16,
+                          "line": 18,
                           "column": 2
                         },
                         "end": {
-                          "line": 16,
+                          "line": 18,
                           "column": 13
                         },
                         "identifierName": "connections"
@@ -1437,15 +1717,15 @@
                     },
                     "value": {
                       "type": "Identifier",
-                      "start": 445,
-                      "end": 463,
+                      "start": 565,
+                      "end": 583,
                       "loc": {
                         "start": {
-                          "line": 16,
+                          "line": 18,
                           "column": 15
                         },
                         "end": {
-                          "line": 16,
+                          "line": 18,
                           "column": 33
                         },
                         "identifierName": "connectionsReducer"
@@ -1455,15 +1735,15 @@
                   },
                   {
                     "type": "ObjectProperty",
-                    "start": 467,
-                    "end": 492,
+                    "start": 587,
+                    "end": 612,
                     "loc": {
                       "start": {
-                        "line": 17,
+                        "line": 19,
                         "column": 2
                       },
                       "end": {
-                        "line": 17,
+                        "line": 19,
                         "column": 27
                       }
                     },
@@ -1472,15 +1752,15 @@
                     "computed": false,
                     "key": {
                       "type": "Identifier",
-                      "start": 467,
-                      "end": 475,
+                      "start": 587,
+                      "end": 595,
                       "loc": {
                         "start": {
-                          "line": 17,
+                          "line": 19,
                           "column": 2
                         },
                         "end": {
-                          "line": 17,
+                          "line": 19,
                           "column": 10
                         },
                         "identifierName": "pairings"
@@ -1489,15 +1769,15 @@
                     },
                     "value": {
                       "type": "Identifier",
-                      "start": 477,
-                      "end": 492,
+                      "start": 597,
+                      "end": 612,
                       "loc": {
                         "start": {
-                          "line": 17,
+                          "line": 19,
                           "column": 12
                         },
                         "end": {
-                          "line": 17,
+                          "line": 19,
                           "column": 27
                         },
                         "identifierName": "pairingsReducer"
@@ -1507,15 +1787,15 @@
                   },
                   {
                     "type": "ObjectProperty",
-                    "start": 496,
-                    "end": 519,
+                    "start": 616,
+                    "end": 639,
                     "loc": {
                       "start": {
-                        "line": 18,
+                        "line": 20,
                         "column": 2
                       },
                       "end": {
-                        "line": 18,
+                        "line": 20,
                         "column": 25
                       }
                     },
@@ -1524,15 +1804,15 @@
                     "computed": false,
                     "key": {
                       "type": "Identifier",
-                      "start": 496,
-                      "end": 503,
+                      "start": 616,
+                      "end": 623,
                       "loc": {
                         "start": {
-                          "line": 18,
+                          "line": 20,
                           "column": 2
                         },
                         "end": {
-                          "line": 18,
+                          "line": 20,
                           "column": 9
                         },
                         "identifierName": "devices"
@@ -1541,15 +1821,15 @@
                     },
                     "value": {
                       "type": "Identifier",
-                      "start": 505,
-                      "end": 519,
+                      "start": 625,
+                      "end": 639,
                       "loc": {
                         "start": {
-                          "line": 18,
+                          "line": 20,
                           "column": 11
                         },
                         "end": {
-                          "line": 18,
+                          "line": 20,
                           "column": 25
                         },
                         "identifierName": "devicesReducer"
@@ -1559,15 +1839,15 @@
                   },
                   {
                     "type": "ObjectProperty",
-                    "start": 523,
-                    "end": 540,
+                    "start": 643,
+                    "end": 660,
                     "loc": {
                       "start": {
-                        "line": 19,
+                        "line": 21,
                         "column": 2
                       },
                       "end": {
-                        "line": 19,
+                        "line": 21,
                         "column": 19
                       }
                     },
@@ -1576,15 +1856,15 @@
                     "computed": false,
                     "key": {
                       "type": "Identifier",
-                      "start": 523,
-                      "end": 527,
+                      "start": 643,
+                      "end": 647,
                       "loc": {
                         "start": {
-                          "line": 19,
+                          "line": 21,
                           "column": 2
                         },
                         "end": {
-                          "line": 19,
+                          "line": 21,
                           "column": 6
                         },
                         "identifierName": "hubs"
@@ -1593,15 +1873,15 @@
                     },
                     "value": {
                       "type": "Identifier",
-                      "start": 529,
-                      "end": 540,
+                      "start": 649,
+                      "end": 660,
                       "loc": {
                         "start": {
-                          "line": 19,
+                          "line": 21,
                           "column": 8
                         },
                         "end": {
-                          "line": 19,
+                          "line": 21,
                           "column": 19
                         },
                         "identifierName": "hubsReducer"
@@ -1611,15 +1891,15 @@
                   },
                   {
                     "type": "ObjectProperty",
-                    "start": 544,
-                    "end": 561,
+                    "start": 664,
+                    "end": 681,
                     "loc": {
                       "start": {
-                        "line": 20,
+                        "line": 22,
                         "column": 2
                       },
                       "end": {
-                        "line": 20,
+                        "line": 22,
                         "column": 19
                       }
                     },
@@ -1628,15 +1908,15 @@
                     "computed": false,
                     "key": {
                       "type": "Identifier",
-                      "start": 544,
-                      "end": 548,
+                      "start": 664,
+                      "end": 668,
                       "loc": {
                         "start": {
-                          "line": 20,
+                          "line": 22,
                           "column": 2
                         },
                         "end": {
-                          "line": 20,
+                          "line": 22,
                           "column": 6
                         },
                         "identifierName": "user"
@@ -1645,15 +1925,15 @@
                     },
                     "value": {
                       "type": "Identifier",
-                      "start": 550,
-                      "end": 561,
+                      "start": 670,
+                      "end": 681,
                       "loc": {
                         "start": {
-                          "line": 20,
+                          "line": 22,
                           "column": 8
                         },
                         "end": {
-                          "line": 20,
+                          "line": 22,
                           "column": 19
                         },
                         "identifierName": "userReducer"
@@ -1663,15 +1943,15 @@
                   },
                   {
                     "type": "ObjectProperty",
-                    "start": 565,
-                    "end": 584,
+                    "start": 685,
+                    "end": 704,
                     "loc": {
                       "start": {
-                        "line": 21,
+                        "line": 23,
                         "column": 2
                       },
                       "end": {
-                        "line": 21,
+                        "line": 23,
                         "column": 21
                       }
                     },
@@ -1680,15 +1960,15 @@
                     "computed": false,
                     "key": {
                       "type": "Identifier",
-                      "start": 565,
-                      "end": 570,
+                      "start": 685,
+                      "end": 690,
                       "loc": {
                         "start": {
-                          "line": 21,
+                          "line": 23,
                           "column": 2
                         },
                         "end": {
-                          "line": 21,
+                          "line": 23,
                           "column": 7
                         },
                         "identifierName": "rooms"
@@ -1697,15 +1977,15 @@
                     },
                     "value": {
                       "type": "Identifier",
-                      "start": 572,
-                      "end": 584,
+                      "start": 692,
+                      "end": 704,
                       "loc": {
                         "start": {
-                          "line": 21,
+                          "line": 23,
                           "column": 9
                         },
                         "end": {
-                          "line": 21,
+                          "line": 23,
                           "column": 21
                         },
                         "identifierName": "roomsReducer"
@@ -1715,15 +1995,15 @@
                   },
                   {
                     "type": "ObjectProperty",
-                    "start": 588,
-                    "end": 607,
+                    "start": 708,
+                    "end": 727,
                     "loc": {
                       "start": {
-                        "line": 22,
+                        "line": 24,
                         "column": 2
                       },
                       "end": {
-                        "line": 22,
+                        "line": 24,
                         "column": 21
                       }
                     },
@@ -1732,15 +2012,15 @@
                     "computed": false,
                     "key": {
                       "type": "Identifier",
-                      "start": 588,
-                      "end": 593,
+                      "start": 708,
+                      "end": 713,
                       "loc": {
                         "start": {
-                          "line": 22,
+                          "line": 24,
                           "column": 2
                         },
                         "end": {
-                          "line": 22,
+                          "line": 24,
                           "column": 7
                         },
                         "identifierName": "plans"
@@ -1749,20 +2029,124 @@
                     },
                     "value": {
                       "type": "Identifier",
-                      "start": 595,
-                      "end": 607,
+                      "start": 715,
+                      "end": 727,
                       "loc": {
                         "start": {
-                          "line": 22,
+                          "line": 24,
                           "column": 9
                         },
                         "end": {
-                          "line": 22,
+                          "line": 24,
                           "column": 21
                         },
                         "identifierName": "plansReducer"
                       },
                       "name": "plansReducer"
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "start": 731,
+                    "end": 762,
+                    "loc": {
+                      "start": {
+                        "line": 25,
+                        "column": 2
+                      },
+                      "end": {
+                        "line": 25,
+                        "column": 33
+                      }
+                    },
+                    "method": false,
+                    "shorthand": false,
+                    "computed": false,
+                    "key": {
+                      "type": "Identifier",
+                      "start": 731,
+                      "end": 740,
+                      "loc": {
+                        "start": {
+                          "line": 25,
+                          "column": 2
+                        },
+                        "end": {
+                          "line": 25,
+                          "column": 11
+                        },
+                        "identifierName": "documents"
+                      },
+                      "name": "documents"
+                    },
+                    "value": {
+                      "type": "Identifier",
+                      "start": 742,
+                      "end": 762,
+                      "loc": {
+                        "start": {
+                          "line": 25,
+                          "column": 13
+                        },
+                        "end": {
+                          "line": 25,
+                          "column": 33
+                        },
+                        "identifierName": "planDocumentsReducer"
+                      },
+                      "name": "planDocumentsReducer"
+                    }
+                  },
+                  {
+                    "type": "ObjectProperty",
+                    "start": 766,
+                    "end": 797,
+                    "loc": {
+                      "start": {
+                        "line": 26,
+                        "column": 2
+                      },
+                      "end": {
+                        "line": 26,
+                        "column": 33
+                      }
+                    },
+                    "method": false,
+                    "shorthand": false,
+                    "computed": false,
+                    "key": {
+                      "type": "Identifier",
+                      "start": 766,
+                      "end": 771,
+                      "loc": {
+                        "start": {
+                          "line": 26,
+                          "column": 2
+                        },
+                        "end": {
+                          "line": 26,
+                          "column": 7
+                        },
+                        "identifierName": "nodes"
+                      },
+                      "name": "nodes"
+                    },
+                    "value": {
+                      "type": "Identifier",
+                      "start": 773,
+                      "end": 797,
+                      "loc": {
+                        "start": {
+                          "line": 26,
+                          "column": 9
+                        },
+                        "end": {
+                          "line": 26,
+                          "column": 33
+                        },
+                        "identifierName": "planDocumentNodesReducer"
+                      },
+                      "name": "planDocumentNodesReducer"
                     }
                   }
                 ]
@@ -1775,15 +2159,15 @@
             {
               "type": "CommentBlock",
               "value": "*\n * Root reducer\n * @type {Object}\n ",
-              "start": 341,
-              "end": 382,
+              "start": 461,
+              "end": 502,
               "loc": {
                 "start": {
-                  "line": 10,
+                  "line": 12,
                   "column": 0
                 },
                 "end": {
-                  "line": 13,
+                  "line": 15,
                   "column": 3
                 }
               }
@@ -1799,15 +2183,15 @@
     {
       "type": "CommentBlock",
       "value": "*\n * Root reducer\n * @type {Object}\n ",
-      "start": 341,
-      "end": 382,
+      "start": 461,
+      "end": 502,
       "loc": {
         "start": {
-          "line": 10,
+          "line": 12,
           "column": 0
         },
         "end": {
-          "line": 13,
+          "line": 15,
           "column": 3
         }
       }
@@ -3279,27 +3663,11 @@
       }
     },
     {
-      "type": "CommentBlock",
-      "value": "*\n * Root reducer\n * @type {Object}\n ",
-      "start": 341,
-      "end": 382,
-      "loc": {
-        "start": {
-          "line": 10,
-          "column": 0
-        },
-        "end": {
-          "line": 13,
-          "column": 3
-        }
-      }
-    },
-    {
       "type": {
-        "label": "const",
-        "keyword": "const",
+        "label": "import",
+        "keyword": "import",
         "beforeExpr": false,
-        "startsExpr": false,
+        "startsExpr": true,
         "rightAssociative": false,
         "isLoop": false,
         "isAssign": false,
@@ -3308,17 +3676,42 @@
         "binop": null,
         "updateContext": null
       },
-      "value": "const",
-      "start": 383,
-      "end": 388,
+      "value": "import",
+      "start": 340,
+      "end": 346,
       "loc": {
         "start": {
-          "line": 14,
+          "line": 9,
           "column": 0
         },
         "end": {
-          "line": 14,
-          "column": 5
+          "line": 9,
+          "column": 6
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "{",
+        "beforeExpr": true,
+        "startsExpr": true,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null
+      },
+      "start": 347,
+      "end": 348,
+      "loc": {
+        "start": {
+          "line": 9,
+          "column": 7
+        },
+        "end": {
+          "line": 9,
+          "column": 8
         }
       }
     },
@@ -3334,44 +3727,149 @@
         "postfix": false,
         "binop": null
       },
-      "value": "rootReducer",
-      "start": 389,
-      "end": 400,
+      "value": "planDocumentsReducer",
+      "start": 349,
+      "end": 369,
       "loc": {
         "start": {
-          "line": 14,
-          "column": 6
+          "line": 9,
+          "column": 9
         },
         "end": {
-          "line": 14,
-          "column": 17
+          "line": 9,
+          "column": 29
         }
       }
     },
     {
       "type": {
-        "label": "=",
-        "beforeExpr": true,
+        "label": "}",
+        "beforeExpr": false,
         "startsExpr": false,
         "rightAssociative": false,
         "isLoop": false,
-        "isAssign": true,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null
+      },
+      "start": 370,
+      "end": 371,
+      "loc": {
+        "start": {
+          "line": 9,
+          "column": 30
+        },
+        "end": {
+          "line": 9,
+          "column": 31
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "name",
+        "beforeExpr": false,
+        "startsExpr": true,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null
+      },
+      "value": "from",
+      "start": 372,
+      "end": 376,
+      "loc": {
+        "start": {
+          "line": 9,
+          "column": 32
+        },
+        "end": {
+          "line": 9,
+          "column": 36
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "string",
+        "beforeExpr": false,
+        "startsExpr": true,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
         "prefix": false,
         "postfix": false,
         "binop": null,
         "updateContext": null
       },
-      "value": "=",
-      "start": 401,
+      "value": "./planDocuments",
+      "start": 377,
+      "end": 394,
+      "loc": {
+        "start": {
+          "line": 9,
+          "column": 37
+        },
+        "end": {
+          "line": 9,
+          "column": 54
+        }
+      }
+    },
+    {
+      "type": {
+        "label": ";",
+        "beforeExpr": true,
+        "startsExpr": false,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null,
+        "updateContext": null
+      },
+      "start": 394,
+      "end": 395,
+      "loc": {
+        "start": {
+          "line": 9,
+          "column": 54
+        },
+        "end": {
+          "line": 9,
+          "column": 55
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "import",
+        "keyword": "import",
+        "beforeExpr": false,
+        "startsExpr": true,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null,
+        "updateContext": null
+      },
+      "value": "import",
+      "start": 396,
       "end": 402,
       "loc": {
         "start": {
-          "line": 14,
-          "column": 18
+          "line": 10,
+          "column": 0
         },
         "end": {
-          "line": 14,
-          "column": 19
+          "line": 10,
+          "column": 6
         }
       }
     },
@@ -3391,11 +3889,263 @@
       "end": 404,
       "loc": {
         "start": {
-          "line": 14,
+          "line": 10,
+          "column": 7
+        },
+        "end": {
+          "line": 10,
+          "column": 8
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "name",
+        "beforeExpr": false,
+        "startsExpr": true,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null
+      },
+      "value": "planDocumentNodesReducer",
+      "start": 405,
+      "end": 429,
+      "loc": {
+        "start": {
+          "line": 10,
+          "column": 9
+        },
+        "end": {
+          "line": 10,
+          "column": 33
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "}",
+        "beforeExpr": false,
+        "startsExpr": false,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null
+      },
+      "start": 430,
+      "end": 431,
+      "loc": {
+        "start": {
+          "line": 10,
+          "column": 34
+        },
+        "end": {
+          "line": 10,
+          "column": 35
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "name",
+        "beforeExpr": false,
+        "startsExpr": true,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null
+      },
+      "value": "from",
+      "start": 432,
+      "end": 436,
+      "loc": {
+        "start": {
+          "line": 10,
+          "column": 36
+        },
+        "end": {
+          "line": 10,
+          "column": 40
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "string",
+        "beforeExpr": false,
+        "startsExpr": true,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null,
+        "updateContext": null
+      },
+      "value": "./planDocumentNodes",
+      "start": 437,
+      "end": 458,
+      "loc": {
+        "start": {
+          "line": 10,
+          "column": 41
+        },
+        "end": {
+          "line": 10,
+          "column": 62
+        }
+      }
+    },
+    {
+      "type": {
+        "label": ";",
+        "beforeExpr": true,
+        "startsExpr": false,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null,
+        "updateContext": null
+      },
+      "start": 458,
+      "end": 459,
+      "loc": {
+        "start": {
+          "line": 10,
+          "column": 62
+        },
+        "end": {
+          "line": 10,
+          "column": 63
+        }
+      }
+    },
+    {
+      "type": "CommentBlock",
+      "value": "*\n * Root reducer\n * @type {Object}\n ",
+      "start": 461,
+      "end": 502,
+      "loc": {
+        "start": {
+          "line": 12,
+          "column": 0
+        },
+        "end": {
+          "line": 15,
+          "column": 3
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "const",
+        "keyword": "const",
+        "beforeExpr": false,
+        "startsExpr": false,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null,
+        "updateContext": null
+      },
+      "value": "const",
+      "start": 503,
+      "end": 508,
+      "loc": {
+        "start": {
+          "line": 16,
+          "column": 0
+        },
+        "end": {
+          "line": 16,
+          "column": 5
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "name",
+        "beforeExpr": false,
+        "startsExpr": true,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null
+      },
+      "value": "rootReducer",
+      "start": 509,
+      "end": 520,
+      "loc": {
+        "start": {
+          "line": 16,
+          "column": 6
+        },
+        "end": {
+          "line": 16,
+          "column": 17
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "=",
+        "beforeExpr": true,
+        "startsExpr": false,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": true,
+        "prefix": false,
+        "postfix": false,
+        "binop": null,
+        "updateContext": null
+      },
+      "value": "=",
+      "start": 521,
+      "end": 522,
+      "loc": {
+        "start": {
+          "line": 16,
+          "column": 18
+        },
+        "end": {
+          "line": 16,
+          "column": 19
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "{",
+        "beforeExpr": true,
+        "startsExpr": true,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null
+      },
+      "start": 523,
+      "end": 524,
+      "loc": {
+        "start": {
+          "line": 16,
           "column": 20
         },
         "end": {
-          "line": 14,
+          "line": 16,
           "column": 21
         }
       }
@@ -3413,15 +4163,15 @@
         "binop": null
       },
       "value": "alarms",
-      "start": 407,
-      "end": 413,
+      "start": 527,
+      "end": 533,
       "loc": {
         "start": {
-          "line": 15,
+          "line": 17,
           "column": 2
         },
         "end": {
-          "line": 15,
+          "line": 17,
           "column": 8
         }
       }
@@ -3439,15 +4189,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 413,
-      "end": 414,
+      "start": 533,
+      "end": 534,
       "loc": {
         "start": {
-          "line": 15,
+          "line": 17,
           "column": 8
         },
         "end": {
-          "line": 15,
+          "line": 17,
           "column": 9
         }
       }
@@ -3465,15 +4215,15 @@
         "binop": null
       },
       "value": "alarmsReducer",
-      "start": 415,
-      "end": 428,
+      "start": 535,
+      "end": 548,
       "loc": {
         "start": {
-          "line": 15,
+          "line": 17,
           "column": 10
         },
         "end": {
-          "line": 15,
+          "line": 17,
           "column": 23
         }
       }
@@ -3491,15 +4241,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 428,
-      "end": 429,
+      "start": 548,
+      "end": 549,
       "loc": {
         "start": {
-          "line": 15,
+          "line": 17,
           "column": 23
         },
         "end": {
-          "line": 15,
+          "line": 17,
           "column": 24
         }
       }
@@ -3517,15 +4267,15 @@
         "binop": null
       },
       "value": "connections",
-      "start": 432,
-      "end": 443,
+      "start": 552,
+      "end": 563,
       "loc": {
         "start": {
-          "line": 16,
+          "line": 18,
           "column": 2
         },
         "end": {
-          "line": 16,
+          "line": 18,
           "column": 13
         }
       }
@@ -3543,15 +4293,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 443,
-      "end": 444,
+      "start": 563,
+      "end": 564,
       "loc": {
         "start": {
-          "line": 16,
+          "line": 18,
           "column": 13
         },
         "end": {
-          "line": 16,
+          "line": 18,
           "column": 14
         }
       }
@@ -3569,15 +4319,15 @@
         "binop": null
       },
       "value": "connectionsReducer",
-      "start": 445,
-      "end": 463,
+      "start": 565,
+      "end": 583,
       "loc": {
         "start": {
-          "line": 16,
+          "line": 18,
           "column": 15
         },
         "end": {
-          "line": 16,
+          "line": 18,
           "column": 33
         }
       }
@@ -3595,15 +4345,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 463,
-      "end": 464,
+      "start": 583,
+      "end": 584,
       "loc": {
         "start": {
-          "line": 16,
+          "line": 18,
           "column": 33
         },
         "end": {
-          "line": 16,
+          "line": 18,
           "column": 34
         }
       }
@@ -3621,15 +4371,15 @@
         "binop": null
       },
       "value": "pairings",
-      "start": 467,
-      "end": 475,
+      "start": 587,
+      "end": 595,
       "loc": {
         "start": {
-          "line": 17,
+          "line": 19,
           "column": 2
         },
         "end": {
-          "line": 17,
+          "line": 19,
           "column": 10
         }
       }
@@ -3647,15 +4397,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 475,
-      "end": 476,
+      "start": 595,
+      "end": 596,
       "loc": {
         "start": {
-          "line": 17,
+          "line": 19,
           "column": 10
         },
         "end": {
-          "line": 17,
+          "line": 19,
           "column": 11
         }
       }
@@ -3673,15 +4423,15 @@
         "binop": null
       },
       "value": "pairingsReducer",
-      "start": 477,
-      "end": 492,
+      "start": 597,
+      "end": 612,
       "loc": {
         "start": {
-          "line": 17,
+          "line": 19,
           "column": 12
         },
         "end": {
-          "line": 17,
+          "line": 19,
           "column": 27
         }
       }
@@ -3699,15 +4449,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 492,
-      "end": 493,
+      "start": 612,
+      "end": 613,
       "loc": {
         "start": {
-          "line": 17,
+          "line": 19,
           "column": 27
         },
         "end": {
-          "line": 17,
+          "line": 19,
           "column": 28
         }
       }
@@ -3725,15 +4475,15 @@
         "binop": null
       },
       "value": "devices",
-      "start": 496,
-      "end": 503,
+      "start": 616,
+      "end": 623,
       "loc": {
         "start": {
-          "line": 18,
+          "line": 20,
           "column": 2
         },
         "end": {
-          "line": 18,
+          "line": 20,
           "column": 9
         }
       }
@@ -3751,15 +4501,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 503,
-      "end": 504,
+      "start": 623,
+      "end": 624,
       "loc": {
         "start": {
-          "line": 18,
+          "line": 20,
           "column": 9
         },
         "end": {
-          "line": 18,
+          "line": 20,
           "column": 10
         }
       }
@@ -3777,15 +4527,15 @@
         "binop": null
       },
       "value": "devicesReducer",
-      "start": 505,
-      "end": 519,
+      "start": 625,
+      "end": 639,
       "loc": {
         "start": {
-          "line": 18,
+          "line": 20,
           "column": 11
         },
         "end": {
-          "line": 18,
+          "line": 20,
           "column": 25
         }
       }
@@ -3803,15 +4553,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 519,
-      "end": 520,
+      "start": 639,
+      "end": 640,
       "loc": {
         "start": {
-          "line": 18,
+          "line": 20,
           "column": 25
         },
         "end": {
-          "line": 18,
+          "line": 20,
           "column": 26
         }
       }
@@ -3829,15 +4579,15 @@
         "binop": null
       },
       "value": "hubs",
-      "start": 523,
-      "end": 527,
+      "start": 643,
+      "end": 647,
       "loc": {
         "start": {
-          "line": 19,
+          "line": 21,
           "column": 2
         },
         "end": {
-          "line": 19,
+          "line": 21,
           "column": 6
         }
       }
@@ -3855,15 +4605,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 527,
-      "end": 528,
+      "start": 647,
+      "end": 648,
       "loc": {
         "start": {
-          "line": 19,
+          "line": 21,
           "column": 6
         },
         "end": {
-          "line": 19,
+          "line": 21,
           "column": 7
         }
       }
@@ -3881,15 +4631,15 @@
         "binop": null
       },
       "value": "hubsReducer",
-      "start": 529,
-      "end": 540,
+      "start": 649,
+      "end": 660,
       "loc": {
         "start": {
-          "line": 19,
+          "line": 21,
           "column": 8
         },
         "end": {
-          "line": 19,
+          "line": 21,
           "column": 19
         }
       }
@@ -3907,15 +4657,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 540,
-      "end": 541,
+      "start": 660,
+      "end": 661,
       "loc": {
         "start": {
-          "line": 19,
+          "line": 21,
           "column": 19
         },
         "end": {
-          "line": 19,
+          "line": 21,
           "column": 20
         }
       }
@@ -3933,15 +4683,15 @@
         "binop": null
       },
       "value": "user",
-      "start": 544,
-      "end": 548,
+      "start": 664,
+      "end": 668,
       "loc": {
         "start": {
-          "line": 20,
+          "line": 22,
           "column": 2
         },
         "end": {
-          "line": 20,
+          "line": 22,
           "column": 6
         }
       }
@@ -3959,15 +4709,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 548,
-      "end": 549,
+      "start": 668,
+      "end": 669,
       "loc": {
         "start": {
-          "line": 20,
+          "line": 22,
           "column": 6
         },
         "end": {
-          "line": 20,
+          "line": 22,
           "column": 7
         }
       }
@@ -3985,15 +4735,15 @@
         "binop": null
       },
       "value": "userReducer",
-      "start": 550,
-      "end": 561,
+      "start": 670,
+      "end": 681,
       "loc": {
         "start": {
-          "line": 20,
+          "line": 22,
           "column": 8
         },
         "end": {
-          "line": 20,
+          "line": 22,
           "column": 19
         }
       }
@@ -4011,15 +4761,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 561,
-      "end": 562,
+      "start": 681,
+      "end": 682,
       "loc": {
         "start": {
-          "line": 20,
+          "line": 22,
           "column": 19
         },
         "end": {
-          "line": 20,
+          "line": 22,
           "column": 20
         }
       }
@@ -4037,15 +4787,15 @@
         "binop": null
       },
       "value": "rooms",
-      "start": 565,
-      "end": 570,
+      "start": 685,
+      "end": 690,
       "loc": {
         "start": {
-          "line": 21,
+          "line": 23,
           "column": 2
         },
         "end": {
-          "line": 21,
+          "line": 23,
           "column": 7
         }
       }
@@ -4063,15 +4813,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 570,
-      "end": 571,
+      "start": 690,
+      "end": 691,
       "loc": {
         "start": {
-          "line": 21,
+          "line": 23,
           "column": 7
         },
         "end": {
-          "line": 21,
+          "line": 23,
           "column": 8
         }
       }
@@ -4089,15 +4839,15 @@
         "binop": null
       },
       "value": "roomsReducer",
-      "start": 572,
-      "end": 584,
+      "start": 692,
+      "end": 704,
       "loc": {
         "start": {
-          "line": 21,
+          "line": 23,
           "column": 9
         },
         "end": {
-          "line": 21,
+          "line": 23,
           "column": 21
         }
       }
@@ -4115,15 +4865,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 584,
-      "end": 585,
+      "start": 704,
+      "end": 705,
       "loc": {
         "start": {
-          "line": 21,
+          "line": 23,
           "column": 21
         },
         "end": {
-          "line": 21,
+          "line": 23,
           "column": 22
         }
       }
@@ -4141,15 +4891,15 @@
         "binop": null
       },
       "value": "plans",
-      "start": 588,
-      "end": 593,
+      "start": 708,
+      "end": 713,
       "loc": {
         "start": {
-          "line": 22,
+          "line": 24,
           "column": 2
         },
         "end": {
-          "line": 22,
+          "line": 24,
           "column": 7
         }
       }
@@ -4167,15 +4917,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 593,
-      "end": 594,
+      "start": 713,
+      "end": 714,
       "loc": {
         "start": {
-          "line": 22,
+          "line": 24,
           "column": 7
         },
         "end": {
-          "line": 22,
+          "line": 24,
           "column": 8
         }
       }
@@ -4193,15 +4943,15 @@
         "binop": null
       },
       "value": "plansReducer",
-      "start": 595,
-      "end": 607,
+      "start": 715,
+      "end": 727,
       "loc": {
         "start": {
-          "line": 22,
+          "line": 24,
           "column": 9
         },
         "end": {
-          "line": 22,
+          "line": 24,
           "column": 21
         }
       }
@@ -4219,16 +4969,224 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 607,
-      "end": 608,
+      "start": 727,
+      "end": 728,
       "loc": {
         "start": {
-          "line": 22,
+          "line": 24,
           "column": 21
         },
         "end": {
-          "line": 22,
+          "line": 24,
           "column": 22
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "name",
+        "beforeExpr": false,
+        "startsExpr": true,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null
+      },
+      "value": "documents",
+      "start": 731,
+      "end": 740,
+      "loc": {
+        "start": {
+          "line": 25,
+          "column": 2
+        },
+        "end": {
+          "line": 25,
+          "column": 11
+        }
+      }
+    },
+    {
+      "type": {
+        "label": ":",
+        "beforeExpr": true,
+        "startsExpr": false,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null,
+        "updateContext": null
+      },
+      "start": 740,
+      "end": 741,
+      "loc": {
+        "start": {
+          "line": 25,
+          "column": 11
+        },
+        "end": {
+          "line": 25,
+          "column": 12
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "name",
+        "beforeExpr": false,
+        "startsExpr": true,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null
+      },
+      "value": "planDocumentsReducer",
+      "start": 742,
+      "end": 762,
+      "loc": {
+        "start": {
+          "line": 25,
+          "column": 13
+        },
+        "end": {
+          "line": 25,
+          "column": 33
+        }
+      }
+    },
+    {
+      "type": {
+        "label": ",",
+        "beforeExpr": true,
+        "startsExpr": false,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null,
+        "updateContext": null
+      },
+      "start": 762,
+      "end": 763,
+      "loc": {
+        "start": {
+          "line": 25,
+          "column": 33
+        },
+        "end": {
+          "line": 25,
+          "column": 34
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "name",
+        "beforeExpr": false,
+        "startsExpr": true,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null
+      },
+      "value": "nodes",
+      "start": 766,
+      "end": 771,
+      "loc": {
+        "start": {
+          "line": 26,
+          "column": 2
+        },
+        "end": {
+          "line": 26,
+          "column": 7
+        }
+      }
+    },
+    {
+      "type": {
+        "label": ":",
+        "beforeExpr": true,
+        "startsExpr": false,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null,
+        "updateContext": null
+      },
+      "start": 771,
+      "end": 772,
+      "loc": {
+        "start": {
+          "line": 26,
+          "column": 7
+        },
+        "end": {
+          "line": 26,
+          "column": 8
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "name",
+        "beforeExpr": false,
+        "startsExpr": true,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null
+      },
+      "value": "planDocumentNodesReducer",
+      "start": 773,
+      "end": 797,
+      "loc": {
+        "start": {
+          "line": 26,
+          "column": 9
+        },
+        "end": {
+          "line": 26,
+          "column": 33
+        }
+      }
+    },
+    {
+      "type": {
+        "label": ",",
+        "beforeExpr": true,
+        "startsExpr": false,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null,
+        "updateContext": null
+      },
+      "start": 797,
+      "end": 798,
+      "loc": {
+        "start": {
+          "line": 26,
+          "column": 33
+        },
+        "end": {
+          "line": 26,
+          "column": 34
         }
       }
     },
@@ -4244,15 +5202,15 @@
         "postfix": false,
         "binop": null
       },
-      "start": 609,
-      "end": 610,
+      "start": 799,
+      "end": 800,
       "loc": {
         "start": {
-          "line": 23,
+          "line": 27,
           "column": 0
         },
         "end": {
-          "line": 23,
+          "line": 27,
           "column": 1
         }
       }
@@ -4270,15 +5228,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 610,
-      "end": 611,
+      "start": 800,
+      "end": 801,
       "loc": {
         "start": {
-          "line": 23,
+          "line": 27,
           "column": 1
         },
         "end": {
-          "line": 23,
+          "line": 27,
           "column": 2
         }
       }
@@ -4298,15 +5256,15 @@
         "updateContext": null
       },
       "value": "export",
-      "start": 613,
-      "end": 619,
+      "start": 803,
+      "end": 809,
       "loc": {
         "start": {
-          "line": 25,
+          "line": 29,
           "column": 0
         },
         "end": {
-          "line": 25,
+          "line": 29,
           "column": 6
         }
       }
@@ -4326,15 +5284,15 @@
         "updateContext": null
       },
       "value": "default",
-      "start": 620,
-      "end": 627,
+      "start": 810,
+      "end": 817,
       "loc": {
         "start": {
-          "line": 25,
+          "line": 29,
           "column": 7
         },
         "end": {
-          "line": 25,
+          "line": 29,
           "column": 14
         }
       }
@@ -4352,15 +5310,15 @@
         "binop": null
       },
       "value": "rootReducer",
-      "start": 628,
-      "end": 639,
+      "start": 818,
+      "end": 829,
       "loc": {
         "start": {
-          "line": 25,
+          "line": 29,
           "column": 15
         },
         "end": {
-          "line": 25,
+          "line": 29,
           "column": 26
         }
       }
@@ -4378,15 +5336,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 639,
-      "end": 640,
+      "start": 829,
+      "end": 830,
       "loc": {
         "start": {
-          "line": 25,
+          "line": 29,
           "column": 26
         },
         "end": {
-          "line": 25,
+          "line": 29,
           "column": 27
         }
       }
@@ -4404,15 +5362,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 641,
-      "end": 641,
+      "start": 831,
+      "end": 831,
       "loc": {
         "start": {
-          "line": 26,
+          "line": 30,
           "column": 0
         },
         "end": {
-          "line": 26,
+          "line": 30,
           "column": 0
         }
       }

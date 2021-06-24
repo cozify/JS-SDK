@@ -1,28 +1,28 @@
 {
   "type": "File",
   "start": 0,
-  "end": 290,
+  "end": 681,
   "loc": {
     "start": {
       "line": 1,
       "column": 0
     },
     "end": {
-      "line": 17,
+      "line": 30,
       "column": 0
     }
   },
   "program": {
     "type": "Program",
     "start": 0,
-    "end": 290,
+    "end": 681,
     "loc": {
       "start": {
         "line": 1,
         "column": 0
       },
       "end": {
-        "line": 17,
+        "line": 30,
         "column": 0
       }
     },
@@ -50,15 +50,31 @@
       {
         "type": "CommentBlock",
         "value": "\nclosed: false\ncreatedAtMs: 1573477740542\nid: \"f9fbd96b-f436-44f8-ba11-4be7aee1238a\"\nlevel: \"err\"\n// eslint-disable-next-line\nmessage: \"\"\nname: \"LT Security Alarm\"\nsourceId: \"b0d685d8-5270-411b-8d1e-2c45c31c8f07\"\ntimestamp: 1573477740542\ntitle: \"Murtohälytys\"\ntype: \"USER_ALARM\"\n",
-        "start": 4,
-        "end": 287,
+        "start": 5,
+        "end": 288,
         "loc": {
           "start": {
-            "line": 2,
+            "line": 3,
             "column": 0
           },
           "end": {
-            "line": 14,
+            "line": 15,
+            "column": 2
+          }
+        }
+      },
+      {
+        "type": "CommentBlock",
+        "value": "\n \"a7fd5286-9649-4967-8b3b-235a05654a87\":\n      \"id\":\"a7fd5286-9649-4967-8b3b-235a05654a87\",\n      \"error\":true,\n      \"cleared\":false,\n      \"message\":\"K\\u00e4ytt\\u00e4j\\u00e4tunnus ja salasana eiv\\u00e4t kelpaa\",\n      \"realtimeMs\":1460110656169,\n      \"sourceId\":\"a3f129ee-1991-4932-b7a1-1abce240ae19\",\n      \"timestamp\":1460110703049,\n      \"type\":\"ALERT\"\n    \"type\":\"USER_ALERTS\"\n",
+        "start": 291,
+        "end": 680,
+        "loc": {
+          "start": {
+            "line": 18,
+            "column": 0
+          },
+          "end": {
+            "line": 29,
             "column": 2
           }
         }
@@ -85,15 +101,31 @@
     {
       "type": "CommentBlock",
       "value": "\nclosed: false\ncreatedAtMs: 1573477740542\nid: \"f9fbd96b-f436-44f8-ba11-4be7aee1238a\"\nlevel: \"err\"\n// eslint-disable-next-line\nmessage: \"\"\nname: \"LT Security Alarm\"\nsourceId: \"b0d685d8-5270-411b-8d1e-2c45c31c8f07\"\ntimestamp: 1573477740542\ntitle: \"Murtohälytys\"\ntype: \"USER_ALARM\"\n",
-      "start": 4,
-      "end": 287,
+      "start": 5,
+      "end": 288,
       "loc": {
         "start": {
-          "line": 2,
+          "line": 3,
           "column": 0
         },
         "end": {
-          "line": 14,
+          "line": 15,
+          "column": 2
+        }
+      }
+    },
+    {
+      "type": "CommentBlock",
+      "value": "\n \"a7fd5286-9649-4967-8b3b-235a05654a87\":\n      \"id\":\"a7fd5286-9649-4967-8b3b-235a05654a87\",\n      \"error\":true,\n      \"cleared\":false,\n      \"message\":\"K\\u00e4ytt\\u00e4j\\u00e4tunnus ja salasana eiv\\u00e4t kelpaa\",\n      \"realtimeMs\":1460110656169,\n      \"sourceId\":\"a3f129ee-1991-4932-b7a1-1abce240ae19\",\n      \"timestamp\":1460110703049,\n      \"type\":\"ALERT\"\n    \"type\":\"USER_ALERTS\"\n",
+      "start": 291,
+      "end": 680,
+      "loc": {
+        "start": {
+          "line": 18,
+          "column": 0
+        },
+        "end": {
+          "line": 29,
           "column": 2
         }
       }
@@ -119,15 +151,31 @@
     {
       "type": "CommentBlock",
       "value": "\nclosed: false\ncreatedAtMs: 1573477740542\nid: \"f9fbd96b-f436-44f8-ba11-4be7aee1238a\"\nlevel: \"err\"\n// eslint-disable-next-line\nmessage: \"\"\nname: \"LT Security Alarm\"\nsourceId: \"b0d685d8-5270-411b-8d1e-2c45c31c8f07\"\ntimestamp: 1573477740542\ntitle: \"Murtohälytys\"\ntype: \"USER_ALARM\"\n",
-      "start": 4,
-      "end": 287,
+      "start": 5,
+      "end": 288,
       "loc": {
         "start": {
-          "line": 2,
+          "line": 3,
           "column": 0
         },
         "end": {
-          "line": 14,
+          "line": 15,
+          "column": 2
+        }
+      }
+    },
+    {
+      "type": "CommentBlock",
+      "value": "\n \"a7fd5286-9649-4967-8b3b-235a05654a87\":\n      \"id\":\"a7fd5286-9649-4967-8b3b-235a05654a87\",\n      \"error\":true,\n      \"cleared\":false,\n      \"message\":\"K\\u00e4ytt\\u00e4j\\u00e4tunnus ja salasana eiv\\u00e4t kelpaa\",\n      \"realtimeMs\":1460110656169,\n      \"sourceId\":\"a3f129ee-1991-4932-b7a1-1abce240ae19\",\n      \"timestamp\":1460110703049,\n      \"type\":\"ALERT\"\n    \"type\":\"USER_ALERTS\"\n",
+      "start": 291,
+      "end": 680,
+      "loc": {
+        "start": {
+          "line": 18,
+          "column": 0
+        },
+        "end": {
+          "line": 29,
           "column": 2
         }
       }
@@ -145,15 +193,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 290,
-      "end": 290,
+      "start": 681,
+      "end": 681,
       "loc": {
         "start": {
-          "line": 17,
+          "line": 30,
           "column": 0
         },
         "end": {
-          "line": 17,
+          "line": 30,
           "column": 0
         }
       }

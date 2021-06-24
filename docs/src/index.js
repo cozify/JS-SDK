@@ -11,7 +11,9 @@ export { store, watchChanges } from './store';
 // import logger from 'redux-logger'
 // const middleware = [...getDefaultMiddleware(), logger]
 
-export { CLOUD_CONNECTION_STATES, HUB_CONNECTION_STATES, useTestcloud } from './connection/constants';
+export {
+  CLOUD_CONNECTION_STATES, HUB_CONNECTION_STATES, useTestcloud, selectCloud,
+} from './connection/constants';
 export { LANGUAGES, USER_STATES, ROLES } from './user/constants';
 export { HUB_STATES, ZWAVE_INCLUSION_STATUS, ZWAVE_EXCLUSION_STATUS } from './hubs/constants';
 
@@ -21,7 +23,8 @@ export {
 } from './user/user';
 
 export {
-  getHubs, selectHubById, unSelectHubById, unSelectHubs, connectHubByTokens,
+  fetchHubs,
+  getHubs, selectHubById, unSelectHubById, unSelectHubs, connectHubByTokens, connectHubBySite,
   lockAndBackup,
   startDiscoveringHubs, stopDiscoveringHubs,
   startPollingById, stopPollingById,
@@ -29,9 +32,21 @@ export {
   doPoll, doRemoteIdQuery,
 } from './hubs/hubs';
 export {
-  isZwaveEnabled, doZwaveInclusion, stopZwaveInclusion, doZwaveExclusion, stopZwaveExclusion, healZwave,
+  isZwaveEnabled,
+  doZwaveInclusion,
+  stopZwaveInclusion,
+  doZwaveExclusion,
+  stopZwaveExclusion,
+  healZwave,
+  getZwaveNodes,
+  checkIsFailedZWaveNode,
+  removeFailedZWaveNode,
+  getZWaveNodeParameter,
+  setZWaveNodeParameter,
 } from './hubs/zwave';
-
+export {
+  getModbusDevicePairings, setModbusDevicePairings,
+} from './hubs/modbus';
 export {
   getDevices, getHubDevices,
   getPairingDevices, getHubPairingDevices,
@@ -39,6 +54,8 @@ export {
 export {
   sendDeviceStateCmd, sendDeviceCmd,
   unpairDevice, identifyDevice, setDeviceMeta,
+  setDeviceVisibility, setDeviceLocked,
+  setDeviceHotWater,
 } from './devices/device';
 
 export {
@@ -51,10 +68,37 @@ export {
   closeAlarm, removeAlarm,
 } from './alarms/alarms';
 
+
 export {
-  getPlans, setPlans,
-  loadPlans, savePlans,
-} from './plans/plans';
+  reactSelectAllPlans,
+  reactSubscribePlans,
+  reactFetchPlans,
+  reactInsertPlan,
+  reactUpdatePlan,
+  reactRemovePlan,
+} from './reducers/plans';
+
+export {
+  reactSelectAllDocuments,
+  reactSubscribePlanDocuments,
+  reactSelectPlanDocuments,
+  reactFetchPlanDocuments,
+  reactInsertPlanDocument,
+  reactUpdatePlanDocument,
+  reactRemovePlanDocument,
+} from './reducers/planDocuments';
+
+export {
+  reactSelectAllDocumentNodes,
+  reactSubscribePlanDocumentNodes,
+  reactSelectPlanDocumentNodes,
+  reactFetchPlanDocumentNodes,
+  reactInsertPlanDocumentNode,
+  reactUpdatePlanDocumentNode,
+  reactRemovePlanDocumentNode,
+} from './reducers/planDocumentNodes';
+
+export { PLAN_NODES } from './plans/constants';
 
 export {
   urlBase64Decode,

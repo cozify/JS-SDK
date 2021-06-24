@@ -1,4 +1,5 @@
 // 
+
 /*
 closed: false
 createdAtMs: 1573477740542
@@ -14,3 +15,15 @@ type: "USER_ALARM"
 */
 
 
+/*
+ "a7fd5286-9649-4967-8b3b-235a05654a87":
+      "id":"a7fd5286-9649-4967-8b3b-235a05654a87",
+      "error":true,
+      "cleared":false,
+      "message":"K\u00e4ytt\u00e4j\u00e4tunnus ja salasana eiv\u00e4t kelpaa",
+      "realtimeMs":1460110656169,
+      "sourceId":"a3f129ee-1991-4932-b7a1-1abce240ae19",
+      "timestamp":1460110703049,
+      "type":"ALERT"
+    "type":"USER_ALERTS"
+*/

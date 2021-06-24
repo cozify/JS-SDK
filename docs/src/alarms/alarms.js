@@ -8,7 +8,8 @@ import { hubsState } from '../reducers/hubs';
 import { userState } from '../reducers/user';
 import { b64DecodeUnicode, getTextFromNode } from '../utils';
 import { send, COMMANDS } from '../connection/send';
-import { HUB_CONNECTION_STATES } from '../connection/constants';
+import { HUB_CONNECTION_STATES, getCloudURL } from '../connection/constants';
+
 
 const initAlarm = (alarm) => {
   const givenAlarm = alarm;
@@ -63,7 +64,7 @@ export function sendAlarmCmd(hubId, commandType, data) {
     const hubs = hubsState.selectors.getHubs(stateNow);
     const hub = hubs[hubId];
     const { hubKey } = hubs[hubId];
-    if (!hub || !hubKey) {
+    if (!hub || (!hubKey && getCloudURL().indexOf('https://one.cozify.fi') === -1)) {
       console.error('SDK closeAlarm error: No hubKey!');
       reject(new Error('Alarm command error: No hubKey!'));
       return;
@@ -192,6 +193,59 @@ export function alarmsDeltaHandler(hubId, reset, alarms) {
         };
         store.dispatch(alarmsState.actions.setAlarm(stateAlarm));
       } else if (key && oldHubAlarms[key]) {
+        store.dispatch(alarmsState.actions.removeAlarm({ hubId, alarmId: key }));
+      }
+    });
+  }
+}
+
+const initAlert = (alert) => {
+  const givenAlert = alert;
+  if (alert.error) {
+    givenAlert.level = 'err';
+  }
+  if (alert.cleared) {
+    givenAlert.closed = true;
+  }
+  if (alert.message) {
+    givenAlert.title = getTextFromNode(givenAlert.message);
+  }
+  return givenAlert;
+};
+
+export function alertsDeltaHandler(hubId, reset, alerts) {
+  let oldHubAlerts = {};
+  const storedAlerts = getAlarms();
+  if (storedAlerts && storedAlerts[hubId]) {
+    oldHubAlerts = storedAlerts[hubId];
+  }
+  /*
+  if (reset) {
+    // If reset then set alerts as they are received
+    const alertsToBeSet = {};
+    if (!isEmpty(alerts)) {
+      Object.entries(alerts).forEach(([key, alert:ALERTS_MAP_TYPE]) => {
+        alertsToBeSet[key] = initAlert(alert); //?
+      });
+    }
+    const stateAlert = {
+      hubId,
+      alarms: alertsToBeSet,
+    };
+    store.dispatch(alarmsState.actions.setAlarms(stateAlert));
+  } else
+  */
+  if (!isEmpty(alerts)) {
+    // Loop alerts to check could it be added or should be removed
+    Object.entries(alerts).forEach(([key, alert]) => {
+      if (key && alert) {
+        const stateAlert = {
+          hubId,
+          alarm: initAlert(alert),
+        };
+        store.dispatch(alarmsState.actions.setAlarm(stateAlert));
+      } else if (key && oldHubAlerts[key]) {
+        // console.info(`Remove Alert ${key}`);
         store.dispatch(alarmsState.actions.removeAlarm({ hubId, alarmId: key }));
       }
     });

@@ -8,7 +8,7 @@ import { send, COMMANDS } from '../connection/send';
 import { store } from '../store';
 import { userState } from '../reducers/user';
 import { hubsState } from '../reducers/hubs';
-import { HUB_CONNECTION_STATES } from '../connection/constants';
+import { HUB_CONNECTION_STATES, getCloudURL } from '../connection/constants';
 // import type { COMMAND_TYPE } from '../connection/constants';
 
 /**
@@ -30,7 +30,7 @@ export function sendDeviceStateCmd(hubId, deviceId, state, properties) {
     }
 
     const hubs = hubsState.selectors.getHubs(stateNow);
-    if (!hubs[hubId] || !hubs[hubId].hubKey) {
+    if (!hubs[hubId] || (!hubs[hubId].hubKey && getCloudURL().indexOf('https://one.cozify.fi') === -1)) {
       console.error('SDK sendDeviceStateCmd error: No hubKey!');
       reject(new Error('Device command error: No hubKey!'));
       return;
@@ -78,8 +78,11 @@ export function sendDeviceCmd(hubId, deviceId, commandType, data, properties) {
 
     const hubs = hubsState.selectors.getHubs(stateNow);
     const hub = hubs[hubId];
-    const { hubKey } = hubs[hubId];
-    if (!hub || !hubKey) {
+    let hubKey;
+    if (hub && hub.hubKey) {
+      hubKey = hub.hubKey;
+    }
+    if (!hub || (!hubKey && getCloudURL().indexOf('https://one.cozify.fi') === -1)) {
       console.error('SDK sendDeviceCmd error: No hubKey!');
       reject(new Error('Device command error: No hubKey!'));
       return;
@@ -95,7 +98,7 @@ export function sendDeviceCmd(hubId, deviceId, commandType, data, properties) {
     const { authKey } = user;
     if (!authKey) {
       console.error('SDK sendDeviceCmd error: No authKey!');
-      reject(new Error('Device command error: No hubKey!'));
+      reject(new Error('Device command error: No authKey!'));
       return;
     }
 
@@ -119,6 +122,15 @@ export function sendDeviceCmd(hubId, deviceId, commandType, data, properties) {
   });
 }
 
+export function setDeviceVisibility(hubId, deviceId, visible) {
+  return sendDeviceCmd(hubId, deviceId, COMMANDS.CMD_DEVICE_VISIBILITY, { id: deviceId, visible });
+}
+export function setDeviceLocked(hubId, deviceId, locked) {
+  return sendDeviceCmd(hubId, deviceId, COMMANDS.CMD_DEVICE_LOCK, { id: deviceId, locked });
+}
+export function setDeviceHotWater(hubId, deviceId, hotWater) {
+  return sendDeviceCmd(hubId, deviceId, COMMANDS.CMD_DEVICE_HOT_WATER, { id: deviceId, hotWater });
+}
 /**
  * Unpair device
  * @param  {string} hubId

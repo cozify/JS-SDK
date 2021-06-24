@@ -1,25 +1,26 @@
 {
-  "coverage": "62.5%",
-  "expectCount": 184,
-  "actualCount": 115,
+  "coverage": "51.92%",
+  "expectCount": 285,
+  "actualCount": 148,
   "files": {
     "src/alarms/alarms.js": {
-      "expectCount": 7,
-      "actualCount": 6,
+      "expectCount": 9,
+      "actualCount": 7,
       "undocumentLines": [
-        13
+        14,
+        202
       ]
     },
     "src/connection/constants.js": {
-      "expectCount": 9,
-      "actualCount": 3,
+      "expectCount": 10,
+      "actualCount": 4,
       "undocumentLines": [
         12,
         18,
         19,
-        23,
-        26,
-        47
+        22,
+        25,
+        53
       ]
     },
     "src/connection/send-retry.js": {
@@ -47,7 +48,7 @@
       "actualCount": 4,
       "undocumentLines": [
         26,
-        113
+        119
       ]
     },
     "src/connection/state.js": {
@@ -56,8 +57,8 @@
       "undocumentLines": []
     },
     "src/devices/device.js": {
-      "expectCount": 5,
-      "actualCount": 5,
+      "expectCount": 8,
+      "actualCount": 8,
       "undocumentLines": []
     },
     "src/devices/devices.js": {
@@ -71,35 +72,40 @@
       "undocumentLines": [
         17,
         29,
-        46,
-        52,
-        57,
-        62,
-        63,
+        59,
         65,
-        66
+        70,
+        75,
+        76,
+        78,
+        79
       ]
     },
     "src/hubs/hubs.js": {
-      "expectCount": 37,
-      "actualCount": 26,
+      "expectCount": 38,
+      "actualCount": 27,
       "undocumentLines": [
         20,
-        315,
-        316,
-        317,
-        318,
-        423,
-        479,
-        480,
-        481,
-        482,
-        483
+        323,
+        324,
+        325,
+        326,
+        431,
+        487,
+        488,
+        489,
+        490,
+        491
       ]
     },
+    "src/hubs/modbus.js": {
+      "expectCount": 4,
+      "actualCount": 4,
+      "undocumentLines": []
+    },
     "src/hubs/zwave.js": {
-      "expectCount": 23,
-      "actualCount": 15,
+      "expectCount": 29,
+      "actualCount": 20,
       "undocumentLines": [
         35,
         36,
@@ -108,44 +114,75 @@
         279,
         280,
         281,
-        516
+        516,
+        558
+      ]
+    },
+    "src/plans/constants.js": {
+      "expectCount": 2,
+      "actualCount": 0,
+      "undocumentLines": [
+        2,
+        9
       ]
     },
     "src/plans/plans.js": {
-      "expectCount": 4,
-      "actualCount": 4,
+      "expectCount": 22,
+      "actualCount": 22,
       "undocumentLines": []
     },
     "src/reducers/alarms.js": {
-      "expectCount": 3,
+      "expectCount": 5,
       "actualCount": 1,
       "undocumentLines": [
-        80,
-        93
+        78,
+        79,
+        93,
+        106
       ]
     },
     "src/reducers/connections.js": {
-      "expectCount": 3,
+      "expectCount": 5,
       "actualCount": 1,
       "undocumentLines": [
-        47,
-        55
+        45,
+        46,
+        60,
+        68
       ]
     },
     "src/reducers/devices.js": {
-      "expectCount": 3,
+      "expectCount": 5,
       "actualCount": 1,
       "undocumentLines": [
+        69,
         70,
-        83
+        84,
+        97
       ]
     },
     "src/reducers/hubs.js": {
-      "expectCount": 3,
+      "expectCount": 5,
       "actualCount": 1,
       "undocumentLines": [
+        87,
         88,
-        101
+        104,
+        117
+      ]
+    },
+    "src/reducers/idea.js": {
+      "expectCount": 9,
+      "actualCount": 1,
+      "undocumentLines": [
+        26,
+        38,
+        44,
+        52,
+        430,
+        431,
+        445,
+        458
       ]
     },
     "src/reducers/index.js": {
@@ -154,39 +191,91 @@
       "undocumentLines": []
     },
     "src/reducers/pairings.js": {
-      "expectCount": 3,
+      "expectCount": 5,
       "actualCount": 1,
       "undocumentLines": [
+        68,
         69,
-        82
+        82,
+        95
+      ]
+    },
+    "src/reducers/planDocumentNodes.js": {
+      "expectCount": 14,
+      "actualCount": 0,
+      "undocumentLines": [
+        22,
+        30,
+        53,
+        64,
+        130,
+        162,
+        182,
+        208,
+        220,
+        244,
+        255,
+        312,
+        319,
+        323
+      ]
+    },
+    "src/reducers/planDocuments.js": {
+      "expectCount": 14,
+      "actualCount": 0,
+      "undocumentLines": [
+        24,
+        32,
+        55,
+        65,
+        107,
+        171,
+        184,
+        209,
+        221,
+        244,
+        255,
+        312,
+        319,
+        323
       ]
     },
     "src/reducers/plans.js": {
-      "expectCount": 7,
-      "actualCount": 1,
+      "expectCount": 13,
+      "actualCount": 0,
       "undocumentLines": [
-        12,
-        21,
-        27,
-        35,
-        319,
-        332
+        28,
+        39,
+        60,
+        79,
+        122,
+        156,
+        169,
+        194,
+        206,
+        229,
+        241,
+        326,
+        345
       ]
     },
     "src/reducers/rooms.js": {
-      "expectCount": 3,
+      "expectCount": 5,
       "actualCount": 1,
       "undocumentLines": [
+        96,
         97,
-        110
+        111,
+        124
       ]
     },
     "src/reducers/user.js": {
-      "expectCount": 3,
+      "expectCount": 4,
       "actualCount": 1,
       "undocumentLines": [
-        138,
-        148
+        136,
+        143,
+        153
       ]
     },
     "src/rooms/constants.js": {
@@ -201,6 +290,20 @@
       "expectCount": 7,
       "actualCount": 7,
       "undocumentLines": []
+    },
+    "src/schemas/schemas.js": {
+      "expectCount": 8,
+      "actualCount": 0,
+      "undocumentLines": [
+        6,
+        7,
+        9,
+        10,
+        13,
+        14,
+        15,
+        20
+      ]
     },
     "src/store.js": {
       "expectCount": 3,

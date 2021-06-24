@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">src/reducers/idea.js | Cozify SDK</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Cozify UI SDK for REST aPI"><meta property="og:type" content="website"><meta property="og:url" content="http://my-library.org"><meta property="og:site_name" content="Cozify SDK"><meta property="og:title" content="Cozify SDK"><meta property="og:image" content="http://my-library.org/logo.png"><meta property="og:description" content="Cozify UI SDK for REST aPI"><meta property="og:author" content="https://twitter.com/foo"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="Cozify SDK"><meta property="twitter:description" content="Cozify UI SDK for REST aPI"><meta property="twitter:image" content="http://my-library.org/logo.png"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./" style="display: flex; align-items: center;"><img src="./image/brand_logo.png" style="width:34px;"></a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/foo/bar"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-watchChanges">watchChanges</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-b64DecodeUnicode">b64DecodeUnicode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getTextFromNode">getTextFromNode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-urlBase64Decode">urlBase64Decode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-store">store</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-isNode">isNode</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#alarms">alarms</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-alarmsDeltaHandler">alarmsDeltaHandler</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-alertsDeltaHandler">alertsDeltaHandler</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-closeAlarm">closeAlarm</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getAlarms">getAlarms</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubAlarms">getHubAlarms</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-removeAlarm">removeAlarm</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sendAlarmCmd">sendAlarmCmd</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#connection">connection</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getCloudHost">getCloudHost</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getCloudURL">getCloudURL</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-selectCloud">selectCloud</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-useTestcloud">useTestcloud</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-resetRetry">resetRetry</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-retryCondition">retryCondition</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-cloudErrorState">cloudErrorState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getAPIversion">getAPIversion</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hubErrorState">hubErrorState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-testSSLCertificate">testSSLCertificate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-send">send</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sendAll">sendAll</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getCloudConnectionState">getCloudConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubConnectionState">getHubConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setCloudConnectionState">setCloudConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setHubConnectionState">setHubConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_API_VERSION">CLOUD_API_VERSION</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CLOUD_FINGERPRINTS_SHA1">CLOUD_FINGERPRINTS_SHA1</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-MAX_API_VERSION">MAX_API_VERSION</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-CLOUD_CONNECTION_STATE_TYPE">CLOUD_CONNECTION_STATE_TYPE</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-COMMANDS_TYPE">COMMANDS_TYPE</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-COMMANDS_TYPE">COMMANDS_TYPE</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-HUB_CONNECTION_STATE_TYPE">HUB_CONNECTION_STATE_TYPE</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#devices">devices</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-identifyDevice">identifyDevice</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sendDeviceCmd">sendDeviceCmd</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sendDeviceStateCmd">sendDeviceStateCmd</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setDeviceHotWater">setDeviceHotWater</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setDeviceLocked">setDeviceLocked</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setDeviceMeta">setDeviceMeta</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setDeviceVisibility">setDeviceVisibility</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-unpairDevice">unpairDevice</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-devicesDeltaHandler">devicesDeltaHandler</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDevices">getDevices</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubDevices">getHubDevices</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubPairingDevices">getHubPairingDevices</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getPairingDevices">getPairingDevices</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-pairingDevicesDeltaHandler">pairingDevicesDeltaHandler</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#hubs">hubs</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-connectHubBySite">connectHubBySite</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-connectHubByTokens">connectHubByTokens</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-doPoll">doPoll</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-doRemoteIdQuery">doRemoteIdQuery</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-fetchHubs">fetchHubs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubs">getHubs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ignorePairingByIds">ignorePairingByIds</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-lockAndBackup">lockAndBackup</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-selectHubById">selectHubById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-startDiscoveringHubs">startDiscoveringHubs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-startPairingById">startPairingById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-startPollingById">startPollingById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-stopDiscoveringHubs">stopDiscoveringHubs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-stopPairingById">stopPairingById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-stopPairings">stopPairings</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-stopPollingById">stopPollingById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-unSelectHubById">unSelectHubById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-unSelectHubs">unSelectHubs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubs">getHubs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getModbusDevicePairings">getModbusDevicePairings</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setModbusDevicePairings">setModbusDevicePairings</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-checkIsFailedZWaveNode">checkIsFailedZWaveNode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-doZwaveExclusion">doZwaveExclusion</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-doZwaveInclusion">doZwaveInclusion</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubs">getHubs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getZWaveNodeParameter">getZWaveNodeParameter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getZwaveNodes">getZwaveNodes</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-healZwave">healZwave</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isZwaveEnabled">isZwaveEnabled</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-removeFailedZWaveNode">removeFailedZWaveNode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setZWaveNodeParameter">setZWaveNodeParameter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-stopZwaveExclusion">stopZwaveExclusion</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-stopZwaveInclusion">stopZwaveInclusion</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-DISCOVERY_INTERVAL_MS">DISCOVERY_INTERVAL_MS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-HUB_PORT">HUB_PORT</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-HUB_PROTOCOL">HUB_PROTOCOL</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-HUB_STATES">HUB_STATES</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-PAIRING_POLL_INTERVAL_MS">PAIRING_POLL_INTERVAL_MS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-POLL_INTERVAL_MS">POLL_INTERVAL_MS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ZWAVE_EXCLUSION_INTERVAL_MS">ZWAVE_EXCLUSION_INTERVAL_MS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ZWAVE_EXCLUSION_STATUS">ZWAVE_EXCLUSION_STATUS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ZWAVE_INCLUSION_INTERVAL_MS">ZWAVE_INCLUSION_INTERVAL_MS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ZWAVE_INCLUSION_STATUS">ZWAVE_INCLUSION_STATUS</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#plans">plans</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-addDeviceType">addDeviceType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-addLocationNode">addLocationNode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-addRoomName">addRoomName</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-addRuleType">addRuleType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-addSceneType">addSceneType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-addTemplate">addTemplate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-fetchPlanDocuments">fetchPlanDocuments</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-fetchPlans">fetchPlans</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getPlanDocuments">getPlanDocuments</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getPlans">getPlans</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-insertPlan">insertPlan</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-removeDeviceType">removeDeviceType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-removeLocationNode">removeLocationNode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-removeRoomName">removeRoomName</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-removeRuleType">removeRuleType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-removeSceneType">removeSceneType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-removeTemplate">removeTemplate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setLocationNode">setLocationNode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setPlanDocuments">setPlanDocuments</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setPlans">setPlans</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setTemplate">setTemplate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-simplifyPlans">simplifyPlans</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-DUMMY">DUMMY</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-PLAN_NODES">PLAN_NODES</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#reducers">reducers</a><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-alarmsState">alarmsState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-selectById">selectById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setAlarms">setAlarms</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-connectionsState">connectionsState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-selectById">selectById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setCloudConnectionState">setCloudConnectionState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-devicesState">devicesState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-selectById">selectById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setDevices">setDevices</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-hubsState">hubsState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-selectById">selectById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-updateHubs">updateHubs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-addRoomName">addRoomName</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-plansState">plansState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-selectById">selectById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-rootReducer">rootReducer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-pairingsState">pairingsState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-selectById">selectById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setPairingDevices">setPairingDevices</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-planDocumentNodesState">planDocumentNodesState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reactFetchPlanDocumentNodes">reactFetchPlanDocumentNodes</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reactInsertPlanDocumentNode">reactInsertPlanDocumentNode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reactRemovePlanDocumentNode">reactRemovePlanDocumentNode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reactSelectPlanDocumentNodes">reactSelectPlanDocumentNodes</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reactSubscribePlanDocumentNodes">reactSubscribePlanDocumentNodes</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reactUpdatePlanDocumentNode">reactUpdatePlanDocumentNode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-selectById">selectById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-planDocumentsState">planDocumentsState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reactFetchPlanDocuments">reactFetchPlanDocuments</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reactInsertPlanDocument">reactInsertPlanDocument</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reactRemovePlanDocument">reactRemovePlanDocument</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reactSelectPlanDocuments">reactSelectPlanDocuments</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reactSubscribePlanDocuments">reactSubscribePlanDocuments</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reactUpdatePlanDocument">reactUpdatePlanDocument</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-selectById">selectById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-plansState">plansState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reactFetchPlans">reactFetchPlans</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reactInsertPlan">reactInsertPlan</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reactRemovePlan">reactRemovePlan</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reactSubscribePlans">reactSubscribePlans</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reactUpdatePlan">reactUpdatePlan</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-selectById">selectById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-roomsState">roomsState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-selectById">selectById</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-setRooms">setRooms</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-changeState">changeState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-userState">userState</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#rooms">rooms</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-addRoom">addRoom</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-editRoom">editRoom</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getHubRooms">getHubRooms</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getRooms">getRooms</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-removeRoom">removeRoom</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-roomsDeltaHandler">roomsDeltaHandler</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sendRoomCmd">sendRoomCmd</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ROOMS_EN">ROOMS_EN</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ROOMS_FI">ROOMS_FI</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#schemas">schemas</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDocumentsFromPlan">getDocumentsFromPlan</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-documentEntity">documentEntity</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-documentsEntity">documentsEntity</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-planEntity">planEntity</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-plansEntity">plansEntity</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#user">user</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-acceptEula">acceptEula</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-changeLanguage">changeLanguage</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-doPwLogin">doPwLogin</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getUserState">getUserState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setAuthenticated">setAuthenticated</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-LANGUAGES">LANGUAGES</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ROLES">ROLES</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-USER_STATES">USER_STATES</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/reducers/idea.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">
+// 
+import {
+  createSlice,
+  createEntityAdapter,
+  // createAsyncThunk,
+  createSelector,
+} from &apos;@reduxjs/toolkit&apos;;
+import isArray from &apos;lodash/isArray&apos;;
+import { PLAN_NODES } from &apos;../plans/constants&apos;;
+
+/*
+* Helpers
+*/
+
+/*
+const setId = (idObj: Object) =&gt; {
+  const givenObject = idObj;
+  if (!givenObject.id) {
+    givenObject.id = Date.now();
+  }
+  return givenObject;
+};
+*/
+
+const setId = (parentTempId, newItem) =&gt; {
+  const item = { ...newItem };
+  if (item.id) {
+    item.id = parentTempId.concat(&apos;:&apos;).concat(item.id);
+  } else if (item.data &amp;&amp; item.data.name) {
+    item.id = parentTempId.concat(&apos;:&apos;).concat(item.data.name.replace(/\s+/g, &apos;&apos;).replace(/\./g, &apos;&apos;).replace(/:/g, &apos;&apos;));
+  } else {
+    item.id = parentTempId.concat(&apos;:?&apos;);
+  }
+  return item;
+};
+
+const getAllDescendantIds = (state, nodeId) =&gt; (
+  (state[nodeId] &amp;&amp; state[nodeId].childIds) ? state[nodeId].childIds.reduce((acc, childId) =&gt; (
+    [...acc, childId, ...getAllDescendantIds(state, childId)]
+  ), []) : []
+);
+
+const deleteMany = (givenState, ids) =&gt; {
+  const state = { ...givenState };
+  ids.forEach((id) =&gt; delete state[id]);
+  return state;
+};
+
+
+
+const findChild = (state, id) =&gt; {
+  let found;
+  (Object.values(state)).forEach((node) =&gt; {
+    if (!found) {
+      if (node &amp;&amp; node.childIds) {
+        // console.error(`FIND ${id} in ${JSON.stringify(node.childIds)} when node ${JSON.stringify(node)}`);
+        if (isArray(node.childIds)) {
+          if (node.childIds.includes(id)) {
+            found = node;
+          }
+        }
+      }
+    }
+  });
+  // console.error(`FOUND ${id} =&gt; ${JSON.stringify(found)}`);
+  return found;
+};
+
+/**
+ * Plans action creators object
+ * @see  https://github.com/reduxjs/@reduxjs/toolkit/blob/master/docs/api/createSlice.md
+ * @return { {
+ *   name : string,
+ *   reducer : ReducerFunction,
+ *   actions : Object&lt;string, ActionCreator},
+ *   selectors : Object&lt;string, Selector&gt;
+ *   }}
+ */
+export const plansState = createSlice({
+  name: &apos;plans&apos;,
+  initialState: {
+    roomNames: [],
+    sceneTypes: [],
+    deviceTypes: [],
+    ruleTypes: [],
+    templates: {},
+    locations: {
+      root: {
+        id: &apos;root&apos;,
+        childIds: [],
+        data: {
+          name: &apos;root&apos;,
+        },
+        open: false,
+      },
+    },
+  },
+  reducers: {
+
+    setPlansState(state, action) {
+      const stateToSet = state;
+      const newState = action.payload;
+      const oldState = stateToSet.plansState;
+      console.log(`SDK setPlansState: PLANS state ${oldState} -&gt; ${newState}`);
+      stateToSet.templates = { ...newState.templates };
+      stateToSet.locations = { ...newState.locations };
+      stateToSet.roomNames = [...newState.roomNames || []];
+      stateToSet.sceneTypes = [...newState.sceneTypes || []];
+      stateToSet.deviceTypes = [...newState.deviceTypes || []];
+      stateToSet.ruleTypes = [...newState.ruleTypes || []];
+    },
+
+    /*
+     * Reducer action of adding room name
+     * @param {Object} state
+     * @param {Object} action
+    */
+    addRoomName(state, action) {
+      const stateToSet = state;
+      const newName = action.payload;
+      if (!stateToSet.roomNames.includes(newName)) {
+        stateToSet.roomNames.push(newName);
+      }
+    },
+
+    /*
+     * Reducer action of removing room name
+     * @param {Object} state
+     * @param {Object} action
+    */
+    removeRoomName(state, action) {
+      const stateToSet = state;
+      stateToSet.roomNames = stateToSet.roomNames.filter((room) =&gt; room !== action.payload);
+    },
+
+    /*
+     * Reducer action of adding device type
+     * @param {Object} state
+     * @param {Object} action
+    */
+    addDeviceType(state, action) {
+      const stateToSet = state;
+      const newDevice = action.payload;
+      // todo check
+      stateToSet.deviceTypes.push(newDevice);
+    },
+
+    /*
+     * Reducer action of removing device type
+     * @param {Object} state
+     * @param {Object} action
+    */
+    removeDeviceType(state, action) {
+      const stateToSet = state;
+      stateToSet.deviceTypes = stateToSet.sceneTypes.filter((deviceType) =&gt; deviceType.id !== action.payload);
+    },
+
+    /*
+     * Reducer action of adding scene type
+     * @param {Object} state
+     * @param {Object} action
+    */
+    addSceneType(state, action) {
+      const stateToSet = state;
+      const newScene = action.payload;
+      // todo check
+      stateToSet.sceneTypes.push(newScene);
+    },
+
+    /*
+     * Reducer action of removing scene type
+     * @param {Object} state
+     * @param {Object} action
+    */
+    removeSceneType(state, action) {
+      const stateToSet = state;
+      stateToSet.sceneTypes = stateToSet.sceneTypes.filter((sceneType) =&gt; sceneType.id !== action.payload);
+    },
+
+    /*
+     * Reducer action of adding scene type
+     * @param {Object} state
+     * @param {Object} action
+    */
+    addRuleType(state, action) {
+      const stateToSet = state;
+      const newRule = action.payload;
+      // todo check
+      stateToSet.ruleTypes.push(newRule);
+    },
+
+    /*
+     * Reducer action of removing scene type
+     * @param {Object} state
+     * @param {Object} action
+    */
+    removeRuleType(state, action) {
+      const stateToSet = state;
+      stateToSet.ruleTypes = stateToSet.ruleTypes.filter((ruleType) =&gt; ruleType.id !== action.payload);
+    },
+
+    /*
+     * Reducer action of setting all templates state
+     * @param {Object} state
+     * @param {Object} action
+    */
+    setTemplates(state, action) {
+      const stateToSet = state;
+
+      const { templates } = action.payload;
+      const newTemplates = {};
+
+      Object.values(templates).forEach((entry) =&gt; {
+        const newTemplate = setId(PLAN_NODES.TEMPLATE, entry);
+        // console.log(JSON.stringify(newTemplate));
+        newTemplates[newTemplate.id] = { ...newTemplate };
+      });
+      stateToSet.templates = { ...newTemplates };
+    },
+
+
+    /*
+     * Reducer action of adding template state
+     * @param {Object} state
+     * @param {Object} action
+     */
+    addTemplate(state, action) {
+      const stateToSet = state;
+      const parentTempId = PLAN_NODES.TEMPLATE;
+      const newTemplate = setId(parentTempId, action.payload);
+
+      // Check that node doesn&apos;t already exist
+      if (!newTemplate || !newTemplate.id) {
+        throw new Error(&apos;SDK addTemplate - no new template given&apos;);
+      }
+      if (stateToSet.templates[newTemplate.id]) {
+        throw new Error(`SDK addTemplate - template ${newTemplate.id} already exist`);
+      }
+      stateToSet.templates[newTemplate.id] = { ...newTemplate };
+    },
+
+
+    /*
+     * Reducer action of setting template state
+     * @param {Object} state
+     * @param {Object} action
+     */
+    setTemplate(state, action) {
+      const stateToSet = state;
+      const template = action.payload;
+      if (!template || !template.id) {
+        throw new Error(&apos;SDK setTemplate - no template given&apos;);
+      }
+      if (!stateToSet.templates[template.id]) {
+        throw new Error(`SDK setTemplate - template ${template.id} does not exist`);
+      }
+      const parentTempId = PLAN_NODES.TEMPLATE;
+      if (template.data &amp;&amp; template.data.name) {
+        const oldId = template.id;
+        const templateToBeSet = { ...template };
+        templateToBeSet.id = null;
+        const setNode = setId(parentTempId, templateToBeSet);
+        if (setNode &amp;&amp; oldId !== setNode.id &amp;&amp; stateToSet.templates[oldId]) {
+          delete stateToSet.templates[oldId];
+          stateToSet.templates[setNode.id] = { ...setNode };
+        } else if (setNode &amp;&amp; setNode.id &amp;&amp; stateToSet.templates[setNode.id]) {
+          stateToSet.templates[setNode.id] = { ...setNode };
+        } else {
+          throw new Error(`SDK setTemplate - template ${template.id} could not be set`);
+        }
+      } else if (template.id &amp;&amp; stateToSet.templates[template.id]) {
+        stateToSet.templates[template.id] = { ...template };
+      } else {
+        throw new Error(`SDK setTemplate - template ${template.id} could not be set`);
+      }
+    },
+
+    /*
+     * Reducer action of removing plan state
+     * @param {Object} state
+     * @param {Object} action
+     */
+    removeTemplate(state, action) {
+      const stateToSet = state;
+
+      const templateId = action.payload;
+      if (!templateId) {
+        throw new Error(&apos;SDK removeLocationNode - no templateId given&apos;);
+      }
+      if (!stateToSet.templates[templateId]) {
+        throw new Error(`SDK removeLocationNode - template ${templateId} doesnt exist`);
+      }
+      delete stateToSet.templates[templateId];
+    },
+
+    /*
+     * Reducer action of adding location node state
+     *
+     * addLocationNode({parentId: parent, data:{}})
+     *
+     * addLocationNode({ parentId: null, newNode: country }));
+     *
+     */
+    addLocationNode(state, action) {
+      const stateToSet = state;
+      const { parentId } = action.payload;
+      const parentTempId = parentId || &apos;root&apos;;
+      const newNode = setId(parentTempId, action.payload.newNode);
+
+      // Check that node doesn&apos;t already exist
+      if (!newNode || !newNode.id) {
+        throw new Error(&apos;SDK addLocationNode - no new node given&apos;);
+      }
+      if (stateToSet.locations[newNode.id]) {
+        throw new Error(`SDK addLocationNode - node ${newNode.id} already exist`);
+      }
+
+      if (!newNode.childIds) {
+        newNode.childIds = [];
+      }
+
+      if (stateToSet.locations[parentTempId] &amp;&amp; newNode &amp;&amp; newNode.id) {
+        if (!stateToSet.locations[parentTempId].childIds) {
+          stateToSet.locations[parentTempId].childIds = [];
+        }
+        stateToSet.locations[parentTempId].childIds = [...stateToSet.locations[parentTempId].childIds, newNode.id];
+        stateToSet.locations[newNode.id] = { ...newNode };
+      }
+    },
+
+    /*
+     * setLocationNode(node)
+     */
+    setLocationNode(state, action) {
+      const stateToSet = state;
+      const node = action.payload;
+
+      if (!node || !node.id) {
+        throw new Error(&apos;SDK setLocationNode - no node given&apos;);
+      }
+      if (!stateToSet.locations[node.id]) {
+        throw new Error(`SDK setLocationNode - node ${node.id} does not exist`);
+      }
+
+      if (!node.childIds) {
+        node.childIds = [];
+      }
+
+      let descendantIds = [];
+      if (stateToSet.locations[node.id]) {
+        descendantIds = getAllDescendantIds(stateToSet.locations, node.id);
+      }
+      const parentTempId = node.id.substr(0, node.id.lastIndexOf(&apos;:&apos;));
+      if (node.data &amp;&amp; node.data.name) {
+        const oldId = node.id;
+        const nodeToBeSet = { ...node };
+
+        nodeToBeSet.id = null;
+        const setNode = setId(parentTempId, nodeToBeSet);
+        if (setNode &amp;&amp; oldId !== setNode.id &amp;&amp; stateToSet.locations[oldId]) {
+          // all child nodes
+          descendantIds.map((childId) =&gt; {
+            if (childId.indexOf(oldId) !== -1) {
+              const newId = childId.replace(oldId, setNode.id);
+              const child = { ...stateToSet.locations[childId] };
+              child.id = newId;
+              // and it&apos;s childs
+              child.childIds = child.childIds.map((id) =&gt; id.replace(oldId, setNode.id));
+
+              delete stateToSet.locations[childId];
+              stateToSet.locations[newId] = { ...child };
+            }
+            return true;
+          });
+          // own childs
+          setNode.childIds = setNode.childIds.map((id) =&gt; id.replace(oldId, setNode.id));
+
+          // parent
+          stateToSet.locations[parentTempId].childIds = stateToSet.locations[parentTempId].childIds.filter((id) =&gt; id !== oldId);
+          stateToSet.locations[parentTempId].childIds.push(setNode.id);
+
+
+          // current
+          delete stateToSet.locations[oldId];
+          stateToSet.locations[setNode.id] = { ...setNode };
+        } else if (setNode &amp;&amp; setNode.id &amp;&amp; stateToSet.locations[setNode.id]) {
+          stateToSet.locations[setNode.id] = { ...setNode };
+        } else {
+          throw new Error(`SDK setLocationNode - node ${node.id} could not be set`);
+        }
+      } else {
+        stateToSet.locations[node.id] = { ...node };
+      }
+    },
+
+
+    /*
+     * removeLocationNode
+     */
+    removeLocationNode(state, action) {
+      const stateToSet = state;
+      const nodeId = action.payload;
+      if (!nodeId) {
+        throw new Error(&apos;SDK removeLocationNode - no nodeId given&apos;);
+      }
+      if (!stateToSet.locations[nodeId]) {
+        throw new Error(`SDK removeLocationNode - node ${nodeId} doesnt exist`);
+      }
+      // console.info(&apos;removeLocationNode &apos;, nodeId);
+      if (nodeId &amp;&amp; nodeId !== &apos;root&apos;) {
+        const descendantIds = getAllDescendantIds(stateToSet.locations, nodeId);
+        // console.info(&apos;descendantIds&apos;, descendantIds);
+        const parent = findChild(stateToSet.locations, nodeId);
+        // console.info(&apos;PARENT&apos;, JSON.stringify(parent));
+        if (parent &amp;&amp; parent.id) {
+          stateToSet.locations = deleteMany(stateToSet.locations, [nodeId, ...descendantIds]);
+          // console.info(&apos;child not yet removed&apos;, JSON.stringify(stateToSet.locations[parent.id].childIds));
+          stateToSet.locations[parent.id].childIds = stateToSet.locations[parent.id].childIds.filter((id) =&gt; id !== nodeId);
+          // console.info(&apos;child removed&apos;, JSON.stringify(stateToSet.locations[parent.id].childIds));
+        } else {
+          throw new Error(`SDK removeLocationNode - node ${nodeId} parent does not exist`);
+        }
+      }
+    },
+  },
+});
+
+
+const adapter = createEntityAdapter();
+export const {
+  selectById: selectPlanById,
+  selectIds: selectPlanIds,
+  selectEntities: selectPlanEntities,
+  selectAll: selectAllPlans,
+  selectTotal: selectTotalPlans,
+} = adapter.getSelectors((state) =&gt; state.plans);
+
+plansState.selectors = adapter.getSelectors((state) =&gt; state.plans);
+plansState.selectors.getPlans = createSelector(
+  [(state) =&gt; state.plans],
+  (plans) =&gt; plans,
+);
+
+const { actions, reducer } = plansState;
+
+/**
+ * Devices reducer
+ * @type {function} reducer
+ */
+export { reducer as plansReducer };
+
+// Extract and export each action creator by name
+/*
+console.log(addDevice({ id: 123, name: &apos;Unnamed device&apos; }))
+{type : &quot;devices/addDevice&quot;, payload : {id : 123, name: &apos;Unnamed device&apos; }}
+*/
+export const {
+  addRoomName, removeRoomName,
+  setTemplates, addTemplate, setTemplate, removeTemplate,
+  setInstallations, addInstallation, setInstallation, removeInstallation,
+  addLocationCountry, setLocationCountry, removeLocationCountry,
+  addLocationNode, setLocationNode, removeLocationNode,
+} = actions;
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

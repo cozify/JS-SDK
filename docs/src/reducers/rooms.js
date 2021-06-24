@@ -1,22 +1,21 @@
 
 // 
 
-// This actionreducer uses internally https://github.com/mweststrate/immer, so it's safe to modify given state directly
-import { createSlice } from 'redux-starter-kit';
+import { createSlice, createSelector, createEntityAdapter } from '@reduxjs/toolkit';
 
 
 /**
  * Rooms action creators object
- * @see  https://github.com/reduxjs/redux-starter-kit/blob/master/docs/api/createSlice.md
+ * @see  https://github.com/reduxjs/@reduxjs/toolkit/blob/master/docs/api/createSlice.md
  * @return { {
- *   slice : string,
+ *   name : string,
  *   reducer : ReducerFunction,
  *   actions : Object<string, ActionCreator},
  *   selectors : Object<string, Selector>
  *   }}
  */
 export const roomsState = createSlice({
-  slice: 'rooms',
+  name: 'rooms',
   initialState: {},
   reducers: {
 
@@ -93,6 +92,21 @@ todos.selectors.getCompletedTodoCount = createSelector(
     todos.reduce((count, todo) => (todo.completed ? count + 1 : count), 0)
 );
 */
+
+const adapter = createEntityAdapter();
+export const {
+  selectById: selectRoomById,
+  selectIds: selectRoomIds,
+  selectEntities: selectRoomEntities,
+  selectAll: selectAllRooms,
+  selectTotal: selectTotalRooms,
+} = adapter.getSelectors((state) => state.rooms);
+
+roomsState.selectors = adapter.getSelectors((state) => state.rooms);
+roomsState.selectors.getRooms = createSelector(
+  [(state) => state.rooms],
+  (rooms) => rooms,
+);
 
 const { actions, reducer } = roomsState;
 

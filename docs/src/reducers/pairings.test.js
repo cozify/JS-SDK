@@ -1,4 +1,4 @@
-// import { configureStore } from 'redux-starter-kit';
+// import { configureStore } from '@reduxjs/toolkit';
 // import deepFreeze from 'deep-freeze';
 import { pairingsState, pairingsReducer } from './pairings';
 import { store } from '../store';

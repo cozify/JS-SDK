@@ -27,22 +27,29 @@ function extractHubInfo(HUBKeys) {
   const hubs = {};
   if (HUBKeys) {
     Object.keys(HUBKeys).forEach((hubKey) => {
-      const coded = HUBKeys[hubKey].split('.')[1];
-      const decoded = urlBase64Decode(coded);
-      const payload = JSON.parse(decoded);
-      const info = {};
-      info.id = payload.hubId || payload.hub_id;
-      info.name = payload.hubName || payload.hub_name;
-      info.hubKey = HUBKeys[hubKey];
-      info.connectionState = HUB_CONNECTION_STATES.UNCONNECTED;
-      if (payload.role) {
-        info.role = payload.role;
-        info.roleString = '';
-        Object.keys(ROLES).forEach((roleKey) => {
-          if (ROLES[roleKey] === info.role) info.roleString = roleKey;
-        });
+      if (HUBKeys[hubKey]) {
+        const coded = HUBKeys[hubKey].split('.')[1];
+        const decoded = urlBase64Decode(coded);
+        const payload = JSON.parse(decoded);
+        const info = {};
+        info.id = payload.hubId || payload.hub_id;
+        info.name = payload.hubName || payload.hub_name;
+        info.hubKey = HUBKeys[hubKey];
+        info.connectionState = HUB_CONNECTION_STATES.UNCONNECTED;
+        if (payload.role) {
+          info.role = payload.role;
+          info.roleString = '';
+          Object.keys(ROLES).forEach((roleKey) => {
+            if (ROLES[roleKey] === info.role) info.roleString = roleKey;
+          });
+        }
+        hubs[info.id] = info;
+      } else {
+        hubs[hubKey] = {
+          id: hubKey,
+          connectionState: HUB_CONNECTION_STATES.UNCONNECTED,
+        };
       }
-      hubs[info.id] = info;
     });
   }
   return hubs;
@@ -69,6 +76,7 @@ function updateFoundHub(hubURL, hub) {
       name: foundHub.name || '',
     };
   }
+  hubsMap[foundHub.id].name = foundHub.name;
   hubsMap[foundHub.id].connected = foundHub.connected;
   hubsMap[foundHub.id].features = foundHub.features;
   hubsMap[foundHub.id].state = foundHub.state;
@@ -94,7 +102,7 @@ export function lockAndBackup(hubId, authKey, hubKey) {
         resolve(status);
       })
       .catch((error) => {
-        console.log(`doRemoteIdQuery ${hubId} error `, error.message);
+        console.log(`lockAndBackup ${hubId} error `, error.message);
         reject(error);
       });
   });
@@ -201,9 +209,9 @@ function fetchCloudMetaData(hubs, authKey) {
   return new Promise((resolve) => {
     const queries = [];
     (Object.values(hubs)).forEach((hub) => {
-      if (hub.hubKey) {
-        queries.push(doRemoteIdQuery(hub.id, authKey, hub.hubKey));
-      }
+      // if (hub.hubKey) {
+      queries.push(doRemoteIdQuery(hub.id, authKey, hub.hubKey));
+      // }
     });
     sendAll(queries)
       .then((values) => {
@@ -229,7 +237,7 @@ function storedUser() {
 /*
  * Make hubsMap by fetching hub meta data from cloud and local
  */
-function makeHubsMap(tokens, doCloudDicovery = true, doSynchnonously = false) {
+function makeHubsMap(tokens, isCloudDiscovery = true, isSynchnonously = false) {
   const { authKey } = storedUser();
   return new Promise((resolve) => {
     hubsMap = extractHubInfo(tokens);
@@ -238,8 +246,8 @@ function makeHubsMap(tokens, doCloudDicovery = true, doSynchnonously = false) {
       .finally(() => {
         // Hubs map may be changed during fetching cloud metadata
         store.dispatch(hubsState.actions.updateHubs(hubsMap));
-        if (doSynchnonously) {
-          if (doCloudDicovery) {
+        if (isSynchnonously) {
+          if (isCloudDiscovery) {
             doCloudDiscovery()
               .then(() => {
                 resolve(getHubs());
@@ -251,7 +259,7 @@ function makeHubsMap(tokens, doCloudDicovery = true, doSynchnonously = false) {
             resolve(getHubs());
           }
         } else {
-          if (doCloudDicovery) {
+          if (isCloudDiscovery) {
             doCloudDiscovery();
           }
           resolve(getHubs());
@@ -263,7 +271,7 @@ function makeHubsMap(tokens, doCloudDicovery = true, doSynchnonously = false) {
 /*
  * Fetch Hub keys by user authKey and start fetching hub meta datas
  */
-function fetchHubs() {
+export function fetchHubs() {
   const { authKey } = storedUser();
   return new Promise((resolve, reject) => {
     if (!authKey) {
@@ -572,6 +580,7 @@ export function doPoll(hubId, reset = false) {
                 break;
               }
               case 'USER_ALERTS': {
+                // alertsDeltaHandler(hubId, doReset, delta.alerts);
                 break;
               }
               case 'ALARM_DELTA': {
@@ -636,17 +645,12 @@ export function selectHubById(hubId, poll = false) {
     const hubs = getHubs();
     if (!isEmpty(hubs)) {
       let pollingHub = null;
-      let error = null;
+      const error = null;
       (Object.values(hubs)).every((hub) => {
         if (hubId === hub.id) {
           store.dispatch(hubsState.actions.selectHub({ hubId: hub.id }));
-          if (hub.hubKey && poll) {
+          if (poll) {
             pollingHub = startPollingById(hub.id);
-            return false; // break
-          }
-          if (!hub.hubKey) {
-            console.error('SDK selectHubById: No hub key error');
-            error = (new Error('no hubKey'));
             return false; // break
           }
           console.debug('SDK selectHubById: Ready to start polling');
@@ -714,7 +718,6 @@ export function connectHubByTokens(hubId, hubKey, discovery = false, sync = true
     if (!hubKey) reject(new Error('No hubKey'));
     if (!authKey) reject(new Error('No AuthKey'));
     const tokens = {};
-    tokens[hubId] = hubKey;
     makeHubsMap(tokens, discovery, sync).then(() => {
       selectHubById(hubId, false).then(() => {
         resolve(getHubs());
@@ -723,6 +726,20 @@ export function connectHubByTokens(hubId, hubKey, discovery = false, sync = true
   });
 }
 
+export function connectHubBySite(hubId, siteId, discovery = false, sync = true) {
+  return new Promise((resolve, reject) => {
+    const { authKey } = storedUser();
+    if (!hubId) reject(new Error('No Hub Id'));
+    if (!authKey) reject(new Error('No AuthKey'));
+    const tokens = {};
+    tokens[hubId] = null;
+    makeHubsMap(tokens, discovery, sync).then(() => {
+      selectHubById(hubId, false).then(() => {
+        resolve(getHubs());
+      }).catch((error) => reject(error));
+    }).catch((error) => reject(error));
+  });
+}
 /*
  * Listener of User state changes
  * Hub discovery is started when user's new state is AUTHENTICATED
