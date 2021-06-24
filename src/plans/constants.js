@@ -30,6 +30,7 @@ export type ROOT_NODE_TYPE = {
 
 export type PLAN_TYPE = {
   uid: string,
+  root: ?string,
   name: ?string,
   created_at: string,
   changed_at: string,

@@ -58,13 +58,13 @@ function testAndRefreshToken(key: string) {
   if (key) {
     const tokenParts = key.split('.');
 
-      if (tokenParts[0]){
-        tokenParts[0] = tokenParts[0].replace('Bearer ', '');
-        header = JSON.parse(urlBase64Decode(tokenParts[0]));
-      }
-      if (tokenParts[1]){
-        payload = JSON.parse(urlBase64Decode(tokenParts[1]));
-      }
+    if (tokenParts[0]) {
+      tokenParts[0] = tokenParts[0].replace('Bearer ', '');
+      header = JSON.parse(urlBase64Decode(tokenParts[0]));
+    }
+    if (tokenParts[1]) {
+      payload = JSON.parse(urlBase64Decode(tokenParts[1]));
+    }
   }
 
   if ((header && header.exp) || (payload != null && payload.exp)) {
@@ -145,7 +145,7 @@ export function send({
   let sendUrl = url;
   let sendTimeout = timeout;
   let sendAuthKey = authKey;
-  let sendHubId = hubId;
+  // let sendHubId = hubId;
   let sendHubKey = hubKey;
   let sendConfig = config;
   let sendType = type;
@@ -183,7 +183,7 @@ export function send({
       if (command.url.indexOf('$API_VER') !== -1) {
         const hubs = hubsState.selectors.getHubs(stateNow);
 
-        if (!hubs[hubId] || (!hubs[hubId].hubKey && getCloudURL().indexOf('https://one.cozify.fi')===-1)) {
+        if (!hubs[hubId] || (!hubs[hubId].hubKey && getCloudURL().indexOf('https://one.cozify.fi') === -1)) {
           return new Promise((resolve, reject) => {
             reject(new Error('SDK Error: Send - Hub or hubKey not found error'));
           });
@@ -199,11 +199,11 @@ export function send({
       } else {
         sendUrl = getCloudURL().concat(command.url);
       }
-      if (hubId && sendUrl.indexOf('https://one.cozify.fi')!==-1 && sendUrl.indexOf('hub/remote')!==-1){
-          const index = sendUrl.indexOf('hub/remote')
-          const lastPart = sendUrl.substring(index+10)
-          const firstPart = sendUrl.substring(0,index)
-          sendUrl =firstPart.concat('hub/').concat(hubId).concat('/remote').concat(lastPart);
+      if (hubId && sendUrl.indexOf('https://one.cozify.fi') !== -1 && sendUrl.indexOf('hub/remote') !== -1) {
+        const index = sendUrl.indexOf('hub/remote');
+        const lastPart = sendUrl.substring(index + 10);
+        const firstPart = sendUrl.substring(0, index);
+        sendUrl = firstPart.concat('hub/').concat(hubId).concat('/remote').concat(lastPart);
       }
     }
 
@@ -217,9 +217,10 @@ export function send({
             sendHubKey = null;
           }
         }
-      } else {
-        sendHubId = false;
       }
+      /* else {
+        sendHubId = false;
+      } */
     }
 
     if (sendUrl && sendUrl.indexOf(getCloudURL()) > -1) {
@@ -284,6 +285,7 @@ export function send({
       'Content-Type': sendType,
       Authorization: sendAuthKey || null,
       'Accept-Language': null,
+      'X-Hub-Key': sendHubKey || null,
     },
     crossDomain: true,
     responseType: 'application/json',
@@ -296,9 +298,12 @@ export function send({
   } else {
     delete reqConf.headers['Accept-Language'];
   }
+
+  /*
   if (sendHubKey){
     reqConf.headers['X-Hub-Key'] = sendHubKey;
   }
+  */
   /* VLi: not needed now
   if (sendHubId){
     reqConf.headers['X-Hub-Id'] = sendHubId;
@@ -333,7 +338,7 @@ export function send({
       //  retries: 3, shouldResetTimeout: false, retryDelay: axiosRetry.exponentialDelay, retryCondition,
       // });
       //
-      testSSLCertificate(remoteConnection && (sendUrl.indexOf('https://one.cozify.fi')===-1))
+      testSSLCertificate(!!(remoteConnection && sendUrl && sendUrl.indexOf('https://one.cozify.fi') === -1))
         .then((status) => {
         // Cancel request if SSL Certificate status is invalid
           if (!status || permanentSSLFailure) {
@@ -342,7 +347,7 @@ export function send({
           } else {
             // SSL is ok,
             // check if auth Key needs to be refreshed
-            if (sendAuthKey && (sendUrl.indexOf('https://one.cozify.fi')===-1)) {
+            if (sendAuthKey) {
               testAndRefreshToken(sendAuthKey);
             }
 

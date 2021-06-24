@@ -10,7 +10,7 @@ import pkg from './package.json';
 
 
 export default [
-  /*
+  // Node
   {
     input: 'src/index.js',
     output: {
@@ -49,7 +49,7 @@ export default [
 
     ],
   },
-  */
+
   // Browser
   {
     input: 'src/index.js',
@@ -80,7 +80,7 @@ export default [
     ],
     external: ['axios'],
   },
-  /*
+
   // Browser minified
   {
     input: 'src/index.js',
@@ -111,9 +111,8 @@ export default [
     ],
     external: ['axios'],
   },
-  */
+
   // ES6 modules
-  /*
   {
     input: 'src/index.js',
     output: {
@@ -147,5 +146,5 @@ export default [
     ],
     external: ['axios'],
   },
-  */
+
 ];

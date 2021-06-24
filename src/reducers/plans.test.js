@@ -1,7 +1,8 @@
 // import { configureStore } from '@reduxjs/toolkit';
 // import deepFreeze from 'deep-freeze';
-import { plansState, plansReducer, listPlans } from './plans';
-import { store } from '../store';
+// import { plansState, plansReducer, listPlans } from './plans';
+import { plansReducer } from './plans';
+// import { store } from '../store';
 // deepFreeze(state) to test state immutability
 
 describe('Pure plansReducer', () => {
@@ -16,6 +17,7 @@ describe('Pure plansReducer', () => {
   });
 });
 
+/* Was just for qqt testing
 describe('Set plans', () => {
   // console.info('plansState: ', plansState);
   // console.info('plansReducer: ', plansReducer);
@@ -99,3 +101,4 @@ describe('Set plans', () => {
     expect(storedPlans.entities['05bc4415-557b-4364-8a31-6ddeb8d5302f'].uid).toEqual('05bc4415-557b-4364-8a31-6ddeb8d5302f');
   });
 });
+*/

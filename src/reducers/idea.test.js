@@ -1,7 +1,8 @@
 // import { configureStore } from '@reduxjs/toolkit';
 // import deepFreeze from 'deep-freeze';
-import { plansState, plansReducer } from './idea';
-import { store } from '../store';
+import { plansReducer } from './idea';
+// import { plansState, plansReducer } from './idea';
+// import { store } from '../store';
 // deepFreeze(state) to test state immutability
 
 describe('Pure plansReducer', () => {
@@ -30,7 +31,7 @@ describe('Pure plansReducer', () => {
 /*
 **
 */
-
+/* Was just for qqt testing
 describe('Room names ', () => {
   it('will be initally empty', () => {
     const stateNow = store.getState();
@@ -136,12 +137,12 @@ describe('Rule types  ', () => {
     expect(storedPlans.ruleTypes).toEqual([]);
   });
 });
-
+*/
 
 /*
 ** Templates
 */
-
+/* Was just for qqt testing
 describe('Templates ', () => {
   it('setTemplates and addTemplate will add templates with id', () => {
     const template1 = {
@@ -220,11 +221,12 @@ describe('Templates ', () => {
     expect(storedPlans.templates['TEMPLATE:1H+K']).toEqual(templateToBe);
   });
 });
-
+*/
 
 /*
  * Locations
 */
+/* Was just for qqt testing
 describe('Locations ', () => {
   it('addLocationNode will add country 1 to empty locations', () => {
     const country = {
@@ -519,3 +521,4 @@ describe('Locations ', () => {
     expect(storedPlansI.locations.root.Erottaja).not.toBeDefined();
   });
 });
+*/

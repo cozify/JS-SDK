@@ -1,12 +1,12 @@
-import { normalize, denormalize, schema } from "normalizr";
-
+// import { normalize, denormalize, schema } from 'normalizr';
+import { normalize, schema } from 'normalizr';
 
 // See https://github.com/paularmstrong/normalizr/blob/master/docs/api.md
 //
-export const planEntity = new schema.Entity('plans', {}, { idAttribute: 'uid'} );
+export const planEntity = new schema.Entity('plans', {}, { idAttribute: 'uid' });
 export const plansEntity = new schema.Array(planEntity);
 
-export const documentEntity = new schema.Entity('documents', {}, { idAttribute: 'uid'} );
+export const documentEntity = new schema.Entity('documents', {}, { idAttribute: 'uid' });
 export const documentsEntity = new schema.Array(documentEntity);
 
 
@@ -17,13 +17,9 @@ planSchema.define({
   document: documentSchema,
 });
 
-export const getDocumentsFromPlan = (plans) => {
-	debugger
-	return normalize(plans, {
-  	plans: planList,
-	})
-
-}
+export const getDocumentsFromPlan = (plans) => normalize(plans, {
+  plans: planList,
+});
 
 
 /*

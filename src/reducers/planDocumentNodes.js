@@ -3,26 +3,35 @@ import {
   createSlice,
   createEntityAdapter,
   createAsyncThunk,
-  createSelector
-} from "@reduxjs/toolkit";
+  createSelector,
+} from '@reduxjs/toolkit';
 
-import type { NODE_TYPE } from './constants';
+import type { NODE_TYPE } from '../plans/constants';
 
-import { GET_PLAN_DOCUMENT_NODES, SUBS_PLAN_DOCUMENT_NODES, INSERT_PLAN_DOCUMENT_NODE, UPDATE_PLAN_DOCUMENT_NODE, REMOVE_PLAN_DOCUMENT_NODE, qqlClient, normalize, isAuth } from '../qql.js'
-
+/* import {
+  GET_PLAN_DOCUMENT_NODES,
+  SUBS_PLAN_DOCUMENT_NODES,
+  INSERT_PLAN_DOCUMENT_NODE,
+  UPDATE_PLAN_DOCUMENT_NODE,
+  REMOVE_PLAN_DOCUMENT_NODE,
+  qqlClient,
+  normalize,
+  isAuth
+} from '../qql.js'
+*/
 
 const planDocumentNodesAdapter = createEntityAdapter({
   // Assume IDs are stored in a field uid
-  selectId: (node) => {
-    return node.uid;
-  },
+  selectId: (node) => node.uid,
   // Keep the "all IDs" array sorted based on document
-  sortComparer: (a, b) => a.document_id.localeCompare(b.document_id)
-})
+  sortComparer: (a, b) => a.document_id.localeCompare(b.document_id),
+});
 
 // Fetch
 async function fetchPlanDocumentNodes(documentId): Promise<NODE_TYPE> {
   return new Promise((resolve, reject) => {
+    reject(new Error(`fetchPlanDocuments documentId: ${documentId} TBD`));
+    /*  Was just test implementation of qql
     qqlClient.query({
       variables: {
         "document_id": documentId
@@ -38,23 +47,27 @@ async function fetchPlanDocumentNodes(documentId): Promise<NODE_TYPE> {
       console.error('SDK fetchPlanDocumentNodes error:', error);
       reject(error);
     });
+    */
   });
 }
 
 export const reactFetchPlanDocumentNodes = createAsyncThunk(
   'plans/fetchPlanDocumentNodes',
   async (documentId, ThunkAPI) => {
-    if (isAuth(ThunkAPI.getState())) {
-      return await fetchPlanDocumentNodes(documentId)
-    }
-  }
-)
+    // if (isAuth(ThunkAPI.getState())) {
+    console.debug('fetchPlanDocuments state: ', ThunkAPI.getState());
+    return fetchPlanDocumentNodes(documentId);
+  },
+
+);
 
 // Subscribe
-export const reactSubscribePlanDocumentNodes  = createAsyncThunk(
+export const reactSubscribePlanDocumentNodes = createAsyncThunk(
   'plans/subscribePlanDocumentNodes',
-  async (params, ThunkAPI) => {
-    return new Promise((resolve, reject) => {
+  async (params, ThunkAPI) => new Promise((resolve, reject) => {
+    console.debug('reactSubscribePlanDocumentNodes state: ', ThunkAPI.getState());
+    reject(new Error('reactSubscribePlanDocumentNodes TBD'));
+    /*  Was just test implementation of qql
       if (isAuth(ThunkAPI.getState())) {
         const {documentId} = params;
         const subsHandle = qqlClient.subscribe({
@@ -85,9 +98,10 @@ export const reactSubscribePlanDocumentNodes  = createAsyncThunk(
       } else {
         reject()
       }
-    })
-  }
-)
+    }
+    */
+  }),
+);
 
 
 /*
@@ -115,17 +129,20 @@ päätason
  */
 // Insert
 async function insertPlanDocumentNode(documentId, parentId, changes): Promise<NODE_TYPE> {
-  debugger
+  const changesToBeMade = changes;
   if (changes && changes.type) {
-    changes.__typename = changes.type
+    // eslint-disable-next-line
+    changesToBeMade.__typename = changes.type;
   }
   return new Promise((resolve, reject) => {
+    reject(new Error(`insertPlanDocumentNode docId: ${documentId}, parentId: ${parentId} TBD, changes: ${changesToBeMade}`));
+    /*  Was just test implementation of qql
     qqlClient.mutate({
       variables: {
         object: {
           document_id: documentId,
           parent_id: parentId,
-          data: changes
+          data: changesToBeMade
         }
       },
       mutation: INSERT_PLAN_DOCUMENT_NODE
@@ -139,30 +156,34 @@ async function insertPlanDocumentNode(documentId, parentId, changes): Promise<NO
       console.error('SDK insertPlanDocumentNode error:', error);
       reject(error);
     });
+    */
   });
 }
 
 export const reactInsertPlanDocumentNode = createAsyncThunk(
   'plans/insertPlanDocumentNode',
   async (params, ThunkAPI) => {
-    if (isAuth(ThunkAPI.getState())) {
-      const {documentId, parentId, changes} = params
-      return await insertPlanDocumentNode(documentId, parentId, changes)
-    }
-  }
-)
+    // if (isAuth(ThunkAPI.getState())) {
+    console.debug('reactInsertPlanDocumentNode state:', ThunkAPI.getState());
+    const { documentId, parentId, changes } = params;
+    return insertPlanDocumentNode(documentId, parentId, changes);
+    // }
+  },
+);
 
-/*{
+/* {
   "uid": "e1727bae-cd29-4a77-8234-a6528fda48fc",
   "changes": {
     "data": {
       "name": "HUB 2.0"
     }
   }
-}*/
+} */
 // Update
 async function updatePlanDocumentNode(uid, changes): Promise<NODE_TYPE> {
   return new Promise((resolve, reject) => {
+    reject(new Error(`updatePlanDocumentNode uid: ${uid} TBD, changes: ${changes}`));
+    /*  Was just test implementation of qql
     qqlClient.mutate({
       variables: {
         uid: uid,
@@ -180,6 +201,7 @@ async function updatePlanDocumentNode(uid, changes): Promise<NODE_TYPE> {
       console.error('SDK updatePlanDocumentNode error:', error);
       reject(error);
     });
+    */
   });
 }
 
@@ -187,16 +209,19 @@ async function updatePlanDocumentNode(uid, changes): Promise<NODE_TYPE> {
 export const reactUpdatePlanDocumentNode = createAsyncThunk(
   'plans/updatePlanDocumentNode',
   async (params, ThunkAPI) => {
-    if (isAuth(ThunkAPI.getState())) {
-      const {uid, changes} = params
-      return await updatePlanDocumentNode(uid, changes)
-    }
-  }
-)
+    // if (isAuth(ThunkAPI.getState())) {
+    console.debug('reactUpdatePlanDocumentNode state: ', ThunkAPI.getState());
+    const { uid, changes } = params;
+    return updatePlanDocumentNode(uid, changes);
+    // }
+  },
+);
 
 // Remove Plan
 async function removePlanDocumentNode(uid): Promise<NODE_TYPE> {
   return new Promise((resolve, reject) => {
+    reject(new Error(`removePlanDocumentNode uid: ${uid} TBD`));
+    /*  Was just test implementation of qql
     qqlClient.mutate({
       variables: {
         "uid": uid,
@@ -212,6 +237,7 @@ async function removePlanDocumentNode(uid): Promise<NODE_TYPE> {
       console.error('SDK removePlanDocumentNode error:', error);
       reject(error);
     });
+    */
   });
 }
 
@@ -219,12 +245,13 @@ async function removePlanDocumentNode(uid): Promise<NODE_TYPE> {
 export const reactRemovePlanDocumentNode = createAsyncThunk(
   'plans/removePlanDocumentNode',
   async (params, ThunkAPI) => {
-    if (isAuth(ThunkAPI.getState())) {
-      const {uid, changes} = params
-      return await removePlanDocumentNode(uid, changes)
-    }
-  }
-)
+    // if (isAuth(ThunkAPI.getState())) {
+    console.debug('reactRemovePlanDocumentNode state: ', ThunkAPI.getState());
+    const { uid } = params;
+    return removePlanDocumentNode(uid);
+    // }
+  },
+);
 
 export const planDocumentNodesState = createSlice({
   name: 'nodes',
@@ -239,34 +266,34 @@ export const planDocumentNodesState = createSlice({
   extraReducers: {
     // Add reducers for additional action types here, and handle loading state as needed
     [reactFetchPlanDocumentNodes.fulfilled]: (state, action) => {
-      planDocumentNodesAdapter.upsertMany(state, action.payload)
+      planDocumentNodesAdapter.upsertMany(state, action.payload);
     },
     [reactFetchPlanDocumentNodes.rejected]: (state, action) => {
-      debugger
-      console.error('SDK reactFetchPlanDocumentNodes rejected');
+      console.error('SDK reactFetchPlanDocumentNodes rejected state: ', state);
+      console.error('SDK reactFetchPlanDocumentNodes rejected action: ', action);
     },
     [reactInsertPlanDocumentNode.fulfilled]: (state, action) => {
-      planDocumentNodesAdapter.updateOne(state, action.payload)
+      planDocumentNodesAdapter.updateOne(state, action.payload);
     },
     [reactInsertPlanDocumentNode.rejected]: (state, action) => {
-      debugger
-      console.error('SDK reactInsertPlanDocumentNode rejected');
+      console.error('SDK reactInsertPlanDocumentNode rejected state: ', state);
+      console.error('SDK reactInsertPlanDocumentNode rejected action: ', action);
     },
     [reactUpdatePlanDocumentNode.fulfilled]: (state, action) => {
-      planDocumentNodesAdapter.updateOne(state, action.payload)
+      planDocumentNodesAdapter.updateOne(state, action.payload);
     },
     [reactUpdatePlanDocumentNode.rejected]: (state, action) => {
-      debugger
-      console.error('SDK reactUpdatePlanDocumentNode rejected');
+      console.error('SDK reactUpdatePlanDocumentNode rejected state: ', state);
+      console.error('SDK reactUpdatePlanDocumentNode rejected action: ', action);
     },
     [reactRemovePlanDocumentNode.fulfilled]: (state, action) => {
-      planDocumentNodesAdapter.updateOne(state, action.payload)
+      planDocumentNodesAdapter.updateOne(state, action.payload);
     },
     [reactRemovePlanDocumentNode.rejected]: (state, action) => {
-      debugger
-      console.error('SDK reactRemovePlanDocumentNode rejected');
+      console.error('SDK reactRemovePlanDocumentNode rejected state: ', state);
+      console.error('SDK reactRemovePlanDocumentNode rejected action: ', action);
     },
-  }
+  },
 });
 
 
@@ -274,14 +301,13 @@ planDocumentNodesState.selectors = planDocumentNodesAdapter.getSelectors((state)
 planDocumentNodesState.selectors.selectPlanDocumentNodes = createSelector(
   [(state) => state.nodes, (state, documentId) => documentId],
   (nodes, documentId) => {
-    const ids = nodes.ids.filter((id) => nodes.entities[id].document_id === documentId)
-    const entities = []
+    const ids = nodes.ids.filter((id) => nodes.entities[id].document_id === documentId);
+    const entities = [];
     ids.forEach((id) => {
-      entities.push(nodes.entities[id])
+      entities.push(nodes.entities[id]);
     });
     return entities;
-
-  }
+  },
 );
 
 export const {
@@ -290,18 +316,15 @@ export const {
   selectEntities: reactSelectDocumentNodeEntities,
   selectAll: reactSelectAllDocumentNodes,
   selectTotal: reactSelectTotalDocumentNodes,
-} = planDocumentNodesAdapter.getSelectors(state => state.nodes);
+} = planDocumentNodesAdapter.getSelectors((state) => state.nodes);
 export const reactSelectPlanDocumentNodes = planDocumentNodesState.selectors.selectPlanDocumentNodes;
 
 
-const { actions, reducer } = planDocumentNodesState;
+// const { actions, reducer } = planDocumentNodesState;
+const { reducer } = planDocumentNodesState;
 
 /**
  * Plan Documents reducer
  * @type {function} reducer
  */
 export { reducer as planDocumentNodesReducer };
-
-
-
-

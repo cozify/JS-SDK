@@ -52,7 +52,7 @@ export function sendRoomCmd(hubId: string, commandType: COMMANDS_TYPE, data: Obj
     const hubs = hubsState.selectors.getHubs(stateNow);
     const hub = hubs[hubId];
     const { hubKey } = hubs[hubId];
-    if (!hub || (!hubKey && getCloudURL().indexOf('https://one.cozify.fi')===-1)) {
+    if (!hub || (!hubKey && getCloudURL().indexOf('https://one.cozify.fi') === -1)) {
       console.error('SDK sendRoomCmd error: No hubKey!');
       reject(new Error('Room command error: No hubKey!'));
       return;

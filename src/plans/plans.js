@@ -3,41 +3,41 @@
 // import isArray from 'lodash/isArray';
 // import pick from 'lodash/pick';
 import { store } from '../store';
-import { userState } from '../reducers/user';
+// import { userState } from '../reducers/user';
 import { plansState, reactFetchPlans } from '../reducers/plans';
 import { planDocumentsState, reactFetchPlanDocuments } from '../reducers/planDocuments';
-import type { TEMPLATE_TYPE, NODE_TYPE, PLAN_TYPE, PLANS_TYPE } from './constants';
-import { send, COMMANDS } from '../connection/send';
-import isEmpty from 'lodash/isEmpty';
+import type {
+  TEMPLATE_TYPE, NODE_TYPE, PLANS_TYPE,
+} from './constants';
+// import { send, COMMANDS } from '../connection/send';
 // import uuid from 'uuid'
 
+export function getPlans(): PLANS_TYPE {
+  const stateNow = store.getState();
+  return plansState.selectors.getPlans(stateNow);
+}
+
+export function setPlans(plans: PLANS_TYPE) {
+  store.dispatch(plansState.actions.setPlansState(plans));
+}
 
 export async function fetchPlans() {
   return new Promise((resolve, reject) => {
-    try{
+    try {
       store.dispatch(reactFetchPlans());
-      const stateNow = store.getState();
+      // const stateNow = store.getState();
       resolve(getPlans());
     } catch (e) {
-      reject(error);
+      reject(e);
     }
   });
 }
 
-export async function fetchPlanDocuments(planId) {
-  return new Promise((resolve, reject) => {
-    try{
-      store.dispatch(reactFetchDocuments(planId));
-      const stateNow = store.getState();
-      resolve(getPlanDocuments());
-    } catch (e) {
-      reject(error);
-    }
-  });
-}
+
 export async function insertPlan(): Promise<PLANS_TYPE> {
   return new Promise((resolve, reject) => {
-
+    reject(new Error('removePlan TBD'));
+    /*  Was just test implementation of qql
     client.mutate({
       variables: {
         "object": {
@@ -71,39 +71,44 @@ export async function insertPlan(): Promise<PLANS_TYPE> {
     .then((result) => {
         debugger;
         console.log(result.data.insert_t_plan_one)
-        resolve(getPlanDocuments());
+        // TODO Should list documents of plan
+        resolve({});
       }).catch((error) => {
         debugger;
         console.error('SDK listPlans error:', error);
         reject(error);
       });
+    */
   });
 }
 // const plansUrl = "http://localhost:3001/plans"
 // const plansUrl = 'https://localhost:8449/cc/0.1/partner/plans';
 
 
-export function getPlans(): PLANS_TYPE {
-  const stateNow = store.getState();
-  return plansState.selectors.getPlans(stateNow);
-}
-export function setPlans(plans: PLANS_TYPE) {
-  store.dispatch(plansState.actions.setPlansState(plans));
-}
-
-export function getPlanDocuments(planId): PLANS_TYPE {
+export function getPlanDocuments(planId: string): PLANS_TYPE {
   const stateNow = store.getState();
   // const array = planDocumentsState.selectors.selectAll(stateNow);
   // const entities = planDocumentsState.selectors.selectEntities(stateNow);
   // const id = planDocumentsState.selectors.selectById(stateNow, "d39e6ddc-6220-4c20-8c7d-9d01e65192de");
   // const idsAndEntities = planDocumentsState.selectors.getDocuments(stateNow);
-  debugger;
   return planDocumentsState.selectors.selectByPlanId(stateNow, planId);
 }
+
+export async function fetchPlanDocuments(planId: string) {
+  return new Promise((resolve, reject) => {
+    try {
+      store.dispatch(reactFetchPlanDocuments(planId));
+      // const stateNow = store.getState();
+      resolve(getPlanDocuments(planId));
+    } catch (e) {
+      reject(e);
+    }
+  });
+}
+
 export function setPlanDocuments(plans: PLANS_TYPE) {
   store.dispatch(planDocumentsState.actions.setPlanDocumentsState(plans));
 }
-
 
 
 export function addRoomName(newName: string) {

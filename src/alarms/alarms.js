@@ -10,8 +10,9 @@ import { b64DecodeUnicode, getTextFromNode } from '../utils';
 import { send, COMMANDS } from '../connection/send';
 import { HUB_CONNECTION_STATES, getCloudURL } from '../connection/constants';
 import type { COMMANDS_TYPE } from '../connection/constants';
-import type { ALARM_TYPE, ALARMS_MAP_TYPE, HUB_ALARMS_MAP_TYPE } from './constants';
-
+import type {
+  ALARM_TYPE, ALARMS_MAP_TYPE, HUB_ALARMS_MAP_TYPE, ALERTS_MAP_TYPE, HUB_ALERTS_MAP_TYPE,
+} from './constants';
 
 
 const initAlarm = (alarm: Object) => {
@@ -67,7 +68,7 @@ export function sendAlarmCmd(hubId: string, commandType: COMMANDS_TYPE, data: Ob
     const hubs = hubsState.selectors.getHubs(stateNow);
     const hub = hubs[hubId];
     const { hubKey } = hubs[hubId];
-    if (!hub || (!hubKey && getCloudURL().indexOf('https://one.cozify.fi')===-1)) {
+    if (!hub || (!hubKey && getCloudURL().indexOf('https://one.cozify.fi') === -1)) {
       console.error('SDK closeAlarm error: No hubKey!');
       reject(new Error('Alarm command error: No hubKey!'));
       return;
@@ -204,11 +205,11 @@ export function alarmsDeltaHandler(hubId: string, reset: boolean, alarms: ALARMS
 
 const initAlert = (alert: Object) => {
   const givenAlert = alert;
-  if(alert.error){
-    alert.level = 'err';
+  if (alert.error) {
+    givenAlert.level = 'err';
   }
-  if(alert.cleared){
-    alert.closed = true;
+  if (alert.cleared) {
+    givenAlert.closed = true;
   }
   if (alert.message) {
     givenAlert.title = getTextFromNode(givenAlert.message);
@@ -253,6 +254,4 @@ export function alertsDeltaHandler(hubId: string, reset: boolean, alerts: ALERTS
       }
     });
   }
-
 }
-

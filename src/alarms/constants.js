@@ -59,4 +59,3 @@ export type ALERT_TYPE = {
 */
 export type ALERTS_MAP_TYPE = {[alarmId: string]: ALERT_TYPE}
 export type HUB_ALERTS_MAP_TYPE = {[hubId: string]: ALERTS_MAP_TYPE}
-

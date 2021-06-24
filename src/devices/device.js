@@ -30,7 +30,7 @@ export function sendDeviceStateCmd(hubId: string, deviceId: string, state: Objec
     }
 
     const hubs = hubsState.selectors.getHubs(stateNow);
-    if (!hubs[hubId] || (!hubs[hubId].hubKey && getCloudURL().indexOf('https://one.cozify.fi')===-1)) {
+    if (!hubs[hubId] || (!hubs[hubId].hubKey && getCloudURL().indexOf('https://one.cozify.fi') === -1)) {
       console.error('SDK sendDeviceStateCmd error: No hubKey!');
       reject(new Error('Device command error: No hubKey!'));
       return;
@@ -78,11 +78,11 @@ export function sendDeviceCmd(hubId: string, deviceId: string, commandType: any,
 
     const hubs = hubsState.selectors.getHubs(stateNow);
     const hub = hubs[hubId];
-    let hubKey = undefined
+    let hubKey;
     if (hub && hub.hubKey) {
       hubKey = hub.hubKey;
     }
-    if (!hub || (!hubKey && getCloudURL().indexOf('https://one.cozify.fi')===-1)) {
+    if (!hub || (!hubKey && getCloudURL().indexOf('https://one.cozify.fi') === -1)) {
       console.error('SDK sendDeviceCmd error: No hubKey!');
       reject(new Error('Device command error: No hubKey!'));
       return;
@@ -123,13 +123,13 @@ export function sendDeviceCmd(hubId: string, deviceId: string, commandType: any,
 }
 
 export function setDeviceVisibility(hubId: string, deviceId: string, visible: boolean): Promise<Object> {
-  return sendDeviceCmd(hubId, deviceId, COMMANDS.CMD_DEVICE_VISIBILITY, { id: deviceId, visible:visible });
+  return sendDeviceCmd(hubId, deviceId, COMMANDS.CMD_DEVICE_VISIBILITY, { id: deviceId, visible });
 }
 export function setDeviceLocked(hubId: string, deviceId: string, locked: boolean): Promise<Object> {
-  return sendDeviceCmd(hubId, deviceId, COMMANDS.CMD_DEVICE_LOCK, { id: deviceId, locked:locked });
+  return sendDeviceCmd(hubId, deviceId, COMMANDS.CMD_DEVICE_LOCK, { id: deviceId, locked });
 }
 export function setDeviceHotWater(hubId: string, deviceId: string, hotWater: boolean): Promise<Object> {
-  return sendDeviceCmd(hubId, deviceId, COMMANDS.CMD_DEVICE_HOT_WATER, { id: deviceId, hotWater:hotWater });
+  return sendDeviceCmd(hubId, deviceId, COMMANDS.CMD_DEVICE_HOT_WATER, { id: deviceId, hotWater });
 }
 /**
  * Unpair device

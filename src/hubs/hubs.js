@@ -9,7 +9,7 @@ import { COMMANDS, send, sendAll } from '../connection/send';
 
 import { devicesDeltaHandler, pairingDevicesDeltaHandler } from '../devices/devices';
 import { roomsDeltaHandler } from '../rooms/rooms';
-import { alarmsDeltaHandler, alertsDeltaHandler } from '../alarms/alarms';
+import { alarmsDeltaHandler } from '../alarms/alarms';
 import { urlBase64Decode } from '../utils';
 import { store, watchChanges } from '../store';
 import { hubsState } from '../reducers/hubs';
@@ -28,7 +28,7 @@ function extractHubInfo(HUBKeys: HUB_KEYS_TYPE): HUBS_MAP_TYPE {
   const hubs: HUBS_MAP_TYPE = {};
   if (HUBKeys) {
     Object.keys(HUBKeys).forEach((hubKey) => {
-      if (HUBKeys[hubKey]){
+      if (HUBKeys[hubKey]) {
         const coded = HUBKeys[hubKey].split('.')[1];
         const decoded = urlBase64Decode(coded);
         const payload = JSON.parse(decoded);
@@ -51,7 +51,6 @@ function extractHubInfo(HUBKeys: HUB_KEYS_TYPE): HUBS_MAP_TYPE {
           connectionState: HUB_CONNECTION_STATES.UNCONNECTED,
         };
       }
-
     });
   }
   return hubs;
@@ -113,7 +112,7 @@ export function lockAndBackup(hubId: string, authKey: string, hubKey: string): P
 /*
  * Remote hub metamata request for version etc information
  */
-export function doRemoteIdQuery(hubId: string, authKey: string, hubKey: string): Promise<any> {
+export function doRemoteIdQuery(hubId: string, authKey: string, hubKey: ?string): Promise<any> {
   return new Promise((resolve, reject) => {
     send({
       command: COMMANDS.CLOUD_META, authKey, hubKey, hubId,
@@ -213,7 +212,7 @@ function fetchCloudMetaData(hubs: HUBS_MAP_TYPE, authKey: string): Promise<Objec
     (Object.values(hubs): any).forEach((hub: HUB_TYPE) => {
       // if (hub.hubKey) {
       queries.push(doRemoteIdQuery(hub.id, authKey, hub.hubKey));
-      //}
+      // }
     });
     sendAll(queries)
       .then((values) => {
@@ -239,7 +238,7 @@ function storedUser(): Object {
 /*
  * Make hubsMap by fetching hub meta data from cloud and local
  */
-function makeHubsMap(tokens: HUB_KEYS_TYPE, doCloudDiscovery: boolean = true, doSynchnonously: boolean = false): Promise<Object> {
+function makeHubsMap(tokens: HUB_KEYS_TYPE, isCloudDiscovery: boolean = true, isSynchnonously: boolean = false): Promise<Object> {
   const { authKey } = storedUser();
   return new Promise((resolve) => {
     hubsMap = extractHubInfo(tokens);
@@ -248,8 +247,8 @@ function makeHubsMap(tokens: HUB_KEYS_TYPE, doCloudDiscovery: boolean = true, do
       .finally(() => {
         // Hubs map may be changed during fetching cloud metadata
         store.dispatch(hubsState.actions.updateHubs(hubsMap));
-        if (doSynchnonously) {
-          if (doCloudDiscovery) {
+        if (isSynchnonously) {
+          if (isCloudDiscovery) {
             doCloudDiscovery()
               .then(() => {
                 resolve(getHubs());
@@ -261,7 +260,7 @@ function makeHubsMap(tokens: HUB_KEYS_TYPE, doCloudDiscovery: boolean = true, do
             resolve(getHubs());
           }
         } else {
-          if (doCloudDiscovery) {
+          if (isCloudDiscovery) {
             doCloudDiscovery();
           }
           resolve(getHubs());
@@ -647,7 +646,7 @@ export function selectHubById(hubId: string, poll: boolean = false): Promise<Obj
     const hubs: HUBS_MAP_TYPE = getHubs();
     if (!isEmpty(hubs)) {
       let pollingHub = null;
-      let error = null;
+      const error = null;
       (Object.values(hubs)).every((hub: any) => {
         if (hubId === hub.id) {
           store.dispatch(hubsState.actions.selectHub({ hubId: hub.id }));

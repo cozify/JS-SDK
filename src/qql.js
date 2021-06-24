@@ -1,8 +1,12 @@
+
+// Whole file was just for qql testing
+/*
 import { ApolloClient, split, HttpLink, InMemoryCache } from '@apollo/client';
 import {GraphQLNormalizr} from 'graphql-normalizr'
 import { gql } from '@apollo/client';
 import { getMainDefinition } from '@apollo/client/utilities';
 import { WebSocketLink } from '@apollo/link-ws';
+*/
 
 /*
 import { SubscriptionClient } from 'graphql-subscriptions-client';
@@ -12,8 +16,8 @@ const qqlSubscriptionClient = new SubscriptionClient('ws://localhost:8080/v1/gra
 });
 */
 
-/* 
-Commented out as graphql not used 
+/*
+Commented out as graphql not used
 const httpLink = new HttpLink({
   uri: 'http://localhost:8080/v1/graphql'
 });
@@ -80,6 +84,7 @@ export const { normalize } = new GraphQLNormalizr(
 */
 
 // Fake client
+/*
 export const qqlClient = {
   query: () => {},
   subscribe: () => {},
@@ -164,7 +169,6 @@ export const INSERT_PLAN = gql`
 `;
 
 
-
 export const UPDATE_PLAN = gql`
   mutation UpdatePlan($uid: String, $changes: t_plan_set_input) {
     update_t_plan(where: {uid: {_eq: $uid}}, _set: $changes) {
@@ -186,7 +190,6 @@ export const REMOVE_PLAN = gql`
     }
   }
 `;
-
 
 
 export const GET_PLAN_DOCUMENTS = gql`
@@ -231,7 +234,7 @@ export const INSERT_PLAN_DOCUMENT = gql`
   }
 `;
 
-// 
+//
 // export const UPDATE_PLAN_DOCUMENT = gql`
 //   mutation UpdateDocument($room_types: jsonb, $rule_types: jsonb, $uid: String) {
 //     update_t_plan_document(where: {uid: {_eq: $uid}}, _set: {room_types: $room_types, rule_types: $rule_types}) {
@@ -247,7 +250,7 @@ export const INSERT_PLAN_DOCUMENT = gql`
 //     }
 //   }
 // `;
-// 
+//
 export const UPDATE_PLAN_DOCUMENT = gql`
   mutation UpdatePlanDocument($uid: String, $changes: t_plan_document_set_input) {
     update_t_plan_document(where: {uid: {_eq: $uid}}, _set: $changes) {
@@ -304,7 +307,6 @@ export const SUBS_PLAN_DOCUMENT_NODES = gql`
 `;
 
 
-
 export const INSERT_PLAN_DOCUMENT_NODE = gql`
   mutation InsertNode($object: t_plan_document_node_insert_input!) {
     insert_t_plan_document_node_one(object: $object) {
@@ -315,7 +317,6 @@ export const INSERT_PLAN_DOCUMENT_NODE = gql`
     }
   }
 `;
-
 
 
 // export const UPDATE_PLAN_DOCUMENT_NODE = gql`
@@ -349,3 +350,5 @@ export const REMOVE_PLAN_DOCUMENT_NODE = gql`
     }
   }
 `;
+
+*/

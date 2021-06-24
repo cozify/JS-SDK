@@ -3,38 +3,44 @@ import {
   createSlice,
   createEntityAdapter,
   createAsyncThunk,
-  createSelector
-} from "@reduxjs/toolkit";
+  // createSelector,
+} from '@reduxjs/toolkit';
 
-import type { PLANS_TYPE, PLAN_TYPE } from './constants';
+import type { PLANS_TYPE, PLAN_TYPE } from '../plans/constants';
 
-import { GET_PLANS, SUBS_PLANS, INSERT_PLAN, UPDATE_PLAN, REMOVE_PLAN, qqlClient, normalize, isAuth } from '../qql.js'
-
+// Was just test implementation of qql
+// import { GET_PLANS, SUBS_PLANS, INSERT_PLAN, UPDATE_PLAN, REMOVE_PLAN, qqlClient, normalize, isAuth } from '../qql.js'
 
 /*
 ** addOne: accepts a single entity, and adds it.
 ** addMany: accepts an array of entities or an object in the shape of Record<EntityId, T>, and adds them.
-** setAll: accepts an array of entities or an object in the shape of Record<EntityId, T>, and replaces the existing entity contents with the values in the array.
+** setAll: accepts an array of entities or an object in the shape of Record<EntityId, T>,
+** and replaces the existing entity contents with the values in the array.
 ** removeOne: accepts a single entity ID value, and removes the entity with that ID if it exists.
 ** removeMany: accepts an array of entity ID values, and removes each entity with those IDs if they exist.
-** updateOne: accepts an "update object" containing an entity ID and an object containing one or more new field values to update inside a changes field, and performs a shallow update on the corresponding entity.
+** updateOne: accepts an "update object" containing an entity ID and an object containing one or
+** more new field values to update inside a changes field, and performs a shallow update on the corresponding entity.
 ** updateMany: accepts an array of update objects, and performs shallow updates on all corresponding entities.
-** upsertOne: accepts a single entity. If an entity with that ID exists, it will perform a shallow update and the specified fields will be merged into the existing entity, with any matching fields overwriting the existing values. If the entity does not exist, it will be added.
+** upsertOne: accepts a single entity. If an entity with that ID exists, it will perform a shallow update
+** and the specified fields will be merged into the existing entity, with any matching fields overwriting the existing values.
+** If the entity does not exist, it will be added.
 ** upsertMany: accepts an array of entities or an object in the shape of Record<EntityId, T> that will be shallowly upserted.
 */
 const plansAdapter = createEntityAdapter({
   // Assume IDs are stored in a field uid
   selectId: (plan) => {
-    // console.log('SDK plansAdapter: ', plan);
+    console.log('SDK plansAdapter: ', plan);
     return plan.uid;
   },
   // Keep the "all IDs" array sorted based on plan names
-  sortComparer: (a, b) => b.changed_at.localeCompare(a.changed_at)
-})
+  sortComparer: (a, b) => b.changed_at.localeCompare(a.changed_at),
+});
 
 // Fetch all plans
 async function fetchPlans(): Promise<PLANS_TYPE> {
   return new Promise((resolve, reject) => {
+    reject(new Error('fetchPlans TBD'));
+    /*  Was just test implementation of qql
     qqlClient.query({
       query: GET_PLANS
     })
@@ -47,29 +53,37 @@ async function fetchPlans(): Promise<PLANS_TYPE> {
       console.error('SDK fetchPlans error:', error);
       reject(error);
     });
+    */
   });
 }
+
 
 export const reactFetchPlans = createAsyncThunk(
   'plans/fetchPlans',
   async (params, ThunkAPI) => {
-    if (isAuth(ThunkAPI.getState())) {
-      return await fetchPlans()
-    }
+    // if (isAuth(ThunkAPI.getState())) {
+    console.debug('reactFetchPlans state', ThunkAPI.getState());
+    return fetchPlans();
+    // }
   },
   {
     condition: (params, { getState, extra }) => {
-      debugger
-      const state = getState()
-    }
+      const state = getState();
+      console.debug('reactFetchPlans condition state: ', state);
+      console.debug('reactFetchPlans condition extra: ', extra);
+    },
   },
-)
+);
+
 
 // Subscribe
-export const reactSubscribePlans  = createAsyncThunk(
+export const reactSubscribePlans = createAsyncThunk(
   'plans/subscribePlans',
-  async (params, ThunkAPI) => {
-    return new Promise((resolve, reject) => {
+  async (params, ThunkAPI) => new Promise((resolve, reject) => {
+    console.debug('reactSubscribePlans state: ', ThunkAPI.getState());
+    console.debug('reactSubscribePlans params: ', params);
+    reject(new Error('subscribePlans TBD'));
+    /*  Was just test implementation of qql
       if (isAuth(ThunkAPI.getState())) {
         const subsHandle = qqlClient.subscribe({
           query: SUBS_PLANS,
@@ -101,12 +115,16 @@ export const reactSubscribePlans  = createAsyncThunk(
         reject()
       }
     })
-  }
-)
+    */
+  }),
+);
 
 // Insert plan
 async function insertPlan(name): Promise<PLAN_TYPE> {
   return new Promise((resolve, reject) => {
+    console.debug('SDK insertPlan name', name);
+    reject(new Error('insertPlans TBD'));
+    /*  Was just test implementation of qql
     qqlClient.mutate({
       variables: {
         object: {
@@ -131,6 +149,7 @@ async function insertPlan(name): Promise<PLAN_TYPE> {
       console.error('SDK insertPlan error:', error);
       reject(error);
     });
+    */
   });
 }
 
@@ -138,17 +157,20 @@ async function insertPlan(name): Promise<PLAN_TYPE> {
 export const reactInsertPlan = createAsyncThunk(
   'plans/insertPlan',
   async (params, ThunkAPI) => {
-    if (isAuth(ThunkAPI.getState())) {
-      const { name } = params
-      return await insertPlan(name)
-    }
-  }
-)
+    // if (isAuth(ThunkAPI.getState())) {
+    console.debug('reactInsertPlan state: ', ThunkAPI.getState());
+    const { name } = params;
+    return insertPlan(name);
+    // }
+  },
+);
 
 
 // Update Plan
 async function updatePlan(uid, changes): Promise<PLAN_TYPE> {
   return new Promise((resolve, reject) => {
+    reject(new Error(`updatePlan uid: ${uid} TBD, changes: ${changes}`));
+    /*  Was just test implementation of qql
     qqlClient.mutate({
       variables: {
         uid: uid,
@@ -165,6 +187,7 @@ async function updatePlan(uid, changes): Promise<PLAN_TYPE> {
       console.error('SDK updatePlan error:', error);
       reject(error);
     });
+    */
   });
 }
 
@@ -172,16 +195,19 @@ async function updatePlan(uid, changes): Promise<PLAN_TYPE> {
 export const reactUpdatePlan = createAsyncThunk(
   'plans/updatePlan',
   async (params, ThunkAPI) => {
-    if (isAuth(ThunkAPI.getState())) {
-      const {uid, changes} = params
-      return await updatePlan(uid, changes)
-    }
-  }
-)
+    // if (isAuth(ThunkAPI.getState())) {
+    console.debug('reactUpdatePlan state: ', ThunkAPI.getState());
+    const { uid, changes } = params;
+    return updatePlan(uid, changes);
+    // }
+  },
+);
 
 // Remove Plan
 async function removePlan(uid): Promise<PLAN_TYPE> {
   return new Promise((resolve, reject) => {
+    reject(new Error(`removePlan  uid: ${uid} TBD`));
+    /*  Was just test implementation of qql
     qqlClient.mutate({
       variables: {
         "uid": uid,
@@ -196,6 +222,7 @@ async function removePlan(uid): Promise<PLAN_TYPE> {
       console.error('SDK removePlan error:', error);
       reject(error);
     });
+    */
   });
 }
 
@@ -203,12 +230,13 @@ async function removePlan(uid): Promise<PLAN_TYPE> {
 export const reactRemovePlan = createAsyncThunk(
   'plans/removePlan',
   async (params, ThunkAPI) => {
-    if (isAuth(ThunkAPI.getState())) {
-      const {uid, changes} = params
-      return await removePlan(uid, changes)
-    }
-  }
-)
+    // if (isAuth(ThunkAPI.getState())) {
+    console.debug('reactRemovePlan state: ', ThunkAPI.getState());
+    const { uid } = params;
+    return removePlan(uid);
+    // }
+  },
+);
 
 // Slice
 export const plansState = createSlice({
@@ -216,12 +244,12 @@ export const plansState = createSlice({
   initialState: plansAdapter.getInitialState(),
   reducers: {
     setPlansState(state, action) {
-      const stateToSet = state;
+      // const stateToSet = state;
+      // const oldState = stateToSet.plansState;
       const newState = action.payload;
-      const oldState = stateToSet.plansState;
       plansAdapter.setAll(state, newState);
-      //console.log(`SDK setPlansState: PLANS state ${oldState} -> ${newState}`);
-      //console.info('plans.js setPlansState: newState', newState)
+      // console.log(`SDK setPlansState: PLANS state ${oldState} -> ${newState}`);
+      // console.info('plans.js setPlansState: newState', newState)
 
       /*
       const normalized = normalize(newState, plansEntity);
@@ -261,43 +289,43 @@ export const plansState = createSlice({
   extraReducers: {
     // Add reducers for additional action types here, and handle loading state as needed
     [reactFetchPlans.fulfilled]: (state, action) => {
-      debugger
-      plansAdapter.upsertMany(state, action.payload)
+      plansAdapter.upsertMany(state, action.payload);
     },
     [reactFetchPlans.rejected]: (state, action) => {
-      debugger
-      console.error('SDK reactFetchPlans rejected');
+      console.error('SDK reactFetchPlans rejected state: ', state);
+      console.error('SDK reactFetchPlans rejected action: ', action);
     },
     [reactInsertPlan.fulfilled]: (state, action) => {
-      plansAdapter.updateOne(state, action.payload)
+      plansAdapter.updateOne(state, action.payload);
     },
     [reactInsertPlan.rejected]: (state, action) => {
-      debugger
-      console.error('SDK reactInsertPlan rejected');
+      console.error('SDK reactInsertPlan rejected state: ', state);
+      console.error('SDK reactInsertPlan rejected action: ', action);
     },
     [reactUpdatePlan.fulfilled]: (state, action) => {
-      plansAdapter.updateOne(state, action.payload)
+      plansAdapter.updateOne(state, action.payload);
     },
     [reactUpdatePlan.rejected]: (state, action) => {
-      debugger
-      console.error('SDK reactFetchPlans rejected');
+      console.error('SDK reactFetchPlans rejected state: ', state);
+      console.error('SDK reactFetchPlans rejected action: ', action);
     },
     [reactRemovePlan.fulfilled]: (state, action) => {
-      plansAdapter.updateOne(state, action.payload)
+      plansAdapter.updateOne(state, action.payload);
     },
     [reactRemovePlan.rejected]: (state, action) => {
-      debugger
-      console.error('SDK reactRemovePlan rejected');
+      console.error('SDK reactRemovePlan rejected state: ', state);
+      console.error('SDK reactRemovePlan rejected action: ', action);
     },
-  }
+  },
 });
 
 
 plansState.selectors = plansAdapter.getSelectors((state) => state.plans);
-plansState.selectors.getPlans = plansState.selectors.selectEntities
+plansState.selectors.getPlans = plansState.selectors.selectEntities;
 
 
-const { actions, reducer } = plansState;
+const { reducer } = plansState;
+// const { actions, reducer } = plansState;
 // console.info('plans.js: actions', actions)
 // console.info('plans.js: reducer', reducer)
 // console.info('plans.js: plansState', plansState)
@@ -320,6 +348,5 @@ export const {
   selectIds: reactSelectPlanIds,
   selectEntities: reactSelectPlanEntities,
   selectAll: reactSelectAllPlans,
-  selectTotal: reactSelectTotalPlans
-} = plansAdapter.getSelectors(state => state.plans);
-
+  selectTotal: reactSelectTotalPlans,
+} = plansAdapter.getSelectors((state) => state.plans);

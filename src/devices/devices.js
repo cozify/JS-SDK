@@ -120,10 +120,10 @@ export function pairingDevicesDeltaHandler(hubId: string, reset: boolean, pairin
     deviceProps.status.state ={ ...deviceState}
     */
     // TODO: end of remove when hub bug fixed
-
-    delete device.status;
-    device = { ...device, ...deviceProps };
-    statePairingDevices.devices[device.id] = device;
+    const deviceToHandle = device;
+    delete deviceToHandle.status;
+    const deviceToPair = { ...deviceToHandle, ...deviceProps };
+    statePairingDevices.devices[device.id] = deviceToPair;
     return true;
   });
 

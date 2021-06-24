@@ -102,7 +102,7 @@ export async function setModbusDevicePairings(hubId: string, modbusDevices: MODB
         type: 'PAIR_MODBUS',
       };
       if (device.deviceType === 'RELAY' || device.deviceType === 'SIGNAL') {
-        item.normallyOff = device.normallyOff ? true : false;
+        item.normallyOff = !!device.normallyOff;
       }
       if ((device.name != null) && (device.name.length > 0) && (device.address != null) && ((device.address <= 247) && (device.address > 0))) {
         if (device.registerRequired) {

@@ -11,7 +11,9 @@ export { store, watchChanges } from './store';
 // import logger from 'redux-logger'
 // const middleware = [...getDefaultMiddleware(), logger]
 
-export { CLOUD_CONNECTION_STATES, HUB_CONNECTION_STATES, useTestcloud, selectCloud } from './connection/constants';
+export {
+  CLOUD_CONNECTION_STATES, HUB_CONNECTION_STATES, useTestcloud, selectCloud,
+} from './connection/constants';
 export { LANGUAGES, USER_STATES, ROLES } from './user/constants';
 export { HUB_STATES, ZWAVE_INCLUSION_STATUS, ZWAVE_EXCLUSION_STATUS } from './hubs/constants';
 
@@ -66,17 +68,6 @@ export {
   closeAlarm, removeAlarm,
 } from './alarms/alarms';
 
-export {
-  fetchPlans,
-  fetchPlanDocuments,
-  simplifyPlans,
-  addDeviceType, removeDeviceType,
-  addSceneType, removeSceneType,
-  addRuleType, removeRuleType,
-  addRoomName, removeRoomName,
-  addTemplate, setTemplate, removeTemplate,
-  addLocationNode, setLocationNode, removeLocationNode,
-} from './plans/plans';
 
 export {
   reactSelectAllPlans,

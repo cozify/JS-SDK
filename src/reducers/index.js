@@ -5,9 +5,9 @@ import { devicesReducer } from './devices';
 import { hubsReducer } from './hubs';
 import { userReducer } from './user';
 import { roomsReducer } from './rooms';
-import { plansReducer } from './plans'
-import { planDocumentsReducer } from './planDocuments'
-import { planDocumentNodesReducer } from './planDocumentNodes'
+import { plansReducer } from './plans';
+import { planDocumentsReducer } from './planDocuments';
+import { planDocumentNodesReducer } from './planDocumentNodes';
 
 /**
  * Root reducer

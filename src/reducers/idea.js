@@ -3,9 +3,9 @@
 import {
   createSlice,
   createEntityAdapter,
-  createAsyncThunk,
-  createSelector
-} from "@reduxjs/toolkit";
+  // createAsyncThunk,
+  createSelector,
+} from '@reduxjs/toolkit';
 import isArray from 'lodash/isArray';
 import { PLAN_NODES } from '../plans/constants';
 
