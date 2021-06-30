@@ -44,6 +44,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sendAlarmCmd">sendAlarmCmd</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#connection">connection</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getCloudHost">getCloudHost</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getCloudURL">getCloudURL</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isOneCloud">isOneCloud</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-selectCloud">selectCloud</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-useTestcloud">useTestcloud</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-resetRetry">resetRetry</a></span></span></li>
@@ -240,6 +241,11 @@ export const CLOUD_FINGERPRINTS_SHA1 = [
 const CLOUD_HOST = &apos;https://api.cozify.fi&apos;;
 const CLOUD_HOST_TEST = &apos;https://testapi.cozify.fi&apos;;
 
+
+const ONE_HOST = &apos;https://one.cozify.fi&apos;;
+const ONE_HOST_DEV = &apos;https://one.dev.cozify.fi&apos;;
+
+
 /* Cloud API VERSION */
 export const CLOUD_API_VERSION = &apos;ui/0.2/&apos;;
 
@@ -263,6 +269,13 @@ export function selectCloud(host) {
 
 export function getCloudHost() {
   return cloudHost;
+}
+
+export function isOneCloud() {
+  if (cloudHost.indexOf(ONE_HOST) !== -1 || cloudHost.indexOf(ONE_HOST_DEV) !== -1) {
+    return true;
+  }
+  return false;
 }
 
 export function getCloudURL() {

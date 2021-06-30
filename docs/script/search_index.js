@@ -510,6 +510,12 @@ window.esdocSearchIndex = [
     "variable"
   ],
   [
+    "cozify-sdk/src/connection/constants.js~isonecloud",
+    "function/index.html#static-function-isOneCloud",
+    "<span>isOneCloud</span> <span class=\"search-result-import-path\">cozify-sdk/src/connection/constants.js</span>",
+    "function"
+  ],
+  [
     "cozify-sdk/src/hubs/zwave.js~iszwaveenabled",
     "function/index.html#static-function-isZwaveEnabled",
     "<span>isZwaveEnabled</span> <span class=\"search-result-import-path\">cozify-sdk/src/hubs/zwave.js</span>",

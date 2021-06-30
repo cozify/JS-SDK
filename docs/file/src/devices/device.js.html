@@ -44,6 +44,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sendAlarmCmd">sendAlarmCmd</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#connection">connection</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getCloudHost">getCloudHost</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getCloudURL">getCloudURL</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isOneCloud">isOneCloud</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-selectCloud">selectCloud</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-useTestcloud">useTestcloud</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-resetRetry">resetRetry</a></span></span></li>
@@ -230,7 +231,7 @@ import { send, COMMANDS } from &apos;../connection/send&apos;;
 import { store } from &apos;../store&apos;;
 import { userState } from &apos;../reducers/user&apos;;
 import { hubsState } from &apos;../reducers/hubs&apos;;
-import { HUB_CONNECTION_STATES, getCloudURL } from &apos;../connection/constants&apos;;
+import { HUB_CONNECTION_STATES, isOneCloud } from &apos;../connection/constants&apos;;
 // import type { COMMAND_TYPE } from &apos;../connection/constants&apos;;
 
 /**
@@ -252,7 +253,7 @@ export function sendDeviceStateCmd(hubId, deviceId, state, properties) {
     }
 
     const hubs = hubsState.selectors.getHubs(stateNow);
-    if (!hubs[hubId] || (!hubs[hubId].hubKey &amp;&amp; getCloudURL().indexOf(&apos;https://one.cozify.fi&apos;) === -1)) {
+    if (!hubs[hubId] || (!hubs[hubId].hubKey &amp;&amp; !isOneCloud())) {
       console.error(&apos;SDK sendDeviceStateCmd error: No hubKey!&apos;);
       reject(new Error(&apos;Device command error: No hubKey!&apos;));
       return;
@@ -304,7 +305,7 @@ export function sendDeviceCmd(hubId, deviceId, commandType, data, properties) {
     if (hub &amp;&amp; hub.hubKey) {
       hubKey = hub.hubKey;
     }
-    if (!hub || (!hubKey &amp;&amp; getCloudURL().indexOf(&apos;https://one.cozify.fi&apos;) === -1)) {
+    if (!hub || (!hubKey &amp;&amp; !isOneCloud())) {
       console.error(&apos;SDK sendDeviceCmd error: No hubKey!&apos;);
       reject(new Error(&apos;Device command error: No hubKey!&apos;));
       return;

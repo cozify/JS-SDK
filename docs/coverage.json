@@ -1,7 +1,7 @@
 {
-  "coverage": "51.92%",
-  "expectCount": 285,
-  "actualCount": 148,
+  "coverage": "51.73%",
+  "expectCount": 288,
+  "actualCount": 149,
   "files": {
     "src/alarms/alarms.js": {
       "expectCount": 9,
@@ -12,15 +12,17 @@
       ]
     },
     "src/connection/constants.js": {
-      "expectCount": 10,
-      "actualCount": 4,
+      "expectCount": 13,
+      "actualCount": 5,
       "undocumentLines": [
         12,
         18,
         19,
         22,
-        25,
-        53
+        23,
+        27,
+        30,
+        65
       ]
     },
     "src/connection/send-retry.js": {
@@ -48,7 +50,7 @@
       "actualCount": 4,
       "undocumentLines": [
         26,
-        119
+        120
       ]
     },
     "src/connection/state.js": {

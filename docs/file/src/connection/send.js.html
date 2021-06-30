@@ -44,6 +44,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sendAlarmCmd">sendAlarmCmd</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#connection">connection</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getCloudHost">getCloudHost</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getCloudURL">getCloudURL</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isOneCloud">isOneCloud</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-selectCloud">selectCloud</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-useTestcloud">useTestcloud</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-resetRetry">resetRetry</a></span></span></li>
@@ -228,7 +229,7 @@ import axiosRetry from &apos;axios-retry&apos;;
 // import rax from &apos;retry-axios&apos;;
 import { urlBase64Decode } from &apos;../utils&apos;;
 import {
-  COMMANDS, CLOUD_CONNECTION_STATES, getCloudURL, HUB_CONNECTION_STATES, MAX_API_VERSION,
+  COMMANDS, CLOUD_CONNECTION_STATES, getCloudURL, isOneCloud, HUB_CONNECTION_STATES, MAX_API_VERSION,
 } from &apos;./constants&apos;;
 import {
   cloudErrorState, hubErrorState, testSSLCertificate, getAPIversion,
@@ -246,6 +247,7 @@ import { retryCondition, resetRetry } from &apos;./send-retry&apos;;
 export { COMMANDS };
 
 let refreshingToken = false;
+
 
 /* eslint no-use-before-define: [&quot;error&quot;, { &quot;functions&quot;: false }] */
 /*
@@ -299,7 +301,7 @@ function testAndRefreshToken(key) {
   if (!diff || diff &lt; 0) {
     // User is unauthenticated
     setCloudConnectionState(CLOUD_CONNECTION_STATES.UNAUTHENTICATED);
-  } else if (diff &amp;&amp; diff &lt; 5 * 24 * 60 * 60) {
+  } else if (!isOneCloud() &amp;&amp; diff &amp;&amp; diff &lt; 5 * 24 * 60 * 60) {
     // refresh if &lt; 5 days to exp date
     refreshAuthKey(key);
   }
@@ -404,7 +406,7 @@ export function send({
       if (command.url.indexOf(&apos;$API_VER&apos;) !== -1) {
         const hubs = hubsState.selectors.getHubs(stateNow);
 
-        if (!hubs[hubId] || (!hubs[hubId].hubKey &amp;&amp; getCloudURL().indexOf(&apos;https://one.cozify.fi&apos;) === -1)) {
+        if (!hubs[hubId] || (!hubs[hubId].hubKey &amp;&amp; !isOneCloud())) {
           return new Promise((resolve, reject) =&gt; {
             reject(new Error(&apos;SDK Error: Send - Hub or hubKey not found error&apos;));
           });
@@ -420,7 +422,7 @@ export function send({
       } else {
         sendUrl = getCloudURL().concat(command.url);
       }
-      if (hubId &amp;&amp; sendUrl.indexOf(&apos;https://one.cozify.fi&apos;) !== -1 &amp;&amp; sendUrl.indexOf(&apos;hub/remote&apos;) !== -1) {
+      if (hubId &amp;&amp; isOneCloud() &amp;&amp; sendUrl.indexOf(&apos;hub/remote&apos;) !== -1) {
         const index = sendUrl.indexOf(&apos;hub/remote&apos;);
         const lastPart = sendUrl.substring(index + 10);
         const firstPart = sendUrl.substring(0, index);
@@ -559,7 +561,7 @@ export function send({
       //  retries: 3, shouldResetTimeout: false, retryDelay: axiosRetry.exponentialDelay, retryCondition,
       // });
       //
-      testSSLCertificate(!!(remoteConnection &amp;&amp; sendUrl &amp;&amp; sendUrl.indexOf(&apos;https://one.cozify.fi&apos;) === -1))
+      testSSLCertificate(!!(remoteConnection &amp;&amp; sendUrl &amp;&amp; !isOneCloud()))
         .then((status) =&gt; {
         // Cancel request if SSL Certificate status is invalid
           if (!status || permanentSSLFailure) {

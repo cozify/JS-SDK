@@ -44,6 +44,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sendAlarmCmd">sendAlarmCmd</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#connection">connection</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getCloudHost">getCloudHost</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getCloudURL">getCloudURL</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isOneCloud">isOneCloud</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-selectCloud">selectCloud</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-useTestcloud">useTestcloud</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-resetRetry">resetRetry</a></span></span></li>
@@ -230,7 +231,7 @@ import { hubsState } from &apos;../reducers/hubs&apos;;
 import { userState } from &apos;../reducers/user&apos;;
 import { b64DecodeUnicode, getTextFromNode } from &apos;../utils&apos;;
 import { send, COMMANDS } from &apos;../connection/send&apos;;
-import { HUB_CONNECTION_STATES, getCloudURL } from &apos;../connection/constants&apos;;
+import { HUB_CONNECTION_STATES, isOneCloud } from &apos;../connection/constants&apos;;
 
 
 const initAlarm = (alarm) =&gt; {
@@ -286,7 +287,7 @@ export function sendAlarmCmd(hubId, commandType, data) {
     const hubs = hubsState.selectors.getHubs(stateNow);
     const hub = hubs[hubId];
     const { hubKey } = hubs[hubId];
-    if (!hub || (!hubKey &amp;&amp; getCloudURL().indexOf(&apos;https://one.cozify.fi&apos;) === -1)) {
+    if (!hub || (!hubKey &amp;&amp; !isOneCloud())) {
       console.error(&apos;SDK closeAlarm error: No hubKey!&apos;);
       reject(new Error(&apos;Alarm command error: No hubKey!&apos;));
       return;

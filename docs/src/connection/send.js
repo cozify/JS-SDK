@@ -6,7 +6,7 @@ import axiosRetry from 'axios-retry';
 // import rax from 'retry-axios';
 import { urlBase64Decode } from '../utils';
 import {
-  COMMANDS, CLOUD_CONNECTION_STATES, getCloudURL, HUB_CONNECTION_STATES, MAX_API_VERSION,
+  COMMANDS, CLOUD_CONNECTION_STATES, getCloudURL, isOneCloud, HUB_CONNECTION_STATES, MAX_API_VERSION,
 } from './constants';
 import {
   cloudErrorState, hubErrorState, testSSLCertificate, getAPIversion,
@@ -24,6 +24,7 @@ import { retryCondition, resetRetry } from './send-retry';
 export { COMMANDS };
 
 let refreshingToken = false;
+
 
 /* eslint no-use-before-define: ["error", { "functions": false }] */
 /*
@@ -77,7 +78,7 @@ function testAndRefreshToken(key) {
   if (!diff || diff < 0) {
     // User is unauthenticated
     setCloudConnectionState(CLOUD_CONNECTION_STATES.UNAUTHENTICATED);
-  } else if (diff && diff < 5 * 24 * 60 * 60) {
+  } else if (!isOneCloud() && diff && diff < 5 * 24 * 60 * 60) {
     // refresh if < 5 days to exp date
     refreshAuthKey(key);
   }
@@ -182,7 +183,7 @@ export function send({
       if (command.url.indexOf('$API_VER') !== -1) {
         const hubs = hubsState.selectors.getHubs(stateNow);
 
-        if (!hubs[hubId] || (!hubs[hubId].hubKey && getCloudURL().indexOf('https://one.cozify.fi') === -1)) {
+        if (!hubs[hubId] || (!hubs[hubId].hubKey && !isOneCloud())) {
           return new Promise((resolve, reject) => {
             reject(new Error('SDK Error: Send - Hub or hubKey not found error'));
           });
@@ -198,7 +199,7 @@ export function send({
       } else {
         sendUrl = getCloudURL().concat(command.url);
       }
-      if (hubId && sendUrl.indexOf('https://one.cozify.fi') !== -1 && sendUrl.indexOf('hub/remote') !== -1) {
+      if (hubId && isOneCloud() && sendUrl.indexOf('hub/remote') !== -1) {
         const index = sendUrl.indexOf('hub/remote');
         const lastPart = sendUrl.substring(index + 10);
         const firstPart = sendUrl.substring(0, index);
@@ -337,7 +338,7 @@ export function send({
       //  retries: 3, shouldResetTimeout: false, retryDelay: axiosRetry.exponentialDelay, retryCondition,
       // });
       //
-      testSSLCertificate(!!(remoteConnection && sendUrl && sendUrl.indexOf('https://one.cozify.fi') === -1))
+      testSSLCertificate(!!(remoteConnection && sendUrl && !isOneCloud()))
         .then((status) => {
         // Cancel request if SSL Certificate status is invalid
           if (!status || permanentSSLFailure) {
