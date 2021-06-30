@@ -18,6 +18,11 @@ export const CLOUD_FINGERPRINTS_SHA1: Array<string> = [
 const CLOUD_HOST: string = 'https://api.cozify.fi';
 const CLOUD_HOST_TEST: string = 'https://testapi.cozify.fi';
 
+
+const ONE_HOST: string = 'https://one.cozify.fi';
+const ONE_HOST_DEV: string = 'https://one.dev.cozify.fi';
+
+
 /* Cloud API VERSION */
 export const CLOUD_API_VERSION: string = 'ui/0.2/';
 
@@ -41,6 +46,13 @@ export function selectCloud(host: string) {
 
 export function getCloudHost() {
   return cloudHost;
+}
+
+export function isOneCloud() {
+  if (cloudHost.indexOf(ONE_HOST) !== -1 || cloudHost.indexOf(ONE_HOST_DEV) !== -1) {
+    return true;
+  }
+  return false;
 }
 
 export function getCloudURL() {

@@ -8,7 +8,7 @@ import { send, COMMANDS } from '../connection/send';
 import { store } from '../store';
 import { userState } from '../reducers/user';
 import { hubsState } from '../reducers/hubs';
-import { HUB_CONNECTION_STATES, getCloudURL } from '../connection/constants';
+import { HUB_CONNECTION_STATES, isOneCloud } from '../connection/constants';
 // import type { COMMAND_TYPE } from '../connection/constants';
 
 /**
@@ -30,7 +30,7 @@ export function sendDeviceStateCmd(hubId: string, deviceId: string, state: Objec
     }
 
     const hubs = hubsState.selectors.getHubs(stateNow);
-    if (!hubs[hubId] || (!hubs[hubId].hubKey && getCloudURL().indexOf('https://one.cozify.fi') === -1)) {
+    if (!hubs[hubId] || (!hubs[hubId].hubKey && !isOneCloud())) {
       console.error('SDK sendDeviceStateCmd error: No hubKey!');
       reject(new Error('Device command error: No hubKey!'));
       return;
@@ -82,7 +82,7 @@ export function sendDeviceCmd(hubId: string, deviceId: string, commandType: any,
     if (hub && hub.hubKey) {
       hubKey = hub.hubKey;
     }
-    if (!hub || (!hubKey && getCloudURL().indexOf('https://one.cozify.fi') === -1)) {
+    if (!hub || (!hubKey && !isOneCloud())) {
       console.error('SDK sendDeviceCmd error: No hubKey!');
       reject(new Error('Device command error: No hubKey!'));
       return;

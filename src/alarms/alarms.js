@@ -8,7 +8,7 @@ import { hubsState } from '../reducers/hubs';
 import { userState } from '../reducers/user';
 import { b64DecodeUnicode, getTextFromNode } from '../utils';
 import { send, COMMANDS } from '../connection/send';
-import { HUB_CONNECTION_STATES, getCloudURL } from '../connection/constants';
+import { HUB_CONNECTION_STATES, isOneCloud } from '../connection/constants';
 import type { COMMANDS_TYPE } from '../connection/constants';
 import type {
   ALARM_TYPE, ALARMS_MAP_TYPE, HUB_ALARMS_MAP_TYPE, ALERTS_MAP_TYPE, HUB_ALERTS_MAP_TYPE,
@@ -68,7 +68,7 @@ export function sendAlarmCmd(hubId: string, commandType: COMMANDS_TYPE, data: Ob
     const hubs = hubsState.selectors.getHubs(stateNow);
     const hub = hubs[hubId];
     const { hubKey } = hubs[hubId];
-    if (!hub || (!hubKey && getCloudURL().indexOf('https://one.cozify.fi') === -1)) {
+    if (!hub || (!hubKey && !isOneCloud())) {
       console.error('SDK closeAlarm error: No hubKey!');
       reject(new Error('Alarm command error: No hubKey!'));
       return;
