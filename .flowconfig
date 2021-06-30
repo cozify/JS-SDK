@@ -7,7 +7,9 @@
 .*/lib/.*
 .*/flow-coverage/.*
 ./rollup.config.js
-
+.*/node_modules/rollup-all/src/asset.json
+.*/node_modules/immer/dist/index
+.*/node_modules/immer/src/types/index.js
 
 [include]
 
