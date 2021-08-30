@@ -538,11 +538,21 @@ export function send({
   return new Promise((resolve, reject) =&gt; {
     if (command || sendUrl) {
       axios.interceptors.response.use((response) =&gt; {
-        if (response.headers[&apos;content-type&apos;].includes(&apos;application/json&apos;) || response.headers[&apos;content-type&apos;].includes(&apos;application/binary&apos;)) {
-          resetRetry(sendUrl);
-          return response;
+        if (response &amp;&amp; response.headers &amp;&amp; response.headers[&apos;content-type&apos;]) {
+          if (response.headers[&apos;content-type&apos;].includes(&apos;application/json&apos;) || response.headers[&apos;content-type&apos;].includes(&apos;application/binary&apos;)) {
+            if (sendUrl) {
+              resetRetry(sendUrl);
+            }
+            return response;
+          }
+          console.error(&apos;send: unknown response type&apos;);
+        } else {
+            // return even if no reply content-type
+            if (sendUrl) {
+              resetRetry(sendUrl);
+            }
+            return response;
         }
-        console.error(&apos;send: unknown response type&apos;);
         return response; // Promise.reject(response);
       }, (error) =&gt; Promise.reject(error));
       /*

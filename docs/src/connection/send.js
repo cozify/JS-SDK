@@ -315,11 +315,21 @@ export function send({
   return new Promise((resolve, reject) => {
     if (command || sendUrl) {
       axios.interceptors.response.use((response) => {
-        if (response.headers['content-type'].includes('application/json') || response.headers['content-type'].includes('application/binary')) {
-          resetRetry(sendUrl);
-          return response;
+        if (response && response.headers && response.headers['content-type']) {
+          if (response.headers['content-type'].includes('application/json') || response.headers['content-type'].includes('application/binary')) {
+            if (sendUrl) {
+              resetRetry(sendUrl);
+            }
+            return response;
+          }
+          console.error('send: unknown response type');
+        } else {
+            // return even if no reply content-type
+            if (sendUrl) {
+              resetRetry(sendUrl);
+            }
+            return response;
         }
-        console.error('send: unknown response type');
         return response; // Promise.reject(response);
       }, (error) => Promise.reject(error));
       /*
